@@ -1,5 +1,8 @@
 package fr.inria.verveine.extractor.java;
 
+import java.util.Collection;
+import java.util.LinkedList;
+
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -123,7 +126,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 */
 	public fr.inria.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd) {
 		ContainerEntity owner = null;
-		fr.inria.verveine.core.gen.famix.Class sup = null;
+		Collection<fr.inria.verveine.core.gen.famix.Class> sups = new LinkedList<fr.inria.verveine.core.gen.famix.Class>();
 		String identifier = null;
 		
 		if (bnd == null) {
@@ -181,18 +184,24 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			identifier = bnd.getName();
 		}
 
-		// superclass
-		if (bnd.isInterface()) {
-			// TODO interface don't have superclass
-		}
-		else if ( (! bnd.isPrimitive()) && (! bnd.getName().equals(OBJECT_NAME)) ) {
+		// superclass and/or implemented interfaces
+		if ( (! bnd.isPrimitive()) && (! bnd.getName().equals(OBJECT_NAME)) ) {
 			// "Object" and primitive types don't have a superclass
-			ITypeBinding supbnd = bnd.getSuperclass();
-			if (supbnd == null) {
-				sup = ensureFamixClassObject(null);
+			
+			// superclass
+			if (! bnd.isInterface()) {
+				ITypeBinding supbnd = bnd.getSuperclass();
+				if (supbnd == null) {
+					sups.add( ensureFamixClassObject(null));
+				}
+				else {
+					sups.add( ensureFamixClass(supbnd));
+				}
 			}
 			else {
-				sup = ensureFamixClass(supbnd);
+				for (ITypeBinding supbnd : bnd.getInterfaces()) {
+					sups.add( ensureFamixClass(supbnd));
+				}
 			}
 		}
 
@@ -237,11 +246,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 		
 		if ((fmx!=null) && fmx.getIsStub()) {
-			// apparently we just created it, so add information to it
+			// apparently we just created it or it already existed as a stub), so add information to it
+			fmx.setIsInterface(bnd.isInterface());
 			fmx.setContainer(owner);
-			if (sup != null) {
+			if (sups.size() > 0) {
 				// some types don't have superclass
-				ensureFamixInheritance(sup, fmx);
+				for (fr.inria.verveine.core.gen.famix.Class sup : sups) {
+					ensureFamixInheritance(sup, fmx);
+				}
 			}
 			fmx.setName(identifier); // might be different from bnd.getName() in the case of anonymous class
 			fmx.setIsStub(Boolean.FALSE);
