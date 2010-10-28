@@ -80,6 +80,15 @@ public class VerveineExtractorJavaTest {
 		assertEquals(11, nodeClass.getMethods().size());
 		assertEquals(2, nodeClass.getAttributes().size());
 		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "lan"), nodeClass.getContainer());
+		assertFalse(nodeClass.getIsInterface());
+
+		fr.inria.verveine.core.gen.famix.Class interfce = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "IPrinter");
+		assertNotNull(interfce);
+		assertEquals("IPrinter", interfce.getName());
+		assertEquals(1, interfce.getMethods().size());
+		assertEquals(0, interfce.getAttributes().size());
+		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "server"), interfce.getContainer());
+		assertTrue(interfce.getIsInterface());
 		
 		fr.inria.verveine.core.gen.famix.Class innerClass = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(innerClass);
@@ -87,13 +96,15 @@ public class VerveineExtractorJavaTest {
 		assertEquals(2, innerClass.getMethods().size());
 		assertEquals(1, innerClass.getAttributes().size());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "PrintServer"), innerClass.getContainer());
-		
+		assertFalse(innerClass.getIsInterface());
+
 		fr.inria.verveine.core.gen.famix.Class anonClass = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "anonymous(IPrinter)");
 		assertNotNull(anonClass);
 		assertEquals("anonymous(IPrinter)", anonClass.getName());
 		assertEquals(1, anonClass.getMethods().size());
 		assertEquals(0, anonClass.getAttributes().size());
 		assertSame(TestVerveineUtils.detectElement(repo,Method.class, "PrintServer"), anonClass.getContainer());
+		assertFalse(anonClass.getIsInterface());
 	}
 
 	@Test
