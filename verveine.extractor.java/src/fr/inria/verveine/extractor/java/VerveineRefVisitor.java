@@ -336,9 +336,9 @@ public class VerveineRefVisitor extends ASTVisitor {
 			if (invoked == null) {
 				invoked = this.dico.ensureFamixStubMethod(name);
 			}
-			/*Invocation inv =*/ dico.ensureFamixInvocation(sender, invoked, receiver);
-			/* An example of how to include location information to an entity:
-			   dico.addSourceAnchor(inv, node); */
+			/* An example of how to include location information to an invocation
+			 * But would require to pass the ASTNode in parameter to this method */
+			/*dico.addSourceAnchor(*/ dico.ensureFamixInvocation(sender, invoked, receiver) /*,node)*/ ;
 		}
 	}
 

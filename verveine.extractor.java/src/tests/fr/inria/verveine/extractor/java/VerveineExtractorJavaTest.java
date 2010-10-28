@@ -25,12 +25,14 @@ import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
+import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
+import fr.inria.verveine.core.gen.famix.SourceAnchor;
 
 import fr.inria.verveine.extractor.java.BatchParser;
 import fr.inria.verveine.extractor.java.JavaDictionary;
@@ -77,7 +79,7 @@ public class VerveineExtractorJavaTest {
 		assertEquals("Node", nodeClass.getName());
 		assertEquals(11, nodeClass.getMethods().size());
 		assertEquals(2, nodeClass.getAttributes().size());
-		assertSame(TestVerveineUtils.detectElement(repo,Namespace.class, "moose.lan"), nodeClass.getContainer());
+		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "lan"), nodeClass.getContainer());
 		
 		fr.inria.verveine.core.gen.famix.Class innerClass = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(innerClass);
@@ -101,7 +103,8 @@ public class VerveineExtractorJavaTest {
 		assertNotSame(dico.ensureFamixClass(A_CLASS_NAME),dico.ensureFamixClass(A_CLASS_NAME));
 		
 		Namespace javaLang = dico.ensureFamixNamespaceJavaLang(null);
-		assertEquals(JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());
+		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
+		assertEquals( javaLangName, javaLang.getName());
 		assertSame(javaLang, dico.ensureFamixNamespaceJavaLang(null));
 
 		fr.inria.verveine.core.gen.famix.Class obj = dico.ensureFamixClassObject(null);
@@ -143,14 +146,14 @@ public class VerveineExtractorJavaTest {
 		Method mweb = TestVerveineUtils.detectElement(repo,Method.class, "methodWithEmptyBody");
 		assertNotNull(mweb);
 		assertEquals("methodWithEmptyBody", mweb.getName());
-		assertEquals("methodWithEmptyBody ()", mweb.getSignature());
+		assertEquals("methodWithEmptyBody()", mweb.getSignature());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node"), mweb.getParentType());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "void"), mweb.getDeclaredType());
 
 		Method em = TestVerveineUtils.detectElement(repo,Method.class, "equalsMultiple");
 		assertNotNull(em);
 		assertEquals("equalsMultiple", em.getName());
-		assertEquals("equalsMultiple (AbstractDestinationAddress)", em.getSignature());
+		assertEquals("equalsMultiple(AbstractDestinationAddress)", em.getSignature());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress"), em.getParentType());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "boolean"), em.getDeclaredType());
 
@@ -165,7 +168,7 @@ public class VerveineExtractorJavaTest {
 		}
 		assertNotNull(n);
 		assertEquals("name", n.getName());
-		assertEquals("name ()", n.getSignature());
+		assertEquals("name()", n.getSignature());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "FileServer"), n.getParentType());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String"), n.getDeclaredType());
 	}
@@ -190,7 +193,8 @@ public class VerveineExtractorJavaTest {
 
 	@Test
 	public void testStubs() {
-		Namespace ns = TestVerveineUtils.detectElement(repo,Namespace.class, JavaDictionary.OBJECT_PACKAGE_NAME);
+		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
+		Namespace ns = TestVerveineUtils.detectElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
 		assertEquals(5, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System
 		
@@ -271,7 +275,7 @@ public class VerveineExtractorJavaTest {
 		for (Method mSDA : sdaClass.getMethods()) {
 			for (Invocation inv : mSDA.getOutgoingInvocations()) {
 				assertTrue( "Unexpected method signature: "+inv.getSignature(),
-							inv.getSignature().equals("equalsSingle (String)") || inv.getSignature().equals("id ()") || inv.getSignature().equals("equals (Object)"));
+							inv.getSignature().equals("equalsSingle(String)") || inv.getSignature().equals("id()") || inv.getSignature().equals("equals(Object)"));
 				if (inv.getSignature().equals("equalsSingle (String)")) {
 					assertSame(sdaClass, ((Method)inv.getSender()).getParentType());
 					assertEquals("self", inv.getReceiver().getName());
@@ -331,4 +335,41 @@ public class VerveineExtractorJavaTest {
 			assertEquals(output, acc.getAccessor());
 		}
 	}
+
+	@Test
+	public void testSourceAnchors() {
+		SourceAnchor anc = null;
+		
+		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "XPrinter");
+		assertNotNull(clazz);
+
+		anc = clazz.getSourceAnchor();
+		assertNotNull(anc);
+		assertSame(clazz, anc.getElement());
+		assertSame(FileAnchor.class, anc.getClass());
+		assertTrue("Wrong file source for class XPrinter", ((FileAnchor)anc).getFileName().endsWith("moose/lan/server/PrintServer.java"));
+		assertEquals(17, ((FileAnchor)anc).getStartLine());
+		
+		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "equalsMultiple");
+		assertNotNull(meth);
+
+		anc = meth.getSourceAnchor();
+		assertNotNull(anc);
+		assertSame(meth, anc.getElement());
+		assertSame(FileAnchor.class, anc.getClass());
+		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((FileAnchor)anc).getFileName().endsWith("moose/lan/SingleDestinationAddress.java"));
+		assertEquals(39, ((FileAnchor)anc).getStartLine());
+		
+		Attribute att = TestVerveineUtils.detectElement(repo, Attribute.class, "originator");
+		assertNotNull(meth);
+
+		anc = att.getSourceAnchor();
+		assertNotNull(anc);
+		assertSame(att, anc.getElement());
+		assertSame(FileAnchor.class, anc.getClass());
+		assertTrue("Wrong file source for field Packet.originator", ((FileAnchor)anc).getFileName().endsWith("moose/lan/Packet.java"));
+		assertEquals(15, ((FileAnchor)anc).getStartLine());
+		
+	}
+
 }

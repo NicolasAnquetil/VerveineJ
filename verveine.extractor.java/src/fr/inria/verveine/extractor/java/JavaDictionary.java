@@ -56,14 +56,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return null;
 		}
 
-		Namespace fmx = ensureFamixUniqEntity(Namespace.class, bnd, bnd.getName());
+		Namespace fmx = ensureFamixNamespaceWithParentScope(bnd, null);
 
 		if (fmx!=null) {
-			if (createParentScope(fmx) != null) {
-				// remove the name of the parent from the name of this package
-				/*String name = fmx.getName();
-				fmx.setName(name.substring(name.lastIndexOf('.')+1));*/
-			}
 			fmx.setIsStub(Boolean.FALSE);			
 		}
 		return fmx;
@@ -71,13 +66,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	@Override
 	public Namespace ensureFamixNamespace(String name) {
-		Namespace fmx = super.ensureFamixNamespace(name);
+		Namespace fmx = ensureFamixNamespaceWithParentScope(null, name);
 		
 		if (fmx!=null) {
-			if (createParentScope(fmx) != null) {
-				// remove the name of the parent from the name of this package
-				/*fmx.setName(name.substring(name.lastIndexOf('.')+1));*/
-			}
 			fmx.setIsStub(Boolean.FALSE);			
 		}
 		
@@ -85,24 +76,42 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Creates and returns a parent namespace for 'fmx'
-	 * @param fmx - the namespace for which to create a parent
-	 * @return the parent namespace created or null
+	 * Creates or recovers a namespace. Also creates or recovers recusively it's parent namespaces
+	 * At least one of bnd and name must be passed, possibly both
+	 * @param bnd - the (optional) binding for the namespace
+	 * @param name - the (optional) full name for the namespace
+	 * @return the namespace created or null
 	 */
-	private Namespace createParentScope(Namespace fmx) {
-		String name = fmx.getName();
-		Namespace parentScope = null;
-		if (fmx.getParentScope() == null) {
-			int pt = name.lastIndexOf('.');
-			if (pt > 0) {
-				parentScope = ensureFamixNamespace(name.substring(0, pt));
-				if (parentScope != null) {
-					parentScope.addChildScopes(fmx);
-				}
+	private Namespace ensureFamixNamespaceWithParentScope(IPackageBinding bnd, String name) {
+		Namespace fmx = null;
+		Namespace parent = null;
+		String[] nameComps;
+		
+		if (bnd != null) {
+			nameComps = bnd.getNameComponents();
+		}
+		else {
+			if (name != null) {
+				nameComps = name.split("\\.");
+			}
+			else {
+				return null;
 			}
 		}
+
+		for (String nameComp : nameComps ) {
+			fmx = ensureFamixUniqEntity(Namespace.class, null, nameComp);
+			if ( (parent != null) && (fmx != null) && (fmx.getParentScope() == null)) {
+				parent.addChildScopes(fmx);
+			}
+			parent = fmx;
+		}
 		
-		return parentScope;
+		if ( (fmx != null) && (bnd != null) ) {
+			mapBind.put(bnd, fmx);
+		}
+
+		return fmx;
 	}
 
 	/**
@@ -270,7 +279,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// method signature
-		sig = bnd.getName() + " (";
+		sig = bnd.getName() + "(";
 		boolean first = true;
 		for (ITypeBinding parBnd : bnd.getParameterTypes()) {
 			if (! first) {
@@ -486,14 +495,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			while ( ! (ast instanceof CompilationUnit) ) {
 				ASTNode tmp = ast.getParent();
 				if ( (ast == null) || (tmp == ast) ) {
-					// we reach the top node without finding a CompilationUnit. This is strange, but what can we do ... ?
+					// we reached the top node without finding a CompilationUnit. This would be strange, but what can one do ... ?
 					return null;
 				}
 				else {
 					ast = tmp;
 				}
 			}
-			// noew create the Famix SourceAnchor
+			// now create the Famix SourceAnchor
 			fa = new FileAnchor();
 			fa.setFileName((String) ((CompilationUnit)ast).getProperty(SOURCE_FILENAME_PROPERTY));
 			fa.setStartLine(((CompilationUnit)ast).getLineNumber(pos));
@@ -524,8 +533,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param bnd -- a potential binding for the "java.lang" package
 	 * @return a Famix Namespace for "java.lang"
 	 */
-	public Namespace ensureFamixNamespaceJavaLang(ITypeBinding bnd) {
-		Namespace fmx =  ensureFamixUniqEntity(Namespace.class, bnd, OBJECT_PACKAGE_NAME);
+	public Namespace ensureFamixNamespaceJavaLang(IPackageBinding bnd) {
+		Namespace fmx = ensureFamixNamespaceWithParentScope(bnd, OBJECT_PACKAGE_NAME);
+		
 		fmx.setIsStub(false);
 
 		return fmx;
