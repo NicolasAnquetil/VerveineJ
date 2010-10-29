@@ -89,7 +89,7 @@ public class VerveineExtractorJavaTest {
 		assertEquals(0, interfce.getAttributes().size());
 		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "server"), interfce.getContainer());
 		assertTrue(interfce.getIsInterface());
-		
+
 		fr.inria.verveine.core.gen.famix.Class innerClass = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(innerClass);
 		assertEquals("XPrinter", innerClass.getName());
@@ -383,4 +383,37 @@ public class VerveineExtractorJavaTest {
 		
 	}
 
+	@Test
+	public void testModifiers() {
+		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "OutputServer");
+		assertNotNull(clazz);
+		assertFalse(clazz.getIsInterface());
+		assertTrue(clazz.getIsAbstract());
+		assertTrue(clazz.getModifiers().contains("abstract"));
+		assertTrue(clazz.getIsPublic());
+		assertFalse(clazz.getIsPrivate());
+		assertFalse(clazz.getIsProtected());
+		assertFalse(clazz.getIsFinal());
+		
+		assertEquals(3, clazz.getMethods().size());
+		for (Method m : clazz.getMethods()) {
+			assertTrue(m.getIsPublic());
+			assertFalse(m.getIsPrivate());
+			assertFalse(m.getIsProtected());
+			assertFalse(m.getIsFinal());
+			if (m.getName().equals("output")) {
+				assertTrue(m.getIsAbstract());
+			}
+			else {
+				assertFalse(m.getIsAbstract());
+			}
+		}
+		
+		assertEquals(1, clazz.getAttributes().size());
+		Attribute a = clazz.getAttributes().iterator().next();
+		assertFalse(a.getIsPublic());
+		assertFalse(a.getIsPrivate());
+		assertTrue(a.getIsProtected());
+		assertFalse(a.getIsFinal());
+	}
 }
