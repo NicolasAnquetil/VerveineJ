@@ -1,6 +1,5 @@
 package fr.inria.verveine.extractor.java;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -23,6 +22,7 @@ import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
+import fr.inria.verveine.core.gen.famix.Parameter;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -56,7 +56,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 		}
 		else {
 			fmx = dico.ensureFamixNamespace(pckg.resolveBinding());
-			if (fmx == null) {
+			if (fmx != null) {
+				fmx.setIsStub(false);
+			}
+			else {
 				System.err.println("         Namespace="+pckg.getName().getFullyQualifiedName() + ",  fallback to creating a stub");
 				// try again without binding
 				fmx = dico.ensureFamixNamespace(pckg.getName().getFullyQualifiedName());
@@ -75,7 +78,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 	public boolean visit(TypeDeclaration node) {
 //		System.err.println("TRACE, DefVisiting TypeDeclaration: "+node.getName().getIdentifier());
 		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(node.resolveBinding());
-		if (fmx == null) {
+		if (fmx != null) {
+			fmx.setIsStub(false);
+		}
+		else {
 			// TODO try to find a binded version corresponding to this stub?
 			System.err.println("         Class="+node.getName().getIdentifier() + ",  fallback to creating a stub");
 			fmx = dico.ensureFamixClass(node.getName().getIdentifier());
@@ -97,7 +103,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 		AnonymousClassDeclaration decl = node.getAnonymousClassDeclaration(); 
 		if (decl != null) {
 			fr.inria.verveine.core.gen.famix.Class fmx = this.dico.ensureFamixClass(decl.resolveBinding());
-			if (fmx == null) {
+			if (fmx != null) {
+				fmx.setIsStub(false);
+			}
+			else {
 				System.err.println("         Class="+"anonymous(??),  fallback to creating a stub");
 				fmx = dico.ensureFamixClass("anonymous(??)");
 				dico.ensureFamixInheritance(dico.ensureFamixClassObject(null), fmx);
@@ -114,23 +123,28 @@ public class VerveineDefVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 //		System.err.println("TRACE, DefVisiting MethodDeclaration: "+node.getName().getIdentifier());
 		Method fmx = dico.ensureFamixMethod(node.resolveBinding());
-		if (fmx == null) {
+		if (fmx != null) {
+			fmx.setIsStub(false);
+		}
+		else {
 			System.err.println("         Method="+node.getName().getIdentifier() + ",  fallback to creating a stub");
 			fmx = dico.ensureFamixMethod(node.getName().getIdentifier());
 			fmx.setParentType(context.topClass());
 			fmx.setSignature(fmx.getName()+" (???)");
 			fmx.setDeclaredType( dico.ensureFamixClassObject(null) );
 		}
-		
+
+		// creating the method's parameters
 		if (fmx != null) {
-			@SuppressWarnings("unchecked")
-			Iterator<SingleVariableDeclaration> iter = node.parameters().iterator();
-			while (iter.hasNext()) {
-				SingleVariableDeclaration param = iter.next();
-				dico.ensureFamixParameter(param.resolveBinding());
+			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
+				Parameter fmxParam = dico.ensureFamixParameter(param.resolveBinding());
+				if (fmxParam != null) {
+					fmxParam.setIsStub(false);
+				}
 			}
 			
 			dico.addSourceAnchor(fmx, node);
@@ -150,7 +164,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 		for (VariableDeclarationFragment vd : (List<VariableDeclarationFragment>)node.fragments()) {
 //			System.err.println("            Field: "+vd.getName().getIdentifier());
 			Attribute fmx = dico.ensureFamixAttribute(vd.resolveBinding());
-			if (fmx == null) {
+			if (fmx != null) {
+				fmx.setIsStub(false);
+			}
+			else {
 				System.err.println("         Attribute="+vd.getName().getFullyQualifiedName() + ",  fallback to creating a stub");
 				fmx = dico.ensureFamixAttribute(vd.getName().getFullyQualifiedName());
 				fmx.setParentType(context.topClass());
@@ -184,7 +201,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 
 		for (VariableDeclarationFragment vd : fragments) {
 			LocalVariable fmx = dico.ensureFamixLocalVariable(vd.resolveBinding());
-			if (fmx == null) {
+			if (fmx != null) {
+				fmx.setIsStub(false);
+			}
+			else {
 				System.err.println("         Variable="+vd.getName().getFullyQualifiedName() + ",  fallback to creating a stub");
 				fmx = dico.ensureFamixLocalVariable(vd.getName().getFullyQualifiedName());
 				fmx.setParentBehaviouralEntity(context.topMethod());

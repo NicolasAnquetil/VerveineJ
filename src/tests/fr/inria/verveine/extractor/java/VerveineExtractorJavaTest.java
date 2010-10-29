@@ -208,16 +208,21 @@ public class VerveineExtractorJavaTest {
 		Namespace ns = TestVerveineUtils.detectElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
 		assertEquals(5, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System
-		
+		assertTrue(ns.getIsStub());
+			
 		fr.inria.verveine.core.gen.famix.Class obj = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(obj);
-		assertFalse(ns.getIsStub());
+		assertTrue(ns.getIsStub());
 		assertSame(ns, obj.getContainer());
 		
 		fr.inria.verveine.core.gen.famix.Class str = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String");
 		assertNotNull(str);
-		assertFalse(str.getIsStub());
+		assertTrue(str.getIsStub());
 		assertSame(ns, str.getContainer());
+		
+		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node");
+		assertNotNull(clazz);
+		assertFalse(clazz.getIsStub());
 	}
 
 	@Test
