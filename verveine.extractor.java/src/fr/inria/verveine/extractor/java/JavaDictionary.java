@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.Modifier;
 
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.Dictionary;
@@ -18,6 +19,7 @@ import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
+import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
@@ -246,7 +248,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 		
 		if ((fmx!=null) && fmx.getIsStub()) {
-			// apparently we just created it or it already existed as a stub), so add information to it
+			// apparently we just created it or it already existed as a stub, so add information to it
 			fmx.setIsInterface(bnd.isInterface());
 			fmx.setContainer(owner);
 			if (sups.size() > 0) {
@@ -254,6 +256,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				for (fr.inria.verveine.core.gen.famix.Class sup : sups) {
 					ensureFamixInheritance(sup, fmx);
 				}
+			}
+			setNamedEntityModifiers(fmx, bnd.getDeclaredModifiers());
+			if (fmx.getIsAbstract()) {
+				// don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
+				fmx.addModifiers("abstract");
 			}
 			fmx.setName(identifier); // might be different from bnd.getName() in the case of anonymous class
 			fmx.setIsStub(Boolean.FALSE);
@@ -329,11 +336,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 		
 		if ((fmx!=null) && fmx.getIsStub()) {
-			// apparently we just created it, so add information to it
+			// apparently we just created it or it already existed as a stub, so add information to it
 			fmx.setParentType(parentClass);
 			fmx.setDeclaredType(rettyp);	
 			fmx.setName(bnd.getName());
 			fmx.setSignature(sig);
+			setNamedEntityModifiers(fmx, bnd.getModifiers());
 			fmx.setIsStub(Boolean.FALSE);
 		}
 
@@ -384,6 +392,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if ((fmx!=null) && fmx.getIsStub()) {
 			// apparently we just created it, so add information to it
+			setNamedEntityModifiers(fmx, bnd.getModifiers());
 			fmx.setParentType(parentClass);
 			fmx.setDeclaredType(typ);	
 			fmx.setName(bnd.getName());
@@ -392,6 +401,19 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		return fmx;
 	}
+
+	/** Sets the modifiers (abstract, public, ...) of a FamixNamedEntity
+	 * @param fmx -- the FamixNamedEntity
+	 * @param mod -- a description of the modifiers as understood by org.eclipse.jdt.core.dom.Modifier
+	 */
+	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
+		fmx.setIsAbstract(Modifier.isAbstract(mod));
+		fmx.setIsFinal(Modifier.isFinal(mod));
+		fmx.setIsPrivate(Modifier.isPrivate(mod));
+		fmx.setIsProtected(Modifier.isProtected(mod));
+		fmx.setIsPublic(Modifier.isPublic(mod));
+	}
+
 
 	/**
 	 * Returns a Famix Paramenter associated with the IVariableBinding. The Entity is created if it does not exist.
