@@ -63,20 +63,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		Namespace fmx = ensureFamixNamespaceWithParentScope(bnd, null);
 
-		if (fmx!=null) {
-			fmx.setIsStub(Boolean.FALSE);			
-		}
 		return fmx;
 	}
 
 	@Override
 	public Namespace ensureFamixNamespace(String name) {
 		Namespace fmx = ensureFamixNamespaceWithParentScope(null, name);
-		
-		if (fmx!=null) {
-			fmx.setIsStub(Boolean.FALSE);			
-		}
-		
+
 		return fmx;
 	}
 
@@ -130,6 +123,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		ContainerEntity owner = null;
 		Collection<fr.inria.verveine.core.gen.famix.Class> sups = new LinkedList<fr.inria.verveine.core.gen.famix.Class>();
 		String identifier = null;
+		boolean wasBound = false;
 		
 		if (bnd == null) {
 			System.err.println("Warning: Unexpected null binding, cannot create Famix Class");
@@ -212,7 +206,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		// ... trying to recover from binding
 		fmx = (fr.inria.verveine.core.gen.famix.Class) getEntityByBinding(bnd);
 		
-		if (fmx == null) {
+		if (fmx != null) {
+			wasBound = true;
+		}
+		else {
+			wasBound = false;
 			// trying to recover from name and other informations
 			for (fr.inria.verveine.core.gen.famix.Class candidate : getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, identifier) ) {
 				if ( (! candidate.getIsStub()) &&
@@ -244,11 +242,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if (fmx == null) {
 			// could not recover it, creating a new entity
-			fmx = (fr.inria.verveine.core.gen.famix.Class) ensureFamixStub(fr.inria.verveine.core.gen.famix.Class.class, bnd, bnd.getName());
+			fmx = (fr.inria.verveine.core.gen.famix.Class) ensureFamixEntity(fr.inria.verveine.core.gen.famix.Class.class, bnd, bnd.getName());
 		}
 		
-		if ((fmx!=null) && fmx.getIsStub()) {
-			// apparently we just created it or it already existed as a stub, so add information to it
+		if ((fmx!=null) && (! wasBound)) {
+			// apparently we just created it or it already existed but was not bound, so add information to it
 			fmx.setIsInterface(bnd.isInterface());
 			fmx.setContainer(owner);
 			if (sups.size() > 0) {
@@ -263,7 +261,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				fmx.addModifiers("abstract");
 			}
 			fmx.setName(identifier); // might be different from bnd.getName() in the case of anonymous class
-			fmx.setIsStub(Boolean.FALSE);
 		}
 	
 		return fmx;
@@ -280,6 +277,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		fr.inria.verveine.core.gen.famix.Class parentClass = null;
 		fr.inria.verveine.core.gen.famix.Class rettyp = null;
 		String sig = null;
+		boolean wasBound = false;
 		
 		if (bnd == null) {
 			System.err.println("Warning: Unexpected null binding, cannot create Famix Method");
@@ -316,13 +314,18 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		// ... trying to recover from binding
 		fmx = (Method) getEntityByBinding(bnd);
 		
-		if (fmx == null) {
+		if (fmx != null) {
+			wasBound = true;
+		}
+		else {
+			wasBound = false;
 			// trying to recover from name and other informations
 			for (Method candidate : getEntityByName(Method.class, bnd.getName()) ) {
-				if ( (! candidate.getIsStub()) &&
-					 (candidate.getParentType() == parentClass) &&
+				if ( (candidate.getParentType() == parentClass) &&
 					 (candidate.getDeclaredType() == rettyp) &&
 					 (candidate.getSignature().equals(sig)) ) {
+					// we could also test that this candidate is not bound yet (to another bnd)
+					// but it requires significant modifications and might not be that useful?
 					fmx = candidate;
 					mapBind.put(bnd, fmx);
 					break;
@@ -332,17 +335,16 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if (fmx == null) {
 			// could not recover it, creating a new entity
-			fmx = (Method) ensureFamixStub(Method.class, bnd, bnd.getName());
+			fmx = (Method) ensureFamixEntity(Method.class, bnd, bnd.getName());
 		}
 		
-		if ((fmx!=null) && fmx.getIsStub()) {
+		if ((fmx!=null) && (! wasBound) ) {
 			// apparently we just created it or it already existed as a stub, so add information to it
 			fmx.setParentType(parentClass);
 			fmx.setDeclaredType(rettyp);	
 			fmx.setName(bnd.getName());
 			fmx.setSignature(sig);
 			setNamedEntityModifiers(fmx, bnd.getModifiers());
-			fmx.setIsStub(Boolean.FALSE);
 		}
 
 		return fmx;
@@ -358,6 +360,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public Attribute ensureFamixAttribute(IVariableBinding bnd) {
 		fr.inria.verveine.core.gen.famix.Class parentClass = null;
 		fr.inria.verveine.core.gen.famix.Class typ = null;
+		boolean wasBound = false;
 
 		if (bnd == null) {
 			System.err.println("Warning: Unexpected null binding, cannot create Famix Attribute");
@@ -372,7 +375,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		// ... trying to recover from binding
 		fmx = (Attribute) getEntityByBinding(bnd);
 		
-		if (fmx == null) {
+		if (fmx != null) {
+			wasBound = true;
+		}
+		else {
+			wasBound = false;
 			// trying to recover from name and other informationsparentBehaviouralEntity
 			for (Attribute candidate : getEntityByName(Attribute.class, bnd.getName()) ) {
 				if ( (! candidate.getIsStub()) &&
@@ -387,16 +394,15 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if (fmx == null) {
 			// could not recover it, creating a new entity
-			fmx = ensureFamixStub(Attribute.class, bnd, bnd.getName());
+			fmx = ensureFamixEntity(Attribute.class, bnd, bnd.getName());
 		}
 		
-		if ((fmx!=null) && fmx.getIsStub()) {
+		if ((fmx!=null) && (! wasBound) ) {
 			// apparently we just created it, so add information to it
 			setNamedEntityModifiers(fmx, bnd.getModifiers());
 			fmx.setParentType(parentClass);
 			fmx.setDeclaredType(typ);	
 			fmx.setName(bnd.getName());
-			fmx.setIsStub(Boolean.FALSE);
 		}
 
 		return fmx;
@@ -423,20 +429,30 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	public Parameter ensureFamixParameter(IVariableBinding bnd) {
+		boolean wasBound = false;
+		
 		if (bnd == null) {
 			System.err.println("Warning: Unexpected null binding, cannot create Famix Parameter");
 			return null;
 		}
 
-		Parameter fmx = (Parameter) ensureFamixStub(Parameter.class, bnd, bnd.getName());
-		if ( (fmx!=null) && fmx.getIsStub() ) {
+		// actually it seems to be very little chances that the aprameter alreasy exist.
+		// but who knows? Does not hurt to try
+		Parameter fmx = (Parameter) getEntityByBinding(bnd);
+		
+		if (fmx != null) {
+			wasBound = true;
+		}
+		else {
+			wasBound = false;
+			fmx = (Parameter) ensureFamixEntity(Parameter.class, bnd, bnd.getName());
+		}
+		
+		if ( (fmx!=null) && (! wasBound) ) {
 			// declaring method
 			fmx.setParentBehaviouralEntity(ensureFamixMethod(bnd.getDeclaringMethod()));
-
 			// type of the attribute
 			fmx.setDeclaredType(this.ensureFamixClass(bnd.getType()));
-
-			fmx.setIsStub(Boolean.FALSE);
 		}
 		
 		return fmx;
@@ -452,6 +468,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd) {
 		Method parentMeth = null;
 		fr.inria.verveine.core.gen.famix.Class typ = null;
+		boolean wasBound = false;
 
 		if (bnd == null) {
 			System.err.println("Warning: Unexpected null binding, cannot create Famix LocalVariable");
@@ -466,11 +483,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		// ... trying to recover from binding
 		fmx = (LocalVariable) getEntityByBinding(bnd);
 
-		if (fmx == null) {
+		if (fmx != null) {
+			wasBound = true;
+		}
+		else {
+			wasBound = false;
 			// trying to recover from name and other informationsparentBehaviouralEntity
 			for (LocalVariable candidate : getEntityByName(LocalVariable.class, bnd.getName()) ) {
-				if ( (! candidate.getIsStub()) &&
-					 (candidate.getParentBehaviouralEntity() == parentMeth) &&
+				if ( (candidate.getParentBehaviouralEntity() == parentMeth) &&
 					 (candidate.getDeclaredType() == typ) ) {
 					fmx = candidate;
 					mapBind.put(bnd, fmx);
@@ -481,14 +501,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if (fmx == null) {
 			// could not recover it, creating a new entity
-			fmx = ensureFamixStub(LocalVariable.class, bnd, bnd.getName());
+			fmx = ensureFamixEntity(LocalVariable.class, bnd, bnd.getName());
 		}
 
-		if ( (fmx!=null) && fmx.getIsStub() ) {
+		if ( (fmx!=null) && (! wasBound) ) {
 			// apparently we just created it, so add information to it
 			fmx.setParentBehaviouralEntity(parentMeth);
 			fmx.setDeclaredType(this.ensureFamixClass(bnd.getType()));
-			fmx.setIsStub(Boolean.FALSE);
 		}
 		
 		return fmx;
@@ -503,10 +522,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 */
 	public UnknownVariable createFamixUnknownVariable(fr.inria.verveine.core.gen.famix.Class ofType, String name) {
 //		System.err.println("TRACE -- createFamixUnknownVariable: "+name);
-		UnknownVariable fmx = (UnknownVariable) createFamixStub(UnknownVariable.class, name);
+		UnknownVariable fmx = (UnknownVariable) createFamixEntity(UnknownVariable.class, name);
 		if (fmx!=null) {
 			fmx.setDeclaredType(ofType);
-			fmx.setIsStub(Boolean.FALSE);
 		}
 		return fmx;
 	}
@@ -569,8 +587,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 */
 	public Namespace ensureFamixNamespaceJavaLang(IPackageBinding bnd) {
 		Namespace fmx = ensureFamixNamespaceWithParentScope(bnd, OBJECT_PACKAGE_NAME);
-		
-		fmx.setIsStub(false);
 
 		return fmx;
 	}
@@ -582,22 +598,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 */
 	public Namespace ensureFamixNamespacePrimitives() {
 		Namespace fmx =  ensureFamixUniqEntity(Namespace.class, null, PRIMITIVE_PCKG_NAME);
-		fmx.setIsStub(false);
 
 		return fmx;
 	}
 
 	/**
-	 * Creates or recovers a Famix Class for the Java "Object".
-	 * @param bnd -- a potential binding for the java "object" class
-	 * @return a Famix class for Java "Object"
+	 * Creates or recovers the Famix Class for "Object".
+	 * @param bnd -- a potential binding for the java "Object" class
+	 * @return a Famix class for "Object"
 	 */
 	public fr.inria.verveine.core.gen.famix.Class ensureFamixClassObject(ITypeBinding bnd) {
 		fr.inria.verveine.core.gen.famix.Class fmx =  ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, bnd, OBJECT_NAME);
 		
 		fmx.setContainer( ensureFamixNamespaceJavaLang(null));
 		// Note: "Object" has no superclass
-		fmx.setIsStub(false);
 
 		return fmx;
 	}
