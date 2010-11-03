@@ -32,6 +32,7 @@ import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
+import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
 
 import fr.inria.verveine.extractor.java.BatchParser;
@@ -61,10 +62,11 @@ public class VerveineExtractorJavaTest {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(11+11, TestVerveineUtils.selectElementsOfType(repo,fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {int,boolean,void,Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System}
+		assertEquals(11+8, TestVerveineUtils.selectElementsOfType(repo,fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System}
+		assertEquals(3, TestVerveineUtils.selectElementsOfType(repo,PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+7, TestVerveineUtils.selectElementsOfType(repo,Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString}
 		assertEquals(10+1, TestVerveineUtils.selectElementsOfType(repo,Attribute.class).size());//10+{System.out}
-		assertEquals(2+5, TestVerveineUtils.selectElementsOfType(repo,Namespace.class).size());//2+{moose,<primitive>,java.lang,java.io,java}
+		assertEquals(2+4, TestVerveineUtils.selectElementsOfType(repo,Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26, TestVerveineUtils.selectElementsOfType(repo,Parameter.class).size());
 		assertEquals(54, TestVerveineUtils.selectElementsOfType(repo,Invocation.class).size());//actually 54, missing 2 !!!!
 		assertEquals(5+12, TestVerveineUtils.selectElementsOfType(repo,Inheritance.class).size());//5 internal + 12 from imported packages/classes
@@ -159,14 +161,14 @@ public class VerveineExtractorJavaTest {
 		assertEquals("methodWithEmptyBody", mweb.getName());
 		assertEquals("methodWithEmptyBody()", mweb.getSignature());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node"), mweb.getParentType());
-		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "void"), mweb.getDeclaredType());
+		assertSame(TestVerveineUtils.detectElement(repo,PrimitiveType.class, "void"), mweb.getDeclaredType());
 
 		Method em = TestVerveineUtils.detectElement(repo,Method.class, "equalsMultiple");
 		assertNotNull(em);
 		assertEquals("equalsMultiple", em.getName());
 		assertEquals("equalsMultiple(AbstractDestinationAddress)", em.getSignature());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress"), em.getParentType());
-		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "boolean"), em.getDeclaredType());
+		assertSame(TestVerveineUtils.detectElement(repo,PrimitiveType.class, "boolean"), em.getDeclaredType());
 
 		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "FileServer");
 		assertNotNull(clazz);
@@ -257,7 +259,7 @@ public class VerveineExtractorJavaTest {
 				assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String"), p.getDeclaredType());
 			}
 			if (p.getName().equals("rv")) {
-				assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "boolean"), p.getDeclaredType());
+				assertSame(TestVerveineUtils.detectElement(repo,PrimitiveType.class, "boolean"), p.getDeclaredType());
 			}
 		}
 	}

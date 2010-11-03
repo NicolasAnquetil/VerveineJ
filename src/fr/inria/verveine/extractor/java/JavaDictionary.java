@@ -22,8 +22,10 @@ import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
+import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
 import fr.inria.verveine.core.gen.famix.SourcedEntity;
+import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.core.gen.famix.UnknownVariable;
 
 /**
@@ -37,7 +39,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	public static final String OBJECT_NAME = "Object";
 	public static final String OBJECT_PACKAGE_NAME = "java.lang";
-	public static final String PRIMITIVE_PCKG_NAME = "<Primitive Package>";   // for int, boolean, .... types
 	public static final String INSTANCE_INIT_BLOCK_NAME = "<InstanceInitializer>";
 	public static final String STATIC_INIT_BLOCK_NAME = "<StaticInitializer>";
 
@@ -112,6 +113,38 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+	public Type ensureFamixType(ITypeBinding bnd) {
+
+		if (bnd == null) {
+			System.err.println("Warning: Unexpected null binding, cannot create Famix Type");
+			return null;
+		}
+
+		while (bnd.isArray()) {
+			bnd = bnd.getComponentType();
+		}
+		
+		if (bnd.isPrimitive()) {
+			return ensureFamixPrimitiveType(bnd);
+		}
+		else {
+			return ensureFamixClass(bnd);
+		}
+	}
+
+	public PrimitiveType ensureFamixPrimitiveType(ITypeBinding bnd) {
+
+		if (bnd == null) {
+			System.err.println("Warning: Unexpected null binding, cannot create Famix Primitive Type");
+			return null;
+		}
+		
+		PrimitiveType fmx = super.ensureFamixPrimitiveType(bnd.getName());
+		fmx.setIsStub(false);
+		mapBind.put(bnd, fmx);
+		return fmx;
+	}
+
 	/**
 	 * Returns a Famix Class associated with the ITypeBinding. The Entity is created if it does not exist.
 	 * The JDT Binding is a unique representation of a java entity within the AST.
@@ -134,6 +167,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			bnd = bnd.getComponentType();
 		}
 		
+		if (bnd.isPrimitive()) {
+			System.err.println("Warning: cannot create Famix Class from aprimitive type");
+			return null;
+		}
+		
 		// container
 		IMethodBinding parentMtd = bnd.getDeclaringMethod();
 		if (parentMtd != null) {
@@ -150,12 +188,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					owner = this.ensureFamixNamespace(parentPckg);
 				}
 				else {
-					if (bnd.isPrimitive()) {
-						owner = this.ensureFamixNamespacePrimitives();
-					}
-					else {
-						owner = this.ensureFamixNamespaceDefault();
-					}
+					owner = this.ensureFamixNamespaceDefault();
 				}
 			}
 		}
@@ -181,8 +214,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// superclass and/or implemented interfaces
-		if ( (! bnd.isPrimitive()) && (! bnd.getName().equals(OBJECT_NAME)) ) {
-			// "Object" and primitive types don't have a superclass
+		if (! bnd.getName().equals(OBJECT_NAME)) {
+			// "Object" does't have a superclass
 			
 			// superclass
 			if (! bnd.isInterface()) {
@@ -274,8 +307,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	public Method ensureFamixMethod(IMethodBinding bnd) {
-		fr.inria.verveine.core.gen.famix.Class parentClass = null;
-		fr.inria.verveine.core.gen.famix.Class rettyp = null;
+		fr.inria.verveine.core.gen.famix.Class owner = null;
+		Type rettyp = null;
 		String sig = null;
 		boolean wasBound = false;
 		
@@ -285,14 +318,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// owner
-		parentClass = this.ensureFamixClass(bnd.getDeclaringClass());
+		owner = this.ensureFamixClass(bnd.getDeclaringClass());
 
 		// return type
 		if (bnd.isConstructor()) {
 			// TODO what to put in metamodel?
 		}
 		else {
-			rettyp = this.ensureFamixClass(bnd.getReturnType());	
+			rettyp = this.ensureFamixType(bnd.getReturnType());	
 		}
 
 		// method signature
@@ -321,7 +354,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			wasBound = false;
 			// trying to recover from name and other informations
 			for (Method candidate : getEntityByName(Method.class, bnd.getName()) ) {
-				if ( (candidate.getParentType() == parentClass) &&
+				if ( (candidate.getParentType() == owner) &&
 					 (candidate.getDeclaredType() == rettyp) &&
 					 (candidate.getSignature().equals(sig)) ) {
 					// we could also test that this candidate is not bound yet (to another bnd)
@@ -340,7 +373,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if ((fmx!=null) && (! wasBound) ) {
 			// apparently we just created it or it already existed as a stub, so add information to it
-			fmx.setParentType(parentClass);
+			fmx.setParentType(owner);
 			fmx.setDeclaredType(rettyp);	
 			fmx.setName(bnd.getName());
 			fmx.setSignature(sig);
@@ -358,8 +391,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	public Attribute ensureFamixAttribute(IVariableBinding bnd) {
-		fr.inria.verveine.core.gen.famix.Class parentClass = null;
-		fr.inria.verveine.core.gen.famix.Class typ = null;
+		fr.inria.verveine.core.gen.famix.Class owner = null;
+		Type typ = null;
 		boolean wasBound = false;
 
 		if (bnd == null) {
@@ -367,8 +400,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return null;
 		}
 
-		parentClass = this.ensureFamixClass(bnd.getDeclaringClass());
-		typ = this.ensureFamixClass(bnd.getType());
+		owner = this.ensureFamixClass(bnd.getDeclaringClass());
+		typ = this.ensureFamixType(bnd.getType());
 
 		// finally trying to recover the entity or creating it
 		Attribute fmx = null;
@@ -383,7 +416,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// trying to recover from name and other informationsparentBehaviouralEntity
 			for (Attribute candidate : getEntityByName(Attribute.class, bnd.getName()) ) {
 				if ( (! candidate.getIsStub()) &&
-					 (candidate.getParentType() == parentClass) &&
+					 (candidate.getParentType() == owner) &&
 					 (candidate.getDeclaredType() == typ) ) {
 					fmx = candidate;
 					mapBind.put(bnd, fmx);
@@ -400,7 +433,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		if ((fmx!=null) && (! wasBound) ) {
 			// apparently we just created it, so add information to it
 			setNamedEntityModifiers(fmx, bnd.getModifiers());
-			fmx.setParentType(parentClass);
+			fmx.setParentType(owner);
 			fmx.setDeclaredType(typ);	
 			fmx.setName(bnd.getName());
 		}
@@ -452,7 +485,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// declaring method
 			fmx.setParentBehaviouralEntity(ensureFamixMethod(bnd.getDeclaringMethod()));
 			// type of the attribute
-			fmx.setDeclaredType(this.ensureFamixClass(bnd.getType()));
+			fmx.setDeclaredType(this.ensureFamixType(bnd.getType()));
 		}
 		
 		return fmx;
@@ -466,8 +499,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd) {
-		Method parentMeth = null;
-		fr.inria.verveine.core.gen.famix.Class typ = null;
+		Method owner = null;
+		Type typ = null;
 		boolean wasBound = false;
 
 		if (bnd == null) {
@@ -475,8 +508,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return null;
 		}
 
-		parentMeth = this.ensureFamixMethod(bnd.getDeclaringMethod());
-		typ = this.ensureFamixClass(bnd.getType());
+		owner = this.ensureFamixMethod(bnd.getDeclaringMethod());
+		typ = this.ensureFamixType(bnd.getType());
 
 		// finally trying to recover the entity or creating it
 		LocalVariable fmx = null;
@@ -490,7 +523,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			wasBound = false;
 			// trying to recover from name and other informationsparentBehaviouralEntity
 			for (LocalVariable candidate : getEntityByName(LocalVariable.class, bnd.getName()) ) {
-				if ( (candidate.getParentBehaviouralEntity() == parentMeth) &&
+				if ( (candidate.getParentBehaviouralEntity() == owner) &&
 					 (candidate.getDeclaredType() == typ) ) {
 					fmx = candidate;
 					mapBind.put(bnd, fmx);
@@ -506,8 +539,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		if ( (fmx!=null) && (! wasBound) ) {
 			// apparently we just created it, so add information to it
-			fmx.setParentBehaviouralEntity(parentMeth);
-			fmx.setDeclaredType(this.ensureFamixClass(bnd.getType()));
+			fmx.setParentBehaviouralEntity(owner);
+			fmx.setDeclaredType(typ);
 		}
 		
 		return fmx;
@@ -520,11 +553,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param bnd -- the JDT Binding 
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public UnknownVariable createFamixUnknownVariable(fr.inria.verveine.core.gen.famix.Class ofType, String name) {
+	public UnknownVariable createFamixUnknownVariable(Type type, String name) {
 //		System.err.println("TRACE -- createFamixUnknownVariable: "+name);
 		UnknownVariable fmx = (UnknownVariable) createFamixEntity(UnknownVariable.class, name);
 		if (fmx!=null) {
-			fmx.setDeclaredType(ofType);
+			fmx.setDeclaredType(type);
 		}
 		return fmx;
 	}
@@ -592,17 +625,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Creates or recovers a Famix Namespace for the primitive types in Java.
-	 * Because this package does not really exist, it has no binding.
-	 * @return a Famix Namespace
-	 */
-	public Namespace ensureFamixNamespacePrimitives() {
-		Namespace fmx =  ensureFamixUniqEntity(Namespace.class, null, PRIMITIVE_PCKG_NAME);
-
-		return fmx;
-	}
-
-	/**
 	 * Creates or recovers the Famix Class for "Object".
 	 * @param bnd -- a potential binding for the java "Object" class
 	 * @return a Famix class for "Object"
@@ -623,5 +645,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		return fmx;
 	}
+
 
 }
