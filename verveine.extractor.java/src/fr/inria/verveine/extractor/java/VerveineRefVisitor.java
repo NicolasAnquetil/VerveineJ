@@ -251,7 +251,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			if (bnd != null) {
 				if (bnd instanceof ITypeBinding) {
 					// msg() is a static method of Name
-					ret = dico.createFamixUnknownVariable( dico.ensureFamixClass((ITypeBinding)bnd), bnd.getName());
+					ret = dico.createFamixUnknownVariable( dico.ensureFamixType((ITypeBinding)bnd), bnd.getName());
 				}
 				else if (bnd instanceof IVariableBinding) {
 					if ( ((IVariableBinding)bnd).isField() ) {
@@ -308,7 +308,8 @@ public class VerveineRefVisitor extends ASTVisitor {
 
 		// type.class.msg()
 		else if (expr instanceof TypeLiteral) {
-			return dico.ensureFamixClass( expr.resolveTypeBinding());
+			// may be could specify: ensureFamixClass ??
+			return dico.ensureFamixType( expr.resolveTypeBinding());
 		}
 
 		// ... OTHER POSSIBLE EXPRESSIONS ?
