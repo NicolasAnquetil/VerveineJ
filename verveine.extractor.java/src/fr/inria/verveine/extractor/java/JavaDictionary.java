@@ -575,7 +575,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if ( (fmx != null) && (ast != null) ) {
 			// position in source file
-			int pos = ast.getStartPosition();
+			int beg = ast.getStartPosition();
+			int end = beg + ast.getLength();
 			// find source file
 			while ( ! (ast instanceof CompilationUnit) ) {
 				ASTNode tmp = ast.getParent();
@@ -590,7 +591,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// now create the Famix SourceAnchor
 			fa = new FileAnchor();
 			fa.setFileName((String) ((CompilationUnit)ast).getProperty(SOURCE_FILENAME_PROPERTY));
-			fa.setStartLine(((CompilationUnit)ast).getLineNumber(pos));
+			fa.setStartLine(((CompilationUnit)ast).getLineNumber(beg));
+			fa.setEndLine(((CompilationUnit)ast).getLineNumber(end));
 			fmx.setSourceAnchor(fa);
 			famixRepo.add(fa);
 		}
