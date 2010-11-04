@@ -367,6 +367,7 @@ public class VerveineExtractorJavaTest {
 		assertSame(FileAnchor.class, anc.getClass());
 		assertTrue("Wrong file source for class XPrinter", ((FileAnchor)anc).getFileName().endsWith("moose/lan/server/PrintServer.java"));
 		assertEquals(17, ((FileAnchor)anc).getStartLine());
+		assertEquals(31, ((FileAnchor)anc).getEndLine());
 		
 		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "equalsMultiple");
 		assertNotNull(meth);
@@ -377,6 +378,7 @@ public class VerveineExtractorJavaTest {
 		assertSame(FileAnchor.class, anc.getClass());
 		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((FileAnchor)anc).getFileName().endsWith("moose/lan/SingleDestinationAddress.java"));
 		assertEquals(39, ((FileAnchor)anc).getStartLine());
+		assertEquals(41, ((FileAnchor)anc).getEndLine());
 		
 		Attribute att = TestVerveineUtils.detectElement(repo, Attribute.class, "originator");
 		assertNotNull(meth);
@@ -387,6 +389,7 @@ public class VerveineExtractorJavaTest {
 		assertSame(FileAnchor.class, anc.getClass());
 		assertTrue("Wrong file source for field Packet.originator", ((FileAnchor)anc).getFileName().endsWith("moose/lan/Packet.java"));
 		assertEquals(15, ((FileAnchor)anc).getStartLine());
+		assertEquals(15, ((FileAnchor)anc).getEndLine());
 		
 	}
 
