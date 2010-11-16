@@ -320,16 +320,29 @@ public class VerveineRefVisitor extends ASTVisitor {
 		return null;
 	}
 
+	/**
+	 * Handles an access to a field by creating the corresponding Famix Entity
+	 * @param bnd -- a binding for the field (i.e attribute)
+	 */
 	private void fieldAccess(IVariableBinding bnd) {
 		BehaviouralEntity accessor = this.context.topMethod();
 		if (accessor != null) {
 			Attribute accessed = this.dico.ensureFamixAttribute(bnd);
 			if (accessed != null) {
 				dico.ensureFamixAccess(accessor, accessed);
+				if ( (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
+					accessed.setParentType(dico.ensureFamixClassArray());
+				}
 			}
 		}
 	}
 
+	/**
+	 * Handles an invocation of a method by creating the corresponding Famix Entity
+	 * @param bnd -- a binding for the method
+	 * @param name of the method invoked
+	 * @param receiver of the call, i.e. the object to which the message is sent
+	 */
 	private void methodInvocation(IMethodBinding bnd, String name, NamedEntity receiver) {
 		BehaviouralEntity sender = this.context.topMethod();
 		if (sender != null) {

@@ -5,17 +5,37 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.AssertStatement;
+import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ConstructorInvocation;
+import org.eclipse.jdt.core.dom.ContinueStatement;
+import org.eclipse.jdt.core.dom.DoStatement;
+import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
+import org.eclipse.jdt.core.dom.SwitchCase;
+import org.eclipse.jdt.core.dom.SwitchStatement;
+import org.eclipse.jdt.core.dom.SynchronizedStatement;
+import org.eclipse.jdt.core.dom.TagElement;
+import org.eclipse.jdt.core.dom.ThrowStatement;
+import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.WhileStatement;
 
 import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.core.gen.famix.Attribute;
@@ -89,6 +109,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 			fmx.setContainer( context.top());
 		}
 		dico.addSourceAnchor(fmx, node);
+		if (context.getLastComment() != null) {
+			dico.createFamixComment(context.getLastComment(), fmx);
+			context.clearLastComment();
+		}
 		this.context.pushClass(fmx);
 		return super.visit(node);
 	}
@@ -138,8 +162,8 @@ public class VerveineDefVisitor extends ASTVisitor {
 			fmx.setDeclaredType( dico.ensureFamixClassObject(null) );
 		}
 
-		// creating the method's parameters
-		if (fmx != null) {
+		if (fmx != null) {			
+			// creating the method's parameters
 			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
 				Parameter fmxParam = dico.ensureFamixParameter(param.resolveBinding());
 				if (fmxParam != null) {
@@ -148,13 +172,25 @@ public class VerveineDefVisitor extends ASTVisitor {
 			}
 			
 			dico.addSourceAnchor(fmx, node);
+			if (context.getLastComment() != null) {
+				dico.createFamixComment(context.getLastComment(), fmx);
+				context.clearLastComment();
+			}
 			this.context.pushMethod(fmx);
+			if (node.getBody() != null) {
+				context.setTopMethodCyclo(1);
+			}
+
 		}
 		return super.visit(node);	
 	}
 
 	public void endVisit(MethodDeclaration node) {
-		this.context.popMethod();
+		int cyclo = context.getTopMethodCyclo();
+		int nos = context.getTopMethodNOS();
+		Method fmx = this.context.popMethod();
+		fmx.setNOS(nos);
+		fmx.setCyclo(cyclo);
 		super.endVisit(node);
 	}
 
@@ -176,6 +212,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 			}
 			
 			dico.addSourceAnchor(fmx, node);
+			if (context.getLastComment() != null) {
+				dico.createFamixComment(context.getLastComment(), fmx);
+				context.clearLastComment();
+			}
 		}
 		return super.visit(node);
 	}
@@ -214,6 +254,118 @@ public class VerveineDefVisitor extends ASTVisitor {
 				dico.addSourceAnchor(fmx, node);
 			}
 		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public boolean visit(Javadoc node) {
+		String comment = "/** ";
+		for (TagElement tag : (List<TagElement>)node.tags()) {
+			comment += tag.toString();
+		}
+		comment += "\n */";
+		this.context.setLastComment(comment);
+		return super.visit(node);
+	}
+
+
+	// METRICS: CYCLO, NOS
+	
+	public boolean visit(AssertStatement node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(Assignment node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(ConstructorInvocation node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(ContinueStatement node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(DoStatement node) {
+		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(EnhancedForStatement node) {
+		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(ForStatement node) {
+		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(IfStatement node) {
+		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(MethodInvocation node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(ReturnStatement node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(SuperConstructorInvocation node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(SuperMethodInvocation node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(SwitchCase node) {
+		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(SwitchStatement node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(SynchronizedStatement node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(ThrowStatement node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(TryStatement node) {
+		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(WhileStatement node) {
+		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
 	}
 
 }
