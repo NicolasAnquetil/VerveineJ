@@ -25,6 +25,7 @@ import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
+import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Invocation;
@@ -225,6 +226,13 @@ public class VerveineExtractorJavaTest {
 		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsStub());
+		
+		/* [].length notused in the default test case 
+		Attribute att = TestVerveineUtils.detectElement(repo, Attribute.class, "length");
+		assertNotNull(att);
+		clazz = (Class) att.getParentType();
+		assertNotNull(clazz);
+		assertEquals(JavaDictionary.ARRAYS_NAME, clazz.getName());*/
 	}
 
 	@Test
@@ -437,7 +445,6 @@ public class VerveineExtractorJavaTest {
 		assertTrue(a.getIsProtected());
 		assertFalse(a.getIsFinal());
 	}
-
 
 	@Test
 	public void testMetric() {	
