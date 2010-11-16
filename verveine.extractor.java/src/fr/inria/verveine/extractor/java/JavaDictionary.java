@@ -39,6 +39,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	public static final String OBJECT_NAME = "Object";
 	public static final String OBJECT_PACKAGE_NAME = "java.lang";
+	public static final String ARRAYS_NAME = "default[]";
 	public static final String INSTANCE_INIT_BLOCK_NAME = "<InstanceInitializer>";
 	public static final String STATIC_INIT_BLOCK_NAME = "<StaticInitializer>";
 
@@ -453,7 +454,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		fmx.setIsPublic(Modifier.isPublic(mod));
 	}
 
-
 	/**
 	 * Returns a Famix Paramenter associated with the IVariableBinding. The Entity is created if it does not exist.
 	 * The JDT Binding is a unique representation of a java entity within the AST.
@@ -640,7 +640,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	@Override
+	/**
+	 * Creates or recovers the Famix Class that will own all stub methods (for which the real owner is unknown)
+	 * @return a Famix class
+	 */
 	public fr.inria.verveine.core.gen.famix.Class ensureFamixClassStubOwner() {
 		fr.inria.verveine.core.gen.famix.Class fmx = super.ensureFamixClassStubOwner();
 		ensureFamixInheritance(ensureFamixClassObject(null), fmx);
@@ -648,5 +651,18 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+	/**
+	 * Creates or recovers the Famix Class for all arrays (<some-type> [])
+	 * In java arrays or objects of special classes (i.e. "I[" for an array of int).
+	 * JDT does not create a binding for these classes, so we create a stub one here. 
+	 * @return a Famix class
+	 */
+	public fr.inria.verveine.core.gen.famix.Class ensureFamixClassArray() {
+		fr.inria.verveine.core.gen.famix.Class fmx = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, ARRAYS_NAME);
+		ensureFamixInheritance(ensureFamixClassObject(null), fmx);
+		fmx.setContainer( ensureFamixNamespaceDefault());
+
+		return fmx;
+	}
 
 }

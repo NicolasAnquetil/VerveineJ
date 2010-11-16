@@ -368,6 +368,17 @@ public class VerveineExtractorJavaTest {
 		assertTrue("Wrong file source for class XPrinter", ((FileAnchor)anc).getFileName().endsWith("moose/lan/server/PrintServer.java"));
 		assertEquals(17, ((FileAnchor)anc).getStartLine());
 		assertEquals(31, ((FileAnchor)anc).getEndLine());
+
+		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node");
+		assertNotNull(clazz);
+
+		anc = clazz.getSourceAnchor();
+		assertNotNull(anc);
+		assertSame(clazz, anc.getElement());
+		assertSame(FileAnchor.class, anc.getClass());
+		assertTrue("Wrong file source for class Node", ((FileAnchor)anc).getFileName().endsWith("moose/lan/Node.java"));
+		assertEquals(6, ((FileAnchor)anc).getStartLine());
+		assertEquals(70, ((FileAnchor)anc).getEndLine());
 		
 		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "equalsMultiple");
 		assertNotNull(meth);
@@ -426,4 +437,27 @@ public class VerveineExtractorJavaTest {
 		assertTrue(a.getIsProtected());
 		assertFalse(a.getIsFinal());
 	}
+
+
+	@Test
+	public void testMetric() {	
+		for (Method m : TestVerveineUtils.listElements(repo, Method.class, "accept")) {
+			assertNotNull(m);
+			fr.inria.verveine.core.gen.famix.Class owner = (fr.inria.verveine.core.gen.famix.Class) m.getParentType();
+			assertNotNull(owner);
+			if (owner.getName().equals("OutputServer")) {
+			assertEquals(2, m.getCyclo());
+				assertEquals(6, m.getNOS());
+			}
+			else if (owner.getName().equals("Node")) {
+				assertEquals(1, m.getCyclo());
+				assertEquals(1, m.getNOS());
+			}
+			else if (owner.getName().equals("WorkStation")) {
+				assertEquals(2, m.getCyclo());
+				assertEquals(7, m.getNOS());
+			}
+		}		
+	}
+
 }
