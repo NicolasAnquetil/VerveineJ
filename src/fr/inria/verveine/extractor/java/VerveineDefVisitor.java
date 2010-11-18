@@ -27,7 +27,6 @@ import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.eclipse.jdt.core.dom.SynchronizedStatement;
-import org.eclipse.jdt.core.dom.TagElement;
 import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.Type;
@@ -39,6 +38,7 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.core.gen.famix.Attribute;
+import fr.inria.verveine.core.gen.famix.Comment;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
@@ -109,9 +109,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 			fmx.setContainer( context.top());
 		}
 		dico.addSourceAnchor(fmx, node);
-		if (context.getLastComment() != null) {
-			dico.createFamixComment(context.getLastComment(), fmx);
-			context.clearLastComment();
+		Javadoc jdoc = node.getJavadoc();
+		if (jdoc != null) {
+			Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
+			dico.addSourceAnchor(cmt, jdoc);
 		}
 		this.context.pushClass(fmx);
 		return super.visit(node);
@@ -172,9 +173,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 			}
 			
 			dico.addSourceAnchor(fmx, node);
-			if (context.getLastComment() != null) {
-				dico.createFamixComment(context.getLastComment(), fmx);
-				context.clearLastComment();
+			Javadoc jdoc = node.getJavadoc();
+			if (jdoc != null) {
+				Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
+				dico.addSourceAnchor(cmt, jdoc);
 			}
 			this.context.pushMethod(fmx);
 			if (node.getBody() != null) {
@@ -212,9 +214,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 			}
 			
 			dico.addSourceAnchor(fmx, node);
-			if (context.getLastComment() != null) {
-				dico.createFamixComment(context.getLastComment(), fmx);
-				context.clearLastComment();
+			Javadoc jdoc = node.getJavadoc();
+			if (jdoc != null) {
+				Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
+				dico.addSourceAnchor(cmt, jdoc);
 			}
 		}
 		return super.visit(node);
@@ -254,18 +257,6 @@ public class VerveineDefVisitor extends ASTVisitor {
 				dico.addSourceAnchor(fmx, node);
 			}
 		}
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public boolean visit(Javadoc node) {
-		String comment = "/** ";
-		for (TagElement tag : (List<TagElement>)node.tags()) {
-			comment += tag.toString();
-		}
-		comment += "\n */";
-		this.context.setLastComment(comment);
-		return super.visit(node);
 	}
 
 

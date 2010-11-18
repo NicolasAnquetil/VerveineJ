@@ -25,7 +25,7 @@ import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
-import fr.inria.verveine.core.gen.famix.Class;
+import fr.inria.verveine.core.gen.famix.Comment;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Invocation;
@@ -445,6 +445,27 @@ public class VerveineExtractorJavaTest {
 		assertTrue(a.getIsProtected());
 		assertFalse(a.getIsFinal());
 	}
+
+	@Test
+	public void testComment() {	
+		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		assertNotNull(clazz);
+		Collection<Comment> cmts = clazz.getComments();
+		assertEquals(1, cmts.size());
+		SourceAnchor anc = cmts.iterator().next().getSourceAnchor();
+		assertEquals(6, ((FileAnchor)anc).getStartLine());
+		assertEquals(10, ((FileAnchor)anc).getEndLine());
+
+		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "equalsSingle");
+		assertNotNull(meth);
+		cmts = meth.getComments();
+		assertEquals(1, cmts.size());
+		anc = cmts.iterator().next().getSourceAnchor();
+		assertEquals(31, ((FileAnchor)anc).getStartLine());
+		assertEquals(34, ((FileAnchor)anc).getEndLine());
+
+	}
+	
 
 	@Test
 	public void testMetric() {	
