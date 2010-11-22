@@ -115,7 +115,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	public Type ensureFamixType(ITypeBinding bnd) {
-
 		if (bnd == null) {
 			System.err.println("Warning: Unexpected null binding, cannot create Famix Type");
 			return null;
@@ -169,7 +168,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 		
 		if (bnd.isPrimitive()) {
-			System.err.println("Warning: cannot create Famix Class from aprimitive type");
+			// should have called ensureFamixPrimitiveType(bnd). Why are we here ?
+			System.err.println("Warning: cannot create Famix Class from a primitive type");
 			return null;
 		}
 		
@@ -255,9 +255,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					break;
 				}
 				else if ( candidate.getIsStub() ) {
-					ContainerEntity ownerBnd = owner;
-					ContainerEntity ownerStub = candidate.getBelongsTo();
-					while ( (! (ownerBnd instanceof Namespace)) &&
+					// find out whether this candidate is defined in the same namespace as the binding received in parameter
+					ContainerEntity ownerBnd = owner;  // the owner of the bounded entity received as parameter
+					ContainerEntity ownerStub = candidate.getBelongsTo();  // the owner of the current candidate
+					while ( (ownerBnd != null) &&
+							(ownerStub != null) &&
+							(! (ownerBnd instanceof Namespace)) &&
 							(ownerBnd.getClass() == ownerStub.getClass()) &&
 							ownerBnd.getName().equals(ownerStub.getName()) ) {
 								ownerBnd = ownerBnd.getBelongsTo();

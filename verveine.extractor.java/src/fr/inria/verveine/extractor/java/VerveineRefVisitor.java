@@ -1,11 +1,14 @@
 package fr.inria.verveine.extractor.java;
 
+import java.util.List;
+
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
+import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
@@ -24,10 +27,14 @@ import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.QualifiedType;
+import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.ThisExpression;
+import org.eclipse.jdt.core.dom.ThrowStatement;
+import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 
@@ -126,8 +133,19 @@ public class VerveineRefVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-		this.context.pushMethod((Method)dico.ensureFamixMethod(node.resolveBinding()));
+		Method meth = dico.ensureFamixMethod(node.resolveBinding());
+		this.context.pushMethod(meth);
+		for (Name excepName : (List<Name>)node.thrownExceptions()) {
+			fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(excepName.resolveTypeBinding());
+			if (excepFmx == null) {
+				excepFmx = this.dico.ensureFamixClass(excepName.getFullyQualifiedName());
+			}
+			if (excepFmx != null) {
+				dico.ensureFamixDeclaredException(meth, excepFmx);
+			}
+		}
 		return super.visit(node);	
 	}
 
@@ -164,6 +182,39 @@ public class VerveineRefVisitor extends ASTVisitor {
 		}
 		return super.visit(node);
 	}
+
+	@Override
+	public boolean visit(CatchClause node) {
+		Method meth = this.context.topMethod();
+		Type excepClass = node.getException().getType();
+		if (meth != null) {
+			fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(excepClass.resolveBinding());
+			if (excepFmx == null) {
+				if (excepClass instanceof SimpleType) {
+					excepFmx = this.dico.ensureFamixClass(((SimpleType) excepClass).getName().getFullyQualifiedName());
+				}
+				else if (excepClass instanceof QualifiedType) {
+					excepFmx = this.dico.ensureFamixClass(((QualifiedType) excepClass).getName().getIdentifier());
+				}
+			}
+			if (excepFmx != null) {
+				dico.ensureFamixCaughtException(meth, excepFmx);
+			}
+		}
+
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(ThrowStatement node) {
+		Method meth = this.context.topMethod();
+		fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(node.getExpression().resolveTypeBinding());
+		if (excepFmx != null) {
+			dico.ensureFamixThrownException(meth, excepFmx);
+		}
+		return super.visit(node);
+	}
+
 
 	/**
 	 * Finds and/or create the Famix Entity receiving a message
