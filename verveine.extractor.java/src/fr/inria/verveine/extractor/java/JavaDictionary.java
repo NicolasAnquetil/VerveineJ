@@ -637,7 +637,16 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public fr.inria.verveine.core.gen.famix.Class ensureFamixClassObject(ITypeBinding bnd) {
 		fr.inria.verveine.core.gen.famix.Class fmx =  ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, bnd, OBJECT_NAME);
 		
-		fmx.setContainer( ensureFamixNamespaceJavaLang(null));
+		if (fmx != null) {
+			fmx.setContainer( ensureFamixNamespaceJavaLang(null));
+			
+			fmx.setIsAbstract(Boolean.FALSE);
+			fmx.setIsFinal(Boolean.FALSE);
+			fmx.setIsInterface(Boolean.FALSE);
+			fmx.setIsPrivate(Boolean.FALSE);
+			fmx.setIsProtected(Boolean.FALSE);
+			fmx.setIsPublic(Boolean.TRUE);
+		}
 		// Note: "Object" has no superclass
 
 		return fmx;
@@ -662,8 +671,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 */
 	public fr.inria.verveine.core.gen.famix.Class ensureFamixClassArray() {
 		fr.inria.verveine.core.gen.famix.Class fmx = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, ARRAYS_NAME);
-		ensureFamixInheritance(ensureFamixClassObject(null), fmx);
-		fmx.setContainer( ensureFamixNamespaceDefault());
+		if (fmx != null) {
+			ensureFamixInheritance(ensureFamixClassObject(null), fmx);
+			fmx.setContainer( ensureFamixNamespaceDefault());
+			
+			fmx.setIsAbstract(Boolean.FALSE);
+			fmx.setIsFinal(Boolean.FALSE);
+			fmx.setIsInterface(Boolean.FALSE);
+			fmx.setIsPrivate(Boolean.FALSE);
+			fmx.setIsProtected(Boolean.FALSE);
+			fmx.setIsPublic(Boolean.TRUE);
+		}
 
 		return fmx;
 	}
