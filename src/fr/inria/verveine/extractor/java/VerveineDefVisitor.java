@@ -80,7 +80,7 @@ public class VerveineDefVisitor extends ASTVisitor {
 				fmx.setIsStub(false);
 			}
 			else {
-				System.err.println("         Namespace="+pckg.getName().getFullyQualifiedName() + ",  fallback to creating a stub");
+				System.err.println("         Namespace="+pckg.getName().getFullyQualifiedName() + ", fallbacks to creating a stub");
 				// try again without binding
 				fmx = dico.ensureFamixNamespace(pckg.getName().getFullyQualifiedName());
 			}

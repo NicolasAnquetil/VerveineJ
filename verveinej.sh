@@ -49,4 +49,4 @@ CLASSPATH="${CLASSPATH}:${BASELIB}/org.eclipse.equinox.preferences_3.3.0.v201005
 CLASSPATH="${CLASSPATH}:${BASELIB}/org.eclipse.osgi_3.6.0.v20100517.jar"
 
 
-java $JOPT -cp $CLASSPATH fr.inria.verveine.extractor.java.BatchParser $VOPT
+java $JOPT -cp $CLASSPATH fr.inria.verveine.extractor.java.VerveineJParser $VOPT
