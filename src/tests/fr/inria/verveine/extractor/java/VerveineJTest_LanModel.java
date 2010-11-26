@@ -39,7 +39,7 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
  * @since May 28, 2010
  *
  */
-public class VerveineExtractorJavaTest {
+public class VerveineJTest_LanModel {
 
 	private static final String A_CLASS_NAME = "--aClassName--";
 
