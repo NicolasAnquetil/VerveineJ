@@ -11,17 +11,13 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.PrintWriter;
 import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import test.fr.inria.verveine.core.TestVerveineUtils;
-
 import ch.akuhn.fame.Repository;
-
-
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
@@ -35,9 +31,8 @@ import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
-
-import fr.inria.verveine.extractor.java.BatchParser;
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
  * @author Simon Denier
@@ -55,9 +50,9 @@ public class VerveineExtractorJavaTest {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		BatchParser parser = new BatchParser(new PrintWriter(System.out), new PrintWriter(System.err), true/*systemExit*/, null/*options*/, null/*progress*/);
-		parser.systemExitWhenFinished = false;
+		VerveineJParser parser = new VerveineJParser();
 		parser.compile(new String[] {"test_src/LANModel"});
+		parser.renameNamespaces();
 		repo = parser.getFamixRepo();
 	}
 
@@ -117,8 +112,7 @@ public class VerveineExtractorJavaTest {
 		assertNotSame(dico.ensureFamixClass(A_CLASS_NAME),dico.ensureFamixClass(A_CLASS_NAME));
 		
 		Namespace javaLang = dico.ensureFamixNamespaceJavaLang(null);
-		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
-		assertEquals( javaLangName, javaLang.getName());
+		assertEquals( JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());
 		assertSame(javaLang, dico.ensureFamixNamespaceJavaLang(null));
 
 		fr.inria.verveine.core.gen.famix.Class obj = dico.ensureFamixClassObject(null);
@@ -466,7 +460,6 @@ public class VerveineExtractorJavaTest {
 
 	}
 	
-
 	@Test
 	public void testMetric() {	
 		for (Method m : TestVerveineUtils.listElements(repo, Method.class, "accept")) {

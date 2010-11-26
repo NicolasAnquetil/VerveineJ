@@ -76,8 +76,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Creates or recovers a namespace. Also creates or recovers recusively it's parent namespaces
-	 * At least one of bnd and name must be passed, possibly both
+	 * Creates or recovers a namespace. Also creates or recovers recusively it's parent namespaces.
+	 * At least one of <b>bnd</b> and <b>name</b> must be passed.
+	 * <p>Note: Packages are created with their fully-qualified name to simplify recovering them when we don't have a binding
+	 * (for example when creating parent packages of a package we have a binding for).
+	 * Because the preferred solution in Moose is to give their simple names to packages, they must be post-processed when
+	 * all is said and done.</p>
 	 * @param bnd - the (optional) binding for the namespace
 	 * @param name - the (optional) full name for the namespace
 	 * @return the namespace created or null
@@ -85,30 +89,22 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	private Namespace ensureFamixNamespaceWithParentScope(IPackageBinding bnd, String name) {
 		Namespace fmx = null;
 		Namespace parent = null;
-		String[] nameComps;
 		
 		if (bnd != null) {
-			nameComps = bnd.getNameComponents();
+			name = bnd.getName();
 		}
-		else {
-			if (name != null) {
-				nameComps = name.split("\\.");
+		
+		if ( (name!=null) && (name.length() > 0) ) {
+			fmx = ensureFamixUniqEntity(Namespace.class, bnd, name);
+			// compute parent's name and creates parent
+			int last = name.lastIndexOf('.');
+			if (last > 0) {
+				parent = ensureFamixNamespaceWithParentScope(null, name.substring(0, last));
 			}
-			else {
-				return null;
-			}
-		}
-
-		for (String nameComp : nameComps ) {
-			fmx = ensureFamixUniqEntity(Namespace.class, null, nameComp);
+			// set the parentscope relationship
 			if ( (parent != null) && (fmx != null) && (fmx.getParentScope() == null)) {
 				parent.addChildScopes(fmx);
 			}
-			parent = fmx;
-		}
-		
-		if ( (fmx != null) && (bnd != null) ) {
-			mapBind.put(bnd, fmx);
 		}
 
 		return fmx;
