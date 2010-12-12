@@ -19,20 +19,59 @@ public class VerveineJParser extends VerveineParser {
 	public static void main(String[] args) {
 		VerveineJParser parser = new VerveineJParser();
 		parser.compile(args);
-		parser.renameNamespaces();
 		parser.outputMSE();
+	}
+	
+	@Override
+	public boolean compile(String[] argv) {
+		boolean ret;
+		if (this.linkToExisting()) {
+			this.expandNamespacesNames();
+		}
+		
+		ret = super.compile(argv);
+		
+		this.compressNamespacesNames();
+		
+		return ret;
 	}
 
 	/**
-	 * As explained in JavaDictionary, Namespaces are created with their fully qualified name
+	 * As explained in JavaDictionary, Namespaces are created with their fully qualified name.
 	 * We need now to give them their simple name
 	 */
-	public void renameNamespaces() {
+	protected void compressNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
 			String name = ns.getName();
 			int last = name.lastIndexOf('.');
 			if (last >= 0) {
 				ns.setName(name.substring(last+1));
+			}
+		}
+	}
+
+	/**
+	 * @see VerveineJParser.compressNamespacesNames()
+	 */
+	protected void expandNamespacesNames() {
+		for (Namespace ns : listAll(Namespace.class)) {
+			expandNamespaceName(ns);
+		}		
+	}
+	
+	private void expandNamespaceName(Namespace ns) {
+		String name = ns.getName();
+		if (name.indexOf('.') > 0) {
+			return;
+		}
+		else {
+			Namespace parent = (Namespace) ns.getParentScope();
+			if (parent == null) {
+				return;
+			}
+			else {
+				expandNamespaceName(parent);
+				ns.setName(parent.getName()+"."+ns.getName());
 			}
 		}
 	}
