@@ -158,6 +158,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			System.err.println("Warning: Unexpected null binding, cannot create Famix Class");
 			return null;
 		}
+		
+		if (bnd.getName().equals(OBJECT_NAME)) {
+			return ensureFamixClassObject(bnd);
+		}
 
 		while (bnd.isArray()) {
 			bnd = bnd.getComponentType();
@@ -243,24 +247,24 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			wasBound = false;
 			// trying to recover from name and other informations
 			for (fr.inria.verveine.core.gen.famix.Class candidate : getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, identifier) ) {
-				if ( (! candidate.getIsStub()) &&
-						(candidate.getBelongsTo() == owner) ) {
+				if ( //(! candidate.getIsStub()) &&
+						(candidate.getContainer() == owner) ) {
 					// could test superclass also...
 					fmx = candidate;
 					mapBind.put(bnd, fmx);
 					break;
 				}
-				else if ( candidate.getIsStub() ) {
+/*				else if ( candidate.getIsStub() ) {
 					// find out whether this candidate is defined in the same namespace as the binding received in parameter
 					ContainerEntity ownerBnd = owner;  // the owner of the bounded entity received as parameter
-					ContainerEntity ownerStub = candidate.getBelongsTo();  // the owner of the current candidate
+					ContainerEntity ownerStub = candidate.getContainer();  // the owner of the current candidate
 					while ( (ownerBnd != null) &&
 							(ownerStub != null) &&
 							(! (ownerBnd instanceof Namespace)) &&
 							(ownerBnd.getClass() == ownerStub.getClass()) &&
 							ownerBnd.getName().equals(ownerStub.getName()) ) {
-								ownerBnd = ownerBnd.getBelongsTo();
-								ownerStub = ownerStub.getBelongsTo();
+								ownerBnd = ownerBnd.getContainer();
+								ownerStub = ownerStub.getContainer();
 					}
 					if ( (ownerBnd instanceof Namespace) &&
 						(ownerStub instanceof Namespace) &&
@@ -269,7 +273,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 						mapBind.put(bnd, fmx);
 						break;
 					}
-				}
+				}*/
 			}
 		}
 		
@@ -415,7 +419,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			wasBound = false;
 			// trying to recover from name and other informationsparentBehaviouralEntity
 			for (Attribute candidate : getEntityByName(Attribute.class, bnd.getName()) ) {
-				if ( (! candidate.getIsStub()) &&
+				if ( //(! candidate.getIsStub()) &&
 					 (candidate.getParentType() == owner) &&
 					 (candidate.getDeclaredType() == typ) ) {
 					fmx = candidate;
@@ -446,11 +450,16 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param mod -- a description of the modifiers as understood by org.eclipse.jdt.core.dom.Modifier
 	 */
 	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
-		fmx.setIsAbstract(Modifier.isAbstract(mod));
-		fmx.setIsFinal(Modifier.isFinal(mod));
-		fmx.setIsPrivate(Modifier.isPrivate(mod));
-		fmx.setIsProtected(Modifier.isProtected(mod));
-		fmx.setIsPublic(Modifier.isPublic(mod));
+		if (Modifier.isAbstract(mod)) {
+			// don't know why there are two different ways to mark abstract classes !!!
+			// But this is a pain!
+			fmx.addModifiers("abstract");
+		}
+		fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
+		fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
+		fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
+		fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
+		fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
 	}
 
 	/**

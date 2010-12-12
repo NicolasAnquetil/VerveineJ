@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2010 Simon Denier
+ * Copyright (c) 2010 Nicolas Anquetil
  */
 package tests.fr.inria.verveine.extractor.java;
 
@@ -11,8 +11,10 @@ import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.io.File;
 import java.util.Collection;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -35,7 +37,7 @@ import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
- * @author Simon Denier
+ * @author Nicolas Anquetil
  * @since May 28, 2010
  *
  */
@@ -50,12 +52,49 @@ public class VerveineJTest_LanModel {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		VerveineJParser parser = new VerveineJParser();
-		parser.compile(new String[] {"test_src/LANModel"});
-		parser.renameNamespaces();
-		repo = parser.getFamixRepo();
+		String[] files = new String[] {
+				"AbstractDestinationAddress.java",
+				"Node.java",
+				"Packet.java",
+				"SingleDestinationAddress.java",
+				"WorkStation.java",
+				"server/FileServer.java",
+				"server/IPrinter.java",
+				"server/OutputServer.java",
+				"server/PrintServer.java"
+		};
+		
+		// separate parsing of each source file
+		for (String f : files) {
+			parseFile(f);
+		}
 	}
 
+	/**
+	 * Parses the file received in parameter independently from any other
+	 * The "separate parsing" mechanism should ensure that linkages are appropriately done
+	 * @param file -- name of the file to parse
+	 */
+	private void parseFile(String file) {
+		String[] args = new String[] {
+				"-cp",
+				"test_src/LANModel/",
+				"test_src/LANModel/moose/lan/"+file
+				};
+		
+		VerveineJParser parser = new VerveineJParser();
+		parser.compile(args);
+		repo = parser.getFamixRepo();
+		
+		new File(VerveineJParser.OUTPUT_FILE).delete();  // delete old MSE file
+		parser.outputMSE();  // to create a new one
+	}
+
+	@After
+	public void tearDown() {
+		new File(VerveineJParser.OUTPUT_FILE).delete();
+	}
+	
 	@Test
 	public void testEntitiesNumber() {
 		assertEquals(11+8, TestVerveineUtils.selectElementsOfType(repo,fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System}
