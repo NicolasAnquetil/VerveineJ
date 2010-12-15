@@ -47,6 +47,10 @@ public class VerveineJTest_LanModel {
 
 	private Repository repo;
 
+	public VerveineJTest_LanModel() {
+		new File(VerveineJParser.OUTPUT_FILE).delete();
+	}
+	
 	/**
 	 * @throws java.lang.Exception
 	 */

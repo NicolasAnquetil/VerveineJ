@@ -37,6 +37,7 @@ fi
 
 CLASSPATH="${CLASSPATH}:${BASELIB}/verveine.extractor.java.jar"
 CLASSPATH="${CLASSPATH}:${BASELIB}/fame.jar"
+CLASSPATH="${CLASSPATH}:${BASELIB}/akuhn-util-r28011.jar"
 CLASSPATH="${CLASSPATH}:${BASELIB}/famix.jar"
 CLASSPATH="${CLASSPATH}:${BASELIB}/verveine.core.jar"
 CLASSPATH="${CLASSPATH}:${BASELIB}/org.eclipse.jdt.core_3.6.0.v_A58.jar"
