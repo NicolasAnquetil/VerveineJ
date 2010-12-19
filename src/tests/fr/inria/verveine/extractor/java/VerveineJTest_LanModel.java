@@ -410,7 +410,7 @@ public class VerveineJTest_LanModel {
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
 		assertSame(FileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for class XPrinter", ((FileAnchor)anc).getFileName().endsWith("moose/lan/server/PrintServer.java"));
+		assertTrue("Wrong file source for class XPrinter", ((FileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/server/PrintServer.java"));
 		assertEquals(17, ((FileAnchor)anc).getStartLine());
 		assertEquals(31, ((FileAnchor)anc).getEndLine());
 
@@ -421,7 +421,7 @@ public class VerveineJTest_LanModel {
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
 		assertSame(FileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for class Node", ((FileAnchor)anc).getFileName().endsWith("moose/lan/Node.java"));
+		assertTrue("Wrong file source for class Node", ((FileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Node.java"));
 		assertEquals(6, ((FileAnchor)anc).getStartLine());
 		assertEquals(70, ((FileAnchor)anc).getEndLine());
 		
@@ -432,7 +432,7 @@ public class VerveineJTest_LanModel {
 		assertNotNull(anc);
 		assertSame(meth, anc.getElement());
 		assertSame(FileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((FileAnchor)anc).getFileName().endsWith("moose/lan/SingleDestinationAddress.java"));
+		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((FileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/SingleDestinationAddress.java"));
 		assertEquals(39, ((FileAnchor)anc).getStartLine());
 		assertEquals(41, ((FileAnchor)anc).getEndLine());
 		
@@ -443,7 +443,7 @@ public class VerveineJTest_LanModel {
 		assertNotNull(anc);
 		assertSame(att, anc.getElement());
 		assertSame(FileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for field Packet.originator", ((FileAnchor)anc).getFileName().endsWith("moose/lan/Packet.java"));
+		assertTrue("Wrong file source for field Packet.originator", ((FileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Packet.java"));
 		assertEquals(15, ((FileAnchor)anc).getStartLine());
 		assertEquals(15, ((FileAnchor)anc).getEndLine());
 		

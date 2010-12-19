@@ -104,7 +104,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			importBnd = ((ITypeBinding)importBnd).getPackage();
 		}
 
-		this.dico.ensureFamixReference(fmxSrc, dico.ensureFamixNamespace( (IPackageBinding) importBnd));
+		context.setLastAssoc( dico.ensureFamixReference(fmxSrc, dico.ensureFamixNamespace( (IPackageBinding) importBnd), context.getLastAssoc()) );
 		
 		return super.visit(node);
 	}
@@ -380,7 +380,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 		if (accessor != null) {
 			Attribute accessed = this.dico.ensureFamixAttribute(bnd);
 			if (accessed != null) {
-				dico.ensureFamixAccess(accessor, accessed);
+				context.setLastAssoc( dico.ensureFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAssoc()) );
 				if ( (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
 					accessed.setParentType(dico.ensureFamixClassArray());
 				}
@@ -401,9 +401,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			if (invoked == null) {
 				invoked = this.dico.ensureFamixStubMethod(name);
 			}
-			/* An example of how to include location information to an invocation
-			 * But would require to pass the ASTNode in parameter to this method */
-			/*dico.addSourceAnchor(*/ dico.ensureFamixInvocation(sender, invoked, receiver) /*,node)*/ ;
+			context.setLastAssoc( dico.ensureFamixInvocation(sender, invoked, receiver, context.getLastAssoc()) );
 		}
 	}
 

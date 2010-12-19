@@ -15,6 +15,5 @@
 	<classpathentry kind="lib" path="lib/fame.jar"/>
 	<classpathentry kind="lib" path="lib/famix.jar"/>
 	<classpathentry kind="lib" path="lib/verveine.core.jar"/>
-	<classpathentry kind="lib" path="lib/akuhn-util-r28011.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
