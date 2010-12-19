@@ -16,19 +16,35 @@ import fr.inria.verveine.core.gen.famix.Namespace;
 
 public class VerveineJParser extends VerveineParser {
 
+	/**
+	 * The arguments that were passed to the parser
+	 * Needed to relativize the source file names
+	 */
+	private String[] initialArgs;
+	
 	public static void main(String[] args) {
 		VerveineJParser parser = new VerveineJParser();
 		parser.compile(args);
 		parser.outputMSE();
 	}
+
+	private void setInitialArgs(String[] args) {
+		this.initialArgs = args;
+	}
+
+	public String[] getInitialArgs() {
+		return this.initialArgs;
+	}
 	
+
 	@Override
 	public boolean compile(String[] argv) {
 		boolean ret;
 		if (this.linkToExisting()) {
 			this.expandNamespacesNames();
 		}
-		
+
+		setInitialArgs(argv);
 		ret = super.compile(argv);
 		
 		this.compressNamespacesNames();
@@ -107,7 +123,7 @@ public class VerveineJParser extends VerveineParser {
 		pars.createASTs(/*sourceFilePaths*/this.filenames, 
 				/*encodings*/this.encodings, 
 				/*bindingKeys*/new String[0], 
-				/*requestor*/new FamixRequestor(getFamixRepo()), 
+				/*requestor*/new FamixRequestor(getFamixRepo(), getInitialArgs()), 
 				/*monitor*/null);
 		// NA --- end of parsing code --------------------------------------------------
 	}
