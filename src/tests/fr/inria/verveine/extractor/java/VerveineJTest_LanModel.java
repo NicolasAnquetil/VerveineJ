@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
@@ -359,6 +360,29 @@ public class VerveineJTest_LanModel {
 				}
 			}
 		}
+		
+		// test that the chain (next/previous) of invocations is correct
+		for (Method mNode : nodeClass.getMethods()) {
+			if (mNode.getName().equals("accept")) {
+				Invocation invok = mNode.getOutgoingInvocations().iterator().next();
+				assertNull(invok.getPrevious());
+				assertNull(invok.getNext());
+			}
+			else if (mNode.getName().equals("send"))  {
+				int nbNull = 0;
+				for (Invocation invok : mNode.getOutgoingInvocations()) {
+					Invocation previous = (Invocation) invok.getPrevious();
+					if (previous == null) {
+						nbNull++;
+					}
+					else {
+						assertSame(mNode, previous.getSender());
+					}					
+				}
+				assertEquals(1, nbNull);
+			}
+		}
+
 	}
 	
 	@Test
