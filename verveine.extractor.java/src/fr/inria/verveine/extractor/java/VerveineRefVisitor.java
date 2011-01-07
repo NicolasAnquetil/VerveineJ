@@ -104,7 +104,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			importBnd = ((ITypeBinding)importBnd).getPackage();
 		}
 
-		context.setLastAssoc( dico.ensureFamixReference(fmxSrc, dico.ensureFamixNamespace( (IPackageBinding) importBnd), context.getLastAssoc()) );
+		context.setLastReference( dico.ensureFamixReference(fmxSrc, dico.ensureFamixNamespace( (IPackageBinding) importBnd), context.getLastReference()) );
 		
 		return super.visit(node);
 	}
@@ -380,11 +380,12 @@ public class VerveineRefVisitor extends ASTVisitor {
 		if (accessor != null) {
 			Attribute accessed = this.dico.ensureFamixAttribute(bnd);
 			if (accessed != null) {
-				context.setLastAssoc( dico.ensureFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAssoc()) );
+				context.setLastAccess( dico.ensureFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
 				if ( (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
 					accessed.setParentType(dico.ensureFamixClassArray());
 				}
 			}
+			//context.setLastAccess( dico.ensureFamixInvocation(sender, invoked, receiver, context.getLastAccess) );
 		}
 	}
 
@@ -401,7 +402,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			if (invoked == null) {
 				invoked = this.dico.ensureFamixStubMethod(name);
 			}
-			context.setLastAssoc( dico.ensureFamixInvocation(sender, invoked, receiver, context.getLastAssoc()) );
+			context.setLastInvocation( dico.ensureFamixInvocation(sender, invoked, receiver, context.getLastInvocation()) );
 		}
 	}
 
