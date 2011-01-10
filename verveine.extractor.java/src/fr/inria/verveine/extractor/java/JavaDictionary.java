@@ -17,6 +17,7 @@ import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
+import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.NamedEntity;
@@ -154,6 +155,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		String identifier = null;
 		boolean wasBound = false;
 		
+		
 		if (bnd == null) {
 			System.err.println("Warning: Unexpected null binding, cannot create Famix Class");
 			return null;
@@ -221,11 +223,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// superclass
 			if (! bnd.isInterface()) {
 				ITypeBinding supbnd = bnd.getSuperclass();
-				if (supbnd == null) {
+				ITypeBinding[] intsbnd = bnd.getInterfaces();
+				if (supbnd == null && intsbnd.length == 0) {
 					sups.add( ensureFamixClassObject(null));
 				}
 				else {
-					sups.add( ensureFamixClass(supbnd));
+					if (supbnd != null) {
+						sups.add(ensureFamixClass(supbnd));
+					}
+					for (ITypeBinding intbnd : intsbnd) {
+						sups.add( ensureFamixClass(intbnd));
+					}
 				}
 			}
 			else {
@@ -288,8 +296,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx.setContainer(owner);
 			if (sups.size() > 0) {
 				// some types don't have superclass
+				Inheritance lastInheritance = null;
 				for (fr.inria.verveine.core.gen.famix.Class sup : sups) {
-					ensureFamixInheritance(sup, fmx);
+					lastInheritance = ensureFamixInheritance(sup, fmx, lastInheritance);
 				}
 			}
 			setNamedEntityModifiers(fmx, bnd.getDeclaredModifiers());
