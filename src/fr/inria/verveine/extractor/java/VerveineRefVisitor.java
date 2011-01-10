@@ -385,7 +385,6 @@ public class VerveineRefVisitor extends ASTVisitor {
 					accessed.setParentType(dico.ensureFamixClassArray());
 				}
 			}
-			//context.setLastAccess( dico.ensureFamixInvocation(sender, invoked, receiver, context.getLastAccess) );
 		}
 	}
 
