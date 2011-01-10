@@ -102,14 +102,14 @@ public class VerveineJTest_LanModel {
 	
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(11+8, TestVerveineUtils.selectElementsOfType(repo,fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System}
+		assertEquals(11+14, TestVerveineUtils.selectElementsOfType(repo,fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable,}
 		assertEquals(3, TestVerveineUtils.selectElementsOfType(repo,PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+7, TestVerveineUtils.selectElementsOfType(repo,Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString}
 		assertEquals(10+1, TestVerveineUtils.selectElementsOfType(repo,Attribute.class).size());//10+{System.out}
 		assertEquals(2+4, TestVerveineUtils.selectElementsOfType(repo,Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26, TestVerveineUtils.selectElementsOfType(repo,Parameter.class).size());
 		assertEquals(54, TestVerveineUtils.selectElementsOfType(repo,Invocation.class).size());//actually 54, missing 2 !!!!
-		assertEquals(5+12, TestVerveineUtils.selectElementsOfType(repo,Inheritance.class).size());//5 internal + 12 from imported packages/classes
+		assertEquals(6+24, TestVerveineUtils.selectElementsOfType(repo,Inheritance.class).size());//6 internal + 24 from imported packages/classes
 		assertEquals(25, TestVerveineUtils.selectElementsOfType(repo,Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0, TestVerveineUtils.selectElementsOfType(repo,LocalVariable.class).size());
 	}
@@ -174,7 +174,7 @@ public class VerveineJTest_LanModel {
 	public void testInheritance() {
 		fr.inria.verveine.core.gen.famix.Class clazz;
 		Collection<Inheritance> superInheritances;
-		Inheritance inh;
+		Inheritance inh, inh2 = null;
 		
 		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
@@ -191,6 +191,27 @@ public class VerveineJTest_LanModel {
 		inh = superInheritances.iterator().next();
 		assertSame(clazz, inh.getSubclass());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		
+		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "XPrinter");
+		assertNotNull(clazz);
+		superInheritances = clazz.getSuperInheritances();
+		assertEquals(2, superInheritances.size()); // superInheritances: Object and IPrinter (in this order)
+		for (Inheritance inheritance : superInheritances) {
+			assertSame(clazz, inheritance.getSubclass());
+			if (inheritance.getSuperclass().getName().equals("IPrinter")) {
+				inh2 = inheritance;
+				assertNull(inheritance.getNext());
+				assertSame(inheritance,inheritance.getPrevious().getNext());
+				assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
+			} else {
+				inh = inheritance;
+				assertNull(inheritance.getPrevious());
+				assertSame(inheritance,inheritance.getNext().getPrevious());
+				assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
+			}
+		}
+		assertSame(inh.getNext(), inh2);
+		assertSame(inh2.getPrevious(), inh);
 	}
 
 	@Test
@@ -248,7 +269,7 @@ public class VerveineJTest_LanModel {
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
 		Namespace ns = TestVerveineUtils.detectElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
-		assertEquals(5, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System
+		assertEquals(8, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Appendable,CharSequence
 		assertTrue(ns.getIsStub());
 			
 		fr.inria.verveine.core.gen.famix.Class obj = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
