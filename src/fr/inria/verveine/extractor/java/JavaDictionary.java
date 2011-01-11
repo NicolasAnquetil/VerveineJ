@@ -5,6 +5,7 @@ import java.util.LinkedList;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
@@ -14,6 +15,8 @@ import org.eclipse.jdt.core.dom.Modifier;
 
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.Dictionary;
+import fr.inria.verveine.core.gen.famix.AnnotationInstance;
+import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
@@ -128,7 +131,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return ensureFamixClass(bnd);
 		}
 	}
-
+	
 	public PrimitiveType ensureFamixPrimitiveType(ITypeBinding bnd) {
 
 		if (bnd == null) {
@@ -138,6 +141,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		PrimitiveType fmx = super.ensureFamixPrimitiveType(bnd.getName());
 		fmx.setIsStub(false);
+		mapBind.put(bnd, fmx);
+		return fmx;
+	}
+	
+	public AnnotationType ensureFamixAnnotationType(ITypeBinding bnd) {
+
+		if (bnd == null) {
+			System.err.println("Warning: Unexpected null binding, cannot create Famix Annotation Type");
+			return null;
+		}
+		
+		AnnotationType fmx = ensureFamixUniqEntity(AnnotationType.class, null, bnd.getName());
+		fmx.setIsStub(true);
+		fmx.setContainer(ensureFamixNamespace(bnd.getPackage()));
 		mapBind.put(bnd, fmx);
 		return fmx;
 	}
@@ -578,6 +595,21 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 		return fmx;
 	}
+	
+	/**
+	 * Creates and returns a FAMIX AnnotationInstance and associates it with an Entity and an AnnotationType
+	 * @param name -- the name (String) of the annotation 
+	 * @param owner -- the entity concerned by this annotation
+	 * @return the FAMIX AnnotationInstance
+	 */
+	public AnnotationInstance createFamixAnnotationInstance(SourcedEntity owner, AnnotationType annType) {
+		AnnotationInstance fmx = new AnnotationInstance();
+		fmx.setAnnotatedEntity(owner);
+		fmx.setAnnotationType(annType);
+		this.famixRepo.add(fmx);
+		
+		return fmx;
+	}
 
 	/**
 	 * Adds location information to a Famix Entity.
@@ -699,5 +731,4 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		return fmx;
 	}
-
 }
