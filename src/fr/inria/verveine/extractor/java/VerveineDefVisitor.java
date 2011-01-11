@@ -17,6 +17,8 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -100,7 +102,8 @@ public class VerveineDefVisitor extends ASTVisitor {
 
 	public boolean visit(TypeDeclaration node) {
 //		System.err.println("TRACE, DefVisiting TypeDeclaration: "+node.getName().getIdentifier());
-		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(node.resolveBinding());
+		ITypeBinding bnd = node.resolveBinding();
+		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd);
 		if (fmx != null) {
 			fmx.setIsStub(false);
 		}
@@ -116,6 +119,11 @@ public class VerveineDefVisitor extends ASTVisitor {
 		if (jdoc != null) {
 			Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
 			dico.addSourceAnchor(cmt, jdoc);
+		}
+		//Annotation
+		for (IAnnotationBinding abnd : bnd.getAnnotations()) {
+			AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
+			dico.createFamixAnnotationInstance(fmx, annType);
 		}
 		this.context.pushClass(fmx);
 		return super.visit(node);
@@ -210,6 +218,7 @@ public class VerveineDefVisitor extends ASTVisitor {
 //		System.err.println("TRACE, DefVisiting FieldDeclaration");
 		for (VariableDeclarationFragment vd : (List<VariableDeclarationFragment>)node.fragments()) {
 //			System.err.println("            Field: "+vd.getName().getIdentifier());
+			IVariableBinding bnd = vd.resolveBinding();
 			Attribute fmx = dico.ensureFamixAttribute(vd.resolveBinding());
 			if (fmx != null) {
 				fmx.setIsStub(false);
@@ -227,6 +236,11 @@ public class VerveineDefVisitor extends ASTVisitor {
 			if (jdoc != null) {
 				Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
 				dico.addSourceAnchor(cmt, jdoc);
+			}
+			//Annotation
+			for (IAnnotationBinding abnd : bnd.getAnnotations()) {
+				AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
+				dico.createFamixAnnotationInstance(fmx, annType);
 			}
 		}
 		return super.visit(node);
