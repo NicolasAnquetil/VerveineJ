@@ -15,6 +15,8 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IAnnotationBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -37,6 +39,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import fr.inria.verveine.core.EntityStack;
+import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.Comment;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
@@ -151,7 +154,8 @@ public class VerveineDefVisitor extends ASTVisitor {
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 //		System.err.println("TRACE, DefVisiting MethodDeclaration: "+node.getName().getIdentifier());
-		Method fmx = dico.ensureFamixMethod(node.resolveBinding());
+		IMethodBinding bnd = node.resolveBinding();
+		Method fmx = dico.ensureFamixMethod(bnd);
 		if (fmx != null) {
 			fmx.setIsStub(false);
 		}
@@ -178,6 +182,11 @@ public class VerveineDefVisitor extends ASTVisitor {
 				Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
 				dico.addSourceAnchor(cmt, jdoc);
 			}
+			//Annotation
+			for (IAnnotationBinding abnd : bnd.getAnnotations()) {
+				AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
+				dico.createFamixAnnotationInstance(fmx, annType);
+			}
 			this.context.pushMethod(fmx);
 			if (node.getBody() != null) {
 				context.setTopMethodCyclo(1);
@@ -195,7 +204,7 @@ public class VerveineDefVisitor extends ASTVisitor {
 		fmx.setCyclo(cyclo);
 		super.endVisit(node);
 	}
-
+	
 	@SuppressWarnings({ "unchecked" })
 	public boolean visit(FieldDeclaration node) {
 //		System.err.println("TRACE, DefVisiting FieldDeclaration");
