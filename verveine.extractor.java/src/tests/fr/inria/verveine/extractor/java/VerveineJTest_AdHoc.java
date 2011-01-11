@@ -9,6 +9,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
 import java.io.File;
+import java.util.Collection;
 
 import org.junit.After;
 import org.junit.Before;
@@ -16,6 +17,9 @@ import org.junit.Test;
 
 import test.fr.inria.verveine.core.TestVerveineUtils;
 import ch.akuhn.fame.Repository;
+import fr.inria.verveine.core.gen.famix.AnnotationInstance;
+import fr.inria.verveine.core.gen.famix.AnnotationType;
+import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.CaughtException;
 import fr.inria.verveine.core.gen.famix.DeclaredException;
 import fr.inria.verveine.core.gen.famix.Method;
@@ -77,5 +81,108 @@ public class VerveineJTest_AdHoc {
 		assertSame(meth, exC.getDefiningMethod());
 		assertSame(excepClass, exC.getExceptionClass());
 	}
-
+	
+	@Test
+	public void testAnnotation() {
+		fr.inria.verveine.core.gen.famix.Class clazz;
+		Collection<AnnotationInstance> annInstances;
+		
+		AnnotationType annTypeOverride = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.AnnotationType.class, "Override");
+		assertNotNull(annTypeOverride);
+		assertEquals("Override", annTypeOverride.getName());
+		
+		AnnotationType annTypeDeprecated = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.AnnotationType.class, "Deprecated");
+		assertNotNull(annTypeDeprecated);
+		assertEquals("Deprecated", annTypeDeprecated.getName());
+		
+		//Annotations to the class
+		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Client");
+		assertNotNull(clazz);
+		annInstances = clazz.getAnnotationInstances();
+		assertEquals(2, annInstances.size());
+		for (AnnotationInstance annotationInstance : annInstances) {
+			assertSame(clazz, annotationInstance.getAnnotatedEntity());
+			if (annotationInstance.getAnnotationType().getName().equals("Override")) {
+				assertEquals("Override", annotationInstance.getAnnotationType().getName());
+				assertSame(annTypeOverride, annotationInstance.getAnnotationType());
+			} else {
+				assertEquals("Deprecated", annotationInstance.getAnnotationType().getName());
+				assertSame(annTypeDeprecated, annotationInstance.getAnnotationType());
+			}
+		}
+		//Annotations to the attributes
+		for (Attribute attribute : clazz.getAttributes()) {
+			annInstances = attribute.getAnnotationInstances();
+			if (attribute.getName().equals("num")) {
+				assertEquals(2, annInstances.size());
+				for (AnnotationInstance annotationInstance : attribute.getAnnotationInstances()) {
+					assertSame(attribute, annotationInstance.getAnnotatedEntity());
+					if (annotationInstance.getAnnotationType().getName().equals("Override")) {
+						assertEquals("Override", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeOverride, annotationInstance.getAnnotationType());
+					} else {
+						assertEquals("Deprecated", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeDeprecated, annotationInstance.getAnnotationType());
+					}
+				}
+			} else if (attribute.getName().equals("nom")) {
+				assertEquals(1, annInstances.size());
+				for (AnnotationInstance annotationInstance : attribute.getAnnotationInstances()) {
+					assertSame(attribute, annotationInstance.getAnnotatedEntity());
+					if (annotationInstance.getAnnotationType().getName().equals("Override")) {
+						assertEquals("Override", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeOverride, annotationInstance.getAnnotationType());
+					} else {
+						assertEquals("Deprecated", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeDeprecated, annotationInstance.getAnnotationType());
+					}
+				}
+			} else {
+				assertEquals(0, annInstances.size());
+			}
+		}
+		//Annotations to the methods
+		for (Method method : clazz.getMethods()) {
+			annInstances = method.getAnnotationInstances();
+			if (method.getName().equals("Client")) {
+				assertEquals(2, annInstances.size());
+				for (AnnotationInstance annotationInstance : method.getAnnotationInstances()) {
+					assertSame(method, annotationInstance.getAnnotatedEntity());
+					if (annotationInstance.getAnnotationType().getName().equals("Override")) {
+						assertEquals("Override", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeOverride, annotationInstance.getAnnotationType());
+					} else {
+						assertEquals("Deprecated", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeDeprecated, annotationInstance.getAnnotationType());
+					}
+				}
+			} else if (method.getName().equals("lire")) {
+				assertEquals(2, annInstances.size());
+				for (AnnotationInstance annotationInstance : method.getAnnotationInstances()) {
+					assertSame(method, annotationInstance.getAnnotatedEntity());
+					if (annotationInstance.getAnnotationType().getName().equals("Override")) {
+						assertEquals("Override", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeOverride, annotationInstance.getAnnotationType());
+					} else {
+						assertEquals("Deprecated", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeDeprecated, annotationInstance.getAnnotationType());
+					}
+				}
+			} else if (method.getName().equals("setNum")) {
+				assertEquals(2, annInstances.size());
+				for (AnnotationInstance annotationInstance : method.getAnnotationInstances()) {
+					assertSame(method, annotationInstance.getAnnotatedEntity());
+					if (annotationInstance.getAnnotationType().getName().equals("Override")) {
+						assertEquals("Override", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeOverride, annotationInstance.getAnnotationType());
+					} else {
+						assertEquals("Deprecated", annotationInstance.getAnnotationType().getName());
+						assertSame(annTypeDeprecated, annotationInstance.getAnnotationType());
+					}
+				}
+			}else {
+				assertEquals(0, annInstances.size());
+			}
+		}
+	}
 }
