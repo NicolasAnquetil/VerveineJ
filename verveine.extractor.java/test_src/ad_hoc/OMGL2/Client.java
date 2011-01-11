@@ -3,18 +3,25 @@ import java.io.BufferedReader;
 import java.io.IOException;
 
 
-
-
+@Override
+@Deprecated
 public class Client {
-
+	
+	@Override
+	@Deprecated
 	private String num;
+	@Deprecated
 	private String nom;
 	
+	@Override
+	@Deprecated
 	public Client(String num, String nom) {
 		this.setNum(num);
 		this.setNom(nom);
 	}
-
+	
+	@Override
+	@Deprecated
 	public static Client lire(BufferedReader in) throws ReadException {
 		String nom = "";
 		String num = "";
@@ -39,11 +46,13 @@ public class Client {
 		return new Client(num, nom);
 		
 	}
-
+	
 	public String toString() {
 		return "client: ["+getNum()+"] "+getNom();
 	}
 	
+	@Override
+	@Deprecated
 	public void setNum(String num) {
 		this.num = num;
 	}
