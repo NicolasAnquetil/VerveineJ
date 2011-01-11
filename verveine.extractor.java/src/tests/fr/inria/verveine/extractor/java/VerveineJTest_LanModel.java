@@ -22,6 +22,8 @@ import org.junit.Test;
 import test.fr.inria.verveine.core.TestVerveineUtils;
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.gen.famix.Access;
+import fr.inria.verveine.core.gen.famix.AnnotationInstance;
+import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Comment;
@@ -112,6 +114,8 @@ public class VerveineJTest_LanModel {
 		assertEquals(6+24, TestVerveineUtils.selectElementsOfType(repo,Inheritance.class).size());//6 internal + 24 from imported packages/classes
 		assertEquals(25, TestVerveineUtils.selectElementsOfType(repo,Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0, TestVerveineUtils.selectElementsOfType(repo,LocalVariable.class).size());
+		assertEquals(1, TestVerveineUtils.selectElementsOfType(repo,AnnotationType.class).size()); //Override
+		assertEquals(2, TestVerveineUtils.selectElementsOfType(repo,AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
 	}
 
 	@Test
@@ -549,7 +553,7 @@ public class VerveineJTest_LanModel {
 	}
 	
 	@Test
-	public void testMetric() {	
+	public void testMetric() {
 		for (Method m : TestVerveineUtils.listElements(repo, Method.class, "accept")) {
 			assertNotNull(m);
 			fr.inria.verveine.core.gen.famix.Class owner = (fr.inria.verveine.core.gen.famix.Class) m.getParentType();
@@ -568,5 +572,43 @@ public class VerveineJTest_LanModel {
 			}
 		}		
 	}
-
+	
+	@Test
+	public void testAnnotation() {
+		fr.inria.verveine.core.gen.famix.Class clazz;
+		Collection<AnnotationInstance> annInstances;
+		
+		AnnotationType annType = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.AnnotationType.class, "Override");
+		assertNotNull(annType);
+		assertEquals("Override", annType.getName());
+		
+		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "PrintServer");
+		assertNotNull(clazz);
+		for (Method method : clazz.getMethods()) {
+			annInstances = method.getAnnotationInstances();
+			if (method.getName().equals("output")) {
+				assertEquals(1, annInstances.size());
+				AnnotationInstance annInstance = annInstances.iterator().next();
+				assertEquals("Override", annInstance.getAnnotationType().getName());
+				assertSame(annType, annInstance.getAnnotationType());
+				assertSame(method, annInstance.getAnnotatedEntity());
+			} else {
+				assertEquals(0, annInstances.size());
+			}
+		}
+		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		assertNotNull(clazz);
+		for (Method method : clazz.getMethods()) {
+			annInstances = method.getAnnotationInstances();
+			if (method.getName().equals("isDestinationFor")) {
+				assertEquals(1, annInstances.size());
+				AnnotationInstance annInstance = annInstances.iterator().next();
+				assertEquals("Override", annInstance.getAnnotationType().getName());
+				assertSame(annType, annInstance.getAnnotationType());
+				assertSame(method, annInstance.getAnnotatedEntity());
+			} else {
+				assertEquals(0, annInstances.size());
+			}
+		}	
+	}
 }
