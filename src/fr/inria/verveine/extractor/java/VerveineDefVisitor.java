@@ -121,9 +121,11 @@ public class VerveineDefVisitor extends ASTVisitor {
 			dico.addSourceAnchor(cmt, jdoc);
 		}
 		//Annotation
-		for (IAnnotationBinding abnd : bnd.getAnnotations()) {
-			AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
-			dico.createFamixAnnotationInstance(fmx, annType);
+		if (bnd != null) {
+			for (IAnnotationBinding abnd : bnd.getAnnotations()) {
+				AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
+				dico.createFamixAnnotationInstance(fmx, annType);
+			}
 		}
 		this.context.pushClass(fmx);
 		return super.visit(node);
@@ -191,9 +193,11 @@ public class VerveineDefVisitor extends ASTVisitor {
 				dico.addSourceAnchor(cmt, jdoc);
 			}
 			//Annotation
-			for (IAnnotationBinding abnd : bnd.getAnnotations()) {
-				AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
-				dico.createFamixAnnotationInstance(fmx, annType);
+			if (bnd != null) {
+				for (IAnnotationBinding abnd : bnd.getAnnotations()) {
+					AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
+					dico.createFamixAnnotationInstance(fmx, annType);
+				}
 			}
 			this.context.pushMethod(fmx);
 			if (node.getBody() != null) {
@@ -238,9 +242,11 @@ public class VerveineDefVisitor extends ASTVisitor {
 				dico.addSourceAnchor(cmt, jdoc);
 			}
 			//Annotation
-			for (IAnnotationBinding abnd : bnd.getAnnotations()) {
-				AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
-				dico.createFamixAnnotationInstance(fmx, annType);
+			if (bnd != null) {
+				for (IAnnotationBinding abnd : bnd.getAnnotations()) {
+					AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
+					dico.createFamixAnnotationInstance(fmx, annType);
+				}
 			}
 		}
 		return super.visit(node);
