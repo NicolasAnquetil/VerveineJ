@@ -136,6 +136,9 @@ public class VerveineRefVisitor extends ASTVisitor {
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 		Method meth = dico.ensureFamixMethod(node.resolveBinding());
+		if (meth == null) {
+			meth = dico.ensureFamixMethod(node, context.topClass());
+		}
 		this.context.pushMethod(meth);
 		for (Name excepName : (List<Name>)node.thrownExceptions()) {
 			fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(excepName.resolveTypeBinding());
@@ -155,14 +158,13 @@ public class VerveineRefVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(MethodInvocation node) {
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(node.getExpression()));
-
+		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(node.getExpression()), node.arguments().size());
 		return super.visit(node);
 	}
 
 	@SuppressWarnings("static-access")
 	public boolean visit(SuperMethodInvocation node) {
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), this.dico.ensureFamixImplicitVariable(this.context.topClass(), dico.SUPER_NAME));
+		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), this.dico.ensureFamixImplicitVariable(this.context.topClass(), dico.SUPER_NAME), node.arguments().size());
 		return super.visit(node);
 	}
 
@@ -394,10 +396,17 @@ public class VerveineRefVisitor extends ASTVisitor {
 	 * @param name of the method invoked
 	 * @param receiver of the call, i.e. the object to which the message is sent
 	 */
-	private void methodInvocation(IMethodBinding bnd, String name, NamedEntity receiver) {
+	private void methodInvocation(IMethodBinding bnd, String name, NamedEntity receiver, int numberOfArguments) {
 		BehaviouralEntity sender = this.context.topMethod();
 		if (sender != null) {
 			Method invoked = this.dico.ensureFamixMethod(bnd);
+			if (invoked == null) {
+				if (receiver != null && receiver.getName().equals("self")) {
+					receiver = this.context.topClass();
+				}
+				invoked = this.dico.ensureFamixMethod(name, receiver, numberOfArguments);
+				//invoked = this.dico.ensureFamixStubMethod(name);
+			}
 			if (invoked == null) {
 				invoked = this.dico.ensureFamixStubMethod(name);
 			}
