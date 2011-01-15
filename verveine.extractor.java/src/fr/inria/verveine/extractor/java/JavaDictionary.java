@@ -1,7 +1,9 @@
 package fr.inria.verveine.extractor.java;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -11,13 +13,16 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.core.gen.famix.AnnotationInstance;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.Attribute;
+import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.Inheritance;
@@ -130,6 +135,24 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		else {
 			return ensureFamixClass(bnd);
 		}
+	}
+	
+	public List<Type> ensureFamixTypes(List types) {
+		List<Type> fmxTypes = new ArrayList<Type>();
+		Type fmxType = null;
+		for (Object type : types) {
+			fmxType = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, type.toString());
+			fmxTypes.add(fmxType);
+		}
+		return fmxTypes;
+	}
+	
+	public Type ensureFamixType(ITypeBinding bnd, String type) {
+		Type fmx = ensureFamixType(bnd);
+		if (fmx == null) {
+			return ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, type);
+		}
+		return fmx;
 	}
 	
 	public PrimitiveType ensureFamixPrimitiveType(ITypeBinding bnd) {
@@ -412,7 +435,55 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		return fmx;
 	}
-
+	
+	@SuppressWarnings("unchecked")
+	public String stubMethodSignature(MethodDeclaration node) {
+		String sig = node.getName().getIdentifier() + "(";
+		boolean first = true;
+		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
+			if (! first) {
+				sig += "," + param.getType().toString();
+			}
+			else {
+				sig += param.getType().toString();
+				first = false;
+			}
+		}
+		sig += ")";
+		return sig;
+	}
+	
+	public Method ensureFamixMethod(String identifier, NamedEntity owner, int numberOfParameters) {
+		Method fmx = null;
+		if (owner != null) {
+			for (Method candidate : getEntityByName(Method.class, identifier) ) {
+				if ((candidate.getParentType() == owner) && (candidate.getParameters().size() == numberOfParameters)) {
+					fmx = candidate;
+					break;
+				}
+			}
+		} else {
+			for (Method candidate : getEntityByName(Method.class, identifier) ) {
+				if (candidate.getParameters().size() == numberOfParameters) {
+					fmx = candidate;
+					break;
+				}
+			}
+		}
+		return fmx;
+	}
+	
+	public Method ensureFamixMethod(MethodDeclaration node, fr.inria.verveine.core.gen.famix.Class owner) {
+		Method fmx = null;
+		for (Method candidate : getEntityByName(Method.class, node.getName().getIdentifier()) ) {
+			if ((candidate.getParentType() == owner) && (candidate.getSignature().equals(stubMethodSignature(node))) ) {
+				fmx = candidate;
+				break;
+			}
+		}
+		return fmx;
+	}
+		
 	/**
 	 * Returns a Famix Attribute associated with the IVariableBinding. The Entity is created if it does not exist.
 	 * The JDT Binding is a unique representation of a java entity within the AST.
@@ -495,7 +566,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param bnd -- the JDT Binding 
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Parameter ensureFamixParameter(IVariableBinding bnd) {
+	public Parameter ensureFamixParameter(IVariableBinding bnd, Method owner) {
 		boolean wasBound = false;
 		
 		if (bnd == null) {
@@ -517,12 +588,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if ( (fmx!=null) && (! wasBound) ) {
 			// declaring method
-			fmx.setParentBehaviouralEntity(ensureFamixMethod(bnd.getDeclaringMethod()));
+			if (bnd.getDeclaringMethod() != null) {
+				fmx.setParentBehaviouralEntity(ensureFamixMethod(bnd.getDeclaringMethod()));
+			} else {
+				fmx.setParentBehaviouralEntity(owner);
+			}
 			// type of the attribute
 			fmx.setDeclaredType(this.ensureFamixType(bnd.getType()));
 		}
 		
 		return fmx;
+	}
+	
+	public Parameter ensureFamixParameter(IVariableBinding bnd) {
+		return ensureFamixParameter(bnd, null);
 	}
 
 	/**
