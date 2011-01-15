@@ -104,6 +104,7 @@ public class VerveineDefVisitor extends ASTVisitor {
 //		System.err.println("TRACE, DefVisiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd);
+		//fmx.setTypeArguments(dico.ensureFamixTypes(node.typeParameters()));
 		if (fmx != null) {
 			fmx.setIsStub(false);
 		}
@@ -160,7 +161,7 @@ public class VerveineDefVisitor extends ASTVisitor {
 		this.context.popClass();
 		super.endVisit(node);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 //		System.err.println("TRACE, DefVisiting MethodDeclaration: "+node.getName().getIdentifier());
@@ -173,16 +174,23 @@ public class VerveineDefVisitor extends ASTVisitor {
 			System.err.println("         Method="+node.getName().getIdentifier() + ",  fallback to creating a stub");
 			fmx = dico.ensureFamixMethod(node.getName().getIdentifier());
 			fmx.setParentType(context.topClass());
-			fmx.setSignature(fmx.getName()+" (???)");
-			fmx.setDeclaredType( dico.ensureFamixClassObject(null) );
+			//fmx.setSignature(fmx.getName()+" (???)");
+			fmx.setSignature(dico.stubMethodSignature(node));
+			//fmx.setDeclaredType( dico.ensureFamixClassObject(null));
+			// Has no binding? It might be a Generic type
+			fmx.setDeclaredType(dico.ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, node.getReturnType2().toString()));
 		}
-
-		if (fmx != null) {			
+		if (fmx != null) {
 			// creating the method's parameters
 			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
-				Parameter fmxParam = dico.ensureFamixParameter(param.resolveBinding());
+//				System.err.println(param.getName().getIdentifier());
+//				System.err.println(param.resolveBinding()==null);
+				Parameter fmxParam = dico.ensureFamixParameter(param.resolveBinding(), fmx);
 				if (fmxParam != null) {
 					fmxParam.setIsStub(false);
+				} else {
+					// Has no binding? It might be a Generic parameter
+					fmxParam = dico.createFamixParameter(param.getName().getIdentifier(), fmx, param.getType().toString());
 				}
 			}
 			
@@ -232,7 +240,9 @@ public class VerveineDefVisitor extends ASTVisitor {
 				fmx = dico.ensureFamixAttribute(vd.getName().getFullyQualifiedName());
 				fmx.setParentType(context.topClass());
 				// should try to find type name from 'node.getType()' ?
-				fmx.setDeclaredType( dico.ensureFamixClassObject(null) );
+				//fmx.setDeclaredType( dico.ensureFamixClassObject(null) );
+				// Has no binding? It might be a Generic type
+				fmx.setDeclaredType(dico.ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, node.getType().toString()));
 			}
 			
 			dico.addSourceAnchor(fmx, node);
@@ -281,8 +291,9 @@ public class VerveineDefVisitor extends ASTVisitor {
 				fmx = dico.ensureFamixLocalVariable(vd.getName().getFullyQualifiedName());
 				fmx.setParentBehaviouralEntity(context.topMethod());
 				// should try to find type name from 'node.getType()' ?
-				fmx.setDeclaredType( dico.ensureFamixClassObject(null) );
-
+				//fmx.setDeclaredType( dico.ensureFamixClassObject(null) );
+				// Has no binding? It might be a Generic type
+				fmx.setDeclaredType(dico.ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, nodeTyp.toString()));
 				dico.addSourceAnchor(fmx, node);
 			}
 		}
