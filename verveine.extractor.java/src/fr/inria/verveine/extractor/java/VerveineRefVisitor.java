@@ -314,7 +314,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 						ret = dico.ensureFamixParameter( (IVariableBinding)bnd);
 					}
 					else { // suppose it's a local variable
-						ret = dico.ensureFamixLocalVariable( (IVariableBinding)bnd);
+						ret = dico.ensureFamixLocalVariable( (IVariableBinding)bnd, context.topMethod());
 					}
 				}
 			}
