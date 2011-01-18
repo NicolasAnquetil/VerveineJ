@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.core.dom.ParameterizedType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
@@ -104,7 +105,6 @@ public class VerveineDefVisitor extends ASTVisitor {
 //		System.err.println("TRACE, DefVisiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd);
-		//fmx.setTypeArguments(dico.ensureFamixTypes(node.typeParameters()));
 		if (fmx != null) {
 			fmx.setIsStub(false);
 		}
@@ -115,6 +115,8 @@ public class VerveineDefVisitor extends ASTVisitor {
 			dico.ensureFamixInheritance(dico.ensureFamixClassObject(null), fmx);
 			fmx.setContainer( context.top());
 		}
+		fmx.setParameterTypes(dico.ensureFamixTypesParameters(node.typeParameters()));
+		
 		dico.addSourceAnchor(fmx, node);
 		Javadoc jdoc = node.getJavadoc();
 		if (jdoc != null) {
@@ -171,7 +173,7 @@ public class VerveineDefVisitor extends ASTVisitor {
 			fmx.setIsStub(false);
 		}
 		else {
-			System.err.println("         Method="+node.getName().getIdentifier() + ",  fallback to creating a stub");
+			System.err.println("         Method="+node.getName().getIdentifier());
 			fmx = dico.ensureFamixMethod(node.getName().getIdentifier());
 			fmx.setParentType(context.topClass());
 			//fmx.setSignature(fmx.getName()+" (???)");
@@ -180,17 +182,22 @@ public class VerveineDefVisitor extends ASTVisitor {
 			// Has no binding? It might be a Generic type
 			fmx.setDeclaredType(dico.ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, node.getReturnType2().toString()));
 		}
+		if (node.getReturnType2() != null && node.getReturnType2().isParameterizedType()) {
+			fmx.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)node.getReturnType2()).typeArguments()));
+		}
 		if (fmx != null) {
 			// creating the method's parameters
 			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
-//				System.err.println(param.getName().getIdentifier());
-//				System.err.println(param.resolveBinding()==null);
 				Parameter fmxParam = dico.ensureFamixParameter(param.resolveBinding(), fmx);
 				if (fmxParam != null) {
 					fmxParam.setIsStub(false);
 				} else {
 					// Has no binding? It might be a Generic parameter
+					System.err.println("         Parameter="+param.getName().getIdentifier());
 					fmxParam = dico.createFamixParameter(param.getName().getIdentifier(), fmx, param.getType().toString());
+				}
+				if (param.getType().isParameterizedType()) {
+					fmxParam.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)param.getType()).typeArguments()));
 				}
 			}
 			
@@ -232,11 +239,13 @@ public class VerveineDefVisitor extends ASTVisitor {
 //			System.err.println("            Field: "+vd.getName().getIdentifier());
 			IVariableBinding bnd = vd.resolveBinding();
 			Attribute fmx = dico.ensureFamixAttribute(vd.resolveBinding());
+			
+			//((ParameterizedType)node.getType()).typeArguments();
 			if (fmx != null) {
 				fmx.setIsStub(false);
 			}
 			else {
-				System.err.println("         Attribute="+vd.getName().getFullyQualifiedName() + ",  fallback to creating a stub");
+				System.err.println("         Attribute="+vd.getName().getFullyQualifiedName());
 				fmx = dico.ensureFamixAttribute(vd.getName().getFullyQualifiedName());
 				fmx.setParentType(context.topClass());
 				// should try to find type name from 'node.getType()' ?
@@ -244,7 +253,9 @@ public class VerveineDefVisitor extends ASTVisitor {
 				// Has no binding? It might be a Generic type
 				fmx.setDeclaredType(dico.ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, node.getType().toString()));
 			}
-			
+			if (node.getType().isParameterizedType()) {
+				fmx.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)node.getType()).typeArguments()));
+			}
 			dico.addSourceAnchor(fmx, node);
 			Javadoc jdoc = node.getJavadoc();
 			if (jdoc != null) {
@@ -282,12 +293,12 @@ public class VerveineDefVisitor extends ASTVisitor {
 		}
 
 		for (VariableDeclarationFragment vd : fragments) {
-			LocalVariable fmx = dico.ensureFamixLocalVariable(vd.resolveBinding());
+			LocalVariable fmx = dico.ensureFamixLocalVariable(vd.resolveBinding(), context.topMethod());
 			if (fmx != null) {
 				fmx.setIsStub(false);
 			}
 			else {
-				System.err.println("         Variable="+vd.getName().getFullyQualifiedName() + ",  fallback to creating a stub");
+				System.err.println("         Variable="+vd.getName().getFullyQualifiedName());
 				fmx = dico.ensureFamixLocalVariable(vd.getName().getFullyQualifiedName());
 				fmx.setParentBehaviouralEntity(context.topMethod());
 				// should try to find type name from 'node.getType()' ?
@@ -295,6 +306,9 @@ public class VerveineDefVisitor extends ASTVisitor {
 				// Has no binding? It might be a Generic type
 				fmx.setDeclaredType(dico.ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, nodeTyp.toString()));
 				dico.addSourceAnchor(fmx, node);
+			}
+			if (nodeTyp.isParameterizedType()) {
+				fmx.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)nodeTyp).typeArguments()));
 			}
 		}
 	}
