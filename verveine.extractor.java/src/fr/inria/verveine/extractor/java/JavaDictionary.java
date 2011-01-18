@@ -7,7 +7,6 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
@@ -16,13 +15,13 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.TypeParameter;
 
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.core.gen.famix.AnnotationInstance;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.Attribute;
-import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.Inheritance;
@@ -137,11 +136,16 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 	}
 	
-	public List<Type> ensureFamixTypes(List types) {
-		List<Type> fmxTypes = new ArrayList<Type>();
+	public Collection<Type> ensureFamixTypes(List<org.eclipse.jdt.core.dom.Type> types) {
+		Collection<Type> fmxTypes = new ArrayList<Type>();
 		Type fmxType = null;
-		for (Object type : types) {
-			fmxType = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, type.toString());
+		for (org.eclipse.jdt.core.dom.Type type : types) {
+			ITypeBinding bnd = type.resolveBinding();
+			if (bnd != null) {
+				fmxType = ensureFamixType(bnd);
+			} else {
+				fmxType = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, type.toString());
+			}
 			fmxTypes.add(fmxType);
 		}
 		return fmxTypes;
@@ -153,6 +157,21 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, type);
 		}
 		return fmx;
+	}
+	
+	public Collection<Type> ensureFamixTypesParameters(List<TypeParameter> types) {
+		Collection<Type> fmxTypes = new ArrayList<Type>();
+		Type fmxType = null;
+		for (TypeParameter type : types) {
+			ITypeBinding bnd = type.resolveBinding();
+			if (bnd != null) {
+				fmxType = ensureFamixType(bnd);
+			} else {
+				fmxType = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, type.toString());
+			}
+			fmxTypes.add(fmxType);
+		}
+		return fmxTypes;
 	}
 	
 	public PrimitiveType ensureFamixPrimitiveType(ITypeBinding bnd) {
@@ -366,7 +385,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		boolean wasBound = false;
 		
 		if (bnd == null) {
-			System.err.println("Warning: Unexpected null binding, cannot create Famix Method");
+			System.err.println("Warning: Unexpected null binding to Famix Method");
 			return null;
 		}
 
@@ -378,7 +397,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// TODO what to put in metamodel?
 		}
 		else {
-			rettyp = this.ensureFamixType(bnd.getReturnType());	
+			rettyp = this.ensureFamixType(bnd.getReturnType());
 		}
 
 		// method signature
@@ -497,7 +516,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		boolean wasBound = false;
 
 		if (bnd == null) {
-			System.err.println("Warning: Unexpected null binding, cannot create Famix Attribute");
+			System.err.println("Warning: Unexpected null binding to Famix Attribute");
 			return null;
 		}
 
@@ -570,7 +589,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		boolean wasBound = false;
 		
 		if (bnd == null) {
-			System.err.println("Warning: Unexpected null binding, cannot create Famix Parameter");
+			System.err.println("Warning: Unexpected null binding to Famix Parameter");
 			return null;
 		}
 
@@ -611,17 +630,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param bnd -- the JDT Binding 
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd) {
+	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, Method fmxMethod) {
 		Method owner = null;
 		Type typ = null;
 		boolean wasBound = false;
 
 		if (bnd == null) {
-			System.err.println("Warning: Unexpected null binding, cannot create Famix LocalVariable");
+			System.err.println("Warning: Unexpected null binding to Famix LocalVariable");
 			return null;
 		}
 
 		owner = this.ensureFamixMethod(bnd.getDeclaringMethod());
+		if (owner == null) {
+			owner = fmxMethod;
+		}
 		typ = this.ensureFamixType(bnd.getType());
 
 		// finally trying to recover the entity or creating it
@@ -658,7 +680,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		return fmx;
 	}
-
+	
+	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd) {
+		return ensureFamixLocalVariable(bnd, null);
+	}
+	
 	/**
 	 * Returns a Famix UnknownVariable associated with the IVariableBinding. The Entity is created if it does not exist.
 	 * The JDT Binding is a unique representation of a java entity within the AST.
