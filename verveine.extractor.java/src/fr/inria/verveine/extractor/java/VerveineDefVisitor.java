@@ -176,11 +176,10 @@ public class VerveineDefVisitor extends ASTVisitor {
 			System.err.println("         Method="+node.getName().getIdentifier());
 			fmx = dico.ensureFamixMethod(node.getName().getIdentifier());
 			fmx.setParentType(context.topClass());
-			//fmx.setSignature(fmx.getName()+" (???)");
 			fmx.setSignature(dico.stubMethodSignature(node));
-			//fmx.setDeclaredType( dico.ensureFamixClassObject(null));
-			// Has no binding? It might be a Generic type
-			fmx.setDeclaredType(dico.ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, node.getReturnType2().toString()));
+			if (! node.isConstructor()) {
+				fmx.setDeclaredType(dico.ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, node.getReturnType2().toString()));
+			}
 		}
 		if (node.getReturnType2() != null && node.getReturnType2().isParameterizedType()) {
 			fmx.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)node.getReturnType2()).typeArguments()));

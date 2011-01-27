@@ -128,7 +128,6 @@ public class VerveineJTest_Dictionary {
 		assertSame(TestVerveineUtils.detectElement(repo, Type.class, "ImplicitVars"), it.next());
 	}
 
-
 	@Test
 	public void testMethodParameterArgumentTypes() {
 		Method fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
