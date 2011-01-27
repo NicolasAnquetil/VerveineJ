@@ -393,12 +393,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		owner = this.ensureFamixClass(bnd.getDeclaringClass());
 
 		// return type
-		if (bnd.isConstructor()) {
-			// TODO what to put in metamodel?
-		}
-		else {
+		if (! bnd.isConstructor()) {
 			rettyp = this.ensureFamixType(bnd.getReturnType());
 		}
+		// TODO   else what?
 
 		// method signature
 		sig = bnd.getName() + "(";
