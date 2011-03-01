@@ -36,6 +36,7 @@ import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
+import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
@@ -70,7 +71,7 @@ public class VerveineJTest_LanModel {
 				"server/OutputServer.java",
 				"server/PrintServer.java"
 		};
-		
+
 		// separate parsing of each source file
 		for (String f : files) {
 			parseFile(f);
@@ -104,7 +105,10 @@ public class VerveineJTest_LanModel {
 	
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(11+14, TestVerveineUtils.selectElementsOfType(repo,fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable,}
+		for (Type t : TestVerveineUtils.selectElementsOfType(repo, Type.class) ) {
+			System.out.println("TEST TYPES "+t.getName()+"   --> "+t.getClass().getCanonicalName());
+		}
+		assertEquals(11+14, TestVerveineUtils.selectElementsOfType(repo,fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable}
 		assertEquals(3, TestVerveineUtils.selectElementsOfType(repo,PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+7, TestVerveineUtils.selectElementsOfType(repo,Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString}
 		assertEquals(10+1, TestVerveineUtils.selectElementsOfType(repo,Attribute.class).size());//10+{System.out}

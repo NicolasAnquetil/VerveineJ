@@ -22,10 +22,15 @@ import org.junit.Test;
 import test.fr.inria.verveine.core.TestVerveineUtils;
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.gen.famix.Attribute;
+import fr.inria.verveine.core.gen.famix.ContainerEntity;
+import fr.inria.verveine.core.gen.famix.Entity;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
+import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
+import fr.inria.verveine.core.gen.famix.ParameterType;
+import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
@@ -60,75 +65,54 @@ public class VerveineJTest_Dictionary {
 
 	@Test
 	public void testClassParameterTypes() {
-		fr.inria.verveine.core.gen.famix.Class nodeClass = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Dictionary");
-		assertNotNull(nodeClass);
-		assertEquals("Dictionary", nodeClass.getName());
-		assertFalse(nodeClass.getIsInterface());
-		assertEquals(1, nodeClass.getParameterTypes().size());
-		assertSame(TestVerveineUtils.detectElement(repo, Type.class, "B"), nodeClass.getParameterTypes().iterator().next());
+		ParameterizableClass dicoClass = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Dictionary");
+		assertNotNull(dicoClass);
+		assertEquals("Dictionary", dicoClass.getName());
+		assertEquals(2, dicoClass.getTypes().size());
+		assertEquals(1, dicoClass.getParameters().size());
+		
+		ParameterType dicoParam = TestVerveineUtils.detectElement(repo, ParameterType.class, "B");
+		assertNotNull(dicoParam);
+		assertEquals("B", dicoParam.getName());
+		
+		assertSame(dicoClass, dicoParam.getContainer());
+		assertSame(dicoParam, dicoClass.getParameters().iterator().next());
 	}
 
 	@Test
+	public void testParameterTypeAsType() {
+		Method gebb = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByBinding");
+		assertNotNull(gebb);
+		assertSame(1, gebb.getParameters().size());
+		
+		Parameter bnd = gebb.getParameters().iterator().next();
+		assertNotNull(bnd);
+		assertEquals("bnd", bnd.getName());
+		
+		Type b = bnd.getDeclaredType();
+		assertNotNull(b);
+		assertEquals("B", b.getName());
+		assertSame(ParameterType.class, b.getClass());
+		
+		ContainerEntity cont = b.getContainer();
+		assertNotNull(cont);
+		assertEquals("Dictionary", cont.getName());
+		assertSame(ParameterizableClass.class, cont.getClass());
+	}
+	
+	/*Test
 	public void testFieldArgumentTypes() {
-		Attribute famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "DEFAULT_PCKG_NAME");
-		assertNotNull(famixAtt);
-		assertEquals("DEFAULT_PCKG_NAME", famixAtt.getName());
-		assertNull(famixAtt.getDeclaredArgumentTypes());
-		
-		famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "STUB_METHOD_CONTAINER_NAME");
-		assertNotNull(famixAtt);
-		assertEquals("STUB_METHOD_CONTAINER_NAME", famixAtt.getName());
-		assertNull(famixAtt.getDeclaredArgumentTypes());
-		
-		famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "SELF_NAME");
-		assertNotNull(famixAtt);
-		assertEquals("SELF_NAME", famixAtt.getName());
-		assertNull(famixAtt.getDeclaredArgumentTypes());
-		
-		famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "SUPER_NAME");
-		assertNotNull(famixAtt);
-		assertEquals("SUPER_NAME", famixAtt.getName());
-		assertNull(famixAtt.getDeclaredArgumentTypes());
-		
-		famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "famixRepo");
-		assertNotNull(famixAtt);
-		assertEquals("famixRepo", famixAtt.getName());
-		assertNull(famixAtt.getDeclaredArgumentTypes());
-
-		famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "mapBind");
+		Attribute famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "mapBind");
 		assertNotNull(famixAtt);
 		assertEquals("mapBind", famixAtt.getName());
 		assertEquals(2, famixAtt.getDeclaredArgumentTypes().size());
 		Iterator<Type> it = famixAtt.getDeclaredArgumentTypes().iterator();
 		assertSame(TestVerveineUtils.detectElement(repo, Type.class, "B"), it.next());
 		assertSame(TestVerveineUtils.detectElement(repo, Type.class, "NamedEntity"), it.next());
-		
-		famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "mapName");
-		assertNotNull(famixAtt);
-		assertEquals("mapName", famixAtt.getName());
-		assertEquals(2, famixAtt.getDeclaredArgumentTypes().size());
-		it = famixAtt.getDeclaredArgumentTypes().iterator();
-		assertSame(TestVerveineUtils.detectElement(repo, Type.class, "String"), it.next());
-		assertSame(TestVerveineUtils.detectElement(repo, Type.class, "Collection"), it.next());
-		
-		famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "mapImpVar");
-		assertNotNull(famixAtt);
-		assertEquals("mapImpVar", famixAtt.getName());
-		assertEquals(2, famixAtt.getDeclaredArgumentTypes().size());
-		it = famixAtt.getDeclaredArgumentTypes().iterator();
-		Collection<Type> fmxClasses = TestVerveineUtils.listElements(repo, Type.class, "Class");
-		String javaLangNamespace = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
-		Namespace ns = TestVerveineUtils.detectElement(repo, Namespace.class, javaLangNamespace);
-		//There are two classes with the name Class (java.lang and famix namespaces). Ensure to get the correct one.
-		for (Type fmxClass : fmxClasses) {
-			if (ns != fmxClass.getContainer()) {
-				assertSame(fmxClass, it.next());
-			}
-		}
-		assertSame(TestVerveineUtils.detectElement(repo, Type.class, "ImplicitVars"), it.next());
 	}
-
-	@Test
+*/
+	
+	/*Test
 	public void testMethodParameterArgumentTypes() {
 		Method fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
 		assertNotNull(fmxMethod);
@@ -192,8 +176,9 @@ public class VerveineJTest_Dictionary {
 			}
 		}
 	}
+	*/
 	
-	@Test
+	/*Test
 	public void testMethodLocalVariableArgumentTypes() {
 		Method fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "mapEntityToName");
 		assertNotNull(fmxMethod);
@@ -233,12 +218,14 @@ public class VerveineJTest_Dictionary {
 			}
 		}
 	}
+	*/
 	
-	@Test
+	/*Test
 	public void testMethodReturnArgumentTypes() {
 		Method fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
 		assertNotNull(fmxMethod);
 		assertEquals(1, fmxMethod.getDeclaredArgumentTypes().size());
 		assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxMethod.getDeclaredArgumentTypes().iterator().next());
 	}
+	*/
 }
