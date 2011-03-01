@@ -1,0 +1,54 @@
+
+memory usage for Eclipse 3.1
+$ time ./verveinej3_1.sh 2> toto.log >&2
+$ time ./verveinej-mono-3_1.sh 2> toto.log >&2
+
+120.51user 3.31system 2:25.05elapsed 85%CPU 
+(0avgtext+0avgdata 9.646.080maxresident)k
+292144inputs+221248outputs (2356major+700607minor)pagefaults 0swaps
+8522 toto.log
+
+120.79user 2.95system 1:53.51elapsed 109%CPU 
+(0avgtext+0avgdata 9.175.040maxresident)k
+142416inputs+220976outputs (87major+622960minor)pagefaults 0swaps
+8522 toto.log
+3.340.182 output.mse
+
+112.33user 4.35system 1:40.17elapsed 116%CPU 
+(0avgtext+0avgdata 9.777.152maxresident)k
+68760inputs+221504outputs (190major+682907minor)pagefaults 0swaps
+
+$ for i in `grep FAMIX output.mse | sed -e 's/ (id:.*//' | sed -e 's/^        (//' | sort -u`; do echo -n "$i   "; grep -c $i output.mse ; done
+FAMIX.Access   60984
+FAMIX.Attribute   27473
+FAMIX.CaughtException   3690
+FAMIX.Class   7906
+FAMIX.Comment   37000
+FAMIX.DeclaredException   3848
+FAMIX.FileAnchor   124493
+FAMIX.ImplicitVariable   4996
+FAMIX.Inheritance   7136
+FAMIX.Invocation   169940
+FAMIX.LocalVariable   37753
+FAMIX.Method   53602
+FAMIX.Namespace   377
+FAMIX.Parameter   52480
+FAMIX.PrimitiveType   9
+FAMIX.Reference   30799
+FAMIX.ThrownException   2414
+FAMIX.UnknownVariable   23090
+FAMIX   647990
+
+$ grep -c 'null binding' toto.log 
+8413
+
+
+=======================================
+SEPARATE
+
+2041.59user 115.58system 27:47.42elapsed 129%CPU 
+(0avgtext+0avgdata 7.086.080maxresident)k
+135200inputs+6149832outputs (110major+16978083minor)pagefaults 0swaps
+
+
+FAMIX.Attribute   27520
