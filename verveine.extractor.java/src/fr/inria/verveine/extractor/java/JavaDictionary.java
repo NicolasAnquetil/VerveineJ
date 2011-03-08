@@ -6,15 +6,16 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.QualifiedType;
+import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.TypeParameter;
 
 import ch.akuhn.fame.Repository;
@@ -30,11 +31,10 @@ import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
-import fr.inria.verveine.core.gen.famix.ParameterType;
-import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
 import fr.inria.verveine.core.gen.famix.SourcedEntity;
+import fr.inria.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.core.gen.famix.UnknownVariable;
 
@@ -61,56 +61,29 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Returns a Famix Namespace associated with the IPackageBinding. The Entity is created if it does not exist.
-	 * The JDT Binding is a unique representation of a java entity within the AST.
-	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
-	 * @param bnd -- the JDT Binding 
-	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
+	 * Returns a Famix Namespace associated with its IPackageBinding and/or name.
+	 * The Entity is created if it does not exist (see also {@link Dictionary#ensureFamixNamespace(Object, String)}).
+	 * Also creates or recovers recusively it's parent namespaces.<br>
+	 * At least one of <b>bnd</b> and <b>name</b> must be non null.
+	 * @param bnd -- the JDT Binding that may be used as a uniq key to recover this namespace
+	 * @param name -- fully qualified name of the namespace (e.g. 'java.lang')
+	 * @return the Famix Namespace found or created. May return null in case of a Famix error
 	 */
-	public Namespace ensureFamixNamespace(IPackageBinding bnd) {
-		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding, cannot create Famix Namespace");
-			return null;
-		}
-
-		Namespace fmx = ensureFamixNamespaceWithParentScope(bnd, null);
-
-		return fmx;
-	}
-
-	@Override
-	public Namespace ensureFamixNamespace(String name) {
-		Namespace fmx = ensureFamixNamespaceWithParentScope(null, name);
-
-		return fmx;
-	}
-
-	/**
-	 * Creates or recovers a namespace. Also creates or recovers recusively it's parent namespaces.
-	 * At least one of <b>bnd</b> and <b>name</b> must be passed.
-	 * <p>Note: Packages are created with their fully-qualified name to simplify recovering them when we don't have a binding
-	 * (for example when creating parent packages of a package we have a binding for).
-	 * Because the preferred solution in Moose is to give their simple names to packages, they must be post-processed when
-	 * all is said and done.</p>
-	 * @param bnd - the (optional) binding for the namespace
-	 * @param name - the (optional) full name for the namespace
-	 * @return the namespace created or null
-	 */
-	private Namespace ensureFamixNamespaceWithParentScope(IPackageBinding bnd, String name) {
+	public Namespace ensureFamixNamespace(IPackageBinding bnd, String name) {
 		Namespace fmx = null;
 		Namespace parent = null;
-		
-		if (bnd != null) {
+
+		if ( (name == null) && (bnd != null) ) {
 			name = bnd.getName();
 		}
 		
-		if ( (name!=null) && (name.length() > 0) ) {
-			fmx = ensureFamixUniqEntity(Namespace.class, bnd, name);
-			// compute parent's name and creates parent
-			int last = name.lastIndexOf('.');
-			if (last > 0) {
-				parent = ensureFamixNamespaceWithParentScope(null, name.substring(0, last));
-			}
+		if (name.length() > 0) {
+			/* Note: Packages are created with their fully-qualified name to simplify recovering them when we don't have a binding
+			 * (for example when creating parent packages of a package we have a binding for).
+			 * Because the preferred solution in Moose is to give their simple names to packages, they must be post-processed when
+			 * all is said and done. */
+			fmx = super.ensureFamixNamespace( bnd, name);
+			parent = this.ensureFamixNamespace(null, removeLastName(name));
 			// set the parentscope relationship
 			if ( (parent != null) && (fmx != null) && (fmx.getParentScope() == null)) {
 				parent.addChildScopes(fmx);
@@ -120,108 +93,51 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	/** Creates or recovers a FAMIX Type. Tries to guess the exact subclass of Type of the entity.
-	 * Checks for: primitive type, interface, class, parameterizable class
-	 * @param bnd -- JDT binding for the type
-	 * @return the type recovered or created, or null in case of an error
-	 */
-	public Type ensureFamixType(ITypeBinding bnd, ContainerEntity ctxt) {
-		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding, cannot create Famix Type");
-			return null;
-		}
-		return ensureFamixType(bnd, bnd.getName(), ctxt);
-	}
-
-	/** Creates or recovers a FAMIX Type. Tries to guess the exact subclass of Type of the entity.
-	 * Checks for: primitive type, interface, class, parameterizable class
-	 * Types are more difficult entities, they can be recovered from their binding or from their name in their context
-	 * @param bnd -- JDT binding for the type
-	 * @param name -- name of the type
-	 * @return the type recovered or created, or null in case of an error
-	 */
-	public Type ensureFamixType(ITypeBinding bnd, String name, ContainerEntity ctxt) {
-		Type fmx = null;
-	
-		if (bnd != null) {
-			bnd = findNonArrayType(bnd);
-			
-			fmx = (Type) getEntityByBinding(bnd);
-			
-			if (fmx != null) {
-				return fmx;
-			}
-
-			fmx = findTypeInContext(name, ctxt);
-			if (fmx != null) {
-				mapBind.put(bnd, fmx);
-				return fmx;
-			}
-		}
-		
-		if ( (fmx == null) && (bnd != null) ) {		
-			// not found, will have to create it
-			// from the binding
-			if (bnd.isPrimitive()) {
-				fmx = ensureFamixPrimitiveType(bnd);
-			}
-			else if (bnd.isClass())  {
-				fmx = ensureFamixClass(bnd);
-			}
-			else if (bnd.isGenericType())  {
-				fmx = ensureFamixParameterizableClass(bnd);
-			}
-			else if (bnd.isParameterizedType())  {
-				fmx = super.ensureFamixType(bnd.getName());
-				mapBind.put(bnd, fmx);
-			}
-			else {
-				fmx = super.ensureFamixType(bnd.getName());
-				mapBind.put(bnd, fmx);
-			}
-		}
-
-		if (fmx == null) {
-			// not found and not created by binding (probably null), will have to create it
-			// from its name
-			fmx = this.ensureFamixType(name);
-		}
-		return fmx;
-	}
-	
-	/** Searches for a type with the given name in the context (a Famix Method or Famix Type)
-	 * If the context is a method, zsearches in its owner. Otherwise returns null.
-	 * See {@link getEntityByName} to search an entity by its name outside any special context
-	 * @param name of the type to look for
-	 * @param ctxt -- context of the search
-	 * @return the Famix Type found or null
-	 */
-	private Type findTypeInContext(String name, ContainerEntity ctxt) {
-		if (ctxt == null) {
-//System.out.println("lookfor type"+ name+"  in NULL context  :-(");
-			return null;
-		}
-//System.out.println("lookfor type"+ name+"  in context:" +ctxt.getName());
-		for (Type typ : ctxt.getTypes()) {
-			if (typ.getName().equals(name)) {
-				return typ;
-			}
-		}
-		if (ctxt instanceof Method) {
-			return findTypeInContext(name, ctxt.getBelongsTo());
-		}
-		
-		return null;
-	}
-
-	//TODO remove this method
 	public Collection<Type> ensureFamixTypes(List<org.eclipse.jdt.core.dom.Type> types) {
 		Collection<Type> fmxTypes = new ArrayList<Type>();
+		
 		Type fmxType = null;
 		for (org.eclipse.jdt.core.dom.Type type : types) {
 			ITypeBinding bnd = type.resolveBinding();
 			if (bnd != null) {
-				fmxType = ensureFamixType(bnd, null);
+				fmxType = ensureFamixType(bnd, findTypeName(type), null);
+			} else {
+				fmxType = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, type.toString());
+			}
+			fmxTypes.add(fmxType);
+		}
+		return fmxTypes;
+	}
+
+	/**
+	 * Recovers or creates a Famix Type (see also {@link Dictionary#ensureFamixType(Object, String, ContainerEntity)}
+	 */
+	public Type ensureFamixType(ITypeBinding bnd, String name, ContainerEntity owner) {
+
+		if (bnd == null) {
+			return super.ensureFamixType(bnd, name, owner);
+		}
+
+		if (bnd.isArray()) {
+			bnd = bnd.getElementType();
+		}
+		
+		if (bnd.isPrimitive()) {
+			return ensureFamixPrimitiveType(bnd, name);
+		}
+		else {
+			return this.ensureFamixClass(bnd, null, null);
+		}
+	}
+	
+	public Collection<Type> ensureFamixTypesParameters(List<TypeParameter> types) {
+		Collection<Type> fmxTypes = new ArrayList<Type>();
+		Type fmxType = null;
+		
+		for (TypeParameter type : types) {
+			ITypeBinding bnd = type.resolveBinding();
+			if (bnd != null) {
+				fmxType = ensureFamixType(bnd, null, null);
 			} else {
 				fmxType = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, type.toString());
 			}
@@ -230,144 +146,149 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmxTypes;
 	}
 	
-	public PrimitiveType ensureFamixPrimitiveType(ITypeBinding bnd) {
-
-		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding, cannot create Famix Primitive Type");
-			return null;
+	public PrimitiveType ensureFamixPrimitiveType(ITypeBinding bnd, String name) {
+		if (name == null) {
+			if (bnd == null) {
+				return null;
+			}
+			else {
+				name = bnd.getName();
+			}
 		}
-		
-		PrimitiveType fmx = super.ensureFamixPrimitiveType(bnd.getName());
-		mapBind.put(bnd, fmx);
-		return fmx;
+		return super.ensureFamixPrimitiveType(bnd, name);
 	}
 	
 	public AnnotationType ensureFamixAnnotationType(ITypeBinding bnd) {
 
 		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding, cannot create Famix Annotation Type");
+			System.err.println("Warning: Unexpected null binding, cannot create Famix Annotation Type");
 			return null;
 		}
 		
 		AnnotationType fmx = ensureFamixUniqEntity(AnnotationType.class, null, bnd.getName());
 		fmx.setIsStub(true);
-		fmx.setContainer(ensureFamixNamespace(bnd.getPackage()));
-		mapBind.put(bnd, fmx);
+		fmx.setContainer(ensureFamixNamespace(bnd.getPackage(), null));
+		mapToKey.put(bnd, fmx);
 		return fmx;
 	}
 
 	/**
-	 * Returns a Famix ParameterType (in a ParameterizableClass) with the given name
-	 * We cannot use bindings here since they are usually null (TODO check the javadoc)
-	 * @param paramName -- the name of the ParameterType
-	 * @param owner -- the ParameterizableClass that defines this ParameterType
-	 * @return the Famix Entity created. May return null if "bnd" is null or in case of a Famix error
-	 */
-	public ParameterType ensureFamixParameterType(String paramName, ParameterizableClass owner) {
-		//System.err.println("TRACE: ensureFamixParameterType( "+paramName+" , "+owner.getName()+" )");
-		ParameterType fmx = null;
-System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
-		fmx = ensureFamixParameterType(paramName);
-
-		ensureFamixInheritance(ensureFamixClassObject(null), fmx);
-		fmx.setContainer( owner);
-
-		return fmx;
-	}
-	
-	/**
-	 * Returns a Famix Parameterizable Class associated with the ITypeBinding similarly to ensureFamixClass for normal classes
-	 * @param bnd -- the JDT Binding 
+	 * Returns a Famix Class associated with the ITypeBinding.
+	 * The Entity is created if it does not exist.
+	 * Params: see {@link Dictionary#ensureFamixClass(Object, String, ContainerEntity)}.
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public ParameterizableClass ensureFamixParameterizableClass(ITypeBinding bnd) {
+	public fr.inria.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd, String name, ContainerEntity owner) {
+		fr.inria.verveine.core.gen.famix.Class fmx = null;
+
+		// if Binding is null, we can only rely on provided parameters, so lets do it now and return
 		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding, cannot create Famix Class");
+			if (name == null) {
+				return null;
+			}
+			if (owner == null) {
+				owner = ensureFamixNamespaceDefault();
+			}
+			return super.ensureFamixClass(null, name, owner);
+		}
+
+		// --------------- some special cases
+		while (bnd.isArray()) {
+			bnd = bnd.getComponentType();
+		}
+
+		if (bnd.isPrimitive()) {
+			// should have called ensureFamixPrimitiveType(bnd). Why are we here ?
 			return null;
 		}
 
-		bnd = findNonArrayType(bnd);
-
-		return ensureFamixClassOrSub(ParameterizableClass.class, bnd, findClassOwner(bnd));
-	}
-
-	/**
-	 * Returns a Famix Class associated with the ITypeBinding. The Entity is created if it does not exist.
-	 * The JDT Binding is a unique representation of a java entity within the AST.
-	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
-	 * @param bnd -- the JDT Binding 
-	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
-	 */
-	public fr.inria.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd) {
-
-		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding, cannot create Famix Class");
-			return null;
+		fmx = (fr.inria.verveine.core.gen.famix.Class)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
 		}
 
-		if (bnd.getName().equals(OBJECT_NAME)) {
+		// --------------- name
+		if (name == null) {
+			if (! bnd.isAnonymous()) {
+				name = bnd.getName();
+			}
+			else { // anonymous class
+				if (bnd.getSuperclass() != null) {
+					name = bnd.getSuperclass().getName();
+				}
+				if ( (name == null) || name.equals(OBJECT_NAME)) {
+					ITypeBinding[] intfcs = bnd.getInterfaces();
+					if ( (intfcs != null) && (intfcs.length > 0) ) {
+						name = bnd.getInterfaces()[0].getName();
+					}
+					else {
+						name = "???";
+					}
+				}
+				name = "anonymous(" + name + ")";
+			}
+		}
+		
+		if (name.equals(OBJECT_NAME)) {
 			return ensureFamixClassObject(bnd);
 		}
 
-		bnd = findNonArrayType(bnd);
-
-		return ensureFamixClassOrSub(fr.inria.verveine.core.gen.famix.Class.class, bnd, findClassOwner(bnd));
-	}
-		
-	/**
-	 * Create a FamixClass or one of its subclass
-	 * @param bnd -- the JDT Binding. If null the methods silently returns null
-	 */
-	@SuppressWarnings("unchecked")
-	private <T extends fr.inria.verveine.core.gen.famix.Class>
-			T ensureFamixClassOrSub( Class<T> fmxClass, ITypeBinding bnd, ContainerEntity owner) {
-
-		String identifier = findClassName(bnd);
-//System.out.println("ensure CLASS: "+identifier+"   type: "+fmxClass.getCanonicalName());
-		Collection<fr.inria.verveine.core.gen.famix.Class> sups = findClassSupers(bnd);
-
-		// finally trying to recover the entity or creating it
-		T fmx = null;
-		// ... trying to recover from binding
-		fmx = (T) getEntityByBinding(bnd);
-
-		boolean wasBound = false;
-		if (fmx != null) {
-			wasBound = true;
-		}
-		else {
-			wasBound = false;
-			// trying to recover from name and other informations
-			for (T candidate : getEntityByName(fmxClass, identifier) ) {
-				if (candidate.getContainer() == owner) {
-					// could test superclass also...
-					fmx = candidate;
-					break;
+		// --------------- owner
+		if ( (owner == null) && (bnd != null) ) {
+			IMethodBinding parentMtd = bnd.getDeclaringMethod();
+			if (parentMtd != null) {
+				owner = this.ensureFamixMethod(parentMtd, null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
+			}
+			else {
+				ITypeBinding parentClass = bnd.getDeclaringClass();
+				if (parentClass != null) {
+					owner = this.ensureFamixClass(parentClass, null, null);
+				}
+				else {
+					IPackageBinding parentPckg = bnd.getPackage();
+					if (parentPckg != null) {
+						owner = this.ensureFamixNamespace(parentPckg, null);
+					}
+					else {
+						owner = this.ensureFamixNamespaceDefault();
+					}
 				}
 			}
 		}
-		
+
+		// --------------- superclasses (including interfaces)
+		Collection<fr.inria.verveine.core.gen.famix.Class> sups = new LinkedList<fr.inria.verveine.core.gen.famix.Class>();
+		if (! bnd.isInterface()) {
+			ITypeBinding supbnd = bnd.getSuperclass();
+			if (supbnd != null) {
+				sups.add(this.ensureFamixClass(supbnd, null, null));
+			}
+			else {
+				sups.add( ensureFamixClassObject(null));
+			}
+		}
+		for (ITypeBinding intbnd : bnd.getInterfaces()) {
+			sups.add( ensureFamixClass(intbnd, null, null));
+		}
+
+		// --------------- recover from name ?
+		for (fr.inria.verveine.core.gen.famix.Class candidate : this.getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, name)) {
+			if ( recoverAndMapClass(bnd, candidate) ) {
+				fmx = candidate;
+				break;
+			}
+		}
 		if (fmx == null) {
-			// could not recover it, creating a new entity
-			// note: name might be different from bnd.getName() in the case of anonymous class
-			fmx = (T) ensureFamixEntity(fmxClass, bnd, identifier);
+			fmx = super.ensureFamixClass(bnd, name, owner);
 		}
 		
-		if ((fmx!=null) && (! wasBound)) {
-			// apparently we just created it or it already existed but was not bound, so add information to it
+		if (fmx!=null) {
+			// we just created it or it was not bound, so we make sure it has the right information in it
 			fmx.setIsInterface(bnd.isInterface());
-			fmx.setContainer(owner);
-			if (sups.size() > 0) {
-				// some types don't have superclass
-				Inheritance lastInheritance = null;
-				for (fr.inria.verveine.core.gen.famix.Class sup : sups) {
-					lastInheritance = ensureFamixInheritance(sup, fmx, lastInheritance);
-				}
+			Inheritance lastInheritance = null;
+			for (fr.inria.verveine.core.gen.famix.Class sup : sups) {
+				lastInheritance = ensureFamixInheritance(sup, fmx, lastInheritance);
 			}
-			if (! wasBound) {
-				mapBind.put(bnd, fmx);
-			}
-			// modifiers
 			setNamedEntityModifiers(fmx, bnd.getDeclaredModifiers());
 			if (fmx.getIsAbstract()) {
 				// don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
@@ -378,189 +299,136 @@ System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
 		return fmx;
 	}
 
-	/** Find the "basic" type of something that may be an array
-	 * @param bnd -- non null binding for the class definition
-	 * @return the "basic" (non array) type binding
-	 */
-	private ITypeBinding findNonArrayType(ITypeBinding bnd) {
-		while (bnd.isArray()) {
-			bnd = bnd.getComponentType();
+	private boolean recoverAndMapNamespace(IPackageBinding bnd, Namespace candidate) {
+		NamedEntity bound = getEntityByKey(bnd); 
+		if (bound == candidate) {
+			return true;
 		}
-		return bnd;
+		else if (bound != null) {
+			return false;
+		}
+
+		if (bnd.getName().equals(candidate.getName())) {
+			mapToKey.put(bnd, candidate);
+			return true;
+		}
+		return false;
 	}
 
-	/** 
-	 * Finds and returns the superclass and/or implemented interfaces of a class declaration
-	 * @param bnd -- non null binding for the class definition
-	 * @return the list of super types
-	 */
-	private Collection<fr.inria.verveine.core.gen.famix.Class> findClassSupers(ITypeBinding bnd) {
-		Collection<fr.inria.verveine.core.gen.famix.Class> sups = new LinkedList<fr.inria.verveine.core.gen.famix.Class>();
-		if (! bnd.getName().equals(OBJECT_NAME)) {
-			// "Object" doesn't have a superclass
+	private boolean recoverAndMapType(ITypeBinding bnd, Type candidate) {
+		if (bnd.isArray()) {
+			bnd = bnd.getElementType();
+		}
+		
+		NamedEntity bound = getEntityByKey(bnd); 
+		if (bound == candidate) {
+			return true;
+		}
+		else if (bound != null) {
+			return false;
+		}
+		
+		if ( (bnd.isClass() || bnd.isInterface()) &&
+			 (candidate instanceof fr.inria.verveine.core.gen.famix.Class) ) {
+			return recoverAndMapClass(bnd, (fr.inria.verveine.core.gen.famix.Class) candidate);
+		}
+		else if ( bnd.isPrimitive() && (candidate instanceof PrimitiveType) ) {
+			if ( (bnd.isPrimitive()) && (bnd.toString().equals(candidate.getName())) ) {
+				mapToKey.put(bnd, candidate);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		else {
+			IMethodBinding methBnd = bnd.getDeclaringMethod();
+			if ( (methBnd != null) && (candidate.getBelongsTo() instanceof Method) ) {
+				if ( recoverAndMapMethod(methBnd, (Method) candidate.getBelongsTo()) ) {
+					mapToKey.put(bnd, candidate);
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
+
+			ITypeBinding classBnd = bnd.getDeclaringClass();
+			if ( (classBnd != null) && (candidate.getBelongsTo() instanceof fr.inria.verveine.core.gen.famix.Class) ) {
+				if ( recoverAndMapClass(classBnd, (fr.inria.verveine.core.gen.famix.Class) candidate.getBelongsTo()) ) {
+					mapToKey.put(bnd, candidate);
+					return true;
+				}
+				else {
+					return false;
+				}
+			}
 			
-			// superclass
-			if (! bnd.isInterface()) {
-				ITypeBinding supbnd = bnd.getSuperclass();
-				ITypeBinding[] intsbnd = bnd.getInterfaces();
-				if (supbnd == null && intsbnd.length == 0) {
-					sups.add( ensureFamixClassObject(null));
-				}
-				else {
-					if (supbnd != null) {
-						//TODO ensureFamixType ??
-						sups.add(ensureFamixClass(supbnd));
-					}
-					for (ITypeBinding intbnd : intsbnd) {
-						//TODO ensureFamixType ??
-						sups.add( ensureFamixClass(intbnd));
-					}
-				}
+			IPackageBinding pckgBnd = bnd.getPackage();
+			if ( (candidate.getBelongsTo() instanceof Namespace) &&
+				 (recoverAndMapNamespace(pckgBnd, (Namespace) candidate.getBelongsTo())) ) {
+				mapToKey.put(bnd, candidate);
+				return true;
 			}
 			else {
-				for (ITypeBinding supbnd : bnd.getInterfaces()) {
-					//TODO ensureFamixType ??
-					sups.add( ensureFamixClass(supbnd));
-				}
+				return false;
 			}
 		}
-		return sups;
 	}
 
-	/** Finds and returns the name of a class declaration, especially for anonymous class
-	 * @param bnd -- non null binding for the class definition
-	 * @return the name
-	 */
-	private String findClassName(ITypeBinding bnd) {
-		String identifier = null;
-		if (! bnd.isAnonymous()) {
-			identifier = bnd.getName();
+	private boolean recoverAndMapClass(ITypeBinding bnd, fr.inria.verveine.core.gen.famix.Class candidate) {
+		NamedEntity bound = getEntityByKey(bnd); 
+		if (bound == candidate) {
+			return true;
 		}
-		else {
-			if (bnd.getSuperclass() != null) {
-				identifier = bnd.getSuperclass().getName();
-			}
-			if ( (identifier == null) || identifier.equals(OBJECT_NAME)) {
-				ITypeBinding[] intfcs = bnd.getInterfaces();
-				if ( (intfcs != null) && (intfcs.length > 0) ) {
-					identifier = bnd.getInterfaces()[0].getName();
-				}
-				else {
-					identifier = "???";
-				}
-			}
-			identifier = "anonymous(" + identifier + ")";
+		else if (bound != null) {
+			return false;
 		}
-		return identifier;
-	}
 
-	/** Finds and returns the owner of a class declaration
-	 * It can be a method (anonymous class), a class (inner class, or ParameterType), or a package (normal class)
-	 * @param bnd -- non null binding for the class definition
-	 * @return the owner found
-	 */
-	private ContainerEntity findClassOwner(ITypeBinding bnd) {
-		ContainerEntity owner = null;
-		IMethodBinding parentMtd = bnd.getDeclaringMethod();
-		if (parentMtd != null) {
-			owner = this.ensureFamixMethod(parentMtd);
-		}
-		else {
-			ITypeBinding parentClass = bnd.getDeclaringClass();
-			if (parentClass != null) {
-				owner = this.ensureFamixClass(parentClass);
+		IMethodBinding methBnd = bnd.getDeclaringMethod();
+		if ( (methBnd != null) && (candidate.getBelongsTo() instanceof Method) ) {
+			if ( recoverAndMapMethod(methBnd, (Method) candidate.getBelongsTo()) ) {
+				mapToKey.put(bnd, candidate);
+				return true;
 			}
 			else {
-				IPackageBinding parentPckg = bnd.getPackage();
-				if (parentPckg != null) {
-					owner = this.ensureFamixNamespace(parentPckg);
-				}
-				else {
-					owner = this.ensureFamixNamespaceDefault();
-				}
+				return false;
 			}
 		}
-		return owner;
-	}
 
-	/**
-	 * Returns a Famix Method associated with the IMethodBinding. The Entity is created if it does not exist.
-	 * The JDT Binding is a unique representation of a java entity within the AST.
-	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
-	 * @param bnd -- the JDT Binding 
-	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
-	 */
-	public Method ensureFamixMethod(IMethodBinding bnd) {
-		Type owner = null;
-		Type rettyp = null;
-		String sig = null;
-		boolean wasBound = false;
-		
-		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding to Famix Method");
-			return null;
+		ITypeBinding classBnd = bnd.getDeclaringClass();
+		if ( (classBnd != null) && (candidate.getBelongsTo() instanceof fr.inria.verveine.core.gen.famix.Class) ) {
+			if ( recoverAndMapClass(classBnd, (fr.inria.verveine.core.gen.famix.Class) candidate.getBelongsTo()) ) {
+				mapToKey.put(bnd, candidate);
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 
-		// owner
-		owner = this.ensureFamixType(bnd.getDeclaringClass(), null);
-
-		// return type
-		if (! bnd.isConstructor()) {
-			rettyp = this.ensureFamixType(bnd.getReturnType(), /*context*/owner); // the context is the declaring class
-		}
-		// TODO   else what?
-
-		sig = computeSignature(bnd);
-
-		// finally trying to recover the entity or creating it
-		Method fmx = null;
-		// ... trying to recover from binding
-		fmx = (Method) getEntityByBinding(bnd);
-		
-		if (fmx != null) {
-			wasBound = true;
+		IPackageBinding pckgBnd = bnd.getPackage();
+		if ( (candidate.getBelongsTo() instanceof Namespace) &&
+			 (recoverAndMapNamespace(pckgBnd, (Namespace) candidate.getBelongsTo())) ) {
+			mapToKey.put(bnd, candidate);
+			return true;
 		}
 		else {
-			wasBound = false;
-			// trying to recover from name and other informations
-			for (Method candidate : getEntityByName(Method.class, bnd.getName()) ) {
-				if ( (candidate.getParentType() == owner) &&
-					 (candidate.getDeclaredType() == rettyp) &&
-					 (candidate.getSignature().equals(sig)) ) {
-					// we could also test that this candidate is not bound yet (to another bnd)
-					// but it would require significant modifications and might not be that useful?
-					fmx = candidate;
-					mapBind.put(bnd, fmx);
-					break;
-				}
-			}
+			return false;
 		}
-		
-		if (fmx == null) {
-			// could not recover it, creating a new entity
-			fmx = (Method) ensureFamixEntity(Method.class, bnd, bnd.getName());
-		}
-		
-		if ((fmx!=null) && (! wasBound) ) {
-			// apparently we just created it or it already existed as a stub, so add information to it
-			fmx.setParentType(owner);
-			fmx.setDeclaredType(rettyp);	
-			fmx.setName(bnd.getName());
-			fmx.setSignature(sig);
-			setNamedEntityModifiers(fmx, bnd.getModifiers());
-		}
-
-		return fmx;
 	}
 
-	/** Computes the signature of a method from its binding
-	 * @param bnd -- bJDT binding of the method
-	 * @return the signature of the method in a String
-	 */
-	private String computeSignature(IMethodBinding bnd) {
-		String sig;
-		// method signature
-		sig = bnd.getName() + "(";
+	private boolean recoverAndMapMethod(IMethodBinding bnd, Method candidate) {
+		NamedEntity bound = getEntityByKey(bnd); 
+		if (bound == candidate) {
+			return true;
+		}
+		else if (bound != null) {
+			return false;
+		}
+
+		// for methods, the name is not enough, we must test the signature also 
+		String sig = bnd.getName() + "(";
 		boolean first = true;
 		for (ITypeBinding parBnd : bnd.getParameterTypes()) {
 			if (! first) {
@@ -570,112 +438,230 @@ System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
 				sig += parBnd.getName();
 				first = false;
 			}
+			sig += ")";
 		}
-		sig += ")";
-		return sig;
+		if (! candidate.getSignature().equals(sig)) {
+			return false;
+		}
+
+		ITypeBinding ownerBnd = bnd.getDeclaringClass();
+		if ( (candidate.getBelongsTo() instanceof fr.inria.verveine.core.gen.famix.Class) &&
+			 (recoverAndMapClass(ownerBnd, (fr.inria.verveine.core.gen.famix.Class) candidate.getBelongsTo())) ) {
+				mapToKey.put(bnd, candidate);
+				// everything seems OK, but we still need to test return type which is not in the Moose signature
+				return recoverAndMapType(bnd.getReturnType(), candidate.getDeclaredType());
+		}
+		else {
+			return false;
+		}
 	}
-	
-	@SuppressWarnings("unchecked")
-	public String stubMethodSignature(MethodDeclaration node) {
-		String sig = node.getName().getIdentifier() + "(";
-		boolean first = true;
-		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
-			if (! first) {
-				sig += "," + param.getType().toString();
+
+	private boolean recoverAndMapVariable(IVariableBinding bnd, StructuralEntity candidate) {
+		NamedEntity bound = (StructuralEntity)getEntityByKey(bnd); 
+		if (bound == candidate) {
+			return true;
+		}
+		else if (bound != null) {
+			return false;
+		}
+
+		IMethodBinding methBnd = bnd.getDeclaringMethod();
+		if ( (methBnd != null) && (candidate.getBelongsTo() instanceof Method) ) {
+			if ( recoverAndMapMethod(methBnd, (Method) candidate.getBelongsTo()) ) {
+				mapToKey.put(bnd, candidate);
+				return true;
 			}
 			else {
-				sig += param.getType().toString();
-				first = false;
+				return false;
 			}
 		}
-		sig += ")";
-		return sig;
-	}
-	
-	public Method ensureFamixMethod(String identifier, NamedEntity owner, int numberOfParameters) {
-		Method fmx = null;
-		if (owner != null) {
-			for (Method candidate : getEntityByName(Method.class, identifier) ) {
-				if ((candidate.getParentType() == owner) && (candidate.getParameters().size() == numberOfParameters)) {
-					fmx = candidate;
-					break;
-				}
-			}
-		} else {
-			for (Method candidate : getEntityByName(Method.class, identifier) ) {
-				if (candidate.getParameters().size() == numberOfParameters) {
-					fmx = candidate;
-					break;
-				}
-			}
+
+		ITypeBinding classBnd = bnd.getDeclaringClass();
+		if ( (candidate.getBelongsTo() instanceof fr.inria.verveine.core.gen.famix.Class) &&
+			 (recoverAndMapClass(classBnd, (fr.inria.verveine.core.gen.famix.Class) candidate.getBelongsTo())) ) {
+			mapToKey.put(bnd, candidate);
+			return true;
 		}
-		return fmx;
-	}
-	
-	public Method ensureFamixMethod(MethodDeclaration node, fr.inria.verveine.core.gen.famix.Class owner) {
-		Method fmx = null;
-		for (Method candidate : getEntityByName(Method.class, node.getName().getIdentifier()) ) {
-			if ((candidate.getParentType() == owner) && (candidate.getSignature().equals(stubMethodSignature(node))) ) {
-				fmx = candidate;
-				break;
-			}
+		else {
+			return false;
 		}
-		return fmx;
 	}
-		
+
 	/**
-	 * Returns a Famix Attribute associated with the IVariableBinding. The Entity is created if it does not exist.
+	 * Returns a Famix Method associated with the IMethodBinding. The Entity is created if it does not exist.
 	 * The JDT Binding is a unique representation of a java entity within the AST.
 	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
 	 * @param bnd -- the JDT Binding 
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Attribute ensureFamixAttribute(IVariableBinding bnd) {
-		Type owner = null;
-		Type typ = null;
-		boolean wasBound = false;
+	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<org.eclipse.jdt.core.dom.Type> paramTypes, Type ret, fr.inria.verveine.core.gen.famix.Class owner) {
+		Method fmx = null;
+		String sig;
+		boolean first;
 
-		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding to Famix Attribute");
-			return null;
-		}
-
-		owner = this.ensureFamixType(bnd.getDeclaringClass(), /*context*/null); // the context is the declaring class=owner
-		typ = this.ensureFamixType(bnd.getType(), owner);
-
-		// finally trying to recover the entity or creating it
-		Attribute fmx = null;
-		// ... trying to recover from binding
-		fmx = (Attribute) getEntityByBinding(bnd);
-		
-		if (fmx != null) {
-			wasBound = true;
-		}
-		else {
-			wasBound = false;
-			// trying to recover from name and other informationsparentBehaviouralEntity
-			for (Attribute candidate : getEntityByName(Attribute.class, bnd.getName()) ) {
-				if ( //(! candidate.getIsStub()) &&
-					 (candidate.getParentType() == owner) &&
-					 (candidate.getDeclaredType() == typ) ) {
-					fmx = candidate;
-					mapBind.put(bnd, fmx);
-					break;
+		// signature is dealt in two places
+		// here we try to use the parameter of ensureFamixMethod to compute the list of parameter types of the FamixMethod
+		// if it does not work and binding is not null, we will have another chance to compute this list later
+		sig = "(";
+		first = true;
+		if (paramTypes != null) {
+			for (org.eclipse.jdt.core.dom.Type t : paramTypes) {
+				if (! first) {
+					sig += "," + findTypeName(t);
+				}
+				else {
+					sig += findTypeName(t);
+					first = false;
 				}
 			}
+			
+		}
+		sig += ")";
+
+		// if Binding is null, we can only rely on provided parameters, so lets do it now and return
+		if (bnd == null) {
+			if (name == null) {
+				return null;
+			}
+			if (paramTypes == null) {
+				sig = name + "(???)";
+			}
+			else {
+				sig = name + sig;
+			}
+			if (owner == null) {
+				owner= ensureFamixClassStubOwner();
+			}
+			return super.ensureFamixMethod(null, name, sig, ret, owner);
+		}
+
+		// --------------- name
+		if (name == null) {
+			name = bnd.getName();
+		}
+
+		// --------------- signature
+		if (paramTypes == null) {
+			sig = "(";
+			first = true;
+			paramTypes = new ArrayList<org.eclipse.jdt.core.dom.Type>();
+			for (ITypeBinding parBnd : bnd.getParameterTypes()) {
+				if (! first) {
+					sig += "," + parBnd.getName();
+				}
+				else {
+					sig += parBnd.getName();
+					first = false;
+				}
+			}
+			sig += ")";
+		}
+		sig = name + sig;
+
+		// --------------- return type
+		if ( (ret == null) && (! bnd.isConstructor()) ) {
+			ret = this.ensureFamixType(bnd.getReturnType(), null, null);
+		}
+		// else leave it to null ...
+
+		// --------------- owner
+		if (owner == null) {
+			owner = ensureFamixClass(bnd.getDeclaringClass(), null, null);
 		}
 		
+		// --------------- recover from name ?
+		for (Method candidate : this.getEntityByName(Method.class, name)) {
+			if ( recoverAndMapMethod(bnd, candidate) ) {
+				fmx = candidate;
+				break;
+			}
+		}
 		if (fmx == null) {
-			// could not recover it, creating a new entity
-			fmx = ensureFamixEntity(Attribute.class, bnd, bnd.getName());
+			fmx = ensureFamixMethod(bnd, name, sig, ret, owner);
 		}
 		
-		if ((fmx!=null) && (! wasBound) ) {
-			// apparently we just created it, so add information to it
+		if (fmx!=null) {
+			// we just created it or it was not bound, so we make sure it has the right information in it
+			fmx.setDeclaredType(ret);
+			fmx.setSignature(sig);
 			setNamedEntityModifiers(fmx, bnd.getModifiers());
+		}
+
+		return fmx;
+	}
+	
+	public String findTypeName(org.eclipse.jdt.core.dom.Type t) {
+		if (t.isPrimitiveType()) {
+			return t.toString();
+		}
+		else if (t.isSimpleType()) {
+			return ((SimpleType)t).getName().getFullyQualifiedName();
+		}
+		else if (t.isQualifiedType()) {
+			return ((QualifiedType)t).getName().getIdentifier();
+		}
+		else if (t.isArrayType()) {
+			return findTypeName( ((ArrayType)t).getElementType() );
+		}
+		else if (t.isParameterizedType()) {
+			return "?";  // TODO
+		}
+		else { // it is a WildCardType
+			return "?"; // TODO
+		}
+	}
+
+	/**
+	 * Returns a Famix Attribute associated with the IVariableBinding. The Entity is created if it does not exist.<br>
+	 * Params: see {@link Dictionary#ensureFamixAttribute(Object, String, Type, Type)} 
+	 * @return the Famix Entity found or created. May return null if <b>bnd</b> and <b>name</b> are null, or <b>bnd</b> and <b>owner</b> are null, or in case of a Famix error
+	 */
+	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, Type type, Type owner) {
+		Attribute fmx = null;
+
+		// if Binding is null, we can only rely on provided parameters, so lets do it now and return
+		if (bnd == null) {
+			if (name == null) {
+				return null;
+			}
+			if (owner == null) {
+				return null;  // what would be the interest of an attribute for which we ignore the declaring class? 
+			}
+			return super.ensureFamixAttribute(null, name, type, owner);
+		}
+
+		// --------------- name
+		if (name == null) {
+			name = bnd.getName();
+		}
+
+		// --------------- return type
+		if (type == null) {
+			type = this.ensureFamixType(bnd.getType(), null, null);
+		}
+		// else leave it to null ...
+
+		// --------------- owner
+		if (owner == null) {
+			owner = ensureFamixClass(bnd.getDeclaringClass(), null, null);
+		}
+		
+		// --------------- recover from name ?
+		for (Attribute candidate : getEntityByName(Attribute.class, name) ) {
+			if ( recoverAndMapVariable(bnd, candidate) ) {
+				fmx = candidate;
+				break;
+			}
+		}
+		if (fmx == null) {
+			fmx = super.ensureFamixAttribute(bnd, name, type, owner);
+		}
+		
+		if (fmx!=null) {
+			// we just created it or it was not bound, so we make sure it has the right information in it
 			fmx.setParentType(owner);
-			fmx.setDeclaredType(typ);	
-			fmx.setName(bnd.getName());
+			fmx.setDeclaredType(type);	
+			setNamedEntityModifiers(fmx, bnd.getModifiers());
 		}
 
 		return fmx;
@@ -709,13 +695,17 @@ System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
 		boolean wasBound = false;
 		
 		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding to Famix Parameter");
+			System.err.println("Warning: Unexpected null binding to Famix Parameter");
 			return null;
 		}
 
-		// actually it seems to be very little chances that the parameter alreasy exist.
+		if (owner == null) {
+			owner = ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
+		}
+		
+		// actually it seems to be very little chances that the parameter already exist.
 		// but who knows? Does not hurt to try
-		Parameter fmx = (Parameter) getEntityByBinding(bnd);
+		Parameter fmx = (Parameter) getEntityByKey(bnd);
 		
 		if (fmx != null) {
 			wasBound = true;
@@ -728,90 +718,73 @@ System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
 		if ( (fmx!=null) && (! wasBound) ) {
 			// declaring method
 			if (bnd.getDeclaringMethod() != null) {
-				fmx.setParentBehaviouralEntity(ensureFamixMethod(bnd.getDeclaringMethod()));
+				fmx.setParentBehaviouralEntity(ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null));  // cast needed to desambiguate the call
 			} else {
 				fmx.setParentBehaviouralEntity(owner);
 			}
 			// type of the attribute
-//System.out.println("looking for parameter type:"+bnd.getName()+"  context="+owner.getName());
-			fmx.setDeclaredType(this.ensureFamixType(bnd.getType(), /*context*/owner));
+			fmx.setDeclaredType(this.ensureFamixType(bnd.getType(), null, null));
 		}
 		
 		return fmx;
 	}
 	
-	public Parameter ensureFamixParameter(IVariableBinding bnd) {
-		return ensureFamixParameter(bnd, null);
-	}
-
 	/**
 	 * Returns a Famix LocalVariable associated with the IVariableBinding. The Entity is created if it does not exist.
-	 * The JDT Binding is a unique representation of a java entity within the AST.
-	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
-	 * @param bnd -- the JDT Binding 
-	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
+	 * Params: see {@link Dictionary#ensureFamixLocalVariable(Object, String, Type, fr.inria.verveine.core.gen.famix.BehaviouralEntity)}
+	 * @return the Famix Entity found or created. May return null if <b>bnd</b> and <b>name</b> are null, or <b>bnd</b> and <b>owner</b> are null, or in case of a Famix error
 	 */
-	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, Method fmxMethod) {
-		Method owner = null;
-		Type typ = null;
-		boolean wasBound = false;
+	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, String name, Type typ, Method owner) {
+		LocalVariable fmx = null;
 
 		if (bnd == null) {
-//			System.err.println("Warning: Unexpected null binding to Famix LocalVariable");
-			return null;
+			if (name == null) {
+				return null;
+			}
+			if (owner == null) {
+				return null;  // what would be the interest of a local variable for which we ignore the declaring method?
+			}
+			return super.ensureFamixLocalVariable(null, name, typ, owner);
 		}
 
-		owner = this.ensureFamixMethod(bnd.getDeclaringMethod());
+		// --------------- name
+		if (name == null) {
+			name = bnd.getName();
+		}
+
+		// --------------- return type
+		if (typ == null) {
+			typ = this.ensureFamixType(bnd.getType(), null, null);
+		}
+		// else leave it to null ...
+
+		// --------------- owner
 		if (owner == null) {
-			owner = fmxMethod;
+			owner = ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
 		}
-		typ = this.ensureFamixType(bnd.getType(), /*context*/fmxMethod);
-
-		// finally trying to recover the entity or creating it
-		LocalVariable fmx = null;
-		// ... trying to recover from binding
-		fmx = (LocalVariable) getEntityByBinding(bnd);
-
-		if (fmx != null) {
-			wasBound = true;
-		}
-		else {
-			wasBound = false;
-			// trying to recover from name and other informationsparentBehaviouralEntity
-			for (LocalVariable candidate : getEntityByName(LocalVariable.class, bnd.getName()) ) {
-				if ( (candidate.getParentBehaviouralEntity() == owner) &&
-					 (candidate.getDeclaredType() == typ) ) {
-					fmx = candidate;
-					mapBind.put(bnd, fmx);
-					break;
-				}
+		
+		// --------------- recover from name ?
+		for (LocalVariable candidate : getEntityByName(LocalVariable.class, name) ) {
+			if ( recoverAndMapVariable(bnd, candidate) ) {
+				fmx = candidate;
+				break;
 			}
 		}
-		
 		if (fmx == null) {
-			// could not recover it, creating a new entity
-			fmx = ensureFamixEntity(LocalVariable.class, bnd, bnd.getName());
+			fmx = super.ensureFamixLocalVariable(bnd, name, typ, owner);
+		}
+		
+		if (fmx != null) {
+			// we just created it or it was not bound, so we make sure it has the right information in it
+			fmx.setParentBehaviouralEntity(owner);
+			fmx.setDeclaredType(typ);	
 		}
 
-		if ( (fmx!=null) && (! wasBound) ) {
-			// apparently we just created it, so add information to it
-			fmx.setParentBehaviouralEntity(owner);
-			fmx.setDeclaredType(typ);
-		}
-		
 		return fmx;
-	}
-	
-	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd) {
-		return ensureFamixLocalVariable(bnd, null);
 	}
 	
 	/**
 	 * Returns a Famix UnknownVariable associated with the IVariableBinding. The Entity is created if it does not exist.
-	 * The JDT Binding is a unique representation of a java entity within the AST.
-	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
-	 * @param bnd -- the JDT Binding 
-	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	public UnknownVariable createFamixUnknownVariable(Type type, String name) {
 //		System.err.println("TRACE -- createFamixUnknownVariable: "+name);
@@ -856,7 +829,7 @@ System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
 			while ( ! (ast instanceof CompilationUnit) ) {
 				ASTNode tmp = ast.getParent();
 				if ( (ast == null) || (tmp == ast) ) {
-					// we reached the top node without finding a CompilationUnit. This would be strange, but what can one do ... ?
+					// if we are here, then we reached the top node without finding a CompilationUnit. This should not happen
 					return null;
 				}
 				else {
@@ -881,12 +854,7 @@ System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
 	 * @return the Famix Method
 	 */
 	public Method ensureFamixStubMethod(String name) {
-		Method fmx = ensureFamixMethod(name);
-		fmx.setSignature(name + " (<unknown-stub>)");
-		fmx.setParentType( ensureFamixClassStubOwner());
-		fmx.setDeclaredType(ensureFamixClassObject(null));
-		
-		return fmx;
+		return ensureFamixMethod(null, name, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, ensureFamixClassStubOwner());  // cast needed to desambiguate the call
 	}
 
 	/**
@@ -896,7 +864,7 @@ System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
 	 * @return a Famix Namespace for "java.lang"
 	 */
 	public Namespace ensureFamixNamespaceJavaLang(IPackageBinding bnd) {
-		Namespace fmx = ensureFamixNamespaceWithParentScope(bnd, OBJECT_PACKAGE_NAME);
+		Namespace fmx = this.ensureFamixNamespace(bnd, OBJECT_PACKAGE_NAME);
 
 		return fmx;
 	}
@@ -956,6 +924,21 @@ System.out.println("creating CLASS: "+paramName+"   type: ParameterType");
 		}
 
 		return fmx;
+	}
+
+
+	public String removeLastName(String qualifiedName) {
+		String ret = null;
+		int last = qualifiedName.lastIndexOf('.');
+		if (last > 0) {
+			// recursively creating the parent
+			ret = qualifiedName.substring(0, last);
+		}
+		else {
+			ret = "";
+		}
+
+		return ret;
 	}
 
 }

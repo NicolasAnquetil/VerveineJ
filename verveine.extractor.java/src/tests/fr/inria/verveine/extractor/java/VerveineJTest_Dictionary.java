@@ -54,7 +54,7 @@ public class VerveineJTest_Dictionary {
 	@Before
 	public void setUp() throws Exception {
 		VerveineJParser parser = new VerveineJParser();
-		parser.compile(new String[] {"test_src/Dictionary"});
+		parser.compile(new String[] {"test_src/ad_hoc/Dictionary.java"});
 		repo = parser.getFamixRepo();
 	}
 

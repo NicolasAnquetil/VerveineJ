@@ -40,9 +40,9 @@ public class VerveineJParser extends VerveineParser {
 	@Override
 	public boolean compile(String[] argv) {
 		boolean ret;
-		if (this.linkToExisting()) {
+		/*if (this.linkToExisting()) {
 			this.expandNamespacesNames();
-		}
+		}*/
 
 		setInitialArgs(argv);
 		ret = super.compile(argv);
