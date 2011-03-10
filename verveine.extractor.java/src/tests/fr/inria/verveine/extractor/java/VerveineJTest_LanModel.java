@@ -59,7 +59,7 @@ public class VerveineJTest_LanModel {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		String[] files = new String[] {
+		/*String[] files = new String[] {
 				"AbstractDestinationAddress.java",
 				"Node.java",
 				"Packet.java",
@@ -72,7 +72,7 @@ public class VerveineJTest_LanModel {
 		};
 
 		// separate parsing of each source file --------
-		/*for (String f : files) {
+		for (String f : files) {
 			parseFile(f);
 		}*/
 		// or parsing the entire project in one pass ---
@@ -86,7 +86,7 @@ public class VerveineJTest_LanModel {
 	 * The "separate parsing" mechanism should ensure that linkages are appropriately done
 	 * @param file -- name of the file to parse
 	 */
-	private void parseFile(String file) {
+/*	private void parseFile(String file) {
 		String[] args = new String[] {
 				"-cp",
 				"test_src/LANModel//moose/lan/",
@@ -100,7 +100,7 @@ public class VerveineJTest_LanModel {
 		new File(VerveineJParser.OUTPUT_FILE).delete();  // delete old MSE file
 		parser.outputMSE();  // to create a new one
 	}
-
+*/
 	@After
 	public void tearDown() {
 		new File(VerveineJParser.OUTPUT_FILE).delete();
@@ -282,7 +282,7 @@ public class VerveineJTest_LanModel {
 			
 		fr.inria.verveine.core.gen.famix.Class obj = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(obj);
-		assertTrue(ns.getIsStub());
+		assertTrue(obj.getIsStub());
 		assertSame(ns, obj.getContainer());
 		
 		fr.inria.verveine.core.gen.famix.Class str = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String");
@@ -294,7 +294,7 @@ public class VerveineJTest_LanModel {
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsStub());
 		
-		/* [].length notused in the default test case 
+		/* [].length not used in the default test case 
 		Attribute att = TestVerveineUtils.detectElement(repo, Attribute.class, "length");
 		assertNotNull(att);
 		clazz = (Class) att.getParentType();

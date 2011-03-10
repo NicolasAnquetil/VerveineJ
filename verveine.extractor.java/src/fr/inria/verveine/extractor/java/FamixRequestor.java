@@ -16,6 +16,7 @@ public class FamixRequestor extends FileASTRequestor {
 	public FamixRequestor(Repository r, String[] initialArgs) {
 		this.famixRepo = r;
 		this.initialArgs = initialArgs;
+
 		this.famixDictionnary = new JavaDictionary(famixRepo);
 	}
 
