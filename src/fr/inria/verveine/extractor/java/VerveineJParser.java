@@ -35,7 +35,6 @@ public class VerveineJParser extends VerveineParser {
 	public String[] getInitialArgs() {
 		return this.initialArgs;
 	}
-	
 
 	@Override
 	public boolean compile(String[] argv) {

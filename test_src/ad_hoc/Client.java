@@ -12,8 +12,7 @@ public class Client {
 	private String num;
 	@Deprecated
 	private String nom;
-	
-	@Override
+
 	@Deprecated
 	public Client(String num, String nom) {
 		this.setNum(num);

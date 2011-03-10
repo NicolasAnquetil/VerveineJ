@@ -1,6 +1,5 @@
 package fr.inria.verveine.extractor.java;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -16,6 +15,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.IPackageBinding;
@@ -32,7 +32,6 @@ import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperFieldAccess;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
@@ -41,6 +40,7 @@ import org.eclipse.jdt.core.dom.ThrowStatement;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
+import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
 import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.core.gen.famix.Attribute;
@@ -114,13 +114,17 @@ public class VerveineRefVisitor extends ASTVisitor {
 			importName = dico.removeLastName(importName);
 		}
 		Namespace fmxDest = dico.ensureFamixNamespace( (IPackageBinding)importBnd, importName);
-		context.setLastReference( dico.ensureFamixReference(fmxSrc, fmxDest, context.getLastReference()) );
+		context.setLastReference( dico.createFamixReference(fmxSrc, fmxDest, context.getLastReference()) );
 		
 		return super.visit(node);
 	}
 
 	public boolean visit(TypeDeclaration node) {
-		this.context.pushClass((fr.inria.verveine.core.gen.famix.Class)dico.getEntityByKey(node.resolveBinding()));
+		ITypeBinding bnd = node.resolveBinding();
+		fr.inria.verveine.core.gen.famix.Class fmx = (fr.inria.verveine.core.gen.famix.Class)dico.getEntityByKey(bnd);
+		this.context.pushClass(fmx );
+
+		dico.addFamixAnnotationInstances(bnd, fmx);
 
 		return super.visit(node);
 	}
@@ -133,7 +137,11 @@ public class VerveineRefVisitor extends ASTVisitor {
 	public boolean visit(ClassInstanceCreation node) {
 		AnonymousClassDeclaration decl = node.getAnonymousClassDeclaration(); 
 		if (decl != null) {
-			this.context.pushClass((fr.inria.verveine.core.gen.famix.Class)dico.getEntityByKey(decl.resolveBinding()));
+			ITypeBinding bnd = decl.resolveBinding();
+			fr.inria.verveine.core.gen.famix.Class fmx = (fr.inria.verveine.core.gen.famix.Class)dico.getEntityByKey(bnd); 
+			this.context.pushClass(fmx);
+
+			dico.addFamixAnnotationInstances(bnd, fmx);
 		}
 		return super.visit(node);
 	}
@@ -146,40 +154,42 @@ public class VerveineRefVisitor extends ASTVisitor {
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 		IMethodBinding bnd = node.resolveBinding();
-		Type retTyp = node.getReturnType2();
-		Collection<Type> paramTypes = new ArrayList<Type>();
-		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
-				paramTypes.add(param.getType());
-		}
-		Method meth = null;
-		if (retTyp != null) {
-			meth = dico.ensureFamixMethod(bnd,
-					node.getName().getIdentifier(),
-					paramTypes,
-					dico.ensureFamixType(retTyp.resolveBinding(), retTyp.toString(), null),
-					context.topClass());
-		}
-		else {
-			meth = dico.ensureFamixMethod(bnd,
-					node.getName().getIdentifier(),
-					paramTypes,
-					null,   // probably a constructor
-					context.topClass());
-		}
+		Method meth = (Method) dico.getEntityByKey(bnd);
 
-		this.context.pushMethod(meth);
-		for (Name excepName : (List<Name>)node.thrownExceptions()) {
-			fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(excepName.resolveTypeBinding(), excepName.getFullyQualifiedName(), null);
-			if (excepFmx != null) {
-				dico.ensureFamixDeclaredException(meth, excepFmx);
+		if (meth != null) {
+			this.context.pushMethod(meth);
+
+			dico.addFamixAnnotationInstances(bnd, meth);
+
+			// Exceptions
+			for (Name excepName : (List<Name>)node.thrownExceptions()) {
+				fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(excepName.resolveTypeBinding(), excepName.getFullyQualifiedName(), null);
+				if (excepFmx != null) {
+					dico.createFamixDeclaredException(meth, excepFmx);
+				}
 			}
 		}
-		return super.visit(node);	
+
+		return super.visit(node);
 	}
 
 	public void endVisit(MethodDeclaration node) {
 		this.context.popMethod();
 		super.endVisit(node);
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	public boolean visit(FieldDeclaration node) {
+//		System.err.println("TRACE, RefVisiting FieldDeclaration");
+		for (VariableDeclarationFragment vd : (List<VariableDeclarationFragment>)node.fragments()) {
+			IVariableBinding bnd = vd.resolveBinding();
+			Attribute fmx = (Attribute) dico.getEntityByKey(bnd);
+
+			if (fmx != null) {
+				dico.addFamixAnnotationInstances(bnd, fmx);
+			}
+		}
+		return super.visit(node);
 	}
 
 	public boolean visit(MethodInvocation node) {
@@ -214,7 +224,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			if (invoked == null) {
 				invoked = this.dico.ensureFamixStubMethod(calledName);
 			}*/
-			context.setLastInvocation( dico.ensureFamixInvocation(sender, invoked, receiver, context.getLastInvocation()) );
+			context.setLastInvocation( dico.createFamixInvocation(sender, invoked, receiver, context.getLastInvocation()) );
 		}
 	}
 
@@ -248,7 +258,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 				excepFmx = this.dico.ensureFamixClass(excepClass.resolveBinding(), ((QualifiedType) excepClass).getName().getIdentifier(), null);
 			}
 			if (excepFmx != null) {
-				dico.ensureFamixCaughtException(meth, excepFmx);
+				dico.createFamixCaughtException(meth, excepFmx);
 			}
 		}
 
@@ -260,11 +270,10 @@ public class VerveineRefVisitor extends ASTVisitor {
 		Method meth = this.context.topMethod();
 		fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(node.getExpression().resolveTypeBinding(), null, null);
 		if (excepFmx != null) {
-			dico.ensureFamixThrownException(meth, excepFmx);
+			dico.createFamixThrownException(meth, excepFmx);
 		}
 		return super.visit(node);
 	}
-
 
 	/**
 	 * Finds and/or create the Famix Entity receiving a message
@@ -358,7 +367,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 					ret = dico.ensureFamixAttribute(bnd, varName, null, null);
 				}
 				else if ( ((IVariableBinding)bnd).isParameter() ) {
-					ret = dico.ensureFamixParameter( (IVariableBinding)bnd, context.topMethod());
+					ret = dico.ensureFamixParameter( (IVariableBinding)bnd, varName, null, context.topMethod());
 				}
 				else { // suppose it's a local variable
 					ret = dico.ensureFamixLocalVariable( (IVariableBinding)bnd, varName, null, context.topMethod());
@@ -423,7 +432,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 		if (accessor != null) {
 			Attribute accessed = this.dico.ensureFamixAttribute(bnd, null, null, null);
 			if (accessed != null) {
-				context.setLastAccess( dico.ensureFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+				context.setLastAccess( dico.createFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
 				if ( (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
 					accessed.setParentType(dico.ensureFamixClassArray());
 				}

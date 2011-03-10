@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.AssertStatement;
 import org.eclipse.jdt.core.dom.Assignment;
@@ -15,14 +17,13 @@ import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.ContinueStatement;
 import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
@@ -44,8 +45,9 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
+import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
 import fr.inria.verveine.core.gen.famix.Attribute;
-import fr.inria.verveine.core.gen.famix.Comment;
+import fr.inria.verveine.core.gen.famix.EnumValue;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
@@ -96,29 +98,20 @@ public class VerveineDefVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(TypeDeclaration node) {
-//		System.err.println("TRACE, DefVisiting TypeDeclaration: "+node.getName().getIdentifier());
+		//System.err.println("TRACE, DefVisiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, node.getName().getIdentifier(), context.top());
 		if (fmx != null) {
 			fmx.setIsStub(false);
+
+			this.context.pushClass(fmx);
+
+			dico.addSourceAnchor(fmx, node);
+			dico.createFamixComment(node.getJavadoc(), fmx);
 		}
 
 		//TODO fmx.setParameterTypes(dico.ensureFamixTypesParameters(node.typeParameters()));
 		
-		dico.addSourceAnchor(fmx, node);
-		Javadoc jdoc = node.getJavadoc();
-		if (jdoc != null) {
-			Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
-			dico.addSourceAnchor(cmt, jdoc);
-		}
-		//Annotation
-		if (bnd != null) {
-			for (IAnnotationBinding abnd : bnd.getAnnotations()) {
-				AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
-				dico.createFamixAnnotationInstance(fmx, annType);
-			}
-		}
-		this.context.pushClass(fmx);
 		return super.visit(node);
 	}
 
@@ -128,28 +121,82 @@ public class VerveineDefVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(ClassInstanceCreation node) {
-//		System.err.println("TRACE, DefVisiting ClassInstanceCreation");
+		//System.err.println("TRACE, DefVisiting ClassInstanceCreation");
+		fr.inria.verveine.core.gen.famix.Class fmx = null;
 		AnonymousClassDeclaration decl = node.getAnonymousClassDeclaration(); 
 		if (decl != null) {
-			fr.inria.verveine.core.gen.famix.Class fmx = this.dico.ensureFamixClass(decl.resolveBinding(), null, context.top());
+			fmx = this.dico.ensureFamixClass(decl.resolveBinding(), null, context.top());
 			if (fmx != null) {
 				fmx.setIsStub(false);
 			}
 
 			dico.addSourceAnchor(fmx, node);
-			this.context.pushClass(fmx);
+		}
+		this.context.pushClass(fmx);
+		return super.visit(node);
+	}
+
+	public void endVisit(ClassInstanceCreation node) {
+		this.context.popClass();
+		super.endVisit(node);
+	}
+
+	public boolean visit(AnnotationTypeDeclaration node) {
+		//System.err.println("TRACE, DefVisiting AnnotationTypeDeclaration: "+node.getName().getIdentifier());
+		ITypeBinding bnd = node.resolveBinding();
+		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), context.top());
+		if (fmx != null) {
+			fmx.setIsStub(Boolean.FALSE);
+			
+			context.pushAnnotationType(fmx);
+		}
+
+		return super.visit(node);
+	}
+
+
+	public void endVisit(AnnotationTypeDeclaration node) {
+		this.context.popAnnotationType();
+		super.endVisit(node);
+	}
+
+	public boolean visit(AnnotationTypeMemberDeclaration node) {
+		//System.err.println("TRACE, DefVisiting AnnotationTypeMemberDeclaration: "+node.getName().getIdentifier());
+		IMethodBinding bnd = node.resolveBinding();
+		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), context.topAnnotationType());
+		if (fmx != null) {
+			fmx.setIsStub(false);
+			
+			context.pushAnnotationMember(fmx);
+		}
+
+		return super.visit(node);
+	}
+
+	public void endVisit(AnnotationTypeMemberDeclaration node) {
+		this.context.popAnnotationMember();
+		super.endVisit(node);
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean visit(EnumDeclaration node) {
+//		System.err.println("TRACE, DefVisiting EnumDeclaration: "+node.getName().getIdentifier());
+		fr.inria.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), context.top());
+		if (fmx != null) {
+			fmx.setIsStub(Boolean.FALSE);
+			
+			for (EnumConstantDeclaration ecst : (List<EnumConstantDeclaration>)node.enumConstants()) {
+				EnumValue ev = dico.ensureFamixEnumValue(ecst.resolveVariable(), ecst.getName().getIdentifier(), fmx);
+				ev.setIsStub(Boolean.FALSE);
+			}
 		}
 		return super.visit(node);
 	}
 
-	public void endVisit(AnonymousClassDeclaration node) {
-		this.context.popClass();
-		super.endVisit(node);
-	}
-	
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 //		System.err.println("TRACE, DefVisiting MethodDeclaration: "+node.getName().getIdentifier());
+		
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
 		Type retTyp = node.getReturnType2();
@@ -157,60 +204,37 @@ public class VerveineDefVisitor extends ASTVisitor {
 		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
 				paramTypes.add(param.getType());
 		}
-		Method fmx = null;
-		if (retTyp != null) {
-			fmx = dico.ensureFamixMethod(bnd,
-					node.getName().getIdentifier(),
-					paramTypes,
-					dico.ensureFamixType(retTyp.resolveBinding(), retTyp.toString(), null),
-					context.topClass());
-		}
-		else {
-			fmx = dico.ensureFamixMethod(bnd,
-					node.getName().getIdentifier(),
-					paramTypes,
-					null,   // probably a constructor
-					context.topClass());
-		}
+		// creating/recovering it
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes,
+											(retTyp == null) ? null : dico.ensureFamixType(retTyp.resolveBinding(), retTyp.toString(), null),
+											context.topClass());
+		
 		if (node.getReturnType2() != null && node.getReturnType2().isParameterizedType()) {
 			//TODO fmx.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)node.getReturnType2()).typeArguments()));
 		}
 		
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			// creating the method's parameters
-			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
-				Parameter fmxParam = dico.ensureFamixParameter(param.resolveBinding(), fmx);
-				if (fmxParam != null) {
-					fmxParam.setIsStub(false);
-				} else {
-					// Has no binding? It might be a Generic parameter
-					System.err.println("         Parameter="+param.getName().getIdentifier());
-					fmxParam = dico.createFamixParameter(param.getName().getIdentifier(), fmx, dico.ensureFamixType(param.getType().resolveBinding(), dico.findTypeName(param.getType()), null));
-				}
-				if (param.getType().isParameterizedType()) {
-					//TODO fmxParam.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)param.getType()).typeArguments()));
-				}
-			}
 			
-			dico.addSourceAnchor(fmx, node);
-			Javadoc jdoc = node.getJavadoc();
-			if (jdoc != null) {
-				Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
-				dico.addSourceAnchor(cmt, jdoc);
-			}
-			//Annotation
-			if (bnd != null) {
-				for (IAnnotationBinding abnd : bnd.getAnnotations()) {
-					AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
-					dico.createFamixAnnotationInstance(fmx, annType);
-				}
-			}
 			this.context.pushMethod(fmx);
 			if (node.getBody() != null) {
 				context.setTopMethodCyclo(1);
 			}
 
+			dico.addSourceAnchor(fmx, node);
+			dico.createFamixComment(node.getJavadoc(), fmx);
+
+			// creating the method's parameters
+			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
+				fr.inria.verveine.core.gen.famix.Type paramTyp = dico.ensureFamixType(param.getType().resolveBinding(), dico.findTypeName(param.getType()), null);
+				Parameter fmxParam = dico.ensureFamixParameter(param.resolveBinding(), param.getName().getIdentifier(), paramTyp, fmx);
+				if (fmxParam != null) {
+					fmxParam.setIsStub(false);
+				}
+				if (param.getType().isParameterizedType()) {
+					//TODO fmxParam.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)param.getType()).typeArguments()));
+				}
+			}
 		}
 		return super.visit(node);	
 	}
@@ -228,7 +252,6 @@ public class VerveineDefVisitor extends ASTVisitor {
 	public boolean visit(FieldDeclaration node) {
 //		System.err.println("TRACE, DefVisiting FieldDeclaration");
 		for (VariableDeclarationFragment vd : (List<VariableDeclarationFragment>)node.fragments()) {
-			IVariableBinding bnd = vd.resolveBinding();
 			Attribute fmx = dico.ensureFamixAttribute(vd.resolveBinding(), vd.getName().getFullyQualifiedName(), dico.ensureFamixType(null, node.getType().toString(), null), context.topClass());
 
 			if (fmx != null) {
@@ -239,18 +262,7 @@ public class VerveineDefVisitor extends ASTVisitor {
 			}
 
 			dico.addSourceAnchor(fmx, node);
-			Javadoc jdoc = node.getJavadoc();
-			if (jdoc != null) {
-				Comment cmt = dico.createFamixComment(jdoc.toString(), fmx);
-				dico.addSourceAnchor(cmt, jdoc);
-			}
-			//Annotation
-			if (bnd != null) {
-				for (IAnnotationBinding abnd : bnd.getAnnotations()) {
-					AnnotationType annType = dico.ensureFamixAnnotationType(abnd.getAnnotationType());
-					dico.createFamixAnnotationInstance(fmx, annType);
-				}
-			}
+			dico.createFamixComment(node.getJavadoc(), fmx);
 		}
 		return super.visit(node);
 	}

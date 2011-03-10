@@ -2,7 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core_3.6.0.v_A58.jar" sourcepath="/org.eclipse.jdt.core">
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core_3.6.0.v_A58.jar" sourcepath="/org.eclipse.jdt.core/dom">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:file:/usr/local/share/eclipse-3_6/plugins/isv-3.2.1-r321_v20060907.jar!/reference/api"/>
 		</attributes>
@@ -14,7 +14,7 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.6.0.v20100517.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.6.0.v20100503.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.equinox.preferences_3.3.0.v20100503.jar"/>
-	<classpathentry kind="lib" path="lib/fame.jar"/>
+	<classpathentry kind="lib" path="lib/fame.jar" sourcepath="/Fame/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/verveine.core"/>
 	<classpathentry kind="output" path="bin"/>
