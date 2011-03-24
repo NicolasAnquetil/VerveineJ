@@ -448,6 +448,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 	 * @param bnd -- a binding for the field (i.e attribute)
 	 */
 	private void fieldAccess(IVariableBinding bnd) {
+		// TODO could be accessing annotation type attribute
 		BehaviouralEntity accessor = this.context.topMethod();
 		if (accessor != null) {
 			Attribute accessed = this.dico.ensureFamixAttribute(bnd, null, null, null);
