@@ -1,9 +1,13 @@
 package fr.inria.verveine.extractor.java;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Map;
+
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
-import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
-import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
 
 import fr.inria.verveine.core.VerveineParser;
 import fr.inria.verveine.core.gen.famix.Namespace;
@@ -20,35 +24,83 @@ public class VerveineJParser extends VerveineParser {
 	 * The arguments that were passed to the parser
 	 * Needed to relativize the source file names
 	 */
-	private String[] initialArgs;
+	private Collection<String> sourceFiles;
 	
+	private ASTParser jdtParser = null;
+	
+	public VerveineJParser() {
+		super();
+
+		jdtParser = ASTParser.newParser(AST.JLS3);
+	}
+	
+	public void setOptions(String[] args) {
+		// we assume java 1.5 code for now, this should be configurable
+		@SuppressWarnings("unchecked")
+		Map<String,String> options = JavaCore.getOptions();
+		options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_5);
+		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_5);
+		options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_5);
+		jdtParser.setCompilerOptions(options);
+
+		Collection<String> classPath = new ArrayList<String>();
+		Collection<String> sourcePath = new ArrayList<String>();
+		sourceFiles = new ArrayList<String>();
+		for (int i=0; i < args.length; i++) {
+			String current = args[i];
+			if (current.equals("-cp")) {
+				classPath.add(args[++i]);
+			}
+			else if (current.endsWith(".java")) {
+				sourceFiles.add(current);
+			}
+			else {
+				sourcePath.add(current);
+			}
+		}
+		
+		jdtParser.setEnvironment(classPath.toArray(new String[0]), sourcePath.toArray(new String[0]), null, true);
+		jdtParser.setResolveBindings(true);
+		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
+		
+		collectJavaFiles(sourcePath, sourceFiles);
+	}
+
+	private void collectJavaFiles(Collection<String> paths, Collection<String> files) {
+		for (String p : paths) {
+			collectJavaFiles(new File(p), files);
+		}
+	}
+
+	private void collectJavaFiles(File f, Collection<String> files) {
+		if (f.isFile() && f.getName().endsWith(".java")) {
+			files.add(f.getAbsolutePath());
+		}
+		else if (f.isDirectory()){
+			for (File child : f.listFiles()) {
+				collectJavaFiles(child, files);
+			}
+		}
+		// else ignore it?
+		
+	}
+
 	public static void main(String[] args) {
 		VerveineJParser parser = new VerveineJParser();
-		parser.compile(args);
+		parser.setOptions(args);
+		parser.parse();
 		parser.outputMSE();
 	}
 
-	private void setInitialArgs(String[] args) {
-		this.initialArgs = args;
-	}
-
-	public String[] getInitialArgs() {
-		return this.initialArgs;
-	}
-
-	@Override
-	public boolean compile(String[] argv) {
-		boolean ret;
-		/*if (this.linkToExisting()) {
+	public void parse() {
+		if (this.linkToExisting()) {
 			this.expandNamespacesNames();
-		}*/
+		}
 
-		setInitialArgs(argv);
-		ret = super.compile(argv);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), new String[0]);
+		jdtParser.createASTs(sourceFiles.toArray(new String[0]), null, new String[0], req, null);
 		
 		this.compressNamespacesNames();
-		
-		return ret;
 	}
 
 	/**
@@ -89,42 +141,6 @@ public class VerveineJParser extends VerveineParser {
 				ns.setName(parent.getName()+"."+ns.getName());
 			}
 		}
-	}
-
-	/*
-	 *  Low-level API performing the actual parsing
-	 *  Overwrite the one in org.eclipse.jdt.internal.compiler.batch.Main;
-	 *  SHOULD NOT USE an internal JDT class. But I don't know how to do it otherwise
-	 */
-	public void performCompilation() {
-
-		this.compilerOptions = new CompilerOptions(this.options);
-		this.compilerOptions.performMethodsFullRecovery = false;
-		this.compilerOptions.performStatementsRecovery = false;
-
-		// NA --- beginning of parsing code --------------------------------------------------
-		String[] tmpclasspath=null;
-		if (this.checkedClasspaths!=null) {
-			tmpclasspath = new String[this.checkedClasspaths.length];
-			int i = 0;
-			for (Classpath cp : this.checkedClasspaths) {
-				tmpclasspath[i++] = cp.getPath();
-			}
-		}
-
-		ASTParser pars = ASTParser.newParser(AST.JLS3);
-		pars.setEnvironment(/*classpathEntries*/tmpclasspath,
-				/*sourcepathEntries*/ new String[0],  // TODO this might be wrong. What if the user specifies some "-sourcepath" when calling Verveine?
-				/*encodings*/null, 
-				/*includeRunningVMBootclasspath*/true);
-		pars.setResolveBindings(true);
-		pars.setKind(ASTParser.K_COMPILATION_UNIT);
-		pars.createASTs(/*sourceFilePaths*/this.filenames, 
-				/*encodings*/this.encodings, 
-				/*bindingKeys*/new String[0], 
-				/*requestor*/new FamixRequestor(getFamixRepo(), getInitialArgs()), 
-				/*monitor*/null);
-		// NA --- end of parsing code --------------------------------------------------
 	}
 	
 }

@@ -16,14 +16,7 @@
 //  along with 'Fame (for Java)'. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-package ch.akuhn.fame.fm3;
-
-import ch.akuhn.fame.FameDescription;
-import ch.akuhn.fame.FamePackage;
-import ch.akuhn.fame.FameProperty;
-import ch.akuhn.fame.Named;
-import ch.akuhn.fame.Nested;
-import ch.akuhn.fame.internal.Warnings;
+package ad_hoc;
 
 /**
  * Abstract superclass of MSE metamodel.
@@ -50,7 +43,7 @@ import ch.akuhn.fame.internal.Warnings;
  */
 @FamePackage("FM3")
 @FameDescription("Element")
-public abstract class Element implements Named, Nested {
+public abstract class Element {
 
     private String name;
 
@@ -83,7 +76,5 @@ public abstract class Element implements Named, Nested {
     public String toString() {
         return this.getFullname();
     }
-    
-    public abstract void checkConstraints(Warnings warnings);
 
 }

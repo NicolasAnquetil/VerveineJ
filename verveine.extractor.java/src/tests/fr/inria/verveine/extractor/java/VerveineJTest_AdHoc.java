@@ -10,9 +10,9 @@ import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.Collection;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,32 +46,24 @@ public class VerveineJTest_AdHoc {
 
 	private Repository repo;
 
-	public VerveineJTest_AdHoc() {
-		// make sure we don't have any pre-existing mse lying in the way
-		new File(VerveineJParser.OUTPUT_FILE).delete();
-	}
-	
-
 	/**
 	 * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
+		new File(VerveineJParser.OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
-		parser.compile(new String[] {"test_src/ad_hoc"});
-		repo = parser.getFamixRepo();
+		this.repo = parser.getFamixRepo();
+		parser.setOptions(new String[] {"test_src/ad_hoc"});
+		parser.parse();
+		repo.exportMSE(new FileWriter(VerveineJParser.OUTPUT_FILE));
 	}
 
-	@After
-	public void tearDown() {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
-	}
-	
 	@Test
 	public void testExceptions() {
 		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "lire");
 		assertNotNull(meth);
-		
+
 		fr.inria.verveine.core.gen.famix.Class excepClass = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "ReadException");
 		assertNotNull(excepClass);
 
@@ -79,7 +71,7 @@ public class VerveineJTest_AdHoc {
 		DeclaredException exD = meth.getDeclaredExceptions().iterator().next();
 		assertSame(meth, exD.getDefiningMethod());
 		assertSame(excepClass, exD.getExceptionClass());
-		
+
 		assertEquals(1, meth.getThrownExceptions().size());
 		ThrownException exT = meth.getThrownExceptions().iterator().next();
 		assertSame(meth, exT.getDefiningMethod());
@@ -169,19 +161,27 @@ public class VerveineJTest_AdHoc {
 	}
 
 	@Test
-	public void testClassParameterTypes() {
-		ParameterizableClass dicoClass = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Dictionary");
-		assertNotNull(dicoClass);
-		assertEquals("Dictionary", dicoClass.getName());
-		assertEquals(2, dicoClass.getTypes().size());
-		assertEquals(1, dicoClass.getParameters().size());
+	public void testParameterizableClass() {
+		ParameterizableClass dico = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Dictionary");
+		assertNotNull(dico);
+		for (Type t : dico.getTypes()) {
+			System.out.println("dico type: "+t.getName());
+		}
+		assertEquals("Dictionary", dico.getName());
+		assertEquals(6, dico.getTypes().size());  // <B> , ImplicitVars , Map<B,NamedEntity> , Map<String,Collection<NamedEntity>> , Collection<NamedEntity> , Map<Class,ImplicitVars>
+		assertEquals(1, dico.getParameters().size());
 		
 		ParameterType dicoParam = TestVerveineUtils.detectElement(repo, ParameterType.class, "B");
 		assertNotNull(dicoParam);
 		assertEquals("B", dicoParam.getName());
 		
-		assertSame(dicoClass, dicoParam.getContainer());
-		assertSame(dicoParam, dicoClass.getParameters().iterator().next());
+		assertSame(dico, dicoParam.getContainer());
+		assertSame(dicoParam, dico.getParameters().iterator().next());
+
+		/* Collection<Object> is not seen as parameterizable by JDT 		 */
+		 ParameterizableClass collec = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Collection");
+		 assertNotNull(collec);
+
 	}
 
 	@Test
@@ -203,17 +203,6 @@ public class VerveineJTest_AdHoc {
 		assertNotNull(cont);
 		assertEquals("Dictionary", cont.getName());
 		assertSame(ParameterizableClass.class, cont.getClass());
-	}
-	
-	@Test
-	public void testFieldArgumentTypes() {
-		Attribute famixAtt = TestVerveineUtils.detectElement(repo, Attribute.class, "mapBind");
-		assertNotNull(famixAtt);
-		assertEquals("mapBind", famixAtt.getName());
-		//assertEquals(2, famixAtt.getDeclaredArgumentTypes().size());
-		//Iterator<Type> it = famixAtt.getDeclaredArgumentTypes().iterator();
-		//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "B"), it.next());
-		//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "NamedEntity"), it.next());
 	}
 	
 	@Test
@@ -321,8 +310,7 @@ public class VerveineJTest_AdHoc {
 			}
 		}
 	}
-	
-	
+
 	@Test
 	public void testMethodReturnArgumentTypes() {
 		Method fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
