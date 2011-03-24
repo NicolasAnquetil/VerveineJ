@@ -16,7 +16,7 @@
 //  along with 'Fame (for Java)'. If not, see <http://www.gnu.org/licenses/>.
 //  
 
-package ch.akuhn.fame;
+package ad_hoc;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -29,7 +29,7 @@ import java.lang.annotation.Target;
  * 
  * @author akuhn
  * 
- */
+ * /
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD })
 public @interface FameProperty {
@@ -43,5 +43,5 @@ public @interface FameProperty {
     String opposite() default "";
 
     Class<?> type() default Void.class;
-
+*/
 }

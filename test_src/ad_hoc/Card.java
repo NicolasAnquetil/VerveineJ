@@ -2,7 +2,7 @@ package ad_hoc;
 
 import java.util.ArrayList;
 import java.util.List;
-
+/*
 public class Card {
 
 	public enum Suit { CLUBS, DIAMONDS, HEARTS, SPADES };
@@ -37,4 +37,5 @@ public class Card {
     public static ArrayList<Card> newDeck() {
         return new ArrayList<Card>(protoDeck); // Return copy of prototype deck
     }
+ */
 }

@@ -1,0 +1,29 @@
+Testsuite: tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel
+Tests run: 16, Failures: 2, Errors: 0, Time elapsed: 10.845 sec
+
+Testcase: testEntitiesNumber took 2.874 sec
+	FAILED
+expected:<25> but was:<33>
+junit.framework.AssertionFailedError: expected:<25> but was:<33>
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testEntitiesNumber(Unknown Source)
+
+Testcase: testClassProperties took 0.933 sec
+Testcase: testNamedEntities took 0.883 sec
+Testcase: testInheritance took 0.632 sec
+Testcase: testMethodProperties took 0.802 sec
+Testcase: testFieldType took 0.753 sec
+Testcase: testStubs took 0.425 sec
+	FAILED
+expected:<9> but was:<17>
+junit.framework.AssertionFailedError: expected:<9> but was:<17>
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testStubs(Unknown Source)
+
+Testcase: testParameter took 0.41 sec
+Testcase: testImplicitVar took 0.399 sec
+Testcase: testInvocation took 0.393 sec
+Testcase: testAccess took 0.39 sec
+Testcase: testSourceAnchors took 0.395 sec
+Testcase: testModifiers took 0.393 sec
+Testcase: testComment took 0.383 sec
+Testcase: testMetric took 0.375 sec
+Testcase: testAnnotation took 0.376 sec

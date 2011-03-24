@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<project name="verveine.extractor.java" default="jar" basedir=".">
+	<!-- Sets variables which can later be used. -->
+	<!-- The value of a property is accessed via ${} -->
+	<property name="src.dir"      location="src" />
+	<property name="build.dir"    location="bin" />
+	<property name="docs.dir"     location="docs" />
+	<property name="dist.dir"     location="lib" />
+	<property name="verveine.jar" location="${dist.dir}/verveine.extractor,java.jar" />
+
+	<!-- Variables used for JUnit testin -->
+	<property name="test.dir" location="src/tests/fr/inria/verveine/extractor/java/" />
+	<property name="test.report.dir" location="testrep" />
+
+
+	<!-- Create a classpath container which can be later used in the ant task -->
+	<path id="build.classpath">
+		<fileset dir="${dist.dir}">
+			<include name="*.jar" />
+		</fileset>
+	</path>
+
+
+	<!-- Deletes the existing build, docs and dist directory-->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${docs.dir}" />
+		<delete file="${verveine.jar}" />
+	</target>
+
+	<!-- Creates the  build, docs and dist directory-->
+	<target name="makedir">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${docs.dir}" />
+		<mkdir dir="${test.report.dir}" />
+	</target>
+
+	<!-- copies the jar from verveine.core -->
+	<target name="corejars" depends="makedir">
+		<copy todir="${dist.dir}" file="../verveine.core/lib/famix.jar"/>
+		<copy todir="${dist.dir}" file="../verveine.core/lib/verveine.core.jar"/>
+	</target>
+
+	<!-- Compiles the java code (including the usage of library for JUnit -->
+	<target name="compile" depends="clean, corejars">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath">
+		</javac>
+	</target>
+
+	<!-- Creates Javadoc -->
+	<target name="docs" depends="compile">
+		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
+			<!-- Define which files / directory should get included, we include all -->
+			<fileset dir="${src.dir}">
+				<include name="**" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<!--Creates the deployable jar file  -->
+	<target name="jar" depends="compile">
+		<jar destfile="${verveine.jar}" basedir="${build.dir}">
+			<include name="fr/inria/verveine/extractor/java/*.class"/>
+		</jar>
+	</target>
+
+	<!-- Run the JUnit Tests -->
+	<!-- Output is XML, could also be plain-->
+	<target name="junit" depends="compile">
+		<junit printsummary="on" fork="true" haltonfailure="no">
+			<classpath>
+				<pathelement path="${build.dir}"/>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<formatter type="plain" />
+			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
+			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
+		</junit>
+	</target>
+
+</project>

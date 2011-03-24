@@ -15,7 +15,6 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Collection;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,6 +27,7 @@ import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Comment;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
+import fr.inria.verveine.core.gen.famix.ImplicitVariable;
 import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
@@ -59,7 +59,8 @@ public class VerveineJTest_LanModel {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		/*String[] files = new String[] {
+		new File(VerveineJParser.OUTPUT_FILE).delete();
+		String[] files = new String[] {
 				"AbstractDestinationAddress.java",
 				"Node.java",
 				"Packet.java",
@@ -71,14 +72,18 @@ public class VerveineJTest_LanModel {
 				"server/PrintServer.java"
 		};
 
+
 		// separate parsing of each source file --------
 		for (String f : files) {
 			parseFile(f);
-		}*/
+		}
+
 		// or parsing the entire project in one pass ---
-		VerveineJParser parser = new VerveineJParser();
-		parser.compile(	new String[] {"test_src/LANModel/moose/lan/"});
+		/*VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
+		parser.setOptions(new String[] {"test_src/LANModel/"});
+		parser.parse();
+		parser.outputMSE();*/
 	}
 
 	/**
@@ -86,40 +91,36 @@ public class VerveineJTest_LanModel {
 	 * The "separate parsing" mechanism should ensure that linkages are appropriately done
 	 * @param file -- name of the file to parse
 	 */
-/*	private void parseFile(String file) {
+	private void parseFile(String file) {
 		String[] args = new String[] {
 				"-cp",
-				"test_src/LANModel//moose/lan/",
+				"test_src/LANModel/",
 				"test_src/LANModel/moose/lan/"+file
 				};
 		
 		VerveineJParser parser = new VerveineJParser();
-		parser.compile(args);
-		repo = parser.getFamixRepo();
+		this.repo = parser.getFamixRepo();
+		parser.setOptions(args);
+		parser.parse();
 		
 		new File(VerveineJParser.OUTPUT_FILE).delete();  // delete old MSE file
 		parser.outputMSE();  // to create a new one
 	}
-*/
-	@After
-	public void tearDown() {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
-	}
-	
+
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(11+14, TestVerveineUtils.selectElementsOfType(repo,fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable}
-		assertEquals(3,     TestVerveineUtils.selectElementsOfType(repo,PrimitiveType.class).size());//int,boolean,void
-		assertEquals(40+7,  TestVerveineUtils.selectElementsOfType(repo,Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString}
-		assertEquals(10+1,  TestVerveineUtils.selectElementsOfType(repo,Attribute.class).size());//10+{System.out}
-		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo,Namespace.class).size());//2+{moose,java.lang,java.io,java}
-		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo,Parameter.class).size());
-		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo,Invocation.class).size());//actually 54, missing 2 !!!!
-		assertEquals(6+24,  TestVerveineUtils.selectElementsOfType(repo,Inheritance.class).size());//6 internal + 24 from imported packages/classes
-		assertEquals(25,    TestVerveineUtils.selectElementsOfType(repo,Access.class).size());// 16 "internal" attributes + 9 System.out
-		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo,LocalVariable.class).size());
-		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo,AnnotationType.class).size()); //Override
-		assertEquals(2,     TestVerveineUtils.selectElementsOfType(repo,AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
+		assertEquals(11+14, TestVerveineUtils.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable}
+		assertEquals(3,     TestVerveineUtils.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
+		assertEquals(40+7,  TestVerveineUtils.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString}
+		assertEquals(10+1,  TestVerveineUtils.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
+		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
+		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
+		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());//actually 54, missing 2 !!!!
+		assertEquals(6+24,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//6 internal + 24 from imported packages/classes
+		assertEquals(25,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
+		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
+		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size()); //Override
+		assertEquals(2,     TestVerveineUtils.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
 	}
 
 	@Test
@@ -277,7 +278,7 @@ public class VerveineJTest_LanModel {
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
 		Namespace ns = TestVerveineUtils.detectElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
-		assertEquals(8, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Appendable,CharSequence
+		assertEquals(9, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence
 		assertTrue(ns.getIsStub());
 			
 		fr.inria.verveine.core.gen.famix.Class obj = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
@@ -338,6 +339,43 @@ public class VerveineJTest_LanModel {
 			}
 		}
 	}
+
+	@Test
+	public void testImplicitVar() {
+		boolean testRan = false;
+		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		assertNotNull(clazz);
+		for (Method m : clazz.getMethods()) {
+			if (m.getName().equals("isDestinationFor" )) {
+				testRan = true;
+				assertEquals(1, m.getOutgoingInvocations().size());
+				Invocation invok = m.getOutgoingInvocations().iterator().next();
+				assertEquals(ImplicitVariable.class, invok.getReceiver().getClass());
+				ImplicitVariable iv = (ImplicitVariable) invok.getReceiver();
+				assertEquals("self", iv.getName());
+				assertSame(m, iv.getBelongsTo());
+			}
+		}
+		assertTrue("Test for SELF did not run, cause: SingleDestinationAddress.isDestinationFor() method not found", testRan);
+
+		testRan = false;
+		clazz = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "WorkStation");
+		assertNotNull(clazz);
+		for (Method m : clazz.getMethods()) {
+			if (m.getName().equals("name" )) {
+				testRan = true;
+				assertEquals(1, m.getOutgoingInvocations().size());
+				Invocation invok = m.getOutgoingInvocations().iterator().next();
+				assertEquals(ImplicitVariable.class, invok.getReceiver().getClass());
+				ImplicitVariable iv = (ImplicitVariable) invok.getReceiver();
+				assertEquals("super", iv.getName());
+				assertSame(m, iv.getBelongsTo());
+			}
+		}
+		assertTrue("Test for SELF did not run, cause: SingleDestinationAddress.isDestinationFor() method not found", testRan);
+
+	}
+
 
 	@Test
 	public void testInvocation() {
@@ -413,6 +451,7 @@ public class VerveineJTest_LanModel {
 		}
 
 	}
+
 	
 	@Test
 	public void testAccess() {
@@ -452,6 +491,7 @@ public class VerveineJTest_LanModel {
 		}
 	}
 
+
 	@Test
 	public void testSourceAnchors() {
 		SourceAnchor anc = null;
@@ -463,7 +503,7 @@ public class VerveineJTest_LanModel {
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
 		assertSame(FileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for class XPrinter", ((FileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/server/PrintServer.java"));
+		assertEquals("test_src/LANModel/moose/lan/server/PrintServer.java", ((FileAnchor)anc).getFileName());
 		assertEquals(17, ((FileAnchor)anc).getStartLine());
 		assertEquals(31, ((FileAnchor)anc).getEndLine());
 
@@ -502,6 +542,7 @@ public class VerveineJTest_LanModel {
 		
 	}
 
+
 	@Test
 	public void testModifiers() {
 		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "OutputServer");
@@ -536,6 +577,7 @@ public class VerveineJTest_LanModel {
 		assertFalse(a.getIsFinal());
 	}
 
+
 	@Test
 	public void testComment() {	
 		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
@@ -555,6 +597,7 @@ public class VerveineJTest_LanModel {
 		assertEquals(34, ((FileAnchor)anc).getEndLine());
 
 	}
+
 	
 	@Test
 	public void testMetric() {
@@ -576,6 +619,7 @@ public class VerveineJTest_LanModel {
 			}
 		}		
 	}
+
 	
 	@Test
 	public void testAnnotation() {
@@ -602,6 +646,7 @@ public class VerveineJTest_LanModel {
 		}
 		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
+		assertEquals(5, clazz.getMethods().size());
 		for (Method method : clazz.getMethods()) {
 			annInstances = method.getAnnotationInstances();
 			if (method.getName().equals("isDestinationFor")) {
@@ -615,4 +660,5 @@ public class VerveineJTest_LanModel {
 			}
 		}	
 	}
+
 }

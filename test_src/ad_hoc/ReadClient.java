@@ -1,4 +1,5 @@
-package OMGL2;
+package ad_hoc;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 

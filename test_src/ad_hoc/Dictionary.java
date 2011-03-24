@@ -1,34 +1,9 @@
-package fr.inria.verveine.core;
+package ad_hoc;
 
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map;
-
-import ch.akuhn.fame.Repository;
-
-import fr.inria.verveine.core.gen.famix.Access;
-import fr.inria.verveine.core.gen.famix.Association;
-import fr.inria.verveine.core.gen.famix.Attribute;
-import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
-import fr.inria.verveine.core.gen.famix.CaughtException;
-import fr.inria.verveine.core.gen.famix.Comment;
-import fr.inria.verveine.core.gen.famix.ContainerEntity;
-import fr.inria.verveine.core.gen.famix.DeclaredException;
-import fr.inria.verveine.core.gen.famix.Entity;
-import fr.inria.verveine.core.gen.famix.ImplicitVariable;
-import fr.inria.verveine.core.gen.famix.Inheritance;
-import fr.inria.verveine.core.gen.famix.Invocation;
-import fr.inria.verveine.core.gen.famix.LocalVariable;
-import fr.inria.verveine.core.gen.famix.Method;
-import fr.inria.verveine.core.gen.famix.NamedEntity;
-import fr.inria.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.core.gen.famix.Parameter;
-import fr.inria.verveine.core.gen.famix.PrimitiveType;
-import fr.inria.verveine.core.gen.famix.Reference;
-import fr.inria.verveine.core.gen.famix.SourcedEntity;
-import fr.inria.verveine.core.gen.famix.StructuralEntity;
-import fr.inria.verveine.core.gen.famix.ThrownException;
 
 public class Dictionary<B> {
 
@@ -36,7 +11,7 @@ public class Dictionary<B> {
 
 	protected Map<String,Collection<NamedEntity>> mapName;
 
-	protected Map<fr.inria.verveine.core.gen.famix.Class,ImplicitVars> mapImpVar;
+	protected Map<NamedEntity,ImplicitVars> mapImpVar;
 
 	protected class ImplicitVars {
 		public ImplicitVariable self_iv;
@@ -53,10 +28,10 @@ public class Dictionary<B> {
 		
 		this.mapBind = new Hashtable<B,NamedEntity>();
 		this.mapName = new Hashtable<String,Collection<NamedEntity>>();
-		this.mapImpVar = new Hashtable<fr.inria.verveine.core.gen.famix.Class,ImplicitVars>();
+		this.mapImpVar = new Hashtable<NamedEntity,ImplicitVars>();
 		
 		if (! this.famixRepo.isEmpty()) {
-			recoverExistingRepository();
+			// nothing
 		}
 	}
 	
@@ -140,4 +115,24 @@ public class Dictionary<B> {
 		return fmx;
 	}
 	
+}
+
+class NamedEntity {
+	public boolean isInstance(NamedEntity obj) {
+		return false;
+	}
+	public void setName(String f) {
+	}
+	public void setIsStub(Boolean f) {
+	}
+}
+
+class Repository {
+	public boolean isEmtpy() {
+		return false;
+	}
+	public void add(NamedEntity f) {
+	}
+}
+
 }
