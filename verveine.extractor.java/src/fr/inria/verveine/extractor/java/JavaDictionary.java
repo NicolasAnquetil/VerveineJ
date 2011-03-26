@@ -20,10 +20,12 @@ import org.eclipse.jdt.core.dom.SimpleType;
 
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.Dictionary;
+import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
 import fr.inria.verveine.core.gen.famix.Attribute;
+import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.Comment;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
@@ -55,6 +57,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String SOURCE_FILENAME_PROPERTY = "verveine-source-filename";
 
 	public static final String OBJECT_NAME = "Object";
+	public static final String METACLASS_NAME = "Class";
 	public static final String OBJECT_PACKAGE_NAME = "java.lang";
 	public static final String ARRAYS_NAME = "default[]";
 	public static final String INSTANCE_INIT_BLOCK_NAME = "<InstanceInitializer>";
@@ -208,7 +211,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		// --------------- name
 		if (name == null) {
 			if (! bnd.isAnonymous()) {
-				name = bnd.getErasure().getName();  // for generics, will give the "core" type name, for naormal type, won't change anything
+				name = bnd.getErasure().getName();  // for generics, will give the "core" type name, for normal type, won't change anything
 			}
 			else { // anonymous class
 				if (bnd.getSuperclass() != null) {
@@ -229,6 +232,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		if (name.equals(OBJECT_NAME)) {
 			return ensureFamixClassObject(bnd);
+		}
+
+		// --------------- recover from name ?
+		for (Type candidate : this.getEntityByName(Type.class, name)) {
+			if ( checkAndMapClass(bnd, candidate) ) {
+				fmx = (Class) candidate;
+				break;
+			}
 		}
 
 		// --------------- owner
@@ -275,13 +286,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			sups.add( ensureFamixType(intbnd, /*name*/null, /*owner*/null, /*ctxt*/owner));
 		}
 
-		// --------------- recover from name ?
-		for (Type candidate : this.getEntityByName(Type.class, name)) {
-			if ( checkAndMapClass(bnd, candidate) ) {
-				fmx = (Class) candidate;
-				break;
-			}
-		}
+		// ---------------- create 
 		if (fmx == null) {
 			if (isGeneric) {
 				fmx = super.ensureFamixParameterizableClass(bnd, name, owner);
@@ -308,8 +313,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+/*	public ParameterizableClass ensureFamixParameterizableType(ITypeBinding bnd, String name, ContainerEntity owner) {
+		ParameterizableClass fmx = null;
+		
+		return fmx;
+	}*/
+	
 	public ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, ParameterizableClass generic, ContainerEntity owner) {
-		ParameterizedType fmx = null;
+			ParameterizedType fmx = null;
 
 		// if Binding is null, we can only rely on provided parameters, so lets do it now and return
 		if (bnd == null) {
@@ -355,7 +366,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- generic
 		if (generic == null) {
-			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true);
+			String genName = name;
+			int i = name.indexOf('<');
+			if (i > 0) {
+				genName = name.substring(0, i);
+			}
+			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), genName, owner, /*isGeneric*/true);
 		}
 
 		// --------------- recover from name ?
@@ -1302,6 +1318,15 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fa;
 	}
 
+	public Access fieldAccess(BehaviouralEntity accessor, Attribute accessed, boolean isWrite, Access lastAccess) {
+		Access ret = null;
+		// TODO could be accessing annotation type attribute
+		if ( (accessor != null) && (accessed != null) ) {
+			ret = super.addFamixAccess(accessor, accessed, isWrite, lastAccess);
+		}
+		return ret;
+	}
+
 	/**
 	 * Creates or recovers a stub Famix Method
 	 * @param name of the method
@@ -1333,19 +1358,23 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		if (fmx != null) {
 			fmx.setContainer( ensureFamixNamespaceJavaLang(null));
-			
-			fmx.setIsAbstract(Boolean.FALSE);
-			fmx.setIsFinal(Boolean.FALSE);
-			fmx.setIsInterface(Boolean.FALSE);
-			fmx.setIsPrivate(Boolean.FALSE);
-			fmx.setIsProtected(Boolean.FALSE);
-			fmx.setIsPublic(Boolean.TRUE);
 		}
 		// Note: "Object" has no superclass
 
 		return fmx;
 	}
 
+	public fr.inria.verveine.core.gen.famix.Class ensureFamixMetaClass(ITypeBinding bnd) {
+		Namespace javaLang = ensureFamixNamespaceJavaLang( (bnd == null) ? null : bnd.getPackage());
+		fr.inria.verveine.core.gen.famix.Class fmx =  ensureFamixClass(bnd, METACLASS_NAME, javaLang, /*isGeneric*/true);
+
+		if ( (fmx != null) && (fmx.getSuperInheritances() == null) ) {
+			ensureFamixInheritance(ensureFamixClassObject(null), fmx, null);
+		}
+
+		return fmx;
+	}
+	
 	/**
 	 * Creates or recovers the Famix Class that will own all stub methods (for which the real owner is unknown)
 	 * @return a Famix class
