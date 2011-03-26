@@ -23,7 +23,6 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
@@ -43,21 +42,17 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
-import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.EnumValue;
-import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.core.gen.famix.Parameter;
 import fr.inria.verveine.core.gen.famix.ParameterType;
 import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.core.gen.famix.StructuralEntity;
@@ -241,31 +236,33 @@ public class VerveineDefVisitor extends ASTVisitor {
 		
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
-		Type retTyp = node.getReturnType2();
+		//Type retTyp = node.getReturnType2();
+		/*fr.inria.verveine.core.gen.famix.Type fmxTyp;
+		if (retTyp == null) {
+			fmxTyp = null;
+		}
+		else {
+			fmxTyp = dico.ensureFamixType(retTyp.resolveBinding(), dico.findTypeName(retTyp), /*owner* /null, context.top());
+		}*/
+
 		Collection<Type> paramTypes = new ArrayList<Type>();
 		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
 				paramTypes.add(param.getType());
 		}
 
-		fr.inria.verveine.core.gen.famix.Type fmxTyp;
-		if (retTyp == null) {
-			fmxTyp = null;
-		}
-		else {
-			fmxTyp = dico.ensureFamixType(retTyp.resolveBinding(), dico.findTypeName(retTyp), /*owner*/null, context.top());
-		}
+		// creating/recovering it (creates it with a null return type because might need this FamixMethod to create the return type.
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, null, context.topClass());
+		fr.inria.verveine.core.gen.famix.Type fmxTyp = referedType(node.getReturnType2(), fmx);
 
-		// creating/recovering it
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, fmxTyp, context.topClass());
-		
-		if (retTyp != null && retTyp.isParameterizedType()) {
+		//if (retTyp != null && retTyp.isParameterizedType()) {
 			//TODO fmx.setDeclaredArgumentTypes(dico.ensureFamixTypes(((ParameterizedType)retTyp).typeArguments()));
-		}
+		//}
 		
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			
 			this.context.pushMethod(fmx);
+			fmx.setDeclaredType(fmxTyp);
 			if (node.getBody() != null) {
 				context.setTopMethodCyclo(1);
 			}
@@ -279,7 +276,8 @@ public class VerveineDefVisitor extends ASTVisitor {
 				// Note: method and ParamTyp bindings are null for ParameterType :-(
 				paramAsVarList = new ArrayList<VariableDeclaration>(1);
 				paramAsVarList.add(param);
-				visitVariablesDeclarations(node, param.getType(), paramAsVarList, context.topMethod());
+				fr.inria.verveine.core.gen.famix.Type varTyp = referedType(param.getType(), context.topMethod());
+				visitVariablesDeclarations(node, varTyp, paramAsVarList, context.topMethod());
 			}
 			return super.visit(node);
 		}
@@ -308,7 +306,8 @@ public class VerveineDefVisitor extends ASTVisitor {
 	public boolean visit(FieldDeclaration node) {
 //		System.err.println("TRACE, DefVisiting FieldDeclaration");
 
-		for (StructuralEntity att : visitVariablesDeclarations(node, node.getType(), (List<VariableDeclaration>)node.fragments(), context.topClass()) ) {
+		fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topClass());
+		for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topClass()) ) {
 			dico.addSourceAnchor(att, node);
 			dico.ensureFamixComment(node.getJavadoc(), att);
 		}
@@ -322,7 +321,8 @@ public class VerveineDefVisitor extends ASTVisitor {
 		// we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them 
 		if (! node.getType().isPrimitiveType()) {
-			for (StructuralEntity att : visitVariablesDeclarations(node, node.getType(), (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
+			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod());
+			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
 				dico.addSourceAnchor(att, node);
 			}
 		}
@@ -337,7 +337,8 @@ public class VerveineDefVisitor extends ASTVisitor {
 		// we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them 
 		if (! node.getType().isPrimitiveType()) {
-			for (StructuralEntity att : visitVariablesDeclarations(node, node.getType(), (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
+			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod());
+			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
 				dico.addSourceAnchor(att, node);
 			}
 		}
@@ -346,43 +347,26 @@ public class VerveineDefVisitor extends ASTVisitor {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Collection<StructuralEntity> visitVariablesDeclarations(ASTNode node, Type varTyp, List<VariableDeclaration> fragments, ContainerEntity ctxt) {
+	private Collection<StructuralEntity> visitVariablesDeclarations(ASTNode node, fr.inria.verveine.core.gen.famix.Type varTyp, List<VariableDeclaration> fragments, ContainerEntity ctxt) {
 		Collection<StructuralEntity> ret = new ArrayList<StructuralEntity>();
 
-		fr.inria.verveine.core.gen.famix.Type fmxTyp;
-		if (varTyp.isParameterizedType()) {
-			ITypeBinding parameterizedBnd = varTyp.resolveBinding();
-			ITypeBinding parameterizableBnd = (parameterizedBnd == null) ? null : parameterizedBnd.getErasure();
-			String tname = dico.findTypeName(varTyp);
-			ParameterizableClass tmpGeneric = null;
-			tmpGeneric = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, tname, /*owner*/null, /*isGeneric*/true);
-
-			fmxTyp = dico.ensureFamixParameterizedType(parameterizedBnd, tname, tmpGeneric, /*owner*/ctxt);
-			for (Type targ : (List<Type>) ((ParameterizedType)varTyp).typeArguments()) {
-				fr.inria.verveine.core.gen.famix.Type fmxTArg = dico.ensureFamixType(targ.resolveBinding(), dico.findTypeName(targ), null, ctxt);
-				((fr.inria.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
-			}
-		}
-		else {
-			fmxTyp = dico.ensureFamixType(varTyp.resolveBinding(), dico.findTypeName(varTyp), /*owner*/null, ctxt);
-		}
 		for (VariableDeclaration vd : fragments) {
 			StructuralEntity fmx;
 			if (node instanceof MethodDeclaration) {
 				// creating the parameters of a method. In this case, 'fragment' is aList<SingleVariableDeclarationFragment> and 'varType' is null
-				fmx = dico.ensureFamixParameter(vd.resolveBinding(), vd.getName().getIdentifier(), fmxTyp, (Method)ctxt);
+				fmx = dico.ensureFamixParameter(vd.resolveBinding(), vd.getName().getIdentifier(), varTyp, (Method)ctxt);
 			}
 			else if (node instanceof FieldDeclaration) {
 				// creating a class' field
-				fmx = dico.ensureFamixAttribute(vd.resolveBinding(), vd.getName().getIdentifier(), fmxTyp, (fr.inria.verveine.core.gen.famix.Class) ctxt);
+				fmx = dico.ensureFamixAttribute(vd.resolveBinding(), vd.getName().getIdentifier(), varTyp, (fr.inria.verveine.core.gen.famix.Class) ctxt);
 			}
 			else if (node instanceof VariableDeclarationExpression) {
 				// creating a method's local variable
-				fmx = dico.ensureFamixLocalVariable(vd.resolveBinding(), vd.getName().getIdentifier(), fmxTyp, (Method) ctxt);
+				fmx = dico.ensureFamixLocalVariable(vd.resolveBinding(), vd.getName().getIdentifier(), varTyp, (Method) ctxt);
 			}
 			else if (node instanceof VariableDeclarationExpression) {
 				// creating a method's local variable
-				fmx = dico.ensureFamixLocalVariable(vd.resolveBinding(), vd.getName().getIdentifier(), fmxTyp, (Method) ctxt);
+				fmx = dico.ensureFamixLocalVariable(vd.resolveBinding(), vd.getName().getIdentifier(), varTyp, (Method) ctxt);
 			}
 			else {
 				fmx = null;
@@ -395,6 +379,37 @@ public class VerveineDefVisitor extends ASTVisitor {
 		}
 
 		return ret;
+	}
+
+	/**
+	 * @param typ
+	 * @param ctxt
+	 * @return
+	 */
+	private fr.inria.verveine.core.gen.famix.Type referedType(Type typ, ContainerEntity ctxt) {
+		fr.inria.verveine.core.gen.famix.Type fmxTyp = null;
+		
+		if (typ == null) {
+			return null;
+		}
+
+		if (typ.isParameterizedType()) {
+			ITypeBinding parameterizedBnd = typ.resolveBinding();
+			ITypeBinding parameterizableBnd = (parameterizedBnd == null) ? null : parameterizedBnd.getErasure();
+			String tname = dico.findTypeName(typ);
+			ParameterizableClass tmpGeneric = null;
+			tmpGeneric = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, tname, /*owner*/null, /*isGeneric*/true);
+
+			fmxTyp = dico.ensureFamixParameterizedType(parameterizedBnd, tname, tmpGeneric, /*owner*/ctxt);
+			for (Type targ : (List<Type>) ((ParameterizedType)typ).typeArguments()) {
+				fr.inria.verveine.core.gen.famix.Type fmxTArg = dico.ensureFamixType(targ.resolveBinding(), dico.findTypeName(targ), null, ctxt);
+				((fr.inria.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
+			}
+		}
+		else {
+			fmxTyp = dico.ensureFamixType(typ.resolveBinding(), dico.findTypeName(typ), /*owner*/null, ctxt);
+		}
+		return fmxTyp;
 	}
 
 	// METRICS: CYCLO, NOS

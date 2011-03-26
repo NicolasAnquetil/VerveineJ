@@ -376,7 +376,6 @@ public class VerveineJTest_LanModel {
 
 	}
 
-
 	@Test
 	public void testInvocation() {
 		fr.inria.verveine.core.gen.famix.Class nodeClass = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node");
@@ -452,7 +451,6 @@ public class VerveineJTest_LanModel {
 
 	}
 
-	
 	@Test
 	public void testAccess() {
 		Attribute att;
@@ -490,7 +488,6 @@ public class VerveineJTest_LanModel {
 			assertEquals(output, acc.getAccessor());
 		}
 	}
-
 
 	@Test
 	public void testSourceAnchors() {
@@ -542,7 +539,6 @@ public class VerveineJTest_LanModel {
 		
 	}
 
-
 	@Test
 	public void testModifiers() {
 		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "OutputServer");
@@ -577,7 +573,6 @@ public class VerveineJTest_LanModel {
 		assertFalse(a.getIsFinal());
 	}
 
-
 	@Test
 	public void testComment() {	
 		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
@@ -597,7 +592,6 @@ public class VerveineJTest_LanModel {
 		assertEquals(34, ((FileAnchor)anc).getEndLine());
 
 	}
-
 	
 	@Test
 	public void testMetric() {
@@ -619,7 +613,6 @@ public class VerveineJTest_LanModel {
 			}
 		}		
 	}
-
 	
 	@Test
 	public void testAnnotation() {

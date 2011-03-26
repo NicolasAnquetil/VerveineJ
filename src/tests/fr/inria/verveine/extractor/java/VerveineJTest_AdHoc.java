@@ -4,10 +4,7 @@
 package tests.fr.inria.verveine.extractor.java;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -18,6 +15,7 @@ import org.junit.Test;
 
 import test.fr.inria.verveine.core.TestVerveineUtils;
 import ch.akuhn.fame.Repository;
+import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.AnnotationInstance;
 import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
@@ -33,6 +31,7 @@ import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
 import fr.inria.verveine.core.gen.famix.ParameterType;
 import fr.inria.verveine.core.gen.famix.ParameterizableClass;
+import fr.inria.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.core.gen.famix.ThrownException;
 import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.VerveineJParser;
@@ -159,18 +158,44 @@ public class VerveineJTest_AdHoc {
 		}
 
 	}
+	
+	@Test
+	public void testClassVar() {
+		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixEntity");
+		assertNotNull(meth);
+		
+		assertEquals(3, meth.getParameters().size());
+		for (Parameter p : meth.getParameters()) {
+			if (p.getName().equals("fmxClass")) {
+				assertEquals(ParameterizedType.class, p.getDeclaredType().getClass());
+				assertEquals("Class", p.getDeclaredType().getName());
+			}
+			else {
+				assertTrue("Unknown parameter for ensureFamixEntity: "+p.getName(),
+							p.getName().equals("name") || p.getName().equals("bnd") );
+				break;
+			}
+		}
+		
+		assertEquals(2, meth.getAccesses().size());
+		boolean classFieldFound = false;
+		for (Access acc : meth.getAccesses()) {
+			if (acc.getTo().getName().equals("class")) {
+				classFieldFound = true;
+			}
+		}
+		assertTrue("ensureFamixEntity does not access <someClass>.class", classFieldFound);
+	}
 
 	@Test
 	public void testParameterizableClass() {
 		ParameterizableClass dico = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Dictionary");
 		assertNotNull(dico);
-		for (Type t : dico.getTypes()) {
-			System.out.println("dico type: "+t.getName());
-		}
+
 		assertEquals("Dictionary", dico.getName());
 		assertEquals(6, dico.getTypes().size());  // <B> , ImplicitVars , Map<B,NamedEntity> , Map<String,Collection<NamedEntity>> , Collection<NamedEntity> , Map<Class,ImplicitVars>
 		assertEquals(1, dico.getParameters().size());
-		
+
 		ParameterType dicoParam = TestVerveineUtils.detectElement(repo, ParameterType.class, "B");
 		assertNotNull(dicoParam);
 		assertEquals("B", dicoParam.getName());
