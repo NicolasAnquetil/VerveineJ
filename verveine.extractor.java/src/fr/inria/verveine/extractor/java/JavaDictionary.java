@@ -235,7 +235,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// --------------- recover from name ?
-		for (Type candidate : this.getEntityByName(Type.class, name)) {
+		for (Type candidate : this.getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, name)) {
 			if ( checkAndMapClass(bnd, candidate) ) {
 				fmx = (Class) candidate;
 				break;
@@ -330,9 +330,19 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return super.ensureFamixParameterizedType(null, name, generic, owner);
 		}
 
+		fmx = (ParameterizedType)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
+		}
+
 		// --------------- name
 		if (name == null) {
 			name = bnd.getName();
+		}
+		// remove parameter types from name
+		int i = name.indexOf('<');
+		if (i > 0) {
+			name = name.substring(0, i);
 		}
 
 		// --------------- owner
@@ -366,12 +376,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- generic
 		if (generic == null) {
-			String genName = name;
-			int i = name.indexOf('<');
-			if (i > 0) {
-				genName = name.substring(0, i);
-			}
-			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), genName, owner, /*isGeneric*/true);
+			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true);
 		}
 
 		// --------------- recover from name ?
@@ -410,6 +415,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				return null;
 			}
 			return super.ensureFamixEnum(null, name, owner);
+		}
+
+		fmx = (fr.inria.verveine.core.gen.famix.Enum)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
 		}
 
 		// --------------- name
@@ -474,6 +484,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return super.ensureFamixEnumValue(null, name, owner);
 		}
 
+		fmx = (EnumValue)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
+		}
+
 		// --------------- name
 		if (name == null) {
 			name = bnd.getName();
@@ -512,6 +527,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				return null;
 			}
 			return super.ensureFamixAnnotationType(null, name, owner);
+		}
+
+		fmx = (AnnotationType)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
 		}
 
 		// --------------- name
@@ -559,6 +579,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				return null;
 			}
 			return super.ensureFamixAnnotationTypeAttribute(null, name, owner);
+		}
+
+		fmx = (AnnotationTypeAttribute)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
 		}
 
 		// --------------- name
@@ -934,7 +959,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Params: see {@link Dictionary#ensureFamixMethod(Object, String, String, Type, Type)}.
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<org.eclipse.jdt.core.dom.Type> paramTypes, Type ret, fr.inria.verveine.core.gen.famix.Class owner) {
+	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<org.eclipse.jdt.core.dom.Type> paramTypes, Type ret, Type owner) {
 		Method fmx = null;
 		String sig;
 		boolean first;
@@ -973,6 +998,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				owner= ensureFamixClassStubOwner();
 			}
 			return super.ensureFamixMethod(null, name, sig, ret, owner);
+		}
+
+		fmx = (Method)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
 		}
 
 		// --------------- name
@@ -1089,6 +1119,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return super.ensureFamixAttribute(null, name, type, owner);
 		}
 
+		fmx = (Attribute)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
+		}
+
 		// --------------- name
 		if (name == null) {
 			name = bnd.getName();
@@ -1170,6 +1205,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return super.createFamixParameter(null, name, typ, owner);
 		}
 
+		fmx = (Parameter)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
+		}
+
 		// --------------- name
 		if (name == null) {
 			name = bnd.getName();
@@ -1224,6 +1264,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return super.ensureFamixLocalVariable(null, name, typ, owner);
 		}
 
+		fmx = (LocalVariable)getEntityByKey(bnd);	// to avoid useless computations if we can
+		if (fmx != null) {
+			return fmx;
+		}
+
 		// --------------- name
 		if (name == null) {
 			name = bnd.getName();
@@ -1260,10 +1305,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 	
 	/**
-	 * Returns a Famix UnknownVariable. The Entity is created if it does not exist.
+	 * Creates and returns a Famix UnknownVariable.
 	 */
-	public UnknownVariable ensureFamixUnknownVariable(Type type, String name) {
-//		System.err.println("TRACE -- ensureFamixUnknownVariable: "+name);
+	public UnknownVariable createFamixUnknownVariable(Type type, String name) {
+//		System.err.println("TRACE -- createFamixUnknownVariable: "+name);
 		UnknownVariable fmx = (UnknownVariable) createFamixEntity(UnknownVariable.class, name);
 		if (fmx!=null) {
 			fmx.setDeclaredType(type);
@@ -1271,7 +1316,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	public Comment ensureFamixComment(org.eclipse.jdt.core.dom.Comment jdoc, NamedEntity fmx) {
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jdoc, NamedEntity fmx) {
 		Comment cmt = null;
 		if (jdoc != null) {
 			cmt = createFamixComment(jdoc.toString(), fmx);

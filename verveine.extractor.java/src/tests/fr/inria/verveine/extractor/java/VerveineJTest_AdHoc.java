@@ -93,7 +93,7 @@ public class VerveineJTest_AdHoc {
 		AnnotationType fmProp = l_FmProp.iterator().next();
 		assertNotNull(fmProp);
 		assertEquals("FameProperty", fmProp.getName());
-		//TODO assertFalse(fmProp.getIsStub());
+		// FIXME assertFalse(fmProp.getIsStub());
 		
 		AnnotationType fmPckg = TestVerveineUtils.detectElement(repo,AnnotationType.class, "FamePackage");
 		assertNotNull(fmPckg);
@@ -158,7 +158,7 @@ public class VerveineJTest_AdHoc {
 		}
 
 	}
-	
+
 	@Test
 	public void testClassVar() {
 		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixEntity");
@@ -177,7 +177,7 @@ public class VerveineJTest_AdHoc {
 			}
 		}
 		
-		assertEquals(2, meth.getAccesses().size());
+		assertEquals(2, meth.getAccesses().size());  // ImplicitVariable.class + mapBind
 		boolean classFieldFound = false;
 		for (Access acc : meth.getAccesses()) {
 			if (acc.getTo().getName().equals("class")) {
@@ -194,6 +194,8 @@ public class VerveineJTest_AdHoc {
 
 		assertEquals("Dictionary", dico.getName());
 		assertEquals(6, dico.getTypes().size());  // <B> , ImplicitVars , Map<B,NamedEntity> , Map<String,Collection<NamedEntity>> , Collection<NamedEntity> , Map<Class,ImplicitVars>
+// FIXME: Collection<NamedEntity> belongsTo getEntityByName !!
+
 		assertEquals(1, dico.getParameters().size());
 
 		ParameterType dicoParam = TestVerveineUtils.detectElement(repo, ParameterType.class, "B");
@@ -203,10 +205,9 @@ public class VerveineJTest_AdHoc {
 		assertSame(dico, dicoParam.getContainer());
 		assertSame(dicoParam, dico.getParameters().iterator().next());
 
-		/* Collection<Object> is not seen as parameterizable by JDT 		 */
-		 ParameterizableClass collec = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Collection");
-		 assertNotNull(collec);
-
+		/* Collection<Object> is not seen as parameterizable by JDT */
+		ParameterizableClass collec = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Collection");
+		assertNotNull(collec);
 	}
 
 	@Test

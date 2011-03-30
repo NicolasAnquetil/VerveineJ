@@ -226,7 +226,19 @@ public class VerveineRefVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(MethodInvocation node) {
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(node.getExpression()));
+		Expression callingExpr = node.getExpression();
+		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(callingExpr));
+		if (callingExpr instanceof SimpleName) {
+			// we might have a hidden FieldAccess here
+			IBinding bnd = ((Name) callingExpr).resolveBinding();
+			if ( (bnd != null) && (bnd instanceof IVariableBinding) && ((IVariableBinding)bnd).isField() ){
+				BehaviouralEntity accessor = this.context.topMethod();
+				Attribute accessed = this.dico.ensureFamixAttribute(bnd, ((SimpleName)callingExpr).getIdentifier(), null, /*owner*/context.topClass());
+				// 'owner' note: using a field without anything before, it must belongs to the currently parsed class
+				
+				context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+			}
+		}
 		return super.visit(node);
 	}
 
@@ -245,7 +257,15 @@ public class VerveineRefVisitor extends ASTVisitor {
 	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver) {
 		BehaviouralEntity sender = this.context.topMethod();
 		if (sender != null) {
-			Method invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/null);  // cast needed to desambiguate the call
+			Method invoked = null;
+			if (receiver instanceof StructuralEntity) {
+				fr.inria.verveine.core.gen.famix.Type varTyp = ((StructuralEntity)receiver).getDeclaredType();
+				invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/varTyp);  // cast needed to desambiguate the call
+			}
+			else {
+				// method static of a class called on the class
+				invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/(fr.inria.verveine.core.gen.famix.Type)receiver);  // cast needed to desambiguate the call
+			}
 			context.setLastInvocation( dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation()) );
 		}
 	}
@@ -261,19 +281,36 @@ public class VerveineRefVisitor extends ASTVisitor {
 		return super.visit(node);
 	}
 
-	/* Could be a FieldAccess (see JDT javadoc: class FieldAccess) 
+	/*
+	 * Could be a FieldAccess (see JDT javadoc: class FieldAccess) 
 	 */
 	public boolean visit(QualifiedName node) {
 		IBinding bnd = node.resolveBinding();
 		if (bnd instanceof IVariableBinding) {
 			// apparently this is a field
 			BehaviouralEntity accessor = this.context.topMethod();
-			Attribute accessed = this.dico.ensureFamixAttribute(bnd, node.getName().getIdentifier(), null, null);
+			Attribute accessed = this.dico.ensureFamixAttribute((IVariableBinding)bnd, node.getName().getIdentifier(), null, null);  // cast needed to access the proper method
 			if ( (accessed != null) && (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
 				accessed.setParentType(dico.ensureFamixClassArray());
 			}
 			context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
 		}
+		return super.visit(node);
+	}
+
+	/* 
+	 * Another FieldAccess in disguise: SomeClass.class
+	 */
+	public boolean visit(TypeLiteral node) {
+		Attribute accessed;
+		fr.inria.verveine.core.gen.famix.Type javaMetaClass = dico.ensureFamixMetaClass(null); 
+		BehaviouralEntity accessor = this.context.topMethod();
+		accessed =  dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass);
+		if ( (accessed != null) && (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
+			accessed.setParentType(dico.ensureFamixClassArray());
+		}
+		context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+
 		return super.visit(node);
 	}
 
@@ -360,12 +397,10 @@ public class VerveineRefVisitor extends ASTVisitor {
 
 		// field.msg()
 		else if (expr instanceof FieldAccess) {
-			BehaviouralEntity accessor = this.context.topMethod();
 			Attribute ret = dico.ensureFamixAttribute(((FieldAccess) expr).resolveFieldBinding(), ((FieldAccess) expr).getName().getIdentifier(), null, null);
 			if ( (ret != null) && (ret.getParentType() == null) && (ret.getName().equals("length")) ) {
 				ret.setParentType(dico.ensureFamixClassArray());
 			}
-			context.setLastAccess( dico.addFamixAccess(accessor, ret, /*isWrite*/false, context.getLastAccess()) );
 
 			return ret;
 		}
@@ -394,17 +429,15 @@ public class VerveineRefVisitor extends ASTVisitor {
 			if (bnd instanceof ITypeBinding) {
 				// msg() is a static method of Name
 				//TODO why returning a variable here? Should not it be the class itself?
-				ret = dico.ensureFamixUnknownVariable( dico.ensureFamixType((ITypeBinding)bnd, null, null, context.top()), bnd.getName());
+				ret = dico.createFamixUnknownVariable( dico.ensureFamixType((ITypeBinding)bnd, null, null, context.top()), bnd.getName());
 			}
 			else if (bnd instanceof IVariableBinding) {
 				String varName = ( ((Name)expr).isSimpleName() ? ((SimpleName)expr).getFullyQualifiedName() : ((QualifiedName)expr).getName().getIdentifier());
 				if ( ((IVariableBinding)bnd).isField() ) {
 					ret = dico.ensureFamixAttribute((IVariableBinding)bnd, varName, null, null);
-					BehaviouralEntity accessor = this.context.topMethod();
 					if ( (ret != null) && (((Attribute) ret).getParentType() == null) && (ret.getName().equals("length")) ) {
 						((Attribute) ret).setParentType(dico.ensureFamixClassArray());
 					}
-					context.setLastAccess( dico.addFamixAccess(accessor, (Attribute) ret, /*isWrite*/false, context.getLastAccess()) );
 
 					return ret;
 				}
@@ -432,12 +465,10 @@ public class VerveineRefVisitor extends ASTVisitor {
 
 		// super.field.msg()
 		else if (expr instanceof SuperFieldAccess) {
-			BehaviouralEntity accessor = this.context.topMethod();
 			Attribute ret = dico.ensureFamixAttribute(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), null, null);
 			if ( (ret != null) && (ret.getParentType() == null) && (ret.getName().equals("length")) ) {
 				ret.setParentType(dico.ensureFamixClassArray());
 			}
-			context.setLastAccess( dico.addFamixAccess(accessor, ret, /*isWrite*/false, context.getLastAccess()) );
 
 			return ret;
 		}
@@ -459,12 +490,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			// similar to a field access
 			Attribute ret;
 			fr.inria.verveine.core.gen.famix.Type javaMetaClass = dico.ensureFamixMetaClass(null); 
-			BehaviouralEntity accessor = this.context.topMethod();
 			ret =  dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass);
-			if ( (ret != null) && (ret.getParentType() == null) && (ret.getName().equals("length")) ) {
-				ret.setParentType(dico.ensureFamixClassArray());
-			}
-			context.setLastAccess( dico.addFamixAccess(accessor, ret, /*isWrite*/false, context.getLastAccess()) );
 
 			return ret;
 		}

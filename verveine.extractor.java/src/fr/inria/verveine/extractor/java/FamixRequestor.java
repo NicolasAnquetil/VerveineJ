@@ -1,5 +1,7 @@
 package fr.inria.verveine.extractor.java;
 
+import java.util.Collection;
+
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
@@ -11,11 +13,13 @@ public class FamixRequestor extends FileASTRequestor {
 	
 	protected JavaDictionary famixDictionnary;
 
-	private String[] initialArgs;
+	private Collection<String> argsDir;
+	private Collection<String> argsFile;
 	
-	public FamixRequestor(Repository r, String[] initialArgs) {
+	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile) {
 		this.famixRepo = r;
-		this.initialArgs = initialArgs;
+		this.argsDir = argsDir;
+		this.argsFile = argsFile;
 
 		this.famixDictionnary = new JavaDictionary(famixRepo);
 	}
@@ -28,13 +32,19 @@ public class FamixRequestor extends FileASTRequestor {
 		ast.accept(new VerveineRefVisitor(this.famixDictionnary));
 	}
 
-	private Object relativePath(String sourceFilePath) {
-		for (String arg : initialArgs) {
-			int i = sourceFilePath.indexOf(arg);
-			if (i >= 0) {
-				return sourceFilePath.substring(i);
+	private Object relativePath(String fullPath) {
+		for (String f : argsFile) {
+			if (fullPath.endsWith(f)) {
+				return f;
 			}
 		}
-		return sourceFilePath;
+
+		for (String d : argsDir) {
+			int i = fullPath.indexOf(d);
+			if (i >= 0) {  // if fullPath contains d
+				return fullPath.substring(i);
+			}
+		}
+		return fullPath;
 	}
 }
