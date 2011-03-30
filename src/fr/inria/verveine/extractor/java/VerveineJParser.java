@@ -20,11 +20,18 @@ import fr.inria.verveine.core.gen.famix.Namespace;
 
 public class VerveineJParser extends VerveineParser {
 
+	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
+	
+
+	protected String codeVers = null;
+	
+	
 	/**
 	 * The arguments that were passed to the parser
 	 * Needed to relativize the source file names
 	 */
-	private Collection<String> sourceFiles;
+	private Collection<String> argPath;
+	private Collection<String> argFiles;
 	
 	private ASTParser jdtParser = null;
 	
@@ -35,35 +42,91 @@ public class VerveineJParser extends VerveineParser {
 	}
 	
 	public void setOptions(String[] args) {
-		// we assume java 1.5 code for now, this should be configurable
-		@SuppressWarnings("unchecked")
-		Map<String,String> options = JavaCore.getOptions();
-		options.put(JavaCore.COMPILER_COMPLIANCE, JavaCore.VERSION_1_5);
-		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, JavaCore.VERSION_1_5);
-		options.put(JavaCore.COMPILER_SOURCE, JavaCore.VERSION_1_5);
-		jdtParser.setCompilerOptions(options);
-
 		Collection<String> classPath = new ArrayList<String>();
-		Collection<String> sourcePath = new ArrayList<String>();
-		sourceFiles = new ArrayList<String>();
-		for (int i=0; i < args.length; i++) {
-			String current = args[i];
-			if (current.equals("-cp")) {
-				classPath.add(args[++i]);
-			}
-			else if (current.endsWith(".java")) {
-				sourceFiles.add(current);
-			}
-			else {
-				sourcePath.add(current);
-			}
-		}
-		
-		jdtParser.setEnvironment(classPath.toArray(new String[0]), sourcePath.toArray(new String[0]), null, true);
+		argPath = new ArrayList<String>();
+		argFiles = new ArrayList<String>();
+
+        int i = 0;
+        while (i < args.length && args[i].startsWith("-")) {
+        	String arg;
+            arg = args[i++];
+
+            if (arg.equals("-h")) {
+            	usage();
+            }
+            else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
+            	setCodeVersion(arg);
+            }
+            else if (arg.equals("-cp")) {
+                if (i < args.length) {
+                	classPath.add(args[++i]);
+                }
+                else {
+                	System.err.println("-cp requires a classPath");
+                }
+
+            }
+        }
+        while (i < args.length) {
+        	String arg;
+            arg = args[i++];
+        	if ( arg.endsWith(".java") && new File(arg).isFile() ) {
+        		argFiles.add(arg);
+        	}
+        	else {
+        		argPath.add(arg);
+        	}
+        }
+
+		jdtParser.setEnvironment(classPath.toArray(new String[0]), argPath.toArray(new String[0]), null, true);
 		jdtParser.setResolveBindings(true);
 		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
+
+		@SuppressWarnings("unchecked")
+		Map<String,String> options = JavaCore.getOptions();
 		
-		collectJavaFiles(sourcePath, sourceFiles);
+		if (codeVers == null) {
+			codeVers = DEFAULT_CODE_VERSION;
+		}
+		options.put(JavaCore.COMPILER_COMPLIANCE, codeVers);
+		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, codeVers);
+		options.put(JavaCore.COMPILER_SOURCE, codeVers);
+
+		jdtParser.setCompilerOptions(options);
+	}
+
+	protected void usage() {
+		System.err.println("Usage: VerveineJ [-h] [-cp CLASSPATH] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.exit(0);
+
+	}
+	protected void setCodeVersion(String arg) {
+		if (codeVers != null) {
+			System.err.println("Trying to set twice code versions: "+ codeVers + " and "+ arg);
+			usage();
+		}
+		else if (arg.equals("-1.1") || arg.equals("-1")) {
+			codeVers = JavaCore.VERSION_1_1;
+		}
+		else if (arg.equals("-1.2") || arg.equals("-2")) {
+			codeVers = JavaCore.VERSION_1_2;
+		}
+		else if (arg.equals("-1.3") || arg.equals("-3")) {
+			codeVers = JavaCore.VERSION_1_3;
+		}
+		else if (arg.equals("-1.4") || arg.equals("-4")) {
+			codeVers = JavaCore.VERSION_1_4;
+		}
+		else if (arg.equals("-1.5") || arg.equals("-5")) {
+			codeVers = JavaCore.VERSION_1_5;
+		}
+		else if (arg.equals("-1.6") || arg.equals("-6")) {
+			codeVers = JavaCore.VERSION_1_6;
+		}
+		else if (arg.equals("-1.7") || arg.equals("-7")) {
+			codeVers = JavaCore.VERSION_1_7;
+		}
+
 	}
 
 	private void collectJavaFiles(Collection<String> paths, Collection<String> files) {
@@ -93,11 +156,17 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	public void parse() {
+		ArrayList<String> sourceFiles = new ArrayList<String>();
+
 		if (this.linkToExisting()) {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), new String[0]);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles);
+
+		sourceFiles.addAll(argFiles);
+		collectJavaFiles(argPath, sourceFiles);
+
 		jdtParser.createASTs(sourceFiles.toArray(new String[0]), null, new String[0], req, null);
 		
 		this.compressNamespacesNames();

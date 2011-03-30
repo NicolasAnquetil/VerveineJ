@@ -6,7 +6,7 @@
 	<property name="build.dir"    location="bin" />
 	<property name="docs.dir"     location="docs" />
 	<property name="dist.dir"     location="lib" />
-	<property name="verveine.jar" location="${dist.dir}/verveine.extractor,java.jar" />
+	<property name="verveine.jar" location="${dist.dir}/verveine.extractor.java.jar" />
 
 	<!-- Variables used for JUnit testin -->
 	<property name="test.dir" location="src/tests/fr/inria/verveine/extractor/java/" />

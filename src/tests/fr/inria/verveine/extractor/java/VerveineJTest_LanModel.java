@@ -26,16 +26,20 @@ import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Comment;
+import fr.inria.verveine.core.gen.famix.Entity;
 import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.ImplicitVariable;
 import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
+import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
+import fr.inria.verveine.core.gen.famix.StructuralEntity;
+import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
@@ -60,7 +64,8 @@ public class VerveineJTest_LanModel {
 	@Before
 	public void setUp() throws Exception {
 		new File(VerveineJParser.OUTPUT_FILE).delete();
-		String[] files = new String[] {
+
+		/*String[] files = new String[] {
 				"AbstractDestinationAddress.java",
 				"Node.java",
 				"Packet.java",
@@ -76,14 +81,14 @@ public class VerveineJTest_LanModel {
 		// separate parsing of each source file --------
 		for (String f : files) {
 			parseFile(f);
-		}
+		}*/
 
 		// or parsing the entire project in one pass ---
-		/*VerveineJParser parser = new VerveineJParser();
+		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 		parser.setOptions(new String[] {"test_src/LANModel/"});
 		parser.parse();
-		parser.outputMSE();*/
+		parser.outputMSE();
 	}
 
 	/**
@@ -121,6 +126,21 @@ public class VerveineJTest_LanModel {
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size()); //Override
 		assertEquals(2,     TestVerveineUtils.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
+	}
+
+	@Test
+	public void testBelongsTo() {
+		for ( Type e : repo.all(Type.class) ) {
+			if (! (e instanceof PrimitiveType) ) {
+				assertNotNull("a Type '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
+			}
+		}
+		for ( BehaviouralEntity e : repo.all(BehaviouralEntity.class) ) {
+			assertNotNull("a BehaviouralEntity '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
+		}
+		for ( StructuralEntity e : repo.all(StructuralEntity.class) ) {
+			assertNotNull("a StructuralEntity '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
+		}
 	}
 
 	@Test
@@ -280,7 +300,7 @@ public class VerveineJTest_LanModel {
 		assertNotNull(ns);
 		assertEquals(9, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence
 		assertTrue(ns.getIsStub());
-			
+
 		fr.inria.verveine.core.gen.famix.Class obj = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(obj);
 		assertTrue(obj.getIsStub());
@@ -481,7 +501,7 @@ public class VerveineJTest_LanModel {
 			}
 		}
 		assertNotNull(output);
-		assertEquals("Wrong number of outgoing access for method PrintServer.output()", 4, output.getAccesses().size());
+		assertEquals(4, output.getAccesses().size());
 		for (Access acc : output.getAccesses()) {
 			assertTrue("Unexpected field accessed: "+acc.getVariable().getName(),
 						acc.getVariable().getName().equals("out") || acc.getVariable().getName().equals("printer"));
