@@ -134,5 +134,3 @@ class Repository {
 	public void add(NamedEntity f) {
 	}
 }
-
-}

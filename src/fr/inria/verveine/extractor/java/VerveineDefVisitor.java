@@ -106,14 +106,15 @@ public class VerveineDefVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	/*
+	 * Can only be a class or interface declaration
+	 */
 	public boolean visit(TypeDeclaration node) {
-		// Can only be a class or interface declaration
-
 //		System.err.println("TRACE, DefVisiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		@SuppressWarnings("unchecked")
-		List<TypeParameter> tparams = node.typeParameters();
-		fr.inria.verveine.core.gen.famix.Class fmx = (Class) dico.ensureFamixType(bnd, /*name*/node.getName().getIdentifier(), /*owner*/context.top(), /*ctxt*/context.top());
+		List<TypeParameter> tparams = (List<TypeParameter>)node.typeParameters();
+		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), /*owner*/context.top(), tparams.size()>0); //   /*ctxt*/context.top());
 		if (fmx != null) {
 			fmx.setIsStub(false);
 
@@ -242,15 +243,17 @@ public class VerveineDefVisitor extends ASTVisitor {
 				paramTypes.add(param.getType());
 		}
 
-		// creating/recovering it (creates it with a null return type because might need this FamixMethod to create the return type.
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/null, context.topClass());
-		fr.inria.verveine.core.gen.famix.Type fmxTyp = referedType(node.getReturnType2(), fmx);
+		// creating/recovering it
+		// creates it with a fake return type because we might need this FamixMethod to create the return type (if it is a ParameterizedType)
+		// we reset the return type to its proper value later
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/dico.ensureFamixClassObject(null), context.topClass());
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			
 			this.context.pushMethod(fmx);
-			fmx.setDeclaredType(fmxTyp);
+			fr.inria.verveine.core.gen.famix.Type fmxRetTyp = referedType(node.getReturnType2(), fmx);
+			fmx.setDeclaredType(fmxRetTyp);
 			if (node.getBody() != null) {
 				context.setTopMethodCyclo(1);
 			}
@@ -380,12 +383,12 @@ public class VerveineDefVisitor extends ASTVisitor {
 			ITypeBinding parameterizedBnd = typ.resolveBinding();
 			ITypeBinding parameterizableBnd = (parameterizedBnd == null) ? null : parameterizedBnd.getErasure();
 			String tname = dico.findTypeName(typ);
-			ParameterizableClass tmpGeneric = null;
-			tmpGeneric = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, tname, /*owner*/null, /*isGeneric*/true);
+			ParameterizableClass generic = null;
+			generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, tname, /*owner*/null, /*isGeneric*/true);
 
-			fmxTyp = dico.ensureFamixParameterizedType(parameterizedBnd, tname, tmpGeneric, /*owner*/ctxt);
+			fmxTyp = dico.ensureFamixParameterizedType(parameterizedBnd, tname, generic, /*owner*/ctxt);
 			for (Type targ : (List<Type>) ((ParameterizedType)typ).typeArguments()) {
-				fr.inria.verveine.core.gen.famix.Type fmxTArg = dico.ensureFamixType(targ.resolveBinding(), dico.findTypeName(targ), null, ctxt);
+				fr.inria.verveine.core.gen.famix.Type fmxTArg = dico.ensureFamixType(targ.resolveBinding(), dico.findTypeName(targ), /*owner*/null, ctxt);
 				((fr.inria.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
 			}
 		}

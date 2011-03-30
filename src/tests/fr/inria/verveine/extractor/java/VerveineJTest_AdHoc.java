@@ -191,10 +191,8 @@ public class VerveineJTest_AdHoc {
 	public void testParameterizableClass() {
 		ParameterizableClass dico = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Dictionary");
 		assertNotNull(dico);
-
 		assertEquals("Dictionary", dico.getName());
 		assertEquals(6, dico.getTypes().size());  // <B> , ImplicitVars , Map<B,NamedEntity> , Map<String,Collection<NamedEntity>> , Collection<NamedEntity> , Map<Class,ImplicitVars>
-// FIXME: Collection<NamedEntity> belongsTo getEntityByName !!
 
 		assertEquals(1, dico.getParameters().size());
 

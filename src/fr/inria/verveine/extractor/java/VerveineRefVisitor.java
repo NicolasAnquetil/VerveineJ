@@ -46,6 +46,7 @@ import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Class;
+import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
@@ -192,7 +193,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 
 			// Exceptions
 			for (Name excepName : (List<Name>)node.thrownExceptions()) {
-				fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(excepName.resolveTypeBinding(), excepName.getFullyQualifiedName(), null);
+				fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(excepName.resolveTypeBinding(), excepName.getFullyQualifiedName(), /*owner*/null, /*isGeneric*/false);
 				if (excepFmx != null) {
 					dico.ensureFamixDeclaredException(meth, excepFmx);
 				}
@@ -233,7 +234,8 @@ public class VerveineRefVisitor extends ASTVisitor {
 			IBinding bnd = ((Name) callingExpr).resolveBinding();
 			if ( (bnd != null) && (bnd instanceof IVariableBinding) && ((IVariableBinding)bnd).isField() ){
 				BehaviouralEntity accessor = this.context.topMethod();
-				Attribute accessed = this.dico.ensureFamixAttribute(bnd, ((SimpleName)callingExpr).getIdentifier(), null, /*owner*/context.topClass());
+				Attribute accessed = this.dico.ensureFamixAttribute((IVariableBinding)bnd, ((SimpleName)callingExpr).getIdentifier(), null, /*owner*/context.topClass());
+				// cast needed to ensure calling the proper ensureFamixAttribute() (in JavaDictionnary)
 				// 'owner' note: using a field without anything before, it must belongs to the currently parsed class
 				
 				context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
@@ -321,10 +323,10 @@ public class VerveineRefVisitor extends ASTVisitor {
 		if (meth != null) {
 			fr.inria.verveine.core.gen.famix.Class excepFmx = null;
 			if (excepClass instanceof SimpleType) {
-				excepFmx = this.dico.ensureFamixClass(excepClass.resolveBinding(), ((SimpleType) excepClass).getName().getFullyQualifiedName(), null);
+				excepFmx = this.dico.ensureFamixClass(excepClass.resolveBinding(), ((SimpleType) excepClass).getName().getFullyQualifiedName(), /*owner*/null, /*isGeneric*/false);
 			}
 			else if (excepClass instanceof QualifiedType) {
-				excepFmx = this.dico.ensureFamixClass(excepClass.resolveBinding(), ((QualifiedType) excepClass).getName().getIdentifier(), null);
+				excepFmx = this.dico.ensureFamixClass(excepClass.resolveBinding(), ((QualifiedType) excepClass).getName().getIdentifier(), /*owner*/null, /*isGeneric*/false);
 			}
 			if (excepFmx != null) {
 				dico.ensureFamixCaughtException(meth, excepFmx);
@@ -337,7 +339,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 	@Override
 	public boolean visit(ThrowStatement node) {
 		Method meth = this.context.topMethod();
-		fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(node.getExpression().resolveTypeBinding(), null, null);
+		fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(node.getExpression().resolveTypeBinding(), /*name*/(String)null, /*owner*/(ContainerEntity)null, /*isGeneric*/false);
 		if (excepFmx != null) {
 			dico.ensureFamixThrownException(meth, excepFmx);
 		}
