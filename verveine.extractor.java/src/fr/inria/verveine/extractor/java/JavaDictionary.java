@@ -155,7 +155,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		if (bnd.isParameterizedType()) {
-			return ensureFamixParameterizedType(bnd, name, /*generic*/null, owner);
+			return ensureFamixParameterizedType(bnd, name, /*generic*/null, ctxt);
 		}
 
 		// it seems wise to test isClass after isGenericType, isParameterizedType, ... ? 
@@ -205,6 +205,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		fmx = (fr.inria.verveine.core.gen.famix.Class)getEntityByKey(bnd);	// to avoid useless computations if we can
 		if (fmx != null) {
+//			System.out.println("ensureClass, recovered from bnd:"+fmx.toString());
 			return fmx;
 		}
 
@@ -230,7 +231,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			}
 		}
 
-		if (name.equals(OBJECT_NAME)) {
+		if (name.equals(OBJECT_NAME)) { // TODO && owner == java.lang
 			return ensureFamixClassObject(bnd);
 		}
 
@@ -238,6 +239,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		for (Type candidate : this.getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, name)) {
 			if ( checkAndMapClass(bnd, candidate) ) {
 				fmx = (Class) candidate;
+//				System.out.println("ensureClass, recovered from name:"+fmx.toString());
 				break;
 			}
 		}
@@ -376,7 +378,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- generic
 		if (generic == null) {
-			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true);
+//			System.out.println("ensureParameterized, trying to recover generic: "+name);
+			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true);
 		}
 
 		// --------------- recover from name ?
