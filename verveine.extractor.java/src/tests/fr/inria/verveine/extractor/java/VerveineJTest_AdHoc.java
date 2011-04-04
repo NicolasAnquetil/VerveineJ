@@ -99,39 +99,16 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	
 	@Test
 	public void testAnnotation() {
-		Collection<AnnotationType> l_FmProp = TestVerveineUtils.listElements(repo,AnnotationType.class, "FameProperty");
-		assertEquals(1, l_FmProp.size());
-
-		AnnotationType fmProp = l_FmProp.iterator().next();
+		AnnotationType fmProp = TestVerveineUtils.detectElement(repo,AnnotationType.class, "FameProperty");
 		assertNotNull(fmProp);
 		assertEquals("FameProperty", fmProp.getName());
 		// FIXME assertFalse(fmProp.getIsStub());
-		
-		AnnotationType fmPckg = TestVerveineUtils.detectElement(repo,AnnotationType.class, "FamePackage");
-		assertNotNull(fmPckg);
-		assertEquals("FamePackage", fmPckg.getName());
-		assertTrue(fmPckg.getIsStub());
-		
-		AnnotationType fmDesc = TestVerveineUtils.detectElement(repo,AnnotationType.class, "FameDescription");
-		assertNotNull(fmDesc);
-		assertEquals("FameDescription", fmDesc.getName());
-		assertTrue(fmDesc.getIsStub());
 
-		// class annotations 
 		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Element");
 		assertNotNull(clazz);
-		Collection<AnnotationInstance> annInstances = clazz.getAnnotationInstances();
-		assertEquals(2, annInstances.size());
-		for (AnnotationInstance annotationInstance : annInstances) {
-			assertSame(clazz, annotationInstance.getAnnotatedEntity());
-			if (annotationInstance.getAnnotationType().getName().equals("FamePackage")) {
-				assertSame(fmPckg, annotationInstance.getAnnotationType());
-			} else {
-				assertEquals("FameDescription", annotationInstance.getAnnotationType().getName());
-				assertSame(fmDesc, annotationInstance.getAnnotationType());
-			}
-		}
+		assertEquals(3, fmProp.getInstances().size());
 
+		assertEquals(5, fmProp.getAttributes().size());
 		AnnotationTypeAttribute decl = null;
 		for (AnnotationTypeAttribute a : TestVerveineUtils.listElements(repo, AnnotationTypeAttribute.class, "derived")) {
 			if (a.getParentAnnotationType() == fmProp) {
@@ -139,11 +116,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 				break;
 			}
 		}
-		assertNotNull(decl);
+		assertNotNull("FameProperty missing AnnotationTypeAttribute: derived", decl);
 		
 		// Method annotations
 		for (Method meth : clazz.getMethods()) {
-			annInstances = meth.getAnnotationInstances();
+			Collection<AnnotationInstance> annInstances = meth.getAnnotationInstances();
 			if (meth.getName().equals("getFullname") || meth.getName().equals("getName") || meth.getName().equals("getOwner")) {
 				assertEquals(1, annInstances.size());
 				AnnotationInstance annInst = annInstances.iterator().next();
@@ -357,29 +334,47 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testEnumDecl() {
+		fr.inria.verveine.core.gen.famix.Class card = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Card");
+		assertNotNull(card);
+
 		fr.inria.verveine.core.gen.famix.Enum rk = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Rank");
 		assertNotNull(rk);
 		assertEquals("Rank", rk.getName());
-		//assertEquals(13, card.getValues().size());
-		assertSame(TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Card"), rk.getBelongsTo());
+		assertEquals(13, rk.getValues().size());
+		assertSame(card, rk.getBelongsTo());
 
 		EnumValue nine = TestVerveineUtils.detectElement(repo, EnumValue.class, "NINE");
 		assertNotNull(nine);
 		assertEquals("NINE", nine.getName());
 		assertSame(rk, nine.getParentEnum());
-		assertSame(rk, nine.getBelongsTo());
 
 		fr.inria.verveine.core.gen.famix.Enum st = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Suit");
 		assertNotNull(st);
 		assertEquals("Suit", st.getName());
-		//assertEquals(4, card.getValues().size());
+		assertEquals(4, st.getValues().size());
 		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "ad_hoc"), st.getBelongsTo());
 
 		EnumValue hrt = TestVerveineUtils.detectElement(repo, EnumValue.class, "HEARTS");
 		assertNotNull(hrt);
 		assertEquals("HEARTS", hrt.getName());
 		assertSame(st, hrt.getParentEnum());
-		assertSame(st, hrt.getBelongsTo());
+
+		assertEquals(3, card.getAttributes().size());
+		for (Attribute a : card.getAttributes()) {
+			if (a.getName().equals("rank")) {
+				assertEquals(rk, a.getDeclaredType());
+			}
+			else if (a.getName().equals("suit")) {
+				assertEquals(st, a.getDeclaredType());
+			}
+			else {
+				assertEquals("protoDeck", a.getName());
+			}
+		}
 	}
 
+	@Test
+	public void testStaticInitializationBlock() {
+		fail("must test static initialization block in Card.java");
+	}
 }

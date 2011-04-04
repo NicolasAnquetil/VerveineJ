@@ -2,10 +2,10 @@ package ad_hoc;
 
 import java.util.ArrayList;
 import java.util.List;
-/*
-public class Card {
 
-	public enum Suit { CLUBS, DIAMONDS, HEARTS, SPADES };
+public enum Suit { CLUBS, DIAMONDS, HEARTS, SPADES };
+
+public class Card {
 
 	public enum Rank { DEUCE, THREE, FOUR, FIVE, SIX,
         SEVEN, EIGHT, NINE, TEN, JACK, QUEEN, KING, ACE }
@@ -22,7 +22,7 @@ public class Card {
     public String toString() { return rank + " of " + suit; }
 
     private static final List<Card> protoDeck = new ArrayList<Card>();
-
+/*
     // Initialize prototype deck
     static {
         for (Suit s : Suit.values())
@@ -33,9 +33,9 @@ public class Card {
             	protoDeck.add(new Card(r, s));
             }
     }
-
+*/
     public static ArrayList<Card> newDeck() {
         return new ArrayList<Card>(protoDeck); // Return copy of prototype deck
     }
- */
+
 }

@@ -18,31 +18,10 @@
 
 package ad_hoc;
 
+import ad_hoc.FameProperty;
 /**
  * Abstract superclass of MSE metamodel.
- * 
- * This is an abstract class with attributes </p>
- * <ul>
- * <li>Element <code>owner</code> (derived)</li>
- * <li>String <code>fullname</code> (derived)</li>
- * <li>String <code>name</code></li>
- * </ul>
- * <p>
- * with these constraints
- * </p>
- * <ul>
- * <li> <code>name</code> must be alphanumeric</li>
- * <li> <code>fullname</code> is derived recursively, concatenating
- * <code>owner.fullname</code> and <code>name</code></li>
- * <li> <code>fullname</code> is separated by dots, eg
- * <code>MSE.Class.attributes</code></li>
- * </ul>
- * 
- * @author Adrian Kuhn
- * 
  */
-@FamePackage("FM3")
-@FameDescription("Element")
 public abstract class Element {
 
     private String name;

@@ -687,8 +687,6 @@ public class VerveineVisitor extends ASTVisitor {
 		return super.visit(node);
 	}
 
-	
-
 	/**
 	 * Finds and/or create the Famix Entity receiving a message
 	 * Can be: ImplicitVariable (this, super), GlobalVariable, LocalVariable, Attribute, UnknownVariable, Parameter
