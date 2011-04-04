@@ -11,8 +11,6 @@ import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.core.gen.famix.ParameterizableClass;
-import fr.inria.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.core.gen.famix.Type;
@@ -101,27 +99,16 @@ public abstract class VerveineJTest_Basic {
 		assertTrue(serial.getIsInterface());
 		assertEquals(0, serial.getSuperInheritances().size());
 
-		ParameterizableClass comp = TestVerveineUtils.detectElement(repo,ParameterizableClass.class, "Comparable");
-		assertNotNull(comp);
-		assertSame(javaLang, comp.getContainer());
-		assertTrue(comp.getIsInterface());
-		assertEquals(0, comp.getSuperInheritances().size());
-
-		ParameterizedType compStr = TestVerveineUtils.detectElement(repo,ParameterizedType.class, "Comparable");
-		assertNotNull(compStr);
-		assertSame(comp, compStr.getParameterizableClass());
-		assertEquals(0, compStr.getSuperInheritances().size());
-		
 		fr.inria.verveine.core.gen.famix.Class str = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String");
 		assertNotNull(str);
 		assertSame(javaLang, str.getContainer());
 		assertEquals(4, str.getSuperInheritances().size());
 		for (Inheritance inh : str.getSuperInheritances()) {
-			assertTrue( "Unexpected super-class for String: "+inh.getSuperclass().getName(),
+			assertTrue( "Unexpected super-class for String: "+inh.getSuperclass(),
 					(inh.getSuperclass() == obj) ||
 					(inh.getSuperclass() == charSeq) ||
 					(inh.getSuperclass() == serial) ||
-					(inh.getSuperclass() == compStr) );
+					(inh.getSuperclass().getName().equals("Comparable")) );  // there are 2 'comparable' in one case, so it's best to only test the name
 		}
 
 		// System
@@ -130,11 +117,15 @@ public abstract class VerveineJTest_Basic {
 		assertSame(javaLang, syst.getContainer());
 		assertEquals(1, syst.getSuperInheritances().size());
 		assertEquals(obj, syst.getSuperInheritances().iterator().next().getSuperclass());
-		assertEquals(2, syst.getAttributes().size());
+		boolean foundOut = false;
 		for (Attribute att : syst.getAttributes()) {
-			assertTrue( "Unexpected super-class for String: "+att.getName(),
-					att.getName().equals("out") || att.getName().equals("err") );
-
+			if (att.getName().equals("out")) {
+				foundOut = true;
+			}
+			else {
+				assertTrue( "Unexpected System attribute: "+att.getName(), att.getName().equals("err") );
+			}
 		}
+		assertTrue("System does not have an attribute 'out'", foundOut);
 	}
 }

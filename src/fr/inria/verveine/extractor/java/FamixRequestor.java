@@ -28,8 +28,7 @@ public class FamixRequestor extends FileASTRequestor {
 //		System.out.println("  ******* TRACE, Requestor is visiting : "+sourceFilePath+" *******");
 		
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, relativePath(sourceFilePath));
-		ast.accept(new VerveineDefVisitor(this.famixDictionnary));
-		ast.accept(new VerveineRefVisitor(this.famixDictionnary));
+		ast.accept(new VerveineVisitor(this.famixDictionnary));
 	}
 
 	private Object relativePath(String fullPath) {
