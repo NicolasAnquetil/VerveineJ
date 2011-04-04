@@ -628,15 +628,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param fmx
 	 */
 	public void addFamixAnnotationInstances(IBinding bnd, NamedEntity fmx) {
-		for (IAnnotationBinding annBnd : bnd.getAnnotations()) {
-			AnnotationType annType = ensureFamixAnnotationType(annBnd.getAnnotationType(), null, null);
-			
-			Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>(); 
-			for (IMemberValuePairBinding annPV : annBnd.getDeclaredMemberValuePairs()) {
-				annAtts.add( createFamixAnnotationInstanceAttribute(ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), annPV.getName(), annType), annPV.getValue().toString()));
+		if (bnd != null) {
+			for (IAnnotationBinding annBnd : bnd.getAnnotations()) {
+				AnnotationType annType = ensureFamixAnnotationType(annBnd.getAnnotationType(), null, null);
+
+				Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>(); 
+				for (IMemberValuePairBinding annPV : annBnd.getDeclaredMemberValuePairs()) {
+					annAtts.add( createFamixAnnotationInstanceAttribute(ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), annPV.getName(), annType), annPV.getValue().toString()));
+				}
+
+				super.addFamixAnnotationInstance(fmx, annType, annAtts);
 			}
-			
-			super.addFamixAnnotationInstance(fmx, annType, annAtts);
 		}
 	}
 
