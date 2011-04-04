@@ -112,7 +112,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(10+1,  TestVerveineUtils.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
-		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());//actually 54, missing 2 !!!!
+		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
 		assertEquals(6+24,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//6 internal + 24 from imported packages/classes
 		assertEquals(25,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
