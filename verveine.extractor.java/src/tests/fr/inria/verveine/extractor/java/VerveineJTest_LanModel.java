@@ -38,8 +38,6 @@ import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
-import fr.inria.verveine.core.gen.famix.StructuralEntity;
-import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
@@ -48,16 +46,10 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
  * @since May 28, 2010
  *
  */
-public class VerveineJTest_LanModel {
+public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	private static final String A_CLASS_NAME = "--aClassName--";
 
-	private Repository repo;
-
-	public VerveineJTest_LanModel() {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
-	}
-	
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -104,7 +96,7 @@ public class VerveineJTest_LanModel {
 				};
 		
 		VerveineJParser parser = new VerveineJParser();
-		this.repo = parser.getFamixRepo();
+		repo = parser.getFamixRepo();
 		parser.setOptions(args);
 		parser.parse();
 		
@@ -126,21 +118,6 @@ public class VerveineJTest_LanModel {
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size()); //Override
 		assertEquals(2,     TestVerveineUtils.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
-	}
-
-	@Test
-	public void testBelongsTo() {
-		for ( Type e : repo.all(Type.class) ) {
-			if (! (e instanceof PrimitiveType) ) {
-				assertNotNull("a Type '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
-			}
-		}
-		for ( BehaviouralEntity e : repo.all(BehaviouralEntity.class) ) {
-			assertNotNull("a BehaviouralEntity '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
-		}
-		for ( StructuralEntity e : repo.all(StructuralEntity.class) ) {
-			assertNotNull("a StructuralEntity '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
-		}
 	}
 
 	@Test
