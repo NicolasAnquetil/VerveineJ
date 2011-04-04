@@ -196,7 +196,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			for (Name excepName : (List<Name>)node.thrownExceptions()) {
 				fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(excepName.resolveTypeBinding(), excepName.getFullyQualifiedName(), /*owner*/null, /*isGeneric*/false);
 				if (excepFmx != null) {
-					dico.ensureFamixDeclaredException(meth, excepFmx);
+					dico.createFamixDeclaredException(meth, excepFmx);
 				}
 			}
 			return super.visit(node);
@@ -315,7 +315,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 				excepFmx = this.dico.ensureFamixClass(excepClass.resolveBinding(), ((QualifiedType) excepClass).getName().getIdentifier(), /*owner*/null, /*isGeneric*/false);
 			}
 			if (excepFmx != null) {
-				dico.ensureFamixCaughtException(meth, excepFmx);
+				dico.createFamixCaughtException(meth, excepFmx);
 			}
 		}
 
@@ -327,7 +327,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 		Method meth = this.context.topMethod();
 		fr.inria.verveine.core.gen.famix.Class excepFmx = this.dico.ensureFamixClass(node.getExpression().resolveTypeBinding(), /*name*/(String)null, /*owner*/(ContainerEntity)null, /*isGeneric*/false);
 		if (excepFmx != null) {
-			dico.ensureFamixThrownException(meth, excepFmx);
+			dico.createFamixThrownException(meth, excepFmx);
 		}
 		return super.visit(node);
 	}
