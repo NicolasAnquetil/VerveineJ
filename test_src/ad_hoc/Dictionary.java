@@ -127,6 +127,10 @@ class NamedEntity {
 	}
 }
 
+class ImplicitVariable extends NamedEntity {
+	
+}
+
 class Repository {
 	public boolean isEmtpy() {
 		return false;

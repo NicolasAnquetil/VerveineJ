@@ -114,7 +114,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			if (name == null) {
 				return null;
 			}
-			fmx = searchTypeInContext(name, ctxt);
+			fmx = searchTypeInContext(name, ctxt); // WildCard Types don't have binding
 			if (fmx != null) {
 				return fmx;
 			}
@@ -146,10 +146,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return ensureFamixEnum(bnd, name, owner);
 		}
 		
-		if (bnd.isTypeVariable() ) {
-			return ensureFamixParameterType(bnd, name, (ParameterizableClass) owner);
-		}
-
 		if (bnd.isRawType() || bnd.isGenericType()) {
 			return ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true);
 		}
@@ -163,6 +159,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return ensureFamixClass(bnd, name, owner, /*isGeneric*/false);
 		}
 
+		if (name == null) {
+			name = bnd.getName();
+		}
+		
+		if (owner == null) {
+			owner = ensureOwner(bnd);
+		}
+
+		if (bnd.isTypeVariable() ) {
+			// a type defined for a method parameter or return type
+			fmx = super.ensureFamixType(bnd, name, owner);
+			
+			return fmx;
+		}
 
 		return super.ensureFamixType(bnd, name, owner);
 	}
@@ -205,7 +215,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		fmx = (fr.inria.verveine.core.gen.famix.Class)getEntityByKey(bnd);	// to avoid useless computations if we can
 		if (fmx != null) {
-//			System.out.println("ensureClass, recovered from bnd:"+fmx.toString());
 			return fmx;
 		}
 
@@ -246,31 +255,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- owner
 		if (owner == null) {
-			IMethodBinding parentMtd = bnd.getDeclaringMethod();
-			if (parentMtd != null) {
-				owner = this.ensureFamixMethod(parentMtd, null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
-			}
-			else {
-				ITypeBinding parentClass = bnd.getDeclaringClass();
-				if (parentClass != null) {
-					Type tmpOwn = this.ensureFamixType(parentClass, /*name*/null, /*owner*/null, /*ctxt*/null);
-					if (tmpOwn instanceof ParameterizedType) {
-						owner = ((ParameterizedType) tmpOwn).getParameterizableClass(); 
-					}
-					else {
-						owner = tmpOwn;
-					}
-				}
-				else {
-					IPackageBinding parentPckg = bnd.getPackage();
-					if (parentPckg != null) {
-						owner = this.ensureFamixNamespace(parentPckg, null);
-					}
-					else {
-						owner = this.ensureFamixNamespaceDefault();
-					}
-				}
-			}
+			owner = ensureOwner(bnd);
 		}
 
 		// --------------- superclasses (including interfaces)
@@ -315,6 +300,41 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+	/**
+	 * Ensures a famix entity for a owner that can be a method, a class or a namespace
+	 * @param bnd -- binding for the owned entity
+	 * @return a famix entity for the owner
+	 */
+	private ContainerEntity ensureOwner(ITypeBinding bnd) {
+		ContainerEntity owner = null;
+		IMethodBinding parentMtd = bnd.getDeclaringMethod();
+		if (parentMtd != null) {
+			owner = this.ensureFamixMethod(parentMtd, null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
+		}
+		else {
+			ITypeBinding parentClass = bnd.getDeclaringClass();
+			if (parentClass != null) {
+				Type tmpOwn = this.ensureFamixType(parentClass, /*name*/null, /*owner*/null, /*ctxt*/null);
+				if (tmpOwn instanceof ParameterizedType) {
+					owner = ((ParameterizedType) tmpOwn).getParameterizableClass(); 
+				}
+				else {
+					owner = tmpOwn;
+				}
+			}
+			else {
+				IPackageBinding parentPckg = bnd.getPackage();
+				if (parentPckg != null) {
+					owner = this.ensureFamixNamespace(parentPckg, null);
+				}
+				else {
+					owner = this.ensureFamixNamespaceDefault();
+				}
+			}
+		}
+		return owner;
+	}
+
 /*	public ParameterizableClass ensureFamixParameterizableType(ITypeBinding bnd, String name, ContainerEntity owner) {
 		ParameterizableClass fmx = null;
 		
@@ -349,31 +369,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- owner
 		if (owner == null) {
-			IMethodBinding parentMtd = bnd.getDeclaringMethod();
-			if (parentMtd != null) {
-				owner = this.ensureFamixMethod(parentMtd, null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
-			}
-			else {
-				ITypeBinding parentClass = bnd.getDeclaringClass();
-				if (parentClass != null) {
-					Type tmpOwn = this.ensureFamixType(parentClass, /*name*/null, /*owner*/null, /*ctxt*/null);
-					if (tmpOwn instanceof ParameterizedType) {
-						owner = ((ParameterizedType) tmpOwn).getParameterizableClass(); 
-					}
-					else {
-						owner = tmpOwn;
-					}
-				}
-				else {
-					IPackageBinding parentPckg = bnd.getPackage();
-					if (parentPckg != null) {
-						owner = this.ensureFamixNamespace(parentPckg, null);
-					}
-					else {
-						owner = this.ensureFamixNamespaceDefault();
-					}
-				}
-			}
+			owner = ensureOwner(bnd);
 		}
 
 		// --------------- generic
@@ -432,25 +428,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- owner
 		if (owner == null) {
-			IMethodBinding parentMtd = bnd.getDeclaringMethod();
-			if (parentMtd != null) {
-				owner = this.ensureFamixMethod(parentMtd, null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
-			}
-			else {
-				ITypeBinding parentClass = bnd.getDeclaringClass();
-				if (parentClass != null) {
-					owner = this.ensureFamixClass(parentClass, null, null);
-				}
-				else {
-					IPackageBinding parentPckg = bnd.getPackage();
-					if (parentPckg != null) {
-						owner = this.ensureFamixNamespace(parentPckg, null);
-					}
-					else {
-						owner = this.ensureFamixNamespaceDefault();
-					}
-				}
-			}
+			owner = ensureOwner(bnd);
 		}
 
 		// --------------- recover from name ?
