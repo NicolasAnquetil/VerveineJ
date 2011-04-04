@@ -50,6 +50,7 @@ import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
+import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.core.gen.famix.StructuralEntity;
 
 /**
@@ -234,11 +235,8 @@ public class VerveineRefVisitor extends ASTVisitor {
 			IBinding bnd = ((Name) callingExpr).resolveBinding();
 			if ( (bnd != null) && (bnd instanceof IVariableBinding) && ((IVariableBinding)bnd).isField() ){
 				BehaviouralEntity accessor = this.context.topMethod();
-				Attribute accessed = this.dico.ensureFamixAttribute((IVariableBinding)bnd, ((SimpleName)callingExpr).getIdentifier(), null, /*owner*/context.topClass());
-				// cast needed to ensure calling the proper ensureFamixAttribute() (in JavaDictionnary)
-				// 'owner' note: using a field without anything before, it must belongs to the currently parsed class
-				
-				context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+				// note: using a field without anything before, owner must be the currently parsed class
+				createAccessedAttribute((IVariableBinding)bnd, ((SimpleName)callingExpr).getIdentifier(), null, /*owner*/context.topClass(), accessor);
 			}
 		}
 		return super.visit(node);
@@ -274,11 +272,9 @@ public class VerveineRefVisitor extends ASTVisitor {
 
 	public boolean visit(FieldAccess node) {
 		BehaviouralEntity accessor = this.context.topMethod();
-		Attribute accessed = this.dico.ensureFamixAttribute(node.resolveFieldBinding(), node.getName().getIdentifier(), null, null);
-		if ( (accessed != null) && (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
-			accessed.setParentType(dico.ensureFamixClassArray());
-		}
-		context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+		IVariableBinding bnd = node.resolveFieldBinding();
+		// FIXME if bnd == null we have a problem
+		createAccessedAttribute(bnd, node.getName().getIdentifier(), null, null, accessor);
 
 		return super.visit(node);
 	}
@@ -291,11 +287,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 		if (bnd instanceof IVariableBinding) {
 			// apparently this is a field
 			BehaviouralEntity accessor = this.context.topMethod();
-			Attribute accessed = this.dico.ensureFamixAttribute((IVariableBinding)bnd, node.getName().getIdentifier(), null, null);  // cast needed to access the proper method
-			if ( (accessed != null) && (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
-				accessed.setParentType(dico.ensureFamixClassArray());
-			}
-			context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+			createAccessedAttribute((IVariableBinding)bnd, node.getName().getIdentifier(), null, null, accessor);
 		}
 		return super.visit(node);
 	}
@@ -304,15 +296,9 @@ public class VerveineRefVisitor extends ASTVisitor {
 	 * Another FieldAccess in disguise: SomeClass.class
 	 */
 	public boolean visit(TypeLiteral node) {
-		Attribute accessed;
 		fr.inria.verveine.core.gen.famix.Type javaMetaClass = dico.ensureFamixMetaClass(null); 
 		BehaviouralEntity accessor = this.context.topMethod();
-		accessed =  dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass);
-		if ( (accessed != null) && (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
-			accessed.setParentType(dico.ensureFamixClassArray());
-		}
-		context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
-
+		createAccessedAttribute(null, "class", javaMetaClass, javaMetaClass, accessor);
 		return super.visit(node);
 	}
 
@@ -399,7 +385,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 
 		// field.msg()
 		else if (expr instanceof FieldAccess) {
-			Attribute ret = dico.ensureFamixAttribute(((FieldAccess) expr).resolveFieldBinding(), ((FieldAccess) expr).getName().getIdentifier(), null, null);
+			Attribute ret = createAccessedAttribute(((FieldAccess) expr).resolveFieldBinding(), ((FieldAccess) expr).getName().getIdentifier(), /*type*/null, /*owner*/null, /*accessor*/null);
 			if ( (ret != null) && (ret.getParentType() == null) && (ret.getName().equals("length")) ) {
 				ret.setParentType(dico.ensureFamixClassArray());
 			}
@@ -436,7 +422,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 			else if (bnd instanceof IVariableBinding) {
 				String varName = ( ((Name)expr).isSimpleName() ? ((SimpleName)expr).getFullyQualifiedName() : ((QualifiedName)expr).getName().getIdentifier());
 				if ( ((IVariableBinding)bnd).isField() ) {
-					ret = dico.ensureFamixAttribute((IVariableBinding)bnd, varName, null, null);
+					ret = createAccessedAttribute((IVariableBinding)bnd, varName, /*typ*/null, /*owner*/null, /*accessor*/null);
 					if ( (ret != null) && (((Attribute) ret).getParentType() == null) && (ret.getName().equals("length")) ) {
 						((Attribute) ret).setParentType(dico.ensureFamixClassArray());
 					}
@@ -467,7 +453,7 @@ public class VerveineRefVisitor extends ASTVisitor {
 
 		// super.field.msg()
 		else if (expr instanceof SuperFieldAccess) {
-			Attribute ret = dico.ensureFamixAttribute(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), null, null);
+			Attribute ret = createAccessedAttribute(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), /*typ*/null, /*owner*/null, /*accessor*/null);
 			if ( (ret != null) && (ret.getParentType() == null) && (ret.getName().equals("length")) ) {
 				ret.setParentType(dico.ensureFamixClassArray());
 			}
@@ -505,4 +491,19 @@ public class VerveineRefVisitor extends ASTVisitor {
 		return null;
 	}
 
+	private Attribute createAccessedAttribute(IVariableBinding bnd, String attName, fr.inria.verveine.core.gen.famix.Type typ, fr.inria.verveine.core.gen.famix.Type owner, BehaviouralEntity accessor) {
+		Attribute accessed;
+		if (bnd != null) {
+			bnd = bnd.getVariableDeclaration();
+		}
+		accessed =  dico.ensureFamixAttribute(bnd, attName, typ, owner);
+		if ( (accessed != null) && (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
+			accessed.setParentType(dico.ensureFamixClassArray());
+		}
+		
+		if ( (accessed != null) && (accessor != null) ) {
+			context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+		}
+		return accessed;
+	}
 }

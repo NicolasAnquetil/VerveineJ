@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import test.fr.inria.verveine.core.TestVerveineUtils;
-import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.AnnotationInstance;
 import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
@@ -41,9 +40,7 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
  * @since November 25, 2010
  *
  */
-public class VerveineJTest_AdHoc {
-
-	private Repository repo;
+public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	/**
 	 * @throws java.lang.Exception
@@ -52,10 +49,25 @@ public class VerveineJTest_AdHoc {
 	public void setUp() throws Exception {
 		new File(VerveineJParser.OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
-		this.repo = parser.getFamixRepo();
+		repo = parser.getFamixRepo();
 		parser.setOptions(new String[] {"test_src/ad_hoc"});
 		parser.parse();
-		repo.exportMSE(new FileWriter(VerveineJParser.OUTPUT_FILE));
+		parser.outputMSE();
+	}
+
+	@Test
+	public void testDictionary() {
+		fr.inria.verveine.core.gen.famix.Class dico = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Dictionary");
+		assertNotNull(dico);
+
+		assertEquals(3, dico.getAttributes().size());
+		//fails because FieldDeclaration and FieldAccess have different bindings (so they are created twice) :-(
+		for (Attribute a : dico.getAttributes()) {
+			assertEquals(dico, a.getBelongsTo());
+			Type t = a.getDeclaredType();
+			assertEquals("Map", t.getName());
+			assertEquals(ParameterizedType.class, t.getClass());
+		}
 	}
 
 	@Test
