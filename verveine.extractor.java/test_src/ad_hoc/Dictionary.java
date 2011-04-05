@@ -90,17 +90,6 @@ public class Dictionary<B> {
 		if (ImplicitVariable.class.isAssignableFrom(fmxClass)) {
 			return null;
 		}
-		
-		if (bnd != null) {
-			fmx = (T) getEntityByBinding(bnd);
-		}
-		else {
-			// Unfortunately different entities with the same name and same type may exist
-			// e.g. 2 parameters of 2 different methods but having the same name
-			// so we must recreate a new entity each time
-
-			//fmxEnt = getEntityByName(fmxClass, name);
-		}
 
 		if (fmx != null) {
 			return fmx;
