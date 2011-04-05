@@ -566,9 +566,15 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(QualifiedName node) {
 		IBinding bnd = node.resolveBinding();
 		if (bnd instanceof IVariableBinding) {
-			// apparently this is a field
-			BehaviouralEntity accessor = this.context.topMethod();
-			createAccessedAttribute((IVariableBinding)bnd, node.getName().getIdentifier(), null, null, accessor);
+			if (((IVariableBinding) bnd).isEnumConstant()) {
+				// it is an enumerated constant
+				//TODO record the access to the enumValue
+			}
+			else {
+				// looks like it is a field
+				BehaviouralEntity accessor = this.context.topMethod();
+				createAccessedAttribute((IVariableBinding)bnd, node.getName().getIdentifier(), null, null, accessor);
+			}	
 		}
 		return super.visit(node);
 	}

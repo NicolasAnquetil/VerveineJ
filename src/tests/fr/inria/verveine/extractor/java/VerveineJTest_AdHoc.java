@@ -7,7 +7,6 @@ package tests.fr.inria.verveine.extractor.java;
 import static org.junit.Assert.*;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.util.Collection;
 
 import org.junit.Before;
@@ -220,106 +219,60 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	
 	@Test
 	public void testMethodParameterArgumentTypes() {
-		Method fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
-		assertNotNull(fmxMethod);
-		assertEquals(2, fmxMethod.getParameters().size());
-		for (Parameter fmxParameter : fmxMethod.getParameters()) {
-			assertTrue(fmxParameter.getName().equals("fmxClass") || fmxParameter.getName().equals("name"));
-			if (fmxParameter.getName().equals("fmxClass")) {
-				//assertEquals(1, fmxParameter.getDeclaredArgumentTypes().size());
-				//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxParameter.getDeclaredArgumentTypes().iterator().next());
-			}
-			if (fmxParameter.getName().equals("name")) {
-				//assertNull(fmxParameter.getDeclaredArgumentTypes());
-			}
-		}
-		
-		fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "createFamixEntity");
-		assertNotNull(fmxMethod);
-		assertEquals(2, fmxMethod.getParameters().size());
-		for (Parameter fmxParameter : fmxMethod.getParameters()) {
-			assertTrue(fmxParameter.getName().equals("fmxClass") || fmxParameter.getName().equals("name"));
-			if (fmxParameter.getName().equals("fmxClass")) {
-				//assertEquals(1, fmxParameter.getDeclaredArgumentTypes().size());
-				//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxParameter.getDeclaredArgumentTypes().iterator().next());
-			}
-			if (fmxParameter.getName().equals("name")) {
-				///assertNull(fmxParameter.getDeclaredArgumentTypes());
+		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixEntity");
+		if (meth.getParameters().size() == 3) {
+			for (Parameter param : meth.getParameters()) {
+				if (param.getName().equals("fmxClass")) {
+					Type classT = param.getDeclaredType();
+					assertNotNull(classT);
+					assertEquals("Class", classT.getName());
+					assertEquals(ParameterizedType.class, classT.getClass());
+					assertEquals(1, ((ParameterizedType)classT).getArguments().size());
+					Type t = ((ParameterizedType)classT).getArguments().iterator().next();
+					assertEquals("T", t.getName());
+					assertSame(meth, t.getBelongsTo());
+				}
+				else if (param.getName().equals("bnd")) {
+					Type b = param.getDeclaredType();
+					assertNotNull(b);
+					assertEquals("B", b.getName());
+					assertSame(meth.getBelongsTo(), b.getBelongsTo());  // b defined in Dictionary class just as the method
+				}
+				else {
+					assertEquals("name", param.getName());
+				}
 			}
 		}
-		
-		fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixEntity");
-		assertNotNull(fmxMethod);
-		assertEquals(3, fmxMethod.getParameters().size());
-		for (Parameter fmxParameter : fmxMethod.getParameters()) {
-			assertTrue(fmxParameter.getName().equals("fmxClass") || fmxParameter.getName().equals("bnd") || fmxParameter.getName().equals("name"));
-			if (fmxParameter.getName().equals("fmxClass")) {
-				//assertEquals(1, fmxParameter.getDeclaredArgumentTypes().size());
-				//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxParameter.getDeclaredArgumentTypes().iterator().next());
-			}
-			if (fmxParameter.getName().equals("bnd")) {
-				//assertNull(fmxParameter.getDeclaredArgumentTypes());
-			}
-			if (fmxParameter.getName().equals("name")) {
-				//assertNull(fmxParameter.getDeclaredArgumentTypes());
-			}
-		}
-		
-		fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixUniqEntity");
-		assertNotNull(fmxMethod);
-		assertEquals(3, fmxMethod.getParameters().size());
-		for (Parameter fmxParameter : fmxMethod.getParameters()) {
-			assertTrue(fmxParameter.getName().equals("fmxClass") || fmxParameter.getName().equals("bnd") || fmxParameter.getName().equals("name"));
-			if (fmxParameter.getName().equals("fmxClass")) {
-				//assertEquals(1, fmxParameter.getDeclaredArgumentTypes().size());
-				//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxParameter.getDeclaredArgumentTypes().iterator().next());
-			}
-			if (fmxParameter.getName().equals("bnd")) {
-				//assertNull(fmxParameter.getDeclaredArgumentTypes());
-			}
-			if (fmxParameter.getName().equals("name")) {
-				//assertNull(fmxParameter.getDeclaredArgumentTypes());
-			}
+		else {
+			assertEquals(2, meth.getParameters().size());
 		}
 	}
 	
 	@Test
 	public void testMethodLocalVariableArgumentTypes() {
-		Method fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "mapEntityToName");
-		assertNotNull(fmxMethod);
-		assertEquals(1, fmxMethod.getLocalVariables().size());
-		for (LocalVariable fmxLocalVariable : fmxMethod.getLocalVariables()) {
-			assertTrue(fmxLocalVariable.getName().equals("l_ent"));
-			//assertEquals(1, fmxLocalVariable.getDeclaredArgumentTypes().size());
-			//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "NamedEntity"), fmxLocalVariable.getDeclaredArgumentTypes().iterator().next());
-		}
-		
-		fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
-		assertNotNull(fmxMethod);
-		assertEquals(2, fmxMethod.getLocalVariables().size());
-		for (LocalVariable fmxLocalVariable : fmxMethod.getLocalVariables()) {
-			assertTrue(fmxLocalVariable.getName().equals("ret") || fmxLocalVariable.getName().equals("l_name"));
-			if (fmxLocalVariable.getName().equals("ret")) {
-				//assertEquals(1, fmxLocalVariable.getDeclaredArgumentTypes().size());
-				//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxLocalVariable.getDeclaredArgumentTypes().iterator().next());
+		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
+		assertNotNull(meth);
+		assertEquals(2, meth.getLocalVariables().size());
+		for (LocalVariable var : meth.getLocalVariables()) {
+			Type collec;
+			if (var.getName().equals("ret")) {
+				collec = var.getDeclaredType();
+				assertNotNull(collec);
+				assertEquals("Collection", collec.getName());
+				assertEquals(ParameterizedType.class, collec.getClass());
+				assertEquals(1, ((ParameterizedType)collec).getArguments().size());
+				Type t = ((ParameterizedType)collec).getArguments().iterator().next();
+				assertEquals("T", t.getName());
+				assertSame(meth, t.getBelongsTo());
 			}
-			if (fmxLocalVariable.getName().equals("l_name")) {
-				//assertEquals(1, fmxLocalVariable.getDeclaredArgumentTypes().size());
-				//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "NamedEntity"), fmxLocalVariable.getDeclaredArgumentTypes().iterator().next());
-			}
-		}
-		
-		fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixUniqEntity");
-		assertNotNull(fmxMethod);
-		assertEquals(2, fmxMethod.getLocalVariables().size());
-		for (LocalVariable fmxLocalVariable : fmxMethod.getLocalVariables()) {
-			assertTrue(fmxLocalVariable.getName().equals("fmx") || fmxLocalVariable.getName().equals("l"));
-			if (fmxLocalVariable.getName().equals("fmx")) {
-				//assertNull(fmxLocalVariable.getDeclaredArgumentTypes());
-			}
-			if (fmxLocalVariable.getName().equals("l")) {
-				//assertEquals(1, fmxLocalVariable.getDeclaredArgumentTypes().size());
-				//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxLocalVariable.getDeclaredArgumentTypes().iterator().next());
+			if (var.getName().equals("l_name")) {
+				collec = var.getDeclaredType();
+				assertNotNull(collec);
+				assertEquals("Collection", collec.getName());
+				assertEquals(ParameterizedType.class, collec.getClass());
+				assertEquals(1, ((ParameterizedType)collec).getArguments().size());
+				Type ne = ((ParameterizedType)collec).getArguments().iterator().next();
+				assertEquals("NamedEntity", ne.getName());
 			}
 		}
 	}
@@ -371,6 +324,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 				assertEquals("protoDeck", a.getName());
 			}
 		}
+	}
+
+	@Test
+	public void testEnumAccess() {
+		fail("must test access to EnumValues in Card.java");		
 	}
 
 	@Test

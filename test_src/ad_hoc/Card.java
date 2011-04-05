@@ -3,8 +3,6 @@ package ad_hoc;
 import java.util.ArrayList;
 import java.util.List;
 
-public enum Suit { CLUBS, DIAMONDS, HEARTS, SPADES };
-
 public class Card {
 
 	public enum Rank { DEUCE, THREE, FOUR, FIVE, SIX,
@@ -19,7 +17,14 @@ public class Card {
 
     public Rank rank() { return rank; }
     public Suit suit() { return suit; }
-    public String toString() { return rank + " of " + suit; }
+    public String toString() {
+    	if (suit == Suit.CLUBS) {
+    		return rank + " of " + suit;
+    	}
+    	else {
+    		return rank + " of clubs";
+    	}
+    }
 
     private static final List<Card> protoDeck = new ArrayList<Card>();
 /*
@@ -39,3 +44,5 @@ public class Card {
     }
 
 }
+
+public enum Suit { CLUBS, DIAMONDS, HEARTS, SPADES };
