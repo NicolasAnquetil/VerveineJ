@@ -30,7 +30,7 @@ public class Dictionary<B> {
 		this.mapName = new Hashtable<String,Collection<NamedEntity>>();
 		this.mapImpVar = new Hashtable<NamedEntity,ImplicitVars>();
 		
-		if (! this.famixRepo.isEmpty()) {
+		if (! this.mapBind.isEmpty()) {
 			// nothing
 		}
 	}

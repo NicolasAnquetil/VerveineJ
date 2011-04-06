@@ -6,12 +6,15 @@ import org.junit.Test;
 
 import test.fr.inria.verveine.core.TestVerveineUtils;
 import ch.akuhn.fame.Repository;
+import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.Association;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Inheritance;
+import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
+import fr.inria.verveine.core.gen.famix.Reference;
 import fr.inria.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
@@ -24,11 +27,13 @@ public abstract class VerveineJTest_Basic {
 
 	@Test
 	public void testAssociation() {
-		for (Association ass : TestVerveineUtils.selectElementsOfType(repo, Association.class) ) {
-			assertNotNull(ass.getClass().getSimpleName()+(ass.getTo()==null?"":" to: "+ass.getTo().getName())+" as no From", ass.getFrom());
+		for (Association ass : TestVerveineUtils.selectElementsOfType(repo, Access.class) ) {
+			if (! (ass instanceof Invocation)) { // null receiver allowed for invocations
+				assertNotNull(ass.getClass().getSimpleName()+(ass.getTo()==null? "" : " to: "+ass.getTo().getName())+" as no From", ass.getFrom());
+			}
 			assertNotNull(ass.getClass().getSimpleName()+" from: "+ass.getFrom().getName()+" as no To", ass.getTo());
 		}
-		
+
 		for (Association ass : TestVerveineUtils.selectElementsOfType(repo, Association.class) ) {
 			Association n = ass.getNext();
 			if (n!=null) {

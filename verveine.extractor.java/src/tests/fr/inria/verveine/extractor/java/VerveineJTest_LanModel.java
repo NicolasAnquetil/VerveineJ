@@ -112,7 +112,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(10+1,  TestVerveineUtils.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
-		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
+		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());//FIXME pb with getreceiver
 		assertEquals(6+24,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//6 internal + 24 from imported packages/classes
 		assertEquals(25,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
@@ -383,17 +383,17 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				 (mNode.getName().equals("methodWithEmptyBody")) ||
 				 (mNode.getName().equals("canOutput")) ||
 				 (mNode.getName().equals("canOriginate")) ) {
-				assertEquals("Wrong number of outgoing invocation for method Node."+mNode.getName()+"()", 0, mNode.getOutgoingInvocations().size());
+				assertEquals("Wrong number of outgoing invocation for Node."+mNode.getSignature(), 0, mNode.getOutgoingInvocations().size());
 			}
 			else if ( (mNode.getName().equals("Node")) ||
 					  (mNode.getName().equals("accept")) ) {
-				assertEquals("Wrong number of outgoing invocation for method Node."+mNode.getName()+"()", 1, mNode.getOutgoingInvocations().size());
+				assertEquals("Wrong number of outgoing invocation for Node."+mNode.getSignature(), 1, mNode.getOutgoingInvocations().size());
 			}
 			else if (mNode.getName().equals("send"))  {
-				assertEquals("Wrong number of outgoing invocation for method Node.send()", 6, mNode.getOutgoingInvocations().size());
+				assertEquals("Wrong number of outgoing invocation for Node.send()", 6, mNode.getOutgoingInvocations().size());
 			}
 			else if (mNode.getName().equals("printOn")) {
-				assertEquals("Wrong number of outgoing invocation for method Node.printOn()", 8, mNode.getOutgoingInvocations().size());
+				assertEquals("Wrong number of outgoing invocation for Node.printOn()", 8, mNode.getOutgoingInvocations().size());
 			}
 		}
 		
