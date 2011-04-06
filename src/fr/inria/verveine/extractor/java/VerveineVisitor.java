@@ -77,6 +77,7 @@ import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.EnumValue;
 import fr.inria.verveine.core.gen.famix.ImplicitVariable;
+import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
@@ -382,7 +383,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationExpression node) {
-//		System.err.println("TRACE, DefVisiting VariableDeclarationExpression");
+//		System.err.println("TRACE, DefVisiting VariableDeclarationExpression: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
 		// we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them 
@@ -398,7 +399,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationStatement node) {
-//		System.err.println("TRACE, DefVisiting VariableDeclarationStatement");
+//		System.err.println("TRACE, DefVisiting VariableDeclarationStatement: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
 		// we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them 
@@ -428,11 +429,7 @@ public class VerveineVisitor extends ASTVisitor {
 				// creating a class' field
 				fmx = dico.ensureFamixAttribute(bnd, name, varTyp, (fr.inria.verveine.core.gen.famix.Class) ctxt);
 			}
-			else if (node instanceof VariableDeclarationExpression) {
-				// creating a method's local variable
-				fmx = dico.ensureFamixLocalVariable(bnd, name, varTyp, (Method) ctxt);
-			}
-			else if (node instanceof VariableDeclarationExpression) {
+			else if ( (node instanceof VariableDeclarationExpression) || (node instanceof VariableDeclarationStatement) ) {
 				// creating a method's local variable
 				fmx = dico.ensureFamixLocalVariable(bnd, name, varTyp, (Method) ctxt);
 			}
@@ -500,7 +497,8 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(SuperMethodInvocation node) {
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topClass(), context.top()));
+		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topClass(), context.top());
+		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver);
 
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
@@ -513,7 +511,13 @@ public class VerveineVisitor extends ASTVisitor {
 		String name = context.topMethod().getName();
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/context.topClass());  // cast needed to desambiguate the call
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, context.topClass(), context.topMethod());
-		context.setLastInvocation( dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation()) );
+		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
+		if (invok == null) {
+			System.err.println("Could not create invocation:'"+context.topMethod()+"' / '"+receiver+"' / '"+invoked+"'");
+		}
+		else {
+			context.setLastInvocation( invok );
+		}
 
 		return super.visit(node);
 	}
@@ -524,7 +528,13 @@ public class VerveineVisitor extends ASTVisitor {
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), null, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/context.topClass());  // cast needed to desambiguate the call
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, context.topClass(), context.topMethod());
-		context.setLastInvocation( dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation()) );
+		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
+		if (invok == null) {
+			System.err.println("Could not create invocation:'"+context.topMethod()+"' / '"+receiver+"' / '"+invoked+"'");
+		}
+		else {
+			context.setLastInvocation( invok );
+		}
 
 		return super.visit(node);
 	}
@@ -544,10 +554,16 @@ public class VerveineVisitor extends ASTVisitor {
 				invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/varTyp);  // cast needed to desambiguate the call
 			}
 			else {
-				// method static of a class called on the class
+				//  static method called on the class (or null receiver)
 				invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/(fr.inria.verveine.core.gen.famix.Type)receiver);  // cast needed to desambiguate the call
 			}
-			context.setLastInvocation( dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation()) );
+			Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation());
+			if (invok == null) {
+				System.err.println("Could not create invocation:'"+sender+"' / '"+receiver+"' / '"+invoked+"'");
+			}
+			else {
+				context.setLastInvocation( invok );
+			}
 		}
 	}
 
