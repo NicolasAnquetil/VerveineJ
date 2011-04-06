@@ -512,12 +512,7 @@ public class VerveineVisitor extends ASTVisitor {
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/context.topClass());  // cast needed to desambiguate the call
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, context.topClass(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
-		if (invok == null) {
-			System.err.println("Could not create invocation:'"+context.topMethod()+"' / '"+receiver+"' / '"+invoked+"'");
-		}
-		else {
-			context.setLastInvocation( invok );
-		}
+		context.setLastInvocation( invok );
 
 		return super.visit(node);
 	}
@@ -529,12 +524,7 @@ public class VerveineVisitor extends ASTVisitor {
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), null, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/context.topClass());  // cast needed to desambiguate the call
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, context.topClass(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
-		if (invok == null) {
-			System.err.println("Could not create invocation:'"+context.topMethod()+"' / '"+receiver+"' / '"+invoked+"'");
-		}
-		else {
-			context.setLastInvocation( invok );
-		}
+		context.setLastInvocation( invok );
 
 		return super.visit(node);
 	}
@@ -558,12 +548,7 @@ public class VerveineVisitor extends ASTVisitor {
 				invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/(fr.inria.verveine.core.gen.famix.Type)receiver);  // cast needed to desambiguate the call
 			}
 			Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation());
-			if (invok == null) {
-				System.err.println("Could not create invocation:'"+sender+"' / '"+receiver+"' / '"+invoked+"'");
-			}
-			else {
-				context.setLastInvocation( invok );
-			}
+			context.setLastInvocation( invok );
 		}
 	}
 
