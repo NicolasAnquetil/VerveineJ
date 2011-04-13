@@ -7,8 +7,7 @@
 	<property name="docs.dir"     location="docs" />
 	<property name="dist.dir"     location="lib" />
 	<property name="verveine.jar" location="${dist.dir}/verveine.extractor.java.jar" />
-
-	<!-- Variables used for JUnit testin -->
+	<property name="core.dir"     location="../verveine.core" />
 	<property name="test.dir" location="src/tests/fr/inria/verveine/extractor/java/" />
 	<property name="test.report.dir" location="testrep" />
 
@@ -28,17 +27,22 @@
 		<delete file="${verveine.jar}" />
 	</target>
 
-	<!-- Creates the  build, docs and dist directory-->
+	<!-- Re-creates the  build, docs and dist directory-->
 	<target name="makedir">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${docs.dir}" />
 		<mkdir dir="${test.report.dir}" />
 	</target>
+	
+	<!-- call ant on verveine.core DOES NOT WORK :-( -->
+	<target name="antcore">
+		<ant dir="${core.dir}" target="jar" inheritAll="false" />
+	</target>
 
 	<!-- copies the jar from verveine.core -->
-	<target name="corejars" depends="makedir">
-		<copy todir="${dist.dir}" file="../verveine.core/lib/famix.jar"/>
-		<copy todir="${dist.dir}" file="../verveine.core/lib/verveine.core.jar"/>
+	<target name="corejars" depends="makedir, antcore">
+		<copy todir="${dist.dir}" file="${core.dir}/lib/famix.jar"/>
+		<copy todir="${dist.dir}" file="${core.dir}/lib/verveine.core.jar"/>
 	</target>
 
 	<!-- Compiles the java code (including the usage of library for JUnit -->
@@ -66,7 +70,7 @@
 
 	<!-- Run the JUnit Tests -->
 	<!-- Output is XML, could also be plain-->
-	<target name="junit" depends="compile">
+	<target name="junit" depends="jar">
 		<junit printsummary="on" fork="true" haltonfailure="no">
 			<classpath>
 				<pathelement path="${build.dir}"/>

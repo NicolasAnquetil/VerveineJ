@@ -159,6 +159,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return ensureFamixClass(bnd, name, owner, /*isGeneric*/false);
 		}
 
+		if (bnd.isAnnotation()) {
+			return ensureFamixAnnotationType(bnd, name, owner);
+		}
+
 		if (name == null) {
 			name = bnd.getName();
 		}

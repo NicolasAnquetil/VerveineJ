@@ -497,7 +497,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(SuperMethodInvocation node) {
-		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topClass(), context.top());
+		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topClass(), context.topMethod());
 		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver);
 
 		this.context.addTopMethodNOS(1);
@@ -704,7 +704,7 @@ public class VerveineVisitor extends ASTVisitor {
 	private NamedEntity getReceiver(Expression expr) {
 		// msg(), same as ThisExpression
 		if (expr == null) {
-			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topClass(), context.top());
+			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topClass(), context.topMethod());
 		}
 
 		// array[i].msg()
@@ -832,7 +832,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// this.msg()
 		else if (expr instanceof ThisExpression) {
-			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topClass(), context.top());
+			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topClass(), context.topMethod());
 		}
 
 		// type.class.msg()

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuite errors="0" failures="2" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" tests="19" time="5.757" timestamp="2011-04-12T15:07:16">
+  <properties>
+    <property name="ant.project.invoked-targets" value="junit" />
+    <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
+    <property name="core.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.core" />
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/i386" />
+    <property name="java.vm.version" value="19.1-b02" />
+    <property name="ant.library.dir" value="/usr/share/ant/lib" />
+    <property name="ant.file.type.verveine.extractor.java" value="file" />
+    <property name="ant.version" value="Apache Ant version 1.8.0 compiled on May 9 2010" />
+    <property name="ant.java.version" value="1.6" />
+    <property name="java.vm.vendor" value="Sun Microsystems Inc." />
+    <property name="java.vendor.url" value="http://java.sun.com/" />
+    <property name="path.separator" value=":" />
+    <property name="java.vm.name" value="Java HotSpot(TM) Server VM" />
+    <property name="file.encoding.pkg" value="sun.io" />
+    <property name="user.country" value="US" />
+    <property name="sun.java.launcher" value="SUN_STANDARD" />
+    <property name="sun.os.patch.level" value="unknown" />
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
+    <property name="user.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java" />
+    <property name="java.runtime.version" value="1.6.0_24-b07" />
+    <property name="java.awt.graphicsenv" value="sun.awt.X11GraphicsEnvironment" />
+    <property name="basedir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java" />
+    <property name="java.endorsed.dirs" value="/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/endorsed" />
+    <property name="os.arch" value="i386" />
+    <property name="ant.project.default-target" value="jar" />
+    <property name="java.io.tmpdir" value="/tmp" />
+    <property name="ant.core.lib" value="/usr/share/ant/lib/ant.jar" />
+    <property name="line.separator" value="
+" />
+    <property name="java.vm.specification.vendor" value="Sun Microsystems Inc." />
+    <property name="os.name" value="Linux" />
+    <property name="ant.home" value="/usr/share/ant" />
+    <property name="build.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/bin" />
+    <property name="ant.project.name" value="verveine.extractor.java" />
+    <property name="sun.jnu.encoding" value="UTF-8" />
+    <property name="java.library.path" value="/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/i386/server:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/i386:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/../lib/i386:/usr/java/packages/lib/i386:/lib:/usr/lib" />
+    <property name="java.class.version" value="50.0" />
+    <property name="java.specification.name" value="Java Platform API Specification" />
+    <property name="test.report.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/testrep" />
+    <property name="sun.management.compiler" value="HotSpot Tiered Compilers" />
+    <property name="ant.file.verveine.extractor.java" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/build.xml" />
+    <property name="os.version" value="2.6.35-28-generic" />
+    <property name="dist.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib" />
+    <property name="ant.file" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/build.xml" />
+    <property name="docs.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/docs" />
+    <property name="user.home" value="/home/anquetin" />
+    <property name="user.timezone" value="" />
+    <property name="java.awt.printerjob" value="sun.print.PSPrinterJob" />
+    <property name="java.specification.version" value="1.6" />
+    <property name="file.encoding" value="UTF-8" />
+    <property name="java.class.path" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/bin:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/akuhn-util-r28011.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/fame.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/famix.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/junit.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.contenttype_3.4.100.v20100505-1235.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.jobs_3.5.0.v20100515.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.resources_3.6.0.v20100526-0737.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.runtime_3.6.0.v20100505.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.equinox.common_3.6.0.v20100503.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.equinox.preferences_3.3.0.v20100503.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.jdt.core_3.6.0.v_A58.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.osgi_3.6.0.v20100517.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.hamcrest.core_1.1.0.v20090501071000.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.core.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.extractor.java.jar:/usr/share/java/ant-launcher-1.8.0.jar:/usr/share/ant/lib/ant.jar:/usr/share/ant/lib/ant-junit.jar" />
+    <property name="user.name" value="anquetin" />
+    <property name="verveine.jar" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.extractor.java.jar" />
+    <property name="java.vm.specification.version" value="1.0" />
+    <property name="sun.arch.data.model" value="32" />
+    <property name="java.home" value="/usr/lib/jvm/java-6-sun-1.6.0.24/jre" />
+    <property name="java.specification.vendor" value="Sun Microsystems Inc." />
+    <property name="user.language" value="en" />
+    <property name="test.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/src/tests/fr/inria/verveine/extractor/java" />
+    <property name="java.vm.info" value="mixed mode" />
+    <property name="java.version" value="1.6.0_24" />
+    <property name="java.ext.dirs" value="/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/ext:/usr/java/packages/lib/ext" />
+    <property name="sun.boot.class.path" value="/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/resources.jar:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/rt.jar:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/sunrsasign.jar:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/jsse.jar:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/jce.jar:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/charsets.jar:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/lib/modules/jdk.boot.jar:/usr/lib/jvm/java-6-sun-1.6.0.24/jre/classes" />
+    <property name="java.vendor" value="Sun Microsystems Inc." />
+    <property name="file.separator" value="/" />
+    <property name="src.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/src" />
+    <property name="java.vendor.url.bug" value="http://java.sun.com/cgi-bin/bugreport.cgi" />
+    <property name="sun.cpu.endian" value="little" />
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle" />
+    <property name="ant.file.type" value="file" />
+    <property name="sun.desktop" value="gnome" />
+    <property name="sun.cpu.isalist" value="" />
+  </properties>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testEntitiesNumber" time="2.117">
+    <failure message="expected:&lt;1&gt; but was:&lt;0&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;1&gt; but was:&lt;0&gt;
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testEntitiesNumber(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testClassProperties" time="0.283" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testNamedEntities" time="0.262" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInheritance" time="0.176" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMethodProperties" time="0.255" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testFieldType" time="0.29" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testStubs" time="0.238" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testParameter" time="0.169" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testImplicitVar" time="0.108" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInvocation" time="0.187" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAccess" time="0.221" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testSourceAnchors" time="0.203" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testModifiers" time="0.173" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testComment" time="0.152" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMetric" time="0.194" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAnnotation" time="0.107">
+    <failure type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: 
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testAnnotation(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAssociation" time="0.12" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testBelongsTo" time="0.161" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testJavaCore" time="0.111" />
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
