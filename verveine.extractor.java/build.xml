@@ -11,8 +11,6 @@
 	<property name="test.dir" location="src/tests/fr/inria/verveine/extractor/java/" />
 	<property name="test.report.dir" location="testrep" />
 
-
-	<!-- Create a classpath container which can be later used in the ant task -->
 	<path id="build.classpath">
 		<fileset dir="${dist.dir}">
 			<include name="*.jar" />

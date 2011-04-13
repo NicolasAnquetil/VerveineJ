@@ -154,13 +154,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return ensureFamixParameterizedType(bnd, name, /*generic*/null, ctxt);
 		}
 
+		if (bnd.isAnnotation()) {
+			return ensureFamixAnnotationType(bnd, name, owner);
+		}
+
 		// it seems wise to test isClass after isGenericType, isParameterizedType, ... ? 
 		if (bnd.isClass() || bnd.isInterface()) {
 			return ensureFamixClass(bnd, name, owner, /*isGeneric*/false);
-		}
-
-		if (bnd.isAnnotation()) {
-			return ensureFamixAnnotationType(bnd, name, owner);
 		}
 
 		if (name == null) {
