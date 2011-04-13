@@ -172,9 +172,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		if (bnd.isTypeVariable() ) {
-			// a type defined for a method parameter or return type
-			fmx = super.ensureFamixType(bnd, name, owner);
-			
+			if (owner instanceof ParameterizableClass) {
+				fmx = super.ensureFamixParameterType(bnd, name, owner);
+			}
+			else {
+				// a type defined for a method parameter or return type
+				fmx = super.ensureFamixType(bnd, name, owner);
+			}			
 			return fmx;
 		}
 

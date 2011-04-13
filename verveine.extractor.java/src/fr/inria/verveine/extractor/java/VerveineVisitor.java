@@ -292,7 +292,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-//		System.err.println("TRACE, DefVisiting MethodDeclaration: "+node.getName().getIdentifier());
+//		System.err.println("TRACE, DefVisiting MethodDeclaration: "+node.getName().getIdentifier();
 		
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
