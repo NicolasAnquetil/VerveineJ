@@ -98,50 +98,55 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	
 	@Test
 	public void testAnnotation() {
-		AnnotationType fmProp = TestVerveineUtils.detectElement(repo,AnnotationType.class, "FameProperty");
-		assertNotNull(fmProp);
-		assertEquals("FameProperty", fmProp.getName());
-		// FIXME assertFalse(fmProp.getIsStub());
+		AnnotationType getProp = TestVerveineUtils.detectElement(repo,AnnotationType.class, "GetProperty");
+		assertNotNull(getProp);
+		assertFalse(getProp.getIsStub());
 
-		fr.inria.verveine.core.gen.famix.Class clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Element");
-		assertNotNull(clazz);
-		assertEquals(3, fmProp.getInstances().size());
+		assertEquals(1, getProp.getAttributes().size());
+		AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) getProp.getAttributes().iterator().next();
+		assertEquals("value", getAtt.getName());
+		assertEquals(4, getProp.getInstances().size());
 
-		assertEquals(5, fmProp.getAttributes().size());
-		AnnotationTypeAttribute decl = null;
-		for (AnnotationTypeAttribute a : TestVerveineUtils.listElements(repo, AnnotationTypeAttribute.class, "derived")) {
-			if (a.getParentAnnotationType() == fmProp) {
-				decl = a;
-				break;
-			}
-		}
-		assertNotNull("FameProperty missing AnnotationTypeAttribute: derived", decl);
-		
+		// Class annotation
+		fr.inria.verveine.core.gen.famix.Class cl = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Serializer");
+		assertEquals(1, cl.getAnnotationInstances().size());
+		AnnotationInstance sw = cl.getAnnotationInstances().iterator().next();
+		assertNotNull(sw);
+		assertEquals("SuppressWarnings", sw.getAnnotationType().getName());
+		assertSame(sw.getAnnotatedEntity(), cl);
+		assertEquals(1, sw.getAttributes().size());
+		AnnotationInstanceAttribute swVal = sw.getAttributes().iterator().next();
+		assertNotNull(swVal);
+		assertEquals("value", swVal.getAnnotationTypeAttribute().getName());
+		assertEquals("serial", swVal.getValue());
+
 		// Method annotations
-		for (Method meth : clazz.getMethods()) {
+		fr.inria.verveine.core.gen.famix.Class book = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Book");
+		assertEquals(11, book.getMethods().size());
+		for (Method meth : book.getMethods()) {
 			Collection<AnnotationInstance> annInstances = meth.getAnnotationInstances();
-			if (meth.getName().equals("getFullname") || meth.getName().equals("getName") || meth.getName().equals("getOwner")) {
+			if (meth.getName().startsWith("get")) {
 				assertEquals(1, annInstances.size());
 				AnnotationInstance annInst = annInstances.iterator().next();
-				assertSame(fmProp, annInst.getAnnotationType());
-				if (meth.getName().equals("getOwner")) {
-					Collection<AnnotationInstanceAttribute> aiAtts = annInst.getAttributes();
-					assertEquals(1, aiAtts.size());
-					AnnotationInstanceAttribute annAtt = aiAtts.iterator().next();
-					assertEquals( annInst, annAtt.getParentAnnotationInstance());
-					assertEquals( "true", annAtt.getValue());
-					assertEquals(decl, annAtt.getAnnotationTypeAttribute());
-				}
+				assertSame(getProp, annInst.getAnnotationType());
+				assertEquals(1, annInst.getAttributes().size());
+				AnnotationInstanceAttribute getValInst = annInst.getAttributes().iterator().next();
+				assertSame(getAtt, getValInst.getAnnotationTypeAttribute());
+				
 			}
-			else if (meth.getName().equals("toString")) {
+			else if (meth.getName().startsWith("set")) {
 				assertEquals(1, annInstances.size());
+				AnnotationInstance annInst = annInstances.iterator().next();
+				assertEquals("SetProperty", annInst.getAnnotationType().getName());
 			}
 			else {
 				assertEquals(0, annInstances.size());
 			}
 		}
 
-		for (Attribute att : clazz.getAttributes()) {
+		// no Attribute annotations
+		assertEquals(5, book.getAttributes().size());
+		for (Attribute att : book.getAttributes()) {
 			assertEquals(0, att.getAnnotationInstances().size());
 		}
 

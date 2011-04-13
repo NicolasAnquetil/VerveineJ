@@ -483,12 +483,12 @@ public class VerveineVisitor extends ASTVisitor {
 		Expression callingExpr = node.getExpression();
 		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(callingExpr));
 		if (callingExpr instanceof SimpleName) {
-			// we might have a hidden FieldAccess here
+			// we might have a FieldAccess here
 			IBinding bnd = ((Name) callingExpr).resolveBinding();
 			if ( (bnd != null) && (bnd instanceof IVariableBinding) && ((IVariableBinding)bnd).isField() ){
-				BehaviouralEntity accessor = this.context.topMethod();
-				// note: using a field without anything before, owner must be the currently parsed class
-				createAccessedAttribute((IVariableBinding)bnd, ((SimpleName)callingExpr).getIdentifier(), null, /*owner*/context.topClass(), accessor);
+				// this is a field access. The field should have been created by 'getReceiver(callingExpr)' above
+				// must still create the field access
+				createAccessedAttribute((IVariableBinding)bnd, /*name*/null, /*type*/null, /*owner*/null, /*accessor*/this.context.topMethod());
 			}
 		}
 
@@ -521,7 +521,7 @@ public class VerveineVisitor extends ASTVisitor {
 		this.context.addTopMethodNOS(1);
 		
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
-		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), null, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/context.topClass());  // cast needed to desambiguate the call
+		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*name*/null, /*paramTypes*/(Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/null);  // cast needed to desambiguate the call
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, context.topClass(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
@@ -537,18 +537,29 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver) {
 		BehaviouralEntity sender = this.context.topMethod();
-		if (sender != null) {
-			Method invoked = null;
-			if (receiver instanceof StructuralEntity) {
-				fr.inria.verveine.core.gen.famix.Type varTyp = ((StructuralEntity)receiver).getDeclaredType();
-				invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/varTyp);  // cast needed to desambiguate the call
+		
+		// checks whether this is really a method
+		if ( (calledBnd != null) && (calledBnd.isAnnotationMember()) ) {
+			// similar to creating a FamixAttribute access
+			AnnotationTypeAttribute accessed =  dico.ensureFamixAnnotationTypeAttribute(calledBnd, calledName, /*owner*/null);
+			if ( (accessed != null) && (sender != null) ) {
+				context.setLastAccess( dico.addFamixAccess(sender, accessed, /*isWrite*/false, context.getLastAccess()) );
 			}
-			else {
-				//  static method called on the class (or null receiver)
-				invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/(fr.inria.verveine.core.gen.famix.Type)receiver);  // cast needed to desambiguate the call
+		}
+		else {
+			if (sender != null) {
+				Method invoked = null;
+				if (receiver instanceof StructuralEntity) {
+					fr.inria.verveine.core.gen.famix.Type varTyp = ((StructuralEntity)receiver).getDeclaredType();
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/varTyp);  // cast needed to desambiguate the call
+				}
+				else {
+					//  static method called on the class (or null receiver)
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/(fr.inria.verveine.core.gen.famix.Type)receiver);  // cast needed to desambiguate the call
+				}
+				Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation());
+				context.setLastInvocation( invok );
 			}
-			Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation());
-			context.setLastInvocation( invok );
 		}
 	}
 
@@ -778,8 +789,7 @@ public class VerveineVisitor extends ASTVisitor {
 			NamedEntity ret = null;
 			if (bnd instanceof ITypeBinding) {
 				// msg() is a static method of Name
-				//TODO why returning a variable here? Should not it be the class itself?
-				ret = dico.createFamixUnknownVariable( dico.ensureFamixType((ITypeBinding)bnd, null, null, context.top()), bnd.getName());
+				ret = dico.ensureFamixType((ITypeBinding)bnd, /*name*/null, /*owner*/null, /*ctxt*/context.top());
 			}
 			else if (bnd instanceof IVariableBinding) {
 				String varName = ( ((Name)expr).isSimpleName() ? ((SimpleName)expr).getFullyQualifiedName() : ((QualifiedName)expr).getName().getIdentifier());
@@ -860,6 +870,7 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 		accessed =  dico.ensureFamixAttribute(bnd, attName, typ, owner);
 		if ( (accessed != null) && (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
+			// special case: length attribute of arrays in Java
 			accessed.setParentType(dico.ensureFamixClassArray());
 		}
 		

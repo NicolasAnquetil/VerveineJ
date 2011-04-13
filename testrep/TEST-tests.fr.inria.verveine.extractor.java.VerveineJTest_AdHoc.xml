@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="15" failures="0" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" tests="15" time="3.738" timestamp="2011-04-12T15:07:23">
+<testsuite errors="0" failures="2" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" tests="15" time="5.906" timestamp="2011-04-13T14:09:52">
   <properties>
     <property name="ant.project.invoked-targets" value="junit" />
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
@@ -74,261 +74,29 @@
     <property name="sun.desktop" value="gnome" />
     <property name="sun.cpu.isalist" value="" />
   </properties>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testDictionary" time="2.02">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testDictionary" time="2.19" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testExceptions" time="0.48" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAnnotation" time="0.431" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testClassVar" time="0.339" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterizableClass" time="0.397" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterTypeAsType" time="0.314" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodParameterArgumentTypes" time="0.355" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodLocalVariableArgumentTypes" time="0.214" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodReturnArgumentTypes" time="0.256" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumDecl" time="0.198" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumAccess" time="0.195">
+    <failure message="must test access to EnumValues in Card.java" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: must test access to EnumValues in Card.java
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.testEnumAccess(Unknown Source)
+</failure>
   </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testExceptions" time="0.188">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testStaticInitializationBlock" time="0.116">
+    <failure message="must test static initialization block in Card.java" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: must test static initialization block in Card.java
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.testStaticInitializationBlock(Unknown Source)
+</failure>
   </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAnnotation" time="0.213">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testClassVar" time="0.14">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterizableClass" time="0.12">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterTypeAsType" time="0.128">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodParameterArgumentTypes" time="0.093">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodLocalVariableArgumentTypes" time="0.081">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodReturnArgumentTypes" time="0.088">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumDecl" time="0.073">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumAccess" time="0.146">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testStaticInitializationBlock" time="0.091">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAssociation" time="0.074">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testBelongsTo" time="0.094">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testJavaCore" time="0.13">
-    <error message="fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType" type="java.lang.ClassCastException">java.lang.ClassCastException: fr.inria.verveine.core.gen.famix.Class cannot be cast to fr.inria.verveine.core.gen.famix.AnnotationType
-	at fr.inria.verveine.extractor.java.JavaDictionary.ensureFamixAnnotationType(Unknown Source)
-	at fr.inria.verveine.extractor.java.VerveineVisitor.visit(Unknown Source)
-	at org.eclipse.jdt.core.dom.AnnotationTypeDeclaration.accept0(AnnotationTypeDeclaration.java:235)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at org.eclipse.jdt.core.dom.ASTNode.acceptChildren(ASTNode.java:2551)
-	at org.eclipse.jdt.core.dom.CompilationUnit.accept0(CompilationUnit.java:219)
-	at org.eclipse.jdt.core.dom.ASTNode.accept(ASTNode.java:2480)
-	at fr.inria.verveine.extractor.java.FamixRequestor.acceptAST(Unknown Source)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:1016)
-	at org.eclipse.jdt.core.dom.CompilationUnitResolver.resolve(CompilationUnitResolver.java:628)
-	at org.eclipse.jdt.core.dom.ASTParser.createASTs(ASTParser.java:982)
-	at fr.inria.verveine.extractor.java.VerveineJParser.parse(Unknown Source)
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.setUp(Unknown Source)
-</error>
-  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAssociation" time="0.117" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testBelongsTo" time="0.123" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testJavaCore" time="0.116" />
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
