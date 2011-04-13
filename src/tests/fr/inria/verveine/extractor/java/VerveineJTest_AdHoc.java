@@ -55,6 +55,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 
 	@Test
+	public void testConstructorInvocations() {
+		// should test 'this()' and 'super()'
+	}
+
+	@Test
 	public void testDictionary() {
 		fr.inria.verveine.core.gen.famix.Class dico = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Dictionary");
 		assertNotNull(dico);
