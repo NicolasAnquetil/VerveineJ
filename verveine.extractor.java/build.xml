@@ -67,7 +67,6 @@
 	</target>
 
 	<!-- Run the JUnit Tests -->
-	<!-- Output is XML, could also be plain-->
 	<target name="junit" depends="jar">
 		<junit printsummary="on" fork="true" haltonfailure="no">
 			<classpath>
@@ -76,9 +75,25 @@
   				  <include name="*.jar"/>
 				</fileset>
 			</classpath>
+			<!-- Output is XML, could also be plain-->
 			<formatter type="xml" />
 			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
 			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
+		</junit>
+	</target>
+
+	<!-- Run the JUnit Tests -->
+	<!-- Output is XML, could also be plain-->
+	<target name="test_lan">
+		<junit printsummary="on" fork="true" haltonfailure="no">
+			<classpath>
+				<pathelement path="${build.dir}"/>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<formatter type="plain" />
+			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
 		</junit>
 	</target>
 

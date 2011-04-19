@@ -56,13 +56,14 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testConstructorInvocations() {
-		// should test 'this()' and 'super()'
+		//  TODO should test 'this()' and 'super()'
 	}
 
 	@Test
 	public void testDictionary() {
 		fr.inria.verveine.core.gen.famix.Class dico = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Dictionary");
 		assertNotNull(dico);
+		assertEquals(6, dico.getMethods().size());
 
 		assertEquals(3, dico.getAttributes().size());
 		//fails because FieldDeclaration and FieldAccess have different bindings (so they are created twice) :-(
@@ -230,31 +231,27 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	@Test
 	public void testMethodParameterArgumentTypes() {
 		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixEntity");
-		if (meth.getParameters().size() == 3) {
-			for (Parameter param : meth.getParameters()) {
-				if (param.getName().equals("fmxClass")) {
-					Type classT = param.getDeclaredType();
-					assertNotNull(classT);
-					assertEquals("Class", classT.getName());
-					assertEquals(ParameterizedType.class, classT.getClass());
-					assertEquals(1, ((ParameterizedType)classT).getArguments().size());
-					Type t = ((ParameterizedType)classT).getArguments().iterator().next();
-					assertEquals("T", t.getName());
-					assertSame(meth, t.getBelongsTo());
-				}
-				else if (param.getName().equals("bnd")) {
-					Type b = param.getDeclaredType();
-					assertNotNull(b);
-					assertEquals("B", b.getName());
-					assertSame(meth.getBelongsTo(), b.getBelongsTo());  // b defined in Dictionary class just as the method
-				}
-				else {
-					assertEquals("name", param.getName());
-				}
+		assertEquals(3, meth.getParameters().size());
+		for (Parameter param : meth.getParameters()) {
+			if (param.getName().equals("fmxClass")) {
+				Type classT = param.getDeclaredType();
+				assertNotNull(classT);
+				assertEquals("Class", classT.getName());
+				assertEquals(ParameterizedType.class, classT.getClass());
+				assertEquals(1, ((ParameterizedType)classT).getArguments().size());
+				Type t = ((ParameterizedType)classT).getArguments().iterator().next();
+				assertEquals("T", t.getName());
+				assertSame(meth, t.getBelongsTo());
 			}
-		}
-		else {
-			assertEquals(2, meth.getParameters().size());
+			else if (param.getName().equals("bnd")) {
+				Type b = param.getDeclaredType();
+				assertNotNull(b);
+				assertEquals("B", b.getName());
+				assertSame(meth.getBelongsTo(), b.getBelongsTo());  // b defined in Dictionary class just as the method
+			}
+			else {
+				assertEquals("name", param.getName());
+			}
 		}
 	}
 	
@@ -338,11 +335,23 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testEnumAccess() {
-		fail("must test access to EnumValues in Card.java");		
+		fr.inria.verveine.core.gen.famix.Enum st = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Suit");
+		assertNotNull(st);
+		assertEquals(4, st.getValues().size());
+		boolean foundClubs = false;
+		for (EnumValue val : st.getValues()) {
+			if (val.getName().equals("CLUBS")) {
+				foundClubs = true;
+				assertEquals(1, val.numberOfIncomingAccesses());
+				Access access = val.getIncomingAccesses().iterator().next();
+				assertEquals("toString", access.getFrom().getName());
+			}
+		}
+		assertTrue("Did not find CUBS EnumValue in Suit Enum", foundClubs);
 	}
 
 	@Test
 	public void testStaticInitializationBlock() {
-		fail("must test static initialization block in Card.java");
+		fail("must test static initialization block");
 	}
 }

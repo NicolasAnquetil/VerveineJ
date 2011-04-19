@@ -220,7 +220,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// should have called ensureFamixPrimitiveType(bnd). Why are we here ?
 			return null;
 		}
-
+		// for inner classes defined in generics !!!
+		bnd = bnd.getErasure();
+		
 		fmx = (fr.inria.verveine.core.gen.famix.Class)getEntityByKey(bnd);	// to avoid useless computations if we can
 		if (fmx != null) {
 			return fmx;
@@ -256,7 +258,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		for (Type candidate : this.getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, name)) {
 			if ( checkAndMapClass(bnd, candidate) ) {
 				fmx = (Class) candidate;
-//				System.out.println("ensureClass, recovered from name:"+fmx.toString());
 				break;
 			}
 		}
@@ -271,7 +272,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		if (! bnd.isInterface()) {
 			ITypeBinding supbnd = bnd.getSuperclass();
 			if (supbnd != null) {
-				sups.add(ensureFamixType(supbnd, /*name*/null, /*owner*/null, /*ctxt*/null)); //supbnd.isGenericType()));
+				sups.add(ensureFamixType(supbnd, /*name*/null, /*owner*/null, /*ctxt*/null));
 			}
 			else {
 				sups.add( ensureFamixClassObject(null));
@@ -343,12 +344,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return owner;
 	}
 
-/*	public ParameterizableClass ensureFamixParameterizableType(ITypeBinding bnd, String name, ContainerEntity owner) {
-		ParameterizableClass fmx = null;
-		
-		return fmx;
-	}*/
-	
 	public ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, ParameterizableClass generic, ContainerEntity owner) {
 			ParameterizedType fmx = null;
 
@@ -370,6 +365,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			name = bnd.getName();
 		}
 		// remove parameter types from name
+		// could also use "bnd.getErasure().getName()"
 		int i = name.indexOf('<');
 		if (i > 0) {
 			name = name.substring(0, i);
@@ -697,7 +693,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// Not sure it does actually happen
 			return false;
 		}
-
+		else if (mapToKey.containsValue(candidate)) {
+			// candidate already bound, and not to this binding
+			return false;
+		}
+		
 		// names are equals and bnd is not mapped, so let's do it
 		mapToKey.put(bnd, candidate);
 		return true;
@@ -716,7 +716,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			bnd = bnd.getElementType();
 		}
 
-		if (! bnd.getName().equals(candidate.getName())) {
+		String bndName;
+		if (bnd.isParameterizedType()) {
+			bndName = bnd.getErasure().getName();
+		}
+		else {
+			bndName = bnd.getName();
+		}
+		if (! bndName.equals(candidate.getName())) {
 			return false;
 		}
 
@@ -730,13 +737,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// Not sure it does actually happen
 			return false;
 		}
-		
+		else if (mapToKey.containsValue(candidate)) {
+			// candidate already bound, and not to this binding
+			return false;
+		}
+
 		if ( bnd.isPrimitive() && (candidate instanceof PrimitiveType) ) {
 			// names are equal so it's OK
 			mapToKey.put(bnd, candidate);
 			return true;
 		}
-		
+
 		if (bnd.isAnnotation() && (candidate instanceof AnnotationType) ) {
 			if (checkAndMapNamespace(bnd.getPackage(), (Namespace) candidate.getBelongsTo())) {
 				mapToKey.put(bnd, candidate);
@@ -745,6 +756,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			else {
 				return false;
 			}
+		}
+
+		if (bnd.isParameterizedType() && (candidate instanceof ParameterizedType)) {
+			return checkAndMapTypeOwner(bnd, (Type) candidate);
 		}
 
 		// Annotation are interfaces too, so we should check this one after isAnnotation
@@ -787,40 +802,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// Not sure it does actually happen
 			return false;
 		}
-
-		// names match, 'bnd' was not bound, check the owners
-		ContainerEntity candidateOwner = candidate.getBelongsTo();
-		IMethodBinding methBnd = bnd.getDeclaringMethod(); // for classes, can enum be declared in methods?
-		if ( (methBnd != null) && (candidateOwner instanceof Method) ) {
-			if ( checkAndMapMethod(methBnd, (Method)candidateOwner) ) {
-				mapToKey.put(bnd, candidate);
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-
-		ITypeBinding classBnd = bnd.getDeclaringClass();
-		if ( (classBnd != null) && (candidateOwner instanceof fr.inria.verveine.core.gen.famix.Class) ) {
-			if ( checkAndMapClass(classBnd, (Type)candidateOwner) ) {
-				mapToKey.put(bnd, candidate);
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-
-		IPackageBinding pckgBnd = bnd.getPackage();
-		if ( (candidateOwner instanceof Namespace) &&
-			 (checkAndMapNamespace(pckgBnd, (Namespace)candidateOwner)) ) {
-			mapToKey.put(bnd, candidate);
-			return true;
-		}
-		else {
+		else if (mapToKey.containsValue(candidate)) {
+			// candidate already bound, and not to this binding
 			return false;
 		}
+
+			return checkAndMapTypeOwner(bnd, candidate);
 	}
 
 	/**
@@ -844,6 +831,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// already bound to something else
 			// May be should continue to see if we need to merge two FamixEntities representing the same thing .... ?
 			// Not sure it does actually happen
+			return false;
+		}
+		else if (mapToKey.containsValue(candidate)) {
+			// candidate already bound, and not to this binding
 			return false;
 		}
 
@@ -920,6 +911,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		else if (bound != null) {
 			return false;
 		}
+		else if (mapToKey.containsValue(candidate)) {
+			// candidate already bound, and not to this binding
+			return false;
+		}
 
 		ContainerEntity candidateOwner = candidate.getBelongsTo();
 		IMethodBinding methBnd = bnd.getDeclaringMethod();
@@ -942,6 +937,54 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		else {
 			return false;
 		}
+	}
+
+	/**
+	 * Checks whether the existing unmapped Famix Type's parent (or owner) matches the binding's owner.
+	 * Checks that the candidate has the same name as the JDT bound type, and checks recursively that owners also match.
+	 * @param bnd -- a JDT binding whose owner we are trying to match to the candidate's owner
+	 * @param candidate -- a Famix Entity
+	 * @return whether we found a match (if <b>true</b>, the mapping is recorded)
+	 */
+	private boolean checkAndMapTypeOwner(ITypeBinding bnd, Type candidate) {
+		// we don't check the names because we are only interested in the Type's owner
+
+		// owner is a Method?
+		ContainerEntity candidateOwner = candidate.getBelongsTo();
+		IMethodBinding methBnd = bnd.getDeclaringMethod(); // for classes, can other types be declared in methods?
+		if ( (methBnd != null) && (candidateOwner instanceof Method) ) {
+			if ( checkAndMapMethod(methBnd, (Method)candidateOwner) ) {
+				mapToKey.put(bnd, candidate);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		// owner is a class ?
+		ITypeBinding classBnd = bnd.getDeclaringClass();
+		if ( (classBnd != null) && (candidateOwner instanceof fr.inria.verveine.core.gen.famix.Class) ) {
+			if ( checkAndMapClass(classBnd, (Type)candidateOwner) ) {
+				mapToKey.put(bnd, candidate);
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		// owner must be a package
+		IPackageBinding pckgBnd = bnd.getPackage();
+		if ( (candidateOwner instanceof Namespace) &&
+			 (checkAndMapNamespace(pckgBnd, (Namespace)candidateOwner)) ) {
+			mapToKey.put(bnd, candidate);
+			return true;
+		}
+		else {
+			return false;
+		}
+
 	}
 
 	/**
@@ -989,6 +1032,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				owner= ensureFamixClassStubOwner();
 			}
 			return super.ensureFamixMethod(null, name, sig, ret, owner);
+		}
+
+		if (bnd.isParameterizedMethod()) {
+			bnd = bnd.getMethodDeclaration();
 		}
 
 		fmx = (Method)getEntityByKey(bnd);	// to avoid useless computations if we can
