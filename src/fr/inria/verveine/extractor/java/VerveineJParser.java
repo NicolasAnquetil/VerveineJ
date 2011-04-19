@@ -48,8 +48,7 @@ public class VerveineJParser extends VerveineParser {
 
         int i = 0;
         while (i < args.length && args[i].startsWith("-")) {
-        	String arg;
-            arg = args[i++];
+        	String arg = args[i++];
 
             if (arg.equals("-h")) {
             	usage();
@@ -59,7 +58,7 @@ public class VerveineJParser extends VerveineParser {
             }
             else if (arg.equals("-cp")) {
                 if (i < args.length) {
-                	classPath.add(args[++i]);
+                	classPath.add(args[i++]);
                 }
                 else {
                 	System.err.println("-cp requires a classPath");

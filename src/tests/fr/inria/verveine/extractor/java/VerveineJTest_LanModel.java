@@ -57,7 +57,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void setUp() throws Exception {
 		new File(VerveineJParser.OUTPUT_FILE).delete();
 
-		/*String[] files = new String[] {
+		String[] files = new String[] {
 				"AbstractDestinationAddress.java",
 				"Node.java",
 				"Packet.java",
@@ -73,14 +73,16 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		// separate parsing of each source file --------
 		for (String f : files) {
 			parseFile(f);
-		}*/
-
+		}
+//*/
+/*
 		// or parsing the entire project in one pass ---
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 		parser.setOptions(new String[] {"test_src/LANModel/"});
 		parser.parse();
 		parser.outputMSE();
+//*/
 	}
 
 	/**
@@ -112,7 +114,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(10+1,  TestVerveineUtils.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
-		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());//FIXME pb with getreceiver
+		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
 		assertEquals(6+24,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//6 internal + 24 from imported packages/classes
 		assertEquals(25,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
