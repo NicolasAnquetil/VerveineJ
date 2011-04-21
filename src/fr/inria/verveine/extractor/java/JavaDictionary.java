@@ -318,7 +318,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		ContainerEntity owner = null;
 		IMethodBinding parentMtd = bnd.getDeclaringMethod();
 		if (parentMtd != null) {
-			owner = this.ensureFamixMethod(parentMtd, null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
+			owner = this.ensureFamixMethod(parentMtd, /*name*/null, /*paramTypes*/(Collection<org.eclipse.jdt.core.dom.Type>)null, /*retTyp*/null, /*owner*/null);  // cast needed to desambiguate the call
 		}
 		else {
 			ITypeBinding parentClass = bnd.getDeclaringClass();
@@ -762,6 +762,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return checkAndMapTypeOwner(bnd, (Type) candidate);
 		}
 
+		if (bnd.isEnum() && (candidate instanceof Enum)) {
+			return checkAndMapTypeOwner(bnd, (Type) candidate);
+		}
+
 		// Annotation are interfaces too, so we should check this one after isAnnotation
 		if ( bnd.isClass() || bnd.isInterface() || bnd.isEnum() ) {
 			return checkAndMapClass(bnd, (Type) candidate);
@@ -876,13 +880,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		// finally let's check the owners
 		ITypeBinding ownerBnd = bnd.getDeclaringClass();
 		NamedEntity candidateOwner = candidate.getBelongsTo();
-		if ( (candidateOwner  instanceof fr.inria.verveine.core.gen.famix.Class) &&
-				 (checkAndMapClass(ownerBnd, (Type)candidateOwner)) ) {
-				mapToKey.put(bnd, candidate);
-				return true;
-			}
-		else if ( (candidateOwner instanceof AnnotationType) &&
-				(checkAndMapClass(ownerBnd, (Type)candidateOwner)) ) {
+		if (checkAndMapType(ownerBnd, (Type)candidateOwner)) {
 			mapToKey.put(bnd, candidate);
 			return true;
 		}
@@ -928,9 +926,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			}
 		}
 
-		ITypeBinding classBnd = bnd.getDeclaringClass();
-		if ( (candidateOwner instanceof Type) &&
-			 (checkAndMapType(classBnd, (Type)candidateOwner)) ) {
+		ITypeBinding typBnd = bnd.getDeclaringClass();
+		// in case of anArray.length ...
+		if ( (typBnd == null) && (candidateOwner.getName().equals(JavaDictionary.ARRAYS_NAME)) ) {
+			mapToKey.put(bnd, candidate);
+			return true;
+		}
+		else if ( (candidateOwner instanceof Type) &&
+				  (checkAndMapType(typBnd, (Type)candidateOwner)) ) {
 			mapToKey.put(bnd, candidate);
 			return true;
 		}
@@ -997,6 +1000,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		Method fmx = null;
 		String sig;
 		boolean first;
+		boolean delayedRetTyp;
 
 		// signature is dealt in two places
 		// here we try to use the parameter of ensureFamixMethod to compute the list of parameter types of the FamixMethod
@@ -1067,8 +1071,24 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		sig = name + sig;
 
 		// --------------- return type
+		delayedRetTyp = false;
+		ITypeBinding retTypBnd = null;
 		if ( (ret == null) && (! bnd.isConstructor()) ) {
-			ret = this.ensureFamixType(bnd.getReturnType(), null, null, owner);
+			// must create the return type
+			// but for method like "<T> T mtd()", i.e. T belongs to mtd and mtd returns T
+			// we need T to create the method and the method to create T ...
+			// so we need to test the situation and deal with it
+			retTypBnd = bnd.getReturnType();
+			if (retTypBnd.isArray()) {
+				retTypBnd = retTypBnd.getElementType();
+			}
+			if ( (retTypBnd != null) && retTypBnd.isTypeVariable() && (retTypBnd.getDeclaringMethod() == bnd) ) {
+				ret = null;
+				delayedRetTyp = true;
+			}
+			else {
+				ret = this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/null, owner);
+			}
 		}
 		// else leave it to null ...
 
@@ -1081,7 +1101,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					owner = ((ParameterizedType) tmpOwn).getParameterizableClass();
 				}
 				else {
-					owner = (Class)tmpOwn; 
+					owner = tmpOwn; 
 				}
 			}
 		}
@@ -1096,12 +1116,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		if (fmx == null) {
 			fmx = ensureFamixMethod(bnd, name, sig, ret, owner);
 		}
-		
-		if (fmx!=null) {
-			// we just created it or it was not bound, so we make sure it has the right information in it
+		else {
+			// apparently we just recovered an unbound method, so we make sure it has the right information in it
 			fmx.setDeclaredType(ret);
 			fmx.setSignature(sig);
+		}
+
+		if (fmx!=null) {
 			setNamedEntityModifiers(fmx, bnd.getModifiers());
+			if (delayedRetTyp) {
+				fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/null, owner));
+			}
 		}
 
 		return fmx;

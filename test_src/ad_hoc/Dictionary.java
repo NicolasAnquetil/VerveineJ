@@ -60,6 +60,10 @@ public class Dictionary<B> {
 		}
 	}
 
+	protected void testMethodRettype() {
+		NamedEntity ent = createFamixEntity(NamedEntity.class, "test");
+	}
+
 	protected <T extends NamedEntity> T createFamixEntity(Class<T> fmxClass, String name) {
 		T fmx = null;
 

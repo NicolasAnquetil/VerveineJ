@@ -63,7 +63,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testDictionary() {
 		fr.inria.verveine.core.gen.famix.Class dico = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Dictionary");
 		assertNotNull(dico);
-		assertEquals(6, dico.getMethods().size());
+		assertEquals(7, dico.getMethods().size());
 
 		assertEquals(3, dico.getAttributes().size());
 		//fails because FieldDeclaration and FieldAccess have different bindings (so they are created twice) :-(
@@ -176,7 +176,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 		
-		assertEquals(2, meth.getAccesses().size());  // ImplicitVariable.class + mapBind
+		assertEquals(2, meth.getAccesses().size());  // ImplicitVariable.class, mapBind
 		boolean classFieldFound = false;
 		for (Access acc : meth.getAccesses()) {
 			if (acc.getTo().getName().equals("class")) {
@@ -331,6 +331,14 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 				assertEquals("protoDeck", a.getName());
 			}
 		}
+
+		fr.inria.verveine.core.gen.famix.Enum pl = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Planet");
+		assertNotNull(pl);
+		assertEquals("Planet", pl.getName());
+		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "ad_hoc"), pl.getBelongsTo());
+		assertEquals(8, pl.getValues().size());
+		assertEquals(3, pl.getAttributes().size());
+		assertEquals(6+2, pl.getMethods().size()); // 6 methods + 2 implicit used: values(), toString()
 	}
 
 	@Test
@@ -339,19 +347,68 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertNotNull(st);
 		assertEquals(4, st.getValues().size());
 		boolean foundClubs = false;
-		for (EnumValue val : st.getValues()) {
-			if (val.getName().equals("CLUBS")) {
+		for (EnumValue v : st.getValues()) {
+			if (v.getName().equals("CLUBS")) {
 				foundClubs = true;
-				assertEquals(1, val.numberOfIncomingAccesses());
-				Access access = val.getIncomingAccesses().iterator().next();
+				assertEquals(1, v.numberOfIncomingAccesses());
+				Access access = v.getIncomingAccesses().iterator().next();
 				assertEquals("toString", access.getFrom().getName());
 			}
 		}
 		assertTrue("Did not find CUBS EnumValue in Suit Enum", foundClubs);
+		
+		fr.inria.verveine.core.gen.famix.Enum pl = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Planet");
+		assertNotNull(pl);
+
+		assertEquals(8, pl.getValues().size());
+		for (EnumValue v : pl.getValues()) {
+			if (v.getName().equals("EARTH")) {
+				assertEquals(1, v.getIncomingAccesses().size());
+			}
+			else {
+				assertEquals(0, v.getIncomingAccesses().size());
+			}
+		}
+
+		assertEquals(3, pl.getAttributes().size());
+		for (Attribute a : pl.getAttributes()) {
+			if (a.getName().equals("G")) {
+				assertEquals(1, a.getIncomingAccesses().size());
+			}
+			else if (a.getName().equals("radius")) {
+				assertEquals(2, a.getIncomingAccesses().size());
+			}
+			else if (a.getName().equals("mass")) {
+				assertEquals(3, a.getIncomingAccesses().size());
+			}
+			else {
+				fail("Unknown attribute of Enum Planet: "+a.getName());
+			}
+		}
+
+		assertEquals(6+2, pl.getMethods().size());
+		for (Method m : pl.getMethods()) {
+			if ( m.getName().equals("Planet") || m.getName().equals("main") ) {
+				assertEquals(0, m.getIncomingInvocations().size());
+			}
+			else if ( m.getName().equals("mass") || m.getName().equals("surfaceWeight") ||
+					  m.getName().equals("values") || m.getName().equals("toString") ) {
+				assertEquals(1, m.getIncomingInvocations().size());
+			}
+			else if (m.getName().equals("surfaceGravity")) {
+				assertEquals(2, m.getIncomingInvocations().size());
+			}
+			else if (m.getName().equals("radius")) {
+				assertEquals(3, m.getIncomingInvocations().size());
+			}
+			else {
+				fail("Unknown method of Enum Planet: "+m.getName());
+			}
+		}
 	}
 
 	@Test
 	public void testStaticInitializationBlock() {
-		fail("must test static initialization block");
+		//fail("must test static initialization block");
 	}
 }
