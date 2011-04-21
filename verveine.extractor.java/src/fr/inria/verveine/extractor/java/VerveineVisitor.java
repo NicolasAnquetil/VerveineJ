@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -75,6 +76,7 @@ import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
+import fr.inria.verveine.core.gen.famix.Enum;
 import fr.inria.verveine.core.gen.famix.EnumValue;
 import fr.inria.verveine.core.gen.famix.ImplicitVariable;
 import fr.inria.verveine.core.gen.famix.Invocation;
@@ -109,7 +111,7 @@ public class VerveineVisitor extends ASTVisitor {
 	// VISITOR METHODS
 
 	public boolean visit(CompilationUnit node) {
-//		System.err.println("TRACE, DefVisiting CompilationUnit: "+node.getProperty(dico.SOURCE_FILENAME_PROPERTY));
+//		System.out.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
 		Namespace fmx = null;
 		PackageDeclaration pckg = node.getPackage();
 		if (pckg==null) {
@@ -133,6 +135,9 @@ public class VerveineVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	public boolean visit(PackageDeclaration node) {
+		return false; // no need to visit children of the declaration
+	}
 	/**
 	 * creating reference from package of this compilation unit to imported package
 	 * not sure it is a good idea ?!?
@@ -160,14 +165,14 @@ public class VerveineVisitor extends ASTVisitor {
 		Namespace fmxDest = dico.ensureFamixNamespace( (IPackageBinding)importBnd, importName);
 		context.setLastReference( dico.addFamixReference(fmxSrc, fmxDest, context.getLastReference()) );
 		
-		return super.visit(node);
+		return false; // don't visit children
 	}
 
 	/*
 	 * Can only be a class or interface declaration
 	 */
 	public boolean visit(TypeDeclaration node) {
-//		System.err.println("TRACE, DefVisiting TypeDeclaration: "+node.getName().getIdentifier());
+//		System.out.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		@SuppressWarnings("unchecked")
 		List<TypeParameter> tparams = (List<TypeParameter>)node.typeParameters();
@@ -175,7 +180,7 @@ public class VerveineVisitor extends ASTVisitor {
 		if (fmx != null) {
 			fmx.setIsStub(false);
 
-			this.context.pushClass(fmx);
+			this.context.pushType(fmx);
 
 			dico.addSourceAnchor(fmx, node);
 			dico.addFamixAnnotationInstances(bnd, fmx);
@@ -196,12 +201,12 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public void endVisit(TypeDeclaration node) {
-		this.context.popClass();
+		this.context.popType();
 		super.endVisit(node);
 	}
 
 	public boolean visit(ClassInstanceCreation node) {
-//		System.err.println("TRACE, DefVisiting ClassInstanceCreation");
+//		System.err.println("TRACE, Visiting ClassInstanceCreation");
 		fr.inria.verveine.core.gen.famix.Class fmx = null;
 		AnonymousClassDeclaration decl = node.getAnonymousClassDeclaration(); 
 		if (decl != null) {
@@ -212,7 +217,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 				dico.addFamixAnnotationInstances(bnd, fmx);
 				dico.addSourceAnchor(fmx, node);
-				this.context.pushClass(fmx);
+				this.context.pushType(fmx);
 				return super.visit(node);
 			}
 			else {
@@ -226,35 +231,60 @@ public class VerveineVisitor extends ASTVisitor {
 	 * intended to close 'visit(ClassInstanceCreation node)' for just this specific case
 	 */
 	public void endVisit(AnonymousClassDeclaration node) {
-		this.context.popClass();
+		this.context.popType();
+		super.endVisit(node);
+	}
+
+	@SuppressWarnings("unchecked")
+	public boolean visit(EnumDeclaration node) {
+//		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
+		fr.inria.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), context.top());
+		if (fmx != null) {
+			fmx.setIsStub(Boolean.FALSE);
+
+			this.context.pushType(fmx);
+
+			for (EnumConstantDeclaration ecst : (List<EnumConstantDeclaration>)node.enumConstants()) {
+				EnumValue ev = dico.ensureFamixEnumValue(ecst.resolveVariable(), ecst.getName().getIdentifier(), fmx);
+				ev.setIsStub(Boolean.FALSE);
+			}
+			return super.visit(node);
+		}
+		else {
+			return false;
+		}
+	}
+
+	public void endVisit(EnumDeclaration node) {
+		this.context.popType();
 		super.endVisit(node);
 	}
 
 	public boolean visit(AnnotationTypeDeclaration node) {
-//		System.err.println("TRACE, DefVisiting AnnotationTypeDeclaration: "+node.getName().getIdentifier());
+//		System.err.println("TRACE, Visiting AnnotationTypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), context.top());
 		if (fmx != null) {
 			fmx.setIsStub(Boolean.FALSE);
 			
-			context.pushAnnotationType(fmx);
+			context.pushType(fmx);
 			return super.visit(node);
 		}
 		else {
-			context.pushAnnotationType(null);
+			context.pushType(null);
 			return false;
 		}
 	}
 
 	public void endVisit(AnnotationTypeDeclaration node) {
-		this.context.popAnnotationType();
+		this.context.popType();
 		super.endVisit(node);
 	}
 
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
-//		System.err.println("TRACE, DefVisiting AnnotationTypeMemberDeclaration: "+node.getName().getIdentifier());
+//		System.err.println("TRACE, Visiting AnnotationTypeMemberDeclaration: "+node.getName().getIdentifier());
 		IMethodBinding bnd = node.resolveBinding();
-		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), context.topAnnotationType());
+		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType());
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			
@@ -273,26 +303,8 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean visit(EnumDeclaration node) {
-//		System.err.println("TRACE, DefVisiting EnumDeclaration: "+node.getName().getIdentifier());
-		fr.inria.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), context.top());
-		if (fmx != null) {
-			fmx.setIsStub(Boolean.FALSE);
-			
-			for (EnumConstantDeclaration ecst : (List<EnumConstantDeclaration>)node.enumConstants()) {
-				EnumValue ev = dico.ensureFamixEnumValue(ecst.resolveVariable(), ecst.getName().getIdentifier(), fmx);
-				ev.setIsStub(Boolean.FALSE);
-			}
-			return super.visit(node);
-		}
-		else {
-			return false;
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-//		System.err.println("TRACE, DefVisiting MethodDeclaration: "+node.getName().getIdentifier();
+//		System.err.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier();
 		
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
@@ -308,7 +320,7 @@ public class VerveineVisitor extends ASTVisitor {
 			// we reset the return type to its proper value later
 			fmxRetTyp = dico.ensureFamixClassObject(null);
 		}
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/fmxRetTyp, context.topClass());
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/fmxRetTyp, context.topType());
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
@@ -371,10 +383,10 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings({ "unchecked" })
 	public boolean visit(FieldDeclaration node) {
-//		System.err.println("TRACE, DefVisiting FieldDeclaration");
+//		System.err.println("TRACE, Visiting FieldDeclaration");
 
-		fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topClass());
-		for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topClass()) ) {
+		fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topType());
+		for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topType()) ) {
 			dico.addSourceAnchor(att, node);
 			dico.createFamixComment(node.getJavadoc(), att);
 		}
@@ -383,7 +395,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationExpression node) {
-//		System.err.println("TRACE, DefVisiting VariableDeclarationExpression: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
+//		System.err.println("TRACE, Visiting VariableDeclarationExpression: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
 		// we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them 
@@ -399,7 +411,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationStatement node) {
-//		System.err.println("TRACE, DefVisiting VariableDeclarationStatement: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
+//		System.err.println("TRACE, Visiting VariableDeclarationStatement: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
 		// we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them 
@@ -427,7 +439,7 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 			else if (node instanceof FieldDeclaration) {
 				// creating a class' field
-				fmx = dico.ensureFamixAttribute(bnd, name, varTyp, (fr.inria.verveine.core.gen.famix.Class) ctxt);
+				fmx = dico.ensureFamixAttribute(bnd, name, varTyp, (fr.inria.verveine.core.gen.famix.Type) ctxt);
 			}
 			else if ( (node instanceof VariableDeclarationExpression) || (node instanceof VariableDeclarationStatement) ) {
 				// creating a method's local variable
@@ -479,16 +491,16 @@ public class VerveineVisitor extends ASTVisitor {
 		return fmxTyp;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(MethodInvocation node) {
 		Expression callingExpr = node.getExpression();
 		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(callingExpr));
 		if (callingExpr instanceof SimpleName) {
-			// we might have a FieldAccess here
-			IBinding bnd = ((Name) callingExpr).resolveBinding();
-			if ( (bnd != null) && (bnd instanceof IVariableBinding) && ((IVariableBinding)bnd).isField() ){
-				// this is a field access. The field should have been created by 'getReceiver(callingExpr)' above
-				// must still create the field access
-				createAccessedAttribute((IVariableBinding)bnd, /*name*/null, /*type*/null, /*owner*/null, /*accessor*/this.context.topMethod());
+			visitSimpleName((SimpleName) callingExpr);
+		}
+		for (Expression a : (List<Expression>)node.arguments()) {
+			if (a instanceof SimpleName) {
+				visitSimpleName((SimpleName) a);
 			}
 		}
 
@@ -497,7 +509,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(SuperMethodInvocation node) {
-		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topClass(), context.topMethod());
+		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) this.context.topType(), context.topMethod());
 		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver);
 
 		this.context.addTopMethodNOS(1);
@@ -509,8 +521,8 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		String name = context.topMethod().getName();
-		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/context.topClass());  // cast needed to desambiguate the call
-		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, context.topClass(), context.topMethod());
+		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/context.topType());  // cast needed to desambiguate the call
+		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, (Class) context.topType(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
 
@@ -522,7 +534,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*name*/null, /*paramTypes*/(Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/null);  // cast needed to desambiguate the call
-		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, context.topClass(), context.topMethod());
+		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) context.topType(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
 
@@ -564,10 +576,11 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(FieldAccess node) {
+//		System.out.println("TRACE, Visiting FieldAccess: "+node.getName().getIdentifier());
 		BehaviouralEntity accessor = this.context.topMethod();
 		IVariableBinding bnd = node.resolveFieldBinding();
 		// FIXME if bnd == null we have a problem
-		createAccessedAttribute(bnd, node.getName().getIdentifier(), null, null, accessor);
+		createAccessedStructEntity(bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
 
 		return super.visit(node);
 	}
@@ -578,16 +591,30 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(QualifiedName node) {
 		IBinding bnd = node.resolveBinding();
 		if (bnd instanceof IVariableBinding) {
-			if (((IVariableBinding) bnd).isEnumConstant()) {
-				// it is an enumerated constant
-				//TODO record the access to the enumValue
-			}
-			else {
-				// looks like it is a field
-				BehaviouralEntity accessor = this.context.topMethod();
-				createAccessedAttribute((IVariableBinding)bnd, node.getName().getIdentifier(), null, null, accessor);
-			}	
+			// could be a field or an enumValue
+			BehaviouralEntity accessor = this.context.topMethod();
+			createAccessedStructEntity((IVariableBinding)bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
 		}
+		return super.visit(node);
+	}
+
+
+	@SuppressWarnings("unchecked")
+	public boolean visit(InfixExpression node) {
+		if (node.getLeftOperand() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getLeftOperand());
+		}
+		if (node.getRightOperand() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getRightOperand());
+		}
+		if (node.hasExtendedOperands()) {
+			for (Expression op : (List<Expression>)node.extendedOperands()) {
+				if (op instanceof SimpleName) {
+					visitSimpleName((SimpleName) op);
+				}
+			}
+		}
+
 		return super.visit(node);
 	}
 
@@ -597,7 +624,12 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(TypeLiteral node) {
 		fr.inria.verveine.core.gen.famix.Type javaMetaClass = dico.ensureFamixMetaClass(null); 
 		BehaviouralEntity accessor = this.context.topMethod();
-		createAccessedAttribute(null, "class", javaMetaClass, javaMetaClass, accessor);
+
+		Attribute accessed =  dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass);
+		if ( (accessed != null) && (accessor != null) ) {
+			context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+		}
+
 		return super.visit(node);
 	}
 
@@ -623,6 +655,9 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(ThrowStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodNOS(1);
 
 		Method meth = this.context.topMethod();
@@ -634,11 +669,23 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(AssertStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
+		if (node.getMessage() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getMessage());
+		}
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(Assignment node) {
+		if (node.getLeftHandSide() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getLeftHandSide());
+		}
+		if (node.getRightHandSide() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getRightHandSide());
+		}		
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
@@ -649,46 +696,70 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(DoStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(EnhancedForStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(ForStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(IfStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(ReturnStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(SwitchCase node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(SwitchStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(SynchronizedStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
@@ -700,11 +771,32 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(WhileStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	/**
+	 * Deals with expressions that are simple name, e.g. "if (aBool) ..." or "return aVar;"<br>
+	 * Tries to create a StruturalEntity access from this.
+	 * {@link ASTVisitor#visit(SimpleName node)} cannot be used because it would be called all the time, so we need
+	 * to check in all places where such simple expressions may occur and that are of interest to us
+	 * @param expr -- the SimpleName expression
+	 */
+	private void visitSimpleName(SimpleName expr) {
+//		System.out.println("visitSimpleName(): "+expr.getIdentifier());
+		IBinding bnd = expr.resolveBinding();
+		if ( (bnd instanceof IVariableBinding) && (context.topMethod() != null) ) {
+			// could be a variable, a field, an enumValue, ...
+			BehaviouralEntity accessor = this.context.topMethod();
+			createAccessedStructEntity((IVariableBinding)bnd, expr.getIdentifier(), /*typ*/null, /*owner*/null, accessor);
+		}
+	
+	}
+	
 	/**
 	 * Finds and/or create the Famix Entity receiving a message
 	 * Can be: ImplicitVariable (this, super), GlobalVariable, LocalVariable, Attribute, UnknownVariable, Parameter
@@ -715,7 +807,7 @@ public class VerveineVisitor extends ASTVisitor {
 	private NamedEntity getReceiver(Expression expr) {
 		// msg(), same as ThisExpression
 		if (expr == null) {
-			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topClass(), context.topMethod());
+			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod());
 		}
 
 		// array[i].msg()
@@ -758,12 +850,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 		// field.msg()
 		else if (expr instanceof FieldAccess) {
-			Attribute ret = createAccessedAttribute(((FieldAccess) expr).resolveFieldBinding(), ((FieldAccess) expr).getName().getIdentifier(), /*type*/null, /*owner*/null, /*accessor*/null);
-			if ( (ret != null) && (ret.getParentType() == null) && (ret.getName().equals("length")) ) {
-				ret.setParentType(dico.ensureFamixClassArray());
-			}
-
-			return ret;
+			return createAccessedStructEntity(((FieldAccess) expr).resolveFieldBinding(), ((FieldAccess) expr).getName().getIdentifier(), /*type*/null, /*owner*/null, /*accessor*/null);
 		}
 
 		// (left-expr oper right-expr).msg()
@@ -794,12 +881,7 @@ public class VerveineVisitor extends ASTVisitor {
 			else if (bnd instanceof IVariableBinding) {
 				String varName = ( ((Name)expr).isSimpleName() ? ((SimpleName)expr).getFullyQualifiedName() : ((QualifiedName)expr).getName().getIdentifier());
 				if ( ((IVariableBinding)bnd).isField() ) {
-					ret = createAccessedAttribute((IVariableBinding)bnd, varName, /*typ*/null, /*owner*/null, /*accessor*/null);
-					if ( (ret != null) && (((Attribute) ret).getParentType() == null) && (ret.getName().equals("length")) ) {
-						((Attribute) ret).setParentType(dico.ensureFamixClassArray());
-					}
-
-					return ret;
+					return createAccessedStructEntity((IVariableBinding)bnd, varName, /*typ*/null, /*owner*/null, /*accessor*/null);
 				}
 				else if ( ((IVariableBinding)bnd).isParameter() ) {
 					ret = dico.ensureFamixParameter( (IVariableBinding)bnd, varName, null, context.topMethod());
@@ -825,12 +907,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 		// super.field.msg()
 		else if (expr instanceof SuperFieldAccess) {
-			Attribute ret = createAccessedAttribute(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), /*typ*/null, /*owner*/null, /*accessor*/null);
-			if ( (ret != null) && (ret.getParentType() == null) && (ret.getName().equals("length")) ) {
-				ret.setParentType(dico.ensureFamixClassArray());
-			}
-
-			return ret;
+			return createAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), /*typ*/null, /*owner*/null, /*accessor*/null);
 		}
 
 		// super.msg1().msg() -- TODO similar to ClassInstanceCreation, 'msg()' is sent to the object returned by 'msg1()'
@@ -842,7 +919,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// this.msg()
 		else if (expr instanceof ThisExpression) {
-			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topClass(), context.topMethod());
+			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, (Class) this.context.topType(), context.topMethod());
 		}
 
 		// type.class.msg()
@@ -863,18 +940,38 @@ public class VerveineVisitor extends ASTVisitor {
 		return null;
 	}
 
-	private Attribute createAccessedAttribute(IVariableBinding bnd, String attName, fr.inria.verveine.core.gen.famix.Type typ, fr.inria.verveine.core.gen.famix.Type owner, BehaviouralEntity accessor) {
-		Attribute accessed;
-		if (bnd != null) {
+	private StructuralEntity createAccessedStructEntity(IVariableBinding bnd, String name, fr.inria.verveine.core.gen.famix.Type typ, ContainerEntity owner, BehaviouralEntity accessor) {
+		StructuralEntity accessed = null;
+		if (bnd == null) {
+			// no way to know if it should be an attribute, EnumValue, variable, ...
+			return null;
+		}
+		else {
 			bnd = bnd.getVariableDeclaration();
 		}
-		accessed =  dico.ensureFamixAttribute(bnd, attName, typ, owner);
-		if ( (accessed != null) && (accessed.getParentType() == null) && (accessed.getName().equals("length")) ) {
+
+		// could also test: "owner instanceof Enum" in case bnd == null
+		if (bnd.isEnumConstant()) {
+			accessed =  dico.ensureFamixEnumValue(bnd, name, (Enum) owner);
+		}
+		else if (bnd.isField()) {
+			accessed =  dico.ensureFamixAttribute(bnd, name, typ, (fr.inria.verveine.core.gen.famix.Type) owner);
 			// special case: length attribute of arrays in Java
-			accessed.setParentType(dico.ensureFamixClassArray());
+			if ( (accessed != null) && (((Attribute) accessed).getParentType() == null) && (accessed.getName().equals("length")) ) {
+				((Attribute) accessed).setParentType(dico.ensureFamixClassArray());
+			}
+		}
+		else if (bnd.isParameter()) {
+			accessed =  dico.ensureFamixParameter(bnd, name, typ, (Method) owner);
+		}
+		else {
+			// it seems it is a variable.
+			// if it is not already defined, we assume we are not interested
+			accessed =  (StructuralEntity) dico.getEntityByKey(bnd);
 		}
 		
-		if ( (accessed != null) && (accessor != null) ) {
+		// We don't create local accesses
+		if ( (accessed != null) && (accessor != null) && (accessed.getBelongsTo() != accessor)) {
 			context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
 		}
 		return accessed;
