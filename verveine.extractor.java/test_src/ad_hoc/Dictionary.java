@@ -1,9 +1,11 @@
-package ad_hoc;
+Rpackage ad_hoc;
 
 import java.util.Collection;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Map;
+
+import org.hamcrest.core.IsInstanceOf;
 
 public class Dictionary<B> {
 
@@ -34,7 +36,7 @@ public class Dictionary<B> {
 			// nothing
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public <T extends NamedEntity> Collection<T> getEntityByName(Class<T> fmxClass, String name) {
 		Collection<T> ret = new LinkedList<T>();
@@ -45,6 +47,7 @@ public class Dictionary<B> {
 				if (fmxClass.isInstance(obj)) {
 					ret.add((T) obj);
 				}
+				fmxClass.class.isInstance(null);  /// for testing VerveineJ
 			}
 		}
 

@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
 import org.eclipse.jdt.core.dom.ArrayCreation;
+import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.AssertStatement;
 import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
@@ -122,12 +123,7 @@ public class VerveineVisitor extends ASTVisitor {
 			fmx.setIsStub(false);
 		}
 
-		if (pckg != null) {
-			return super.visit(node);
-		}
-		else {
-			return false;
-		}
+		return super.visit(node);
 	}
 
 	public void endVisit(CompilationUnit node) {
@@ -211,7 +207,7 @@ public class VerveineVisitor extends ASTVisitor {
 		AnonymousClassDeclaration decl = node.getAnonymousClassDeclaration(); 
 		if (decl != null) {
 			ITypeBinding bnd = decl.resolveBinding();
-			fmx = (Class) this.dico.ensureFamixType(bnd, /*name*/"anonymous("+dico.findTypeName(node.getType())+")", /*owner*/context.top(), /*ctxt*/context.top());  //  isGeneric = false
+			fmx = (Class) this.dico.ensureFamixType(bnd, /*name*/"anonymous("+findTypeName(node.getType())+")", /*owner*/context.top(), /*ctxt*/context.top());  //  isGeneric = false
 			if (fmx != null) {
 				fmx.setIsStub(false);
 
@@ -309,9 +305,9 @@ public class VerveineVisitor extends ASTVisitor {
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
 
-		Collection<Type> paramTypes = new ArrayList<Type>();
+		Collection<String> paramTypes = new ArrayList<String>();
 		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
-				paramTypes.add(param.getType());
+				paramTypes.add(findTypeName(param.getType()));
 		}
 
 		fr.inria.verveine.core.gen.famix.Type fmxRetTyp = null;
@@ -470,23 +466,23 @@ public class VerveineVisitor extends ASTVisitor {
 		if (typ.isParameterizedType()) {
 			ITypeBinding parameterizedBnd = typ.resolveBinding();
 			ITypeBinding parameterizableBnd = (parameterizedBnd == null) ? null : parameterizedBnd.getErasure();
-			String tname = dico.findTypeName(typ);
+			String tname = findTypeName(typ);
 			ParameterizableClass generic = null;
 			generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, tname, /*owner*/null, /*isGeneric*/true);
 
 			fmxTyp = dico.ensureFamixParameterizedType(parameterizedBnd, tname, generic, /*owner*/ctxt);
 			for (Type targ : (List<Type>) ((ParameterizedType)typ).typeArguments()) {
-				fr.inria.verveine.core.gen.famix.Type fmxTArg = dico.ensureFamixType(targ.resolveBinding(), dico.findTypeName(targ), /*owner*/null, ctxt);
+				fr.inria.verveine.core.gen.famix.Type fmxTArg = dico.ensureFamixType(targ.resolveBinding(), findTypeName(targ), /*owner*/null, ctxt);
 				((fr.inria.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
 			}
 		}
 		else if ( typ.isSimpleType() && (typ.resolveBinding()==null) && (ctxt instanceof Method)) {
 			// might be a wildcardType with no previous "definition"
 			// in this case the owner is this very method
-			fmxTyp = dico.ensureFamixType((ITypeBinding)null, dico.findTypeName(typ), /*owner*/ctxt, ctxt);
+			fmxTyp = dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, ctxt);
 		}
 		else {
-			fmxTyp = dico.ensureFamixType(typ.resolveBinding(), dico.findTypeName(typ), /*owner*/null, ctxt);
+			fmxTyp = dico.ensureFamixType(typ.resolveBinding(), findTypeName(typ), /*owner*/null, ctxt);
 		}
 		return fmxTyp;
 	}
@@ -521,7 +517,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		String name = context.topMethod().getName();
-		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/context.topType());  // cast needed to desambiguate the call
+		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<String>)null, /*retType*/null, /*owner*/context.topType());  // cast needed to desambiguate the call
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, (Class) context.topType(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
@@ -533,7 +529,7 @@ public class VerveineVisitor extends ASTVisitor {
 		this.context.addTopMethodNOS(1);
 		
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
-		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*name*/null, /*paramTypes*/(Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/null);  // cast needed to desambiguate the call
+		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*name*/null, /*paramTypes*/(Collection<String>)null, /*retType*/null, /*owner*/null);  // cast needed to desambiguate the call
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) context.topType(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
@@ -549,9 +545,32 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver) {
 		BehaviouralEntity sender = this.context.topMethod();
-		
-		// checks whether this is really a method
-		if ( (calledBnd != null) && (calledBnd.isAnnotationMember()) ) {
+		Method invoked = null;
+
+		if ( (receiver != null) && (receiver.getName().equals("class")) && (calledBnd != null) && (calledBnd.getDeclaringClass()==null)) {
+			/*bug with JDT*/
+			invoked = (Method) dico.getEntityByKey(calledBnd);
+			if ( (invoked==null) && (sender != null) ) {
+				fr.inria.verveine.core.gen.famix.Class javaMetaClass = dico.ensureFamixMetaClass(null);
+				for (Method m : javaMetaClass.getMethods()) {
+					if (m.getName().equals(calledName)) {
+						invoked = m;
+						break;
+					}
+				}
+				if (invoked == null) {
+					fr.inria.verveine.core.gen.famix.Type retType = dico.ensureFamixType(calledBnd.getReturnType(), /*name*/null, /*owner*/null, /*ctxt*/javaMetaClass);
+					Collection<String> paramTypes = new ArrayList<String>();
+					for (ITypeBinding pt : calledBnd.getParameterTypes()) {
+							paramTypes.add(pt.getName());
+					}
+					invoked = this.dico.ensureFamixMethod(null, calledName, paramTypes, /*retType*/retType, /*owner*/javaMetaClass);
+					dico.mapKey(calledBnd, invoked);
+				}
+			}
+		}
+		else if ( (calledBnd != null) && (calledBnd.isAnnotationMember()) ) {
+			// checks whether this is not an AnnotationType member
 			// similar to creating a FamixAttribute access
 			AnnotationTypeAttribute accessed =  dico.ensureFamixAnnotationTypeAttribute(calledBnd, calledName, /*owner*/null);
 			if ( (accessed != null) && (sender != null) ) {
@@ -560,14 +579,13 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 		else {
 			if (sender != null) {
-				Method invoked = null;
 				if (receiver instanceof StructuralEntity) {
 					fr.inria.verveine.core.gen.famix.Type varTyp = ((StructuralEntity)receiver).getDeclaredType();
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/varTyp);  // cast needed to desambiguate the call
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, /*owner*/varTyp);  // cast needed to desambiguate the call
 				}
 				else {
 					//  static method called on the class (or null receiver)
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<org.eclipse.jdt.core.dom.Type>)null, /*retType*/null, /*owner*/(fr.inria.verveine.core.gen.famix.Type)receiver);  // cast needed to desambiguate the call
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, /*owner*/(fr.inria.verveine.core.gen.famix.Type)receiver);  // cast needed to desambiguate the call
 				}
 				Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation());
 				context.setLastInvocation( invok );
@@ -919,7 +937,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// this.msg()
 		else if (expr instanceof ThisExpression) {
-			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, (Class) this.context.topType(), context.topMethod());
+			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod());
 		}
 
 		// type.class.msg()
@@ -975,6 +993,36 @@ public class VerveineVisitor extends ASTVisitor {
 			context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
 		}
 		return accessed;
+	}
+
+	private String findTypeName(org.eclipse.jdt.core.dom.Type t) {
+		if (t == null) {
+			return null;
+		}
+		
+		if (t.isPrimitiveType()) {
+			return t.toString();
+		}
+		else if (t.isSimpleType()) {
+			return ((SimpleType)t).getName().getFullyQualifiedName();
+		}
+		else if (t.isQualifiedType()) {
+			return ((QualifiedType)t).getName().getIdentifier();
+		}
+		else if (t.isArrayType()) {
+			return findTypeName( ((ArrayType)t).getElementType() );
+		}
+		else if (t.isParameterizedType()) {
+			return findTypeName(((org.eclipse.jdt.core.dom.ParameterizedType)t).getType());
+		}
+		else { // it is a WildCardType
+			if ( ((org.eclipse.jdt.core.dom.WildcardType)t).isUpperBound() ) {
+				return findTypeName( ((org.eclipse.jdt.core.dom.WildcardType)t).getBound() );
+			}
+			else {
+				return JavaDictionary.OBJECT_NAME;
+			}
+		}
 	}
 
 }

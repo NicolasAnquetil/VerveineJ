@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="0" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" tests="19" time="13.182" timestamp="2011-04-19T22:37:35">
+<testsuite errors="0" failures="10" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" tests="19" time="12.463" timestamp="2011-04-23T17:27:47">
   <properties>
     <property name="ant.project.invoked-targets" value="junit" />
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
@@ -74,25 +74,65 @@
     <property name="sun.desktop" value="gnome" />
     <property name="sun.cpu.isalist" value="" />
   </properties>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testEntitiesNumber" time="3.376" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testClassProperties" time="1.437" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testNamedEntities" time="0.965" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInheritance" time="0.621" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMethodProperties" time="0.764" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testFieldType" time="0.797" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testStubs" time="0.481" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testParameter" time="0.399" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testImplicitVar" time="0.394" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInvocation" time="0.387" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAccess" time="0.387" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testSourceAnchors" time="0.38" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testModifiers" time="0.385" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testComment" time="0.385" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMetric" time="0.371" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAnnotation" time="0.376" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAssociation" time="0.378" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testBelongsTo" time="0.376" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testJavaCore" time="0.367" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testEntitiesNumber" time="3.442">
+    <failure message="expected:&lt;47&gt; but was:&lt;26&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;47&gt; but was:&lt;26&gt;
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testEntitiesNumber(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testClassProperties" time="1.136">
+    <failure message="expected:&lt;11&gt; but was:&lt;9&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;11&gt; but was:&lt;9&gt;
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testClassProperties(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testNamedEntities" time="0.914" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInheritance" time="0.812" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMethodProperties" time="0.453">
+    <failure type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: 
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testMethodProperties(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testFieldType" time="0.462" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testStubs" time="0.445" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testParameter" time="0.421">
+    <failure message="Wrong number of parameter for method Node.printOn() expected:&lt;1&gt; but was:&lt;2&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: Wrong number of parameter for method Node.printOn() expected:&lt;1&gt; but was:&lt;2&gt;
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testParameter(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testImplicitVar" time="0.398">
+    <failure message="Test for SELF did not run, cause: SingleDestinationAddress.isDestinationFor() method not found" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: Test for SELF did not run, cause: SingleDestinationAddress.isDestinationFor() method not found
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testImplicitVar(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInvocation" time="0.388">
+    <failure message="Wrong number of outgoing invocation for Node.accept(Packet) expected:&lt;1&gt; but was:&lt;12&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: Wrong number of outgoing invocation for Node.accept(Packet) expected:&lt;1&gt; but was:&lt;12&gt;
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testInvocation(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAccess" time="0.41">
+    <failure type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: 
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testAccess(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testSourceAnchors" time="0.381" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testModifiers" time="0.375">
+    <failure message="expected:&lt;3&gt; but was:&lt;0&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;3&gt; but was:&lt;0&gt;
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testModifiers(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testComment" time="0.378" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMetric" time="0.371">
+    <failure message="expected:&lt;1&gt; but was:&lt;2&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;1&gt; but was:&lt;2&gt;
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testMetric(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAnnotation" time="0.379">
+    <failure message="expected:&lt;5&gt; but was:&lt;3&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;5&gt; but was:&lt;3&gt;
+	at tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.testAnnotation(Unknown Source)
+</failure>
+  </testcase>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAssociation" time="0.377" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testBelongsTo" time="0.377" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testJavaCore" time="0.363" />
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
