@@ -63,6 +63,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String INSTANCE_INIT_BLOCK_NAME = "<InstanceInitializer>";
 	public static final String STATIC_INIT_BLOCK_NAME = "<StaticInitializer>";
 
+	public void mapKey(IBinding bnd, NamedEntity fmx) {
+		mapToKey.put(bnd, fmx);
+	}
+
 	/**
 	 * @param famixRepo
 	 */
@@ -318,7 +322,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		ContainerEntity owner = null;
 		IMethodBinding parentMtd = bnd.getDeclaringMethod();
 		if (parentMtd != null) {
-			owner = this.ensureFamixMethod(parentMtd, /*name*/null, /*paramTypes*/(Collection<org.eclipse.jdt.core.dom.Type>)null, /*retTyp*/null, /*owner*/null);  // cast needed to desambiguate the call
+			owner = this.ensureFamixMethod(parentMtd, /*name*/null, /*paramTypes*/(Collection<String>)null, /*retTyp*/null, /*owner*/null);  // cast needed to desambiguate the call
 		}
 		else {
 			ITypeBinding parentClass = bnd.getDeclaringClass();
@@ -996,7 +1000,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Params: see {@link Dictionary#ensureFamixMethod(Object, String, String, Type, Type)}.
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<org.eclipse.jdt.core.dom.Type> paramTypes, Type ret, Type owner) {
+	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type ret, Type owner) {
 		Method fmx = null;
 		String sig;
 		boolean first;
@@ -1008,12 +1012,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		sig = "(";
 		first = true;
 		if (paramTypes != null) {
-			for (org.eclipse.jdt.core.dom.Type t : paramTypes) {
+			for (String t : paramTypes) {
 				if (! first) {
-					sig += "," + findTypeName(t);
+					sig += "," + t;
 				}
 				else {
-					sig += findTypeName(t);
+					sig += t;
 					first = false;
 				}
 			}
@@ -1056,7 +1060,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		if (paramTypes == null) {
 			sig = "(";
 			first = true;
-			paramTypes = new ArrayList<org.eclipse.jdt.core.dom.Type>();
 			for (ITypeBinding parBnd : bnd.getParameterTypes()) {
 				if (! first) {
 					sig += "," + parBnd.getName();
@@ -1087,7 +1090,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				delayedRetTyp = true;
 			}
 			else {
-				ret = this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/null, owner);
+				ret = this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/null, /*ctxt*/owner);
 			}
 		}
 		// else leave it to null ...
@@ -1125,41 +1128,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		if (fmx!=null) {
 			setNamedEntityModifiers(fmx, bnd.getModifiers());
 			if (delayedRetTyp) {
-				fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/null, owner));
+				fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/fmx, /*ctxt*/owner));
 			}
 		}
 
 		return fmx;
-	}
-	
-	public String findTypeName(org.eclipse.jdt.core.dom.Type t) {
-		if (t == null) {
-			return null;
-		}
-		
-		if (t.isPrimitiveType()) {
-			return t.toString();
-		}
-		else if (t.isSimpleType()) {
-			return ((SimpleType)t).getName().getFullyQualifiedName();
-		}
-		else if (t.isQualifiedType()) {
-			return ((QualifiedType)t).getName().getIdentifier();
-		}
-		else if (t.isArrayType()) {
-			return findTypeName( ((ArrayType)t).getElementType() );
-		}
-		else if (t.isParameterizedType()) {
-			return findTypeName(((org.eclipse.jdt.core.dom.ParameterizedType)t).getType());
-		}
-		else { // it is a WildCardType
-			if ( ((org.eclipse.jdt.core.dom.WildcardType)t).isUpperBound() ) {
-				return findTypeName( ((org.eclipse.jdt.core.dom.WildcardType)t).getBound() );
-			}
-			else {
-				return OBJECT_NAME;
-			}
-		}
 	}
 
 	/**
@@ -1285,7 +1258,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- owner
 		if (owner == null) {
-			owner = ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
+			owner = ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<String>)null, null, null);  // cast needed to desambiguate the call
 		}
 		
 		// --------------- recover from name ?
@@ -1344,7 +1317,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- owner
 		if (owner == null) {
-			owner = ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, null);  // cast needed to desambiguate the call
+			owner = ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<String>)null, null, null);  // cast needed to desambiguate the call
 		}
 		
 		// --------------- recover from name ?
@@ -1441,7 +1414,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return the Famix Method
 	 */
 	public Method ensureFamixStubMethod(String name) {
-		return ensureFamixMethod(null, name, (Collection<org.eclipse.jdt.core.dom.Type>)null, null, ensureFamixClassStubOwner());  // cast needed to desambiguate the call
+		return ensureFamixMethod(null, name, (Collection<String>)null, null, ensureFamixClassStubOwner());  // cast needed to desambiguate the call
 	}
 
 	/**
