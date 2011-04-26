@@ -1,4 +1,4 @@
-Rpackage ad_hoc;
+// No package declaration on purpose
 
 import java.util.Collection;
 import java.util.Hashtable;

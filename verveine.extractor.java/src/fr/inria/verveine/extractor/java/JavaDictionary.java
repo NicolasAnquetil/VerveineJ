@@ -91,17 +91,23 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		if ( (name == null) && (bnd != null) ) {
 			name = bnd.getName();
 		}
-		
-		if (name.length() > 0) {
+
+		if (name.equals("")) {
+			return ensureFamixNamespaceDefault();
+		}
+		else {
 			/* Note: Packages are created with their fully-qualified name to simplify recovering them when we don't have a binding
 			 * (for example when creating parent packages of a package we have a binding for).
 			 * Because the preferred solution in Moose is to give their simple names to packages, they must be post-processed when
 			 * all is said and done. */
 			fmx = super.ensureFamixNamespace( bnd, name);
-			parent = ensureFamixNamespace(null, removeLastName(name));
-			// set the parentscope relationship
-			if ( (parent != null) && (fmx != null) && (fmx.getParentScope() == null)) {
-				parent.addChildScopes(fmx);
+			String parentName = removeLastName(name);
+			if (parentName.length() > 0) {
+				parent = ensureFamixNamespace(null, parentName);
+				// set the parentscope relationship
+				if ( (parent != null) && (fmx != null) && (fmx.getParentScope() == null)) {
+					parent.addChildScopes(fmx);
+				}
 			}
 		}
 
