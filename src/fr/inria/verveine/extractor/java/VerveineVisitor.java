@@ -122,6 +122,7 @@ public class VerveineVisitor extends ASTVisitor {
 			fmx = dico.ensureFamixNamespace(pckg.resolveBinding(), pckg.getName().getFullyQualifiedName());
 			fmx.setIsStub(false);
 		}
+		this.context.pushPckg(fmx);
 
 		return super.visit(node);
 	}
@@ -134,6 +135,7 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(PackageDeclaration node) {
 		return false; // no need to visit children of the declaration
 	}
+
 	/**
 	 * creating reference from package of this compilation unit to imported package
 	 * not sure it is a good idea ?!?

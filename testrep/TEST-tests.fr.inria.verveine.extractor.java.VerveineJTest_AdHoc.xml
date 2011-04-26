@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="4" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" tests="16" time="6.069" timestamp="2011-04-23T17:28:00">
+<testsuite errors="0" failures="0" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" tests="16" time="5.816" timestamp="2011-04-25T22:44:08">
   <properties>
     <property name="ant.project.invoked-targets" value="junit" />
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
@@ -74,38 +74,166 @@
     <property name="sun.desktop" value="gnome" />
     <property name="sun.cpu.isalist" value="" />
   </properties>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testConstructorInvocations" time="2.292" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testDictionary" time="0.367">
-    <failure message="expected:&lt;7&gt; but was:&lt;6&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;7&gt; but was:&lt;6&gt;
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.testDictionary(Unknown Source)
-</failure>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testExceptions" time="0.355" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAnnotation" time="0.357">
-    <failure message="expected:&lt;11&gt; but was:&lt;10&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;11&gt; but was:&lt;10&gt;
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.testAnnotation(Unknown Source)
-</failure>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testClassVar" time="0.282" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterizableClass" time="0.331" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterTypeAsType" time="0.291" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodParameterArgumentTypes" time="0.222" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodLocalVariableArgumentTypes" time="0.176" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodReturnArgumentTypes" time="0.215" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumDecl" time="0.213">
-    <failure message="expected:&lt;8&gt; but was:&lt;7&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;8&gt; but was:&lt;7&gt;
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.testEnumDecl(Unknown Source)
-</failure>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumAccess" time="0.159">
-    <failure message="expected:&lt;8&gt; but was:&lt;7&gt;" type="junit.framework.AssertionFailedError">junit.framework.AssertionFailedError: expected:&lt;8&gt; but was:&lt;7&gt;
-	at tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc.testEnumAccess(Unknown Source)
-</failure>
-  </testcase>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testStaticInitializationBlock" time="0.173" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAssociation" time="0.139" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testBelongsTo" time="0.261" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testJavaCore" time="0.168" />
-  <system-out><![CDATA[]]></system-out>
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testConstructorInvocations" time="2.064" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testDictionary" time="0.389" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testExceptions" time="0.456" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAnnotation" time="0.382" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testClassVar" time="0.243" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterizableClass" time="0.315" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterTypeAsType" time="0.277" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodParameterArgumentTypes" time="0.245" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodLocalVariableArgumentTypes" time="0.182" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodReturnArgumentTypes" time="0.174" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumDecl" time="0.238" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumAccess" time="0.272" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testStaticInitializationBlock" time="0.167" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAssociation" time="0.118" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testBelongsTo" time="0.097" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testJavaCore" time="0.101" />
+  <system-out><![CDATA[  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadException.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/GetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Book.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/SetProperty.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/annotations/Serializer.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Dictionary.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Planet.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/Card.java *******
+  TRACE, Requestor is visiting : /home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/test_src/ad_hoc/ReadClient.java *******
+]]></system-out>
   <system-err><![CDATA[]]></system-err>
 </testsuite>
