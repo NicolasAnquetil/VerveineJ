@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
@@ -15,8 +14,6 @@ import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Modifier;
-import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.SimpleType;
 
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.Dictionary;
@@ -60,11 +57,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String METACLASS_NAME = "Class";
 	public static final String OBJECT_PACKAGE_NAME = "java.lang";
 	public static final String ARRAYS_NAME = "default[]";
-	public static final String INSTANCE_INIT_BLOCK_NAME = "<InstanceInitializer>";
-	public static final String STATIC_INIT_BLOCK_NAME = "<StaticInitializer>";
+	public static final String INIT_BLOCK_NAME = "<Initializer>";
 
 	public void mapKey(IBinding bnd, NamedEntity fmx) {
-		mapToKey.put(bnd, fmx);
+		super.mapEntityToKey(bnd, fmx);
 	}
 
 	/**
@@ -703,13 +699,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// Not sure it does actually happen
 			return false;
 		}
-		else if (mapToKey.containsValue(candidate)) {
+		else if (getEntityKey(candidate) != null) {
 			// candidate already bound, and not to this binding
 			return false;
 		}
-		
+
 		// names are equals and bnd is not mapped, so let's do it
-		mapToKey.put(bnd, candidate);
+		mapEntityToKey(bnd, candidate);
 		return true;
 	}
 
@@ -747,20 +743,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// Not sure it does actually happen
 			return false;
 		}
-		else if (mapToKey.containsValue(candidate)) {
+		else if (getEntityKey(candidate) != null) {
 			// candidate already bound, and not to this binding
 			return false;
 		}
 
 		if ( bnd.isPrimitive() && (candidate instanceof PrimitiveType) ) {
 			// names are equal so it's OK
-			mapToKey.put(bnd, candidate);
+			mapEntityToKey(bnd, candidate);
 			return true;
 		}
 
 		if (bnd.isAnnotation() && (candidate instanceof AnnotationType) ) {
 			if (checkAndMapNamespace(bnd.getPackage(), (Namespace) candidate.getBelongsTo())) {
-				mapToKey.put(bnd, candidate);
+				mapEntityToKey(bnd, candidate);
 				return true;
 			}
 			else {
@@ -816,7 +812,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// Not sure it does actually happen
 			return false;
 		}
-		else if (mapToKey.containsValue(candidate)) {
+		else if (getEntityKey(candidate) != null) {
 			// candidate already bound, and not to this binding
 			return false;
 		}
@@ -847,7 +843,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// Not sure it does actually happen
 			return false;
 		}
-		else if (mapToKey.containsValue(candidate)) {
+		else if (getEntityKey(candidate) != null) {
 			// candidate already bound, and not to this binding
 			return false;
 		}
@@ -891,7 +887,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		ITypeBinding ownerBnd = bnd.getDeclaringClass();
 		NamedEntity candidateOwner = candidate.getBelongsTo();
 		if (checkAndMapType(ownerBnd, (Type)candidateOwner)) {
-			mapToKey.put(bnd, candidate);
+			mapEntityToKey(bnd, candidate);
 			return true;
 		}
 		else {
@@ -919,16 +915,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		else if (bound != null) {
 			return false;
 		}
-		else if (mapToKey.containsValue(candidate)) {
+		else if (getEntityKey(candidate) != null) {
 			// candidate already bound, and not to this binding
 			return false;
 		}
 
 		ContainerEntity candidateOwner = candidate.getBelongsTo();
+		// local variable or parameter ?
 		IMethodBinding methBnd = bnd.getDeclaringMethod();
 		if ( (methBnd != null) && (candidateOwner instanceof Method) ) {
 			if ( checkAndMapMethod(methBnd, (Method)candidateOwner) ) {
-				mapToKey.put(bnd, candidate);
+				mapEntityToKey(bnd, candidate);
 				return true;
 			}
 			else {
@@ -936,15 +933,19 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			}
 		}
 
+		// field ?
 		ITypeBinding typBnd = bnd.getDeclaringClass();
 		// in case of anArray.length ...
+		if ((candidateOwner==null)||(candidateOwner.getName()==null)) {
+			candidateOwner=null;
+		}
 		if ( (typBnd == null) && (candidateOwner.getName().equals(JavaDictionary.ARRAYS_NAME)) ) {
-			mapToKey.put(bnd, candidate);
+			mapEntityToKey(bnd, candidate);
 			return true;
 		}
 		else if ( (candidateOwner instanceof Type) &&
 				  (checkAndMapType(typBnd, (Type)candidateOwner)) ) {
-			mapToKey.put(bnd, candidate);
+			mapEntityToKey(bnd, candidate);
 			return true;
 		}
 		else {
@@ -967,7 +968,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		IMethodBinding methBnd = bnd.getDeclaringMethod(); // for classes, can other types be declared in methods?
 		if ( (methBnd != null) && (candidateOwner instanceof Method) ) {
 			if ( checkAndMapMethod(methBnd, (Method)candidateOwner) ) {
-				mapToKey.put(bnd, candidate);
+				mapEntityToKey(bnd, candidate);
 				return true;
 			}
 			else {
@@ -979,7 +980,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		ITypeBinding classBnd = bnd.getDeclaringClass();
 		if ( (classBnd != null) && (candidateOwner instanceof fr.inria.verveine.core.gen.famix.Class) ) {
 			if ( checkAndMapClass(classBnd, (Type)candidateOwner) ) {
-				mapToKey.put(bnd, candidate);
+				mapEntityToKey(bnd, candidate);
 				return true;
 			}
 			else {
@@ -991,7 +992,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		IPackageBinding pckgBnd = bnd.getPackage();
 		if ( (candidateOwner instanceof Namespace) &&
 			 (checkAndMapNamespace(pckgBnd, (Namespace)candidateOwner)) ) {
-			mapToKey.put(bnd, candidate);
+			mapEntityToKey(bnd, candidate);
 			return true;
 		}
 		else {

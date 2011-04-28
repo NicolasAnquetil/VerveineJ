@@ -38,6 +38,7 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
+import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
@@ -302,7 +303,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-//		System.err.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier();
+//		System.out.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier();
 		
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
@@ -378,6 +379,51 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 		super.endVisit(node);
 	}
+
+	@Override
+	public boolean visit(Initializer node) {
+//		System.out.println("TRACE, Visiting Initializer: ");
+		
+		Collection<String> paramTypes = new ArrayList<String>();
+
+		Method fmx = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, paramTypes, /*retType*/null, context.topType());
+
+		if (fmx != null) {
+			fmx.setIsStub(false);
+
+			this.context.pushMethod(fmx);
+			dico.addSourceAnchor(fmx, node);
+			dico.createFamixComment(node.getJavadoc(), fmx);
+
+			if (node.getBody() != null) {
+				context.setTopMethodCyclo(1);
+			}
+
+			return super.visit(node);
+		}
+		else {
+			this.context.pushMethod(null);
+			return false;
+		}
+	}
+
+
+	@Override
+	public void endVisit(Initializer node) {
+		int cyclo = 0;
+		int nos = 0;
+		if (context.topMethod() != null) {
+			cyclo = context.getTopMethodCyclo();
+			nos = context.getTopMethodNOS();
+		}
+		Method fmx = this.context.popMethod();
+		if (fmx != null) {
+			fmx.setNOS(nos);
+			fmx.setCyclo(cyclo);
+		}
+		super.endVisit(node);
+	}
+
 
 	@SuppressWarnings({ "unchecked" })
 	public boolean visit(FieldDeclaration node) {

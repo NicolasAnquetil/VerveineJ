@@ -25,13 +25,14 @@ public class FamixRequestor extends FileASTRequestor {
 	}
 
 	public void acceptAST(String sourceFilePath, CompilationUnit ast) {
-		System.out.println("VerveineJ processing file: "+sourceFilePath);
+		String path = relativePath(sourceFilePath);
+		System.out.println("VerveineJ processing file: "+path);
 		
-		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, relativePath(sourceFilePath));
+		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		ast.accept(new VerveineVisitor(this.famixDictionnary));
 	}
 
-	private Object relativePath(String fullPath) {
+	private String relativePath(String fullPath) {
 		for (String f : argsFile) {
 			if (fullPath.endsWith(f)) {
 				return f;
