@@ -409,6 +409,13 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testStaticInitializationBlock() {
-		//fail("must test static initialization block");
+		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "<Initializer>");
+		assertNotNull(meth);
+		assertEquals("<Initializer>()", meth.getSignature());
+
+		fr.inria.verveine.core.gen.famix.Class card = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Card");
+		assertSame(card, meth.getParentType());
+		
+		assertEquals(3, meth.getOutgoingInvocations().size());
 	}
 }
