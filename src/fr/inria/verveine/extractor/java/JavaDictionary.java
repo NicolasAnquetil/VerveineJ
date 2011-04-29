@@ -1454,7 +1454,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	public fr.inria.verveine.core.gen.famix.Class ensureFamixMetaClass(ITypeBinding bnd) {
 		Namespace javaLang = ensureFamixNamespaceJavaLang( (bnd == null) ? null : bnd.getPackage());
-		fr.inria.verveine.core.gen.famix.Class fmx =  ensureFamixClass(bnd, METACLASS_NAME, javaLang, /*isGeneric*/true);
+		fr.inria.verveine.core.gen.famix.Class fmx =  ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true);
 
 		if ( (fmx != null) && (fmx.getSuperInheritances() == null) ) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, null);
