@@ -209,7 +209,7 @@ public class VerveineVisitor extends ASTVisitor {
 		AnonymousClassDeclaration decl = node.getAnonymousClassDeclaration(); 
 		if (decl != null) {
 			ITypeBinding bnd = decl.resolveBinding();
-			fmx = (Class) this.dico.ensureFamixType(bnd, /*name*/"anonymous("+findTypeName(node.getType())+")", /*owner*/context.top(), /*ctxt*/context.top());  //  isGeneric = false
+			fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+findTypeName(node.getType())+")", /*owner*/context.top(), /*isGeneric*/false);
 			if (fmx != null) {
 				fmx.setIsStub(false);
 
