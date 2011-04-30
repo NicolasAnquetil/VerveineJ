@@ -188,6 +188,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testParameterizableClass() {
+		assertEquals(8, TestVerveineUtils.selectElementsOfType(repo, ParameterizableClass.class).size()); //Class,Comparable,List,ArrayList,Collection,Map,Iterable,Dictionary
+
 		ParameterizableClass dico = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Dictionary");
 		assertNotNull(dico);
 		assertEquals("Dictionary", dico.getName());

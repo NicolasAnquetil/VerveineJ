@@ -33,6 +33,7 @@ import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.Parameter;
+import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
@@ -117,6 +118,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size()); //Override
 		assertEquals(2,     TestVerveineUtils.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
+		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, ParameterizableClass.class).size()); //Comparable
 	}
 
 	@Test
