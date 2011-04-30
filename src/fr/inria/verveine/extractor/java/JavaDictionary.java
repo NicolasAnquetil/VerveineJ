@@ -23,7 +23,6 @@ import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
 import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
-import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.Comment;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.Enum;
@@ -41,6 +40,7 @@ import fr.inria.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceAnchor;
 import fr.inria.verveine.core.gen.famix.SourcedEntity;
+import fr.inria.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.core.gen.famix.UnknownVariable;
 
@@ -59,7 +59,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String ARRAYS_NAME = "default[]";
 	public static final String INIT_BLOCK_NAME = "<Initializer>";
 
-	public void mapKey(IBinding bnd, NamedEntity fmx) {
+	// result of utility methods for checking mathcing between two entities
+	private enum CheckResult {
+		MATCH, UNDECIDED, FAIL;
+	}
+
+  	public void mapKey(IBinding bnd, NamedEntity fmx) {
 		super.mapEntityToKey(bnd, fmx);
 	}
 
@@ -260,17 +265,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			return ensureFamixClassObject(bnd);
 		}
 
-		// --------------- recover from name ?
-		for (Type candidate : this.getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, name)) {
-			if ( checkAndMapClass(bnd, candidate) ) {
-				fmx = (Class) candidate;
-				break;
-			}
-		}
-
 		// --------------- owner
 		if (owner == null) {
 			owner = ensureOwner(bnd);
+		}
+
+		// --------------- recover from name ?
+		for (fr.inria.verveine.core.gen.famix.Class candidate : this.getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, name)) {
+			if ( checkAndMapClass(bnd, name, owner, candidate) ) {
+				fmx = candidate;
+				break;
+			}
 		}
 
 		// --------------- superclasses (including interfaces)
@@ -390,7 +395,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (ParameterizedType candidate : getEntityByName(ParameterizedType.class, name) ) {
-			if ( checkAndMapType(bnd, candidate) ) {
+			if ( checkAndMapType(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -443,7 +448,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (fr.inria.verveine.core.gen.famix.Enum candidate : getEntityByName(fr.inria.verveine.core.gen.famix.Enum.class, name) ) {
-			if ( checkAndMapType(bnd, candidate) ) {
+			if ( checkAndMapType(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -492,7 +497,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		// --------------- recover from name ?
 		for (EnumValue candidate : getEntityByName(EnumValue.class, name) ) {
-			if ( checkAndMapVariable(bnd, candidate) ) {
+			if ( checkAndMapVariable(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -543,7 +548,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (AnnotationType candidate : getEntityByName(AnnotationType.class, name) ) {
-			if ( checkAndMapType(bnd, candidate) ) {
+			if ( checkAndMapType(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -592,7 +597,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (AnnotationTypeAttribute candidate : getEntityByName(AnnotationTypeAttribute.class, name) ) {
-			if ( checkAndMapMethod(bnd, candidate) ) {
+			// JDT treats annotation type attributes as methods ...
+			// checkAndMapMethod wants a signature as 2nd argument so we add empty param list
+			if ( checkAndMapMethod(bnd, name+"()", null, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -665,7 +672,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (Type candidate : this.getEntityByName(Type.class, name)) {
-			if ( checkAndMapType(bnd, candidate) ) {
+			if ( checkAndMapType(bnd, name, owner, candidate) ) {
 				fmx = (ParameterType) candidate;
 				break;
 			}
@@ -681,31 +688,31 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Checks whether the existing unmapped Famix Namespace matches the binding.
 	 * Checks that the candidate has the same name as the JDT bound package, and checks recursively that owners also match.
 	 * @param bnd -- a JDT binding that we are trying to match to the candidate
+	 * @param ent TODO
+	 * @param owner TODO
 	 * @param candidate -- a Famix Entity
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean checkAndMapNamespace(IPackageBinding bnd, Namespace candidate) {
-		if (! bnd.getName().equals(candidate.getName())) {
+	private boolean checkAndMapNamespace(IPackageBinding bnd, String name, Namespace owner, NamedEntity candidate) {
+		if (! (candidate instanceof Namespace) ) {
 			return false;
 		}
 
-		NamedEntity bound = getEntityByKey(bnd); 
-		if (bound == candidate) {
+		// check whether bnd and candidate are already bound
+		CheckResult res = checkKeyMatch(bnd, candidate);
+		if (res == CheckResult.MATCH) {
 			return true;
 		}
-		else if (bound != null) {
-			// already bound to something else
-			// May be should continue to see if we need to merge two FamixEntities representing the same thing .... ?
-			// Not sure it does actually happen
-			return false;
-		}
-		else if (getEntityKey(candidate) != null) {
-			// candidate already bound, and not to this binding
+		else if (res == CheckResult.FAIL) {
 			return false;
 		}
 
-		// names are equals and bnd is not mapped, so let's do it
-		mapEntityToKey(bnd, candidate);
+		if (checkNameMatch(bnd, name, candidate) == CheckResult.FAIL) {
+			return false;
+		}
+
+		// names match, not need to look at owner because names of Namespaces are their fully qualified name
+		conditionalMapToKey(bnd, candidate);
 		return true;
 	}
 
@@ -714,49 +721,63 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Checks that the candidate has the same name as the JDT bound type, and checks recursively that owners also match.
 	 * We also check that the actual class of the candidate matches (can be a sub-class of FamixType). 
 	 * @param bnd -- a JDT binding that we are trying to match to the candidate
+	 * @param owner TODO
+	 * @param fmxType TODO
 	 * @param candidate -- a Famix NamedEntity (Class, Type, PrimitiveType, Enum, AnnotationType)
+	 * @param ent TODO
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean checkAndMapType(ITypeBinding bnd, NamedEntity candidate) {
-		if (bnd.isArray()) {
-			bnd = bnd.getElementType();
+	private boolean checkAndMapType(ITypeBinding bnd, String name, ContainerEntity owner, NamedEntity candidate) {
+		if (! (candidate instanceof Type) ) {
+			return false;
 		}
 
-		String bndName;
-		if (bnd.isParameterizedType()) {
-			bndName = bnd.getErasure().getName();
+		// check whether bnd and candidate are already bound
+		CheckResult res = checkKeyMatch(bnd, candidate);
+		if (res == CheckResult.MATCH) {
+			return true;
+		}
+		else if (res == CheckResult.FAIL) {
+			return false;
+		}
+
+		if ( (bnd != null) && (bnd.isArray()) ) {
+				bnd = bnd.getElementType();
+		}
+
+		// checking names
+		if ( (bnd != null) && (bnd.isParameterizedType()) ) {
+			name = bnd.getErasure().getName();
 		}
 		else {
-			bndName = bnd.getName();
+			name = bnd.getName();
 		}
-		if (! bndName.equals(candidate.getName())) {
+		if (checkNameMatch(null, name, candidate) == CheckResult.FAIL) {
 			return false;
 		}
 
-		NamedEntity bound = getEntityByKey(bnd); 
-		if (bound == candidate) {
-			return true;
-		}
-		else if (bound != null) {
-			// already bound to something else
-			// May be should continue to see if we need to merge two FamixEntities representing the same thing .... ?
-			// Not sure it does actually happen
-			return false;
-		}
-		else if (getEntityKey(candidate) != null) {
-			// candidate already bound, and not to this binding
-			return false;
+		// special case of primitive types
+		if (candidate instanceof PrimitiveType) {
+			if ( (bnd != null) && bnd.isPrimitive() ) {
+				// names are equal so it's OK
+				conditionalMapToKey(bnd, candidate);
+				return true;
+			}
+			else if ( (bnd == null) && (owner == null) ) {
+				return true;
+			}
 		}
 
-		if ( bnd.isPrimitive() && (candidate instanceof PrimitiveType) ) {
-			// names are equal so it's OK
-			mapEntityToKey(bnd, candidate);
-			return true;
+		// check owners without bnd
+		if (bnd == null) {
+			return checkAndMapTypeOwner(bnd, owner, (Type) candidate);
 		}
-
-		if (bnd.isAnnotation() && (candidate instanceof AnnotationType) ) {
-			if (checkAndMapNamespace(bnd.getPackage(), (Namespace) candidate.getBelongsTo())) {
-				mapEntityToKey(bnd, candidate);
+		
+		// check owners with bnd
+		// type is an annotation
+		if (bnd.isAnnotation() && (candidate instanceof AnnotationType)) {
+			if (checkAndMapNamespace(bnd.getPackage(), owner.getName(), (Namespace)owner.getBelongsTo(), candidate.getBelongsTo())) {
+				conditionalMapToKey(bnd, candidate);
 				return true;
 			}
 			else {
@@ -764,17 +785,23 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			}
 		}
 
+		// check owners with bnd
+		// type is a Parameterized type
 		if (bnd.isParameterizedType() && (candidate instanceof ParameterizedType)) {
-			return checkAndMapTypeOwner(bnd, (Type) candidate);
+			return checkAndMapTypeOwner(bnd, owner, (Type) candidate);
 		}
 
+		// check owners with bnd
+		// type is an Enum
 		if (bnd.isEnum() && (candidate instanceof Enum)) {
-			return checkAndMapTypeOwner(bnd, (Type) candidate);
+			return checkAndMapTypeOwner(bnd, owner, (Type) candidate);
 		}
 
+		// check owners with bnd
+		// type is something elae (a class or interface)
 		// Annotation are interfaces too, so we should check this one after isAnnotation
-		if ( bnd.isClass() || bnd.isInterface() || bnd.isEnum() ) {
-			return checkAndMapClass(bnd, (Type) candidate);
+		if ( bnd.isClass() || bnd.isInterface() ) {
+			return checkAndMapClass(bnd, name, owner, (Type) candidate);
 		}
 
 		return false;
@@ -784,40 +811,32 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Checks whether the existing unmapped Famix Class (or Interface or Enum) matches the binding.
 	 * Checks that the candidate has the same name as the JDT bound type, and checks recursively that owners also match.
 	 * @param bnd -- a JDT binding that we are trying to match to the candidate
+	 * @param name TODO
+	 * @param owner TODO
+	 * @param fmxType TODO
 	 * @param candidate -- a Famix Entity
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean checkAndMapClass(ITypeBinding bnd, Type candidate) {
-		if (! bnd.getName().equals(candidate.getName())) {
-			return false;
-		}
-		
-		NamedEntity bound = getEntityByKey(bnd); 
-		if (bound == candidate) {
-			if ( (bnd.isClass() || bnd.isInterface()) && (! (candidate instanceof fr.inria.verveine.core.gen.famix.Class)) ) {
-				System.err.println("JavaDictionary.checkAndMapClass() found a FamixType that should be a FamixClass: "+candidate.getName());
-				return false;
-			}
-			else if ( bnd.isEnum() && (! (candidate instanceof fr.inria.verveine.core.gen.famix.Enum)) ) {
-				System.err.println("JavaDictionary.checkAndMapClass() found a FamixType that should be a FamixEnum: "+candidate.getName());
-				return false;
-			}
-			else {
-				return true;
-			}
-		}
-		else if (bound != null) {
-			// already bound to something else
-			// May be should continue to see if we need to merge two FamixEntities representing the same thing .... ?
-			// Not sure it does actually happen
-			return false;
-		}
-		else if (getEntityKey(candidate) != null) {
-			// candidate already bound, and not to this binding
+	private boolean checkAndMapClass(ITypeBinding bnd, String name, ContainerEntity owner, Type candidate) {
+		if (! (candidate instanceof fr.inria.verveine.core.gen.famix.Class)) {
 			return false;
 		}
 
-			return checkAndMapTypeOwner(bnd, candidate);
+		// check whether bnd and candidate are already bound
+		CheckResult res = checkKeyMatch(bnd, candidate);
+		if (res == CheckResult.MATCH) {
+			return true;
+		}
+		else if (res == CheckResult.FAIL) {
+			return false;
+		}
+
+		if (checkNameMatch(bnd, name, candidate) == CheckResult.FAIL) {
+			return false;
+		}
+
+		// checking owner
+		return checkAndMapTypeOwner(bnd, owner, candidate);
 	}
 
 	/**
@@ -825,69 +844,92 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Checks that the candidate has the same name and same signature as the JDT bound method, and checks recursively that owners also match.
 	 * Note that AnnotationTypeAttribute are treated as methods by JDT, so they are checked here.
 	 * @param bnd -- a JDT binding that we are trying to match to the candidate
+	 * @param name TODO
+	 * @param owner TODO
 	 * @param candidate -- a Famix Entity (regular Method or AnnotationTypeAttribute)
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean checkAndMapMethod(IMethodBinding bnd, NamedEntity candidate) {
-		if (! bnd.getName().equals(candidate.getName())) {
+	private boolean checkAndMapMethod(IMethodBinding bnd, String sig, Type retTyp, ContainerEntity owner, NamedEntity candidate) {
+		if (! (candidate instanceof Method) ) {
 			return false;
 		}
 
-		NamedEntity bound = getEntityByKey(bnd); 
-		if (bound == candidate) {
+		// check whether bnd and candidate are already bound
+		CheckResult res = checkKeyMatch(bnd, candidate);
+		if (res == CheckResult.MATCH) {
 			return true;
 		}
-		else if (bound != null) {
-			// already bound to something else
-			// May be should continue to see if we need to merge two FamixEntities representing the same thing .... ?
-			// Not sure it does actually happen
-			return false;
-		}
-		else if (getEntityKey(candidate) != null) {
-			// candidate already bound, and not to this binding
+		else if (res == CheckResult.FAIL) {
 			return false;
 		}
 
-		// for methods, the name is not enough, we must test the signature also ...
-		// for AnnotationTypeAttribute, we don't need this
+		// checking names (actually could check only signature)
+		String name = (sig != null) ? sig.substring(0, sig.indexOf('(')) : null;
+		if (checkNameMatch(bnd, name, candidate) == CheckResult.FAIL) {
+			return false;
+		}
+
+		// for methods, the name is not enough, we must test the signature also
+		// but not for AnnotationTypeAttribute
 		if (candidate instanceof Method) {
-			String sig = bnd.getName() + "(";
-			boolean first = true;
-			for (ITypeBinding parBnd : bnd.getParameterTypes()) {
-				if (! first) {
-					sig += "," + parBnd.getName();
+			if (bnd != null) {
+				sig = bnd.getName() + "(";
+				boolean first = true;
+				for (ITypeBinding parBnd : bnd.getParameterTypes()) {
+					if (! first) {
+						sig += "," + parBnd.getName();
+					}
+					else {
+						sig += parBnd.getName();
+						first = false;
+					}
 				}
-				else {
-					sig += parBnd.getName();
-					first = false;
-				}
+				sig += ")";
 			}
-			sig += ")";
 			if (! ((Method) candidate).getSignature().equals(sig)) {
 				return false;
 			}
 
-			// ... and the signature should include the return type
-			if (bnd.isConstructor()) {
-				if ( ((Method) candidate).getDeclaredType() != null) {
-					return false;
+			// and still for method, must also check the return type
+			if (bnd != null) {
+				if (bnd.isConstructor()) {
+					if ( ((Method) candidate).getDeclaredType() != null ) {
+						return false;
+					}
+					// else OK for now
+				}
+				else { // not a constructor
+					if ( ((Method) candidate).getDeclaredType() == null ) {
+						return false;
+					}
+					else if (! checkAndMapType(bnd.getReturnType(), null, null, ((Method) candidate).getDeclaredType()) ) {
+						return false;
+					}
+					// else OK for now
 				}
 			}
-			else {
-				if ( ((Method) candidate).getDeclaredType() == null) {
-					return false;
+			else {  // bnd == null
+				if (retTyp == null) { // similar to (bnd.isConstructor())
+					if ( ((Method) candidate).getDeclaredType() != null ) {
+						return false;
+					}
+					// else OK for now
 				}
-				if (! checkAndMapType(bnd.getReturnType(), ((Method) candidate).getDeclaredType()) ) {
-					return false;
+				else { // (ret != null)  i.e. not a constructor
+					if ( ((Method) candidate).getDeclaredType() == null ) {
+						return false;
+					}
+					else if (! checkAndMapType(null, retTyp.getName(), retTyp.getBelongsTo(), ((Method) candidate).getDeclaredType()) ) {
+						return false;
+					}
+					// else OK for now
 				}
 			}
-		}
+		}  // if (candidate instanceof Method)
 
-		// finally let's check the owners
-		ITypeBinding ownerBnd = bnd.getDeclaringClass();
-		NamedEntity candidateOwner = candidate.getBelongsTo();
-		if (checkAndMapType(ownerBnd, (Type)candidateOwner)) {
-			mapEntityToKey(bnd, candidate);
+		// check owner
+		if (checkAndMapOwnerAsType( ((bnd != null)?bnd.getDeclaringClass():null), owner, candidate.getBelongsTo()) == CheckResult.MATCH) {
+			conditionalMapToKey(bnd, candidate);
 			return true;
 		}
 		else {
@@ -900,105 +942,233 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Checks that the candidate has the same name as the JDT bound variable, and checks recursively that owners also match.
 	 * The Famix candidate is a NamedEntity and not a StructuralEntity to allow dealing with Famix EnumValue that JDT treats as variables
 	 * @param bnd -- a JDT binding that we are trying to match to the candidate
+	 * @param name TODO
+	 * @param owner TODO
 	 * @param candidate -- a Famix Entity (a StructuralEntity or an EnumValue)
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean checkAndMapVariable(IVariableBinding bnd, NamedEntity candidate) {
-		if (! bnd.getName().equals(candidate.getName())) {
+	private boolean checkAndMapVariable(IVariableBinding bnd, String name, ContainerEntity owner, NamedEntity candidate) {
+		if (! (candidate instanceof StructuralEntity)) {
 			return false;
 		}
 
-		NamedEntity bound = (NamedEntity)getEntityByKey(bnd); 
-		if (bound == candidate) {
+		// check whether bnd and candidate are already bound
+		CheckResult keyMatch = checkKeyMatch(bnd, candidate);
+		if (keyMatch == CheckResult.MATCH) {
 			return true;
 		}
-		else if (bound != null) {
-			return false;
-		}
-		else if (getEntityKey(candidate) != null) {
-			// candidate already bound, and not to this binding
+		else if (keyMatch == CheckResult.FAIL) {
 			return false;
 		}
 
+		if (checkNameMatch(bnd, name, candidate) == CheckResult.FAIL) {
+			return false;
+		}
+
+		// check owner
 		ContainerEntity candidateOwner = candidate.getBelongsTo();
+
 		// local variable or parameter ?
-		IMethodBinding methBnd = bnd.getDeclaringMethod();
-		if ( (methBnd != null) && (candidateOwner instanceof Method) ) {
-			if ( checkAndMapMethod(methBnd, (Method)candidateOwner) ) {
-				mapEntityToKey(bnd, candidate);
-				return true;
-			}
-			else {
-				return false;
+		// owner is a Method? (for example in case of an anonymous class)
+		CheckResult res = checkAndMapOwnerAsMethod( ((bnd != null) ? bnd.getDeclaringMethod() : null), owner, candidateOwner);
+		if (res == CheckResult.FAIL) {
+			return false;
+		}
+		else if (res == CheckResult.MATCH) {
+			conditionalMapToKey(bnd, candidate);
+			return true;
+		}
+
+		// check owner
+		// <anArray>.length field?
+		if (name.equals("length")) {
+			boolean isArrayLengthField = ((bnd != null) && (bnd.getDeclaringClass() == null)) ||
+										 ((bnd == null) && (owner.getName().equals(JavaDictionary.ARRAYS_NAME)));
+			if (isArrayLengthField) {
+				if (candidateOwner.getName().equals(JavaDictionary.ARRAYS_NAME)) {
+					conditionalMapToKey(bnd, candidate);
+					return true;
+				}
+				else {
+					return false;
+				}
 			}
 		}
 
-		// field ?
-		ITypeBinding typBnd = bnd.getDeclaringClass();
-		// in case of anArray.length ...
-		if ((candidateOwner==null)||(candidateOwner.getName()==null)) {
-			candidateOwner=null;
-		}
-		if ( (typBnd == null) && (candidateOwner.getName().equals(JavaDictionary.ARRAYS_NAME)) ) {
-			mapEntityToKey(bnd, candidate);
+		// check owner
+		// "normal" field?
+		res = checkAndMapOwnerAsType( ((bnd != null) ? bnd.getDeclaringClass() : null), owner, candidateOwner);
+		if (res == CheckResult.MATCH) {
+			conditionalMapToKey(bnd, candidate);
 			return true;
 		}
-		else if ( (candidateOwner instanceof Type) &&
-				  (checkAndMapType(typBnd, (Type)candidateOwner)) ) {
-			mapEntityToKey(bnd, candidate);
-			return true;
-		}
-		else {
-			return false;
-		}
+		return false;
 	}
 
 	/**
 	 * Checks whether the existing unmapped Famix Type's parent (or owner) matches the binding's owner.
 	 * Checks that the candidate has the same name as the JDT bound type, and checks recursively that owners also match.
 	 * @param bnd -- a JDT binding whose owner we are trying to match to the candidate's owner
+	 * @param ent TODO
+	 * @param owner TODO
 	 * @param candidate -- a Famix Entity
 	 * @return whether we found a match (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean checkAndMapTypeOwner(ITypeBinding bnd, Type candidate) {
-		// we don't check the names because we are only interested in the Type's owner
-
-		// owner is a Method?
+	private boolean checkAndMapTypeOwner(ITypeBinding bnd, NamedEntity owner, Type candidate) {
 		ContainerEntity candidateOwner = candidate.getBelongsTo();
-		IMethodBinding methBnd = bnd.getDeclaringMethod(); // for classes, can other types be declared in methods?
-		if ( (methBnd != null) && (candidateOwner instanceof Method) ) {
-			if ( checkAndMapMethod(methBnd, (Method)candidateOwner) ) {
-				mapEntityToKey(bnd, candidate);
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
 
-		// owner is a class ?
-		ITypeBinding classBnd = bnd.getDeclaringClass();
-		if ( (classBnd != null) && (candidateOwner instanceof fr.inria.verveine.core.gen.famix.Class) ) {
-			if ( checkAndMapClass(classBnd, (Type)candidateOwner) ) {
-				mapEntityToKey(bnd, candidate);
-				return true;
-			}
-			else {
-				return false;
-			}
-		}
-
-		// owner must be a package
-		IPackageBinding pckgBnd = bnd.getPackage();
-		if ( (candidateOwner instanceof Namespace) &&
-			 (checkAndMapNamespace(pckgBnd, (Namespace)candidateOwner)) ) {
-			mapEntityToKey(bnd, candidate);
+		// owner is a Method? (for example in case of an anonymous class)
+		CheckResult res = checkAndMapOwnerAsMethod( ((bnd != null) ? bnd.getDeclaringMethod() : null), owner, candidate);
+		if (res == CheckResult.MATCH) {
+			conditionalMapToKey(bnd, candidate);
 			return true;
-		}
-		else {
+		} 
+		else if (res == CheckResult.FAIL) {
 			return false;
 		}
 
+		// owner is a class ?
+		res = checkAndMapOwnerAsType( ((bnd != null) ? bnd.getDeclaringClass() : null), owner, candidateOwner);
+		if (res == CheckResult.MATCH) {
+			conditionalMapToKey(bnd, candidate);
+			return true;
+		}
+		else if (res == CheckResult.FAIL) {
+			return false;
+		}
+
+		// owner must be a package
+		if (checkAndMapOwnerAsNamespace( ((bnd != null)?bnd.getPackage():null), owner, candidateOwner) == CheckResult.MATCH) {
+			conditionalMapToKey(bnd, candidate);
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Check whether the owner of candidates is a method macthinf either methBnd or owner
+	 * @param bnd
+	 * @param owner
+	 * @param candidate
+	 * @return a {@link JavaDictionary#CheckResult}
+	 */
+	private CheckResult checkAndMapOwnerAsMethod(IMethodBinding methBnd, NamedEntity owner, ContainerEntity candidateOwner) {
+		if ( (methBnd != null) || ((owner != null) && (owner instanceof Method)) ) {
+			if (! (candidateOwner instanceof Method)) {
+				return CheckResult.FAIL;
+			}
+			
+			ContainerEntity ownerOwner = (owner != null) ? owner.getBelongsTo() : null;
+			String ownerSig = (owner != null) ? ((Method)owner).getSignature() : null;
+			Type ownerReturn = (owner != null) ? ((Method)owner).getDeclaredType() : null;
+
+			if ( checkAndMapMethod(methBnd, ownerSig, ownerReturn, ownerOwner, (Method)candidateOwner) ) {
+				return CheckResult.MATCH;
+			}
+			else {
+				return CheckResult.FAIL;
+			}
+		}
+		return CheckResult.UNDECIDED;
+	}
+
+	/**
+	 * @param bnd
+	 * @param owner
+	 * @param candidate
+	 * @param candidateOwner
+	 * @param ownerOwner
+	 * @return
+	 */
+	private CheckResult checkAndMapOwnerAsType(ITypeBinding typBnd, NamedEntity owner, ContainerEntity candidateOwner) {
+		if ( (typBnd != null) || ((owner != null) && (owner instanceof Type)) ) {
+			if (! (candidateOwner instanceof Type)) {
+				return CheckResult.FAIL;
+			}
+
+			ContainerEntity ownerOwner = (owner != null) ? owner.getBelongsTo() : null;
+			String ownerName= (owner != null) ? ((Type)owner).getName() : null;
+
+			if (checkAndMapType(typBnd, ownerName, ownerOwner, candidateOwner)) {
+				return CheckResult.MATCH;
+			}
+			else {
+				return CheckResult.FAIL;
+			}
+		}
+		return CheckResult.UNDECIDED;
+	}
+
+	private CheckResult checkAndMapOwnerAsNamespace(IPackageBinding pckgBnd, NamedEntity owner, ContainerEntity candidateOwner) {
+		if ( (pckgBnd != null) || ((owner != null) && (owner instanceof Namespace)) ) {
+			if (! (candidateOwner instanceof Namespace)) {
+				return CheckResult.FAIL;
+			}
+
+			Namespace ownerOwner = (owner != null) ? (Namespace)owner.getBelongsTo() : null;
+			String ownerName= (owner != null) ? ((Namespace)owner).getName() : null;
+
+			if (checkAndMapNamespace(pckgBnd, ownerName, ownerOwner, candidateOwner)) {
+				return CheckResult.MATCH;
+			}
+			else {
+				return CheckResult.FAIL;
+			}
+		}
+		return CheckResult.UNDECIDED;
+	}
+
+	/**
+	 * Checks whether the name and the candidate matches the name of the entity (given either by 'bnd' or 'name')<br>
+	 * 'name' and 'bnd' cannot be null together
+	 * @param bnd -- binding associated with the entity may be null
+	 * @param name -- name of the entity may be null
+	 * @param candidate
+	 * @return true if names match, false if not
+	 */
+	private CheckResult checkNameMatch(IBinding bnd, String name, NamedEntity candidate) {
+		if ( (bnd != null) && (! bnd.getName().equals(candidate.getName())) ) {
+			return CheckResult.FAIL;
+		}
+		else if ( (bnd == null) && (name != null) && (! name.equals(candidate.getName())) ) {
+			return CheckResult.FAIL;
+		}
+		else {
+			return CheckResult.MATCH;
+		}
+	}
+
+	/**
+	 * Check whether key and candidate are already bound together, whether either is bound to something else, or whether none is bound 
+	 * @param key
+	 * @param candidate
+	 * @return <ul><li><b>-1</b>, if either is bound to something else</li><li><b>0</b>, if none is bound (or key is null)</li><li><b>1</b>, if they are bound to each other</li></ul>  
+	 */
+	private CheckResult checkKeyMatch(IBinding key, NamedEntity candidate) {
+		if (key == null) {
+			return CheckResult.UNDECIDED;
+		}
+
+		NamedEntity bound = (NamedEntity)getEntityByKey(key); 
+		if (bound == candidate) {
+			return CheckResult.MATCH;
+		}
+		else if (bound != null) {
+			return CheckResult.FAIL;
+		}
+		else if (getEntityKey(candidate) != null) {
+			// candidate already bound, and not to this binding
+			return CheckResult.FAIL;
+		}
+		else {
+			return CheckResult.UNDECIDED;
+		}
+	}
+
+	private void conditionalMapToKey(IBinding bnd, NamedEntity ent) {
+		if (bnd != null) {
+			mapEntityToKey(bnd, ent);
+		}
 	}
 
 	/**
@@ -1118,7 +1288,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		// --------------- recover from name ?
 		for (Method candidate : this.getEntityByName(Method.class, name)) {
-			if ( checkAndMapMethod(bnd, candidate) ) {
+			if ( checkAndMapMethod(bnd, sig, ret, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -1193,7 +1363,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		// --------------- recover from name ?
 		for (Attribute candidate : getEntityByName(Attribute.class, name) ) {
-			if ( checkAndMapVariable(bnd, candidate) ) {
+			if ( checkAndMapVariable(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -1270,7 +1440,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		// --------------- recover from name ?
 		for (Parameter candidate : getEntityByName(Parameter.class, name) ) {
-			if ( checkAndMapVariable(bnd, candidate) ) {
+			if ( checkAndMapVariable(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -1329,7 +1499,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 		// --------------- recover from name ?
 		for (LocalVariable candidate : getEntityByName(LocalVariable.class, name) ) {
-			if ( checkAndMapVariable(bnd, candidate) ) {
+			if ( checkAndMapVariable(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
