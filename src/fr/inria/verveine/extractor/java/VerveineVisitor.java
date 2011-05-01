@@ -203,32 +203,52 @@ public class VerveineVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	/**
+	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
+	 * we are in its parent node: a ClassInstanceCreation.
+	 * So we must keep this type from when visit method to the other.<br>
+	 * Note that in some special cases one can also have an anonymous class definition without specifying its superclass.
+	 */
+	private Type anonymousSuperType;
+
+	/**
+	 * See {@link VerveineVisitor#anonymousSuperType}
+	 */
 	public boolean visit(ClassInstanceCreation node) {
 //		System.err.println("TRACE, Visiting ClassInstanceCreation");
-		fr.inria.verveine.core.gen.famix.Class fmx = null;
-		AnonymousClassDeclaration decl = node.getAnonymousClassDeclaration(); 
-		if (decl != null) {
-			ITypeBinding bnd = decl.resolveBinding();
-			fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+findTypeName(node.getType())+")", /*owner*/context.top(), /*isGeneric*/false);
-			if (fmx != null) {
-				fmx.setIsStub(false);
-
-				dico.addFamixAnnotationInstances(bnd, fmx);
-				dico.addSourceAnchor(fmx, node);
-				this.context.pushType(fmx);
-				return super.visit(node);
-			}
-			else {
-				return false;
-			}
+		if (node.getAnonymousClassDeclaration() != null) {
+			anonymousSuperType = node.getType();
+		}
+		else {
+			anonymousSuperType = null;
 		}
 		return super.visit(node);
 	}
 
-	/* 
-	 * intended to close 'visit(ClassInstanceCreation node)' for just this specific case
+	/**
+	 * See {@link VerveineVisitor#anonymousSuperType}
 	 */
+	public boolean visit(AnonymousClassDeclaration node) {
+		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
+		fr.inria.verveine.core.gen.famix.Class fmx = null;
+		ITypeBinding bnd = node.resolveBinding();
+		String anonSuperTypeName = (anonymousSuperType != null) ? findTypeName(anonymousSuperType) : context.topType().getName();
+		fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+anonSuperTypeName+")", /*owner*/context.top(), /*isGeneric*/false);
+		if (fmx != null) {
+			fmx.setIsStub(false);
+
+			dico.addFamixAnnotationInstances(bnd, fmx);
+			dico.addSourceAnchor(fmx, node);
+			this.context.pushType(fmx);
+			return super.visit(node);
+		}
+		else {
+			return false;
+		}
+	}
+
 	public void endVisit(AnonymousClassDeclaration node) {
+		anonymousSuperType = null;
 		this.context.popType();
 		super.endVisit(node);
 	}
@@ -406,7 +426,6 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 	}
 
-
 	@Override
 	public void endVisit(Initializer node) {
 		int cyclo = 0;
@@ -422,7 +441,6 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 		super.endVisit(node);
 	}
-
 
 	@SuppressWarnings({ "unchecked" })
 	public boolean visit(FieldDeclaration node) {
@@ -552,7 +570,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(SuperMethodInvocation node) {
-		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) this.context.topType(), context.topMethod());
+		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(), context.topMethod());
 		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver);
 
 		this.context.addTopMethodNOS(1);

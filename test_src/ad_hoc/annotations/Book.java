@@ -1,5 +1,10 @@
 package ad_hoc.annotations;
 
+/**
+ * Commentaire ajouté pour tester UTF-8
+ * (A comment with accent to test UTF-8)
+ */
+
 public class Book {
 
 	public static final Book DESIGN_PATTERNS = new Book("Design Patterns", 
