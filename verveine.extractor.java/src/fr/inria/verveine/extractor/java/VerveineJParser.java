@@ -99,6 +99,7 @@ public class VerveineJParser extends VerveineParser {
 		System.exit(0);
 
 	}
+
 	protected void setCodeVersion(String arg) {
 		if (codeVers != null) {
 			System.err.println("Trying to set twice code versions: "+ codeVers + " and "+ arg);
