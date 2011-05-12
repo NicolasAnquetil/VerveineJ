@@ -1578,7 +1578,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		if ( (fmx != null) && (ast != null) ) {
 			// position in source file
 			int beg = ast.getStartPosition();
-			int end = beg + ast.getLength();
+			int end = beg + ast.getLength()-1;
 			// find source file
 			while ( ! (ast instanceof CompilationUnit) ) {
 				ASTNode tmp = ast.getParent();
@@ -1594,7 +1594,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fa = new FileAnchor();
 			fa.setFileName((String) ((CompilationUnit)ast).getProperty(SOURCE_FILENAME_PROPERTY));
 			fa.setStartLine(((CompilationUnit)ast).getLineNumber(beg));
-			fa.setEndLine(((CompilationUnit)ast).getLineNumber(end));
+			int tmp= ((CompilationUnit)ast).getLineNumber(end);
+			fa.setEndLine(tmp);
 			fmx.setSourceAnchor(fa);
 			famixRepo.add(fa);
 		}
