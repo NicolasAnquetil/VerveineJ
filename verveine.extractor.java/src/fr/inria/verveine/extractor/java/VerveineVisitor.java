@@ -385,17 +385,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public void endVisit(MethodDeclaration node) {
-		int cyclo = 0;
-		int nos = 0;
-		if (context.topMethod() != null) {
-			cyclo = context.getTopMethodCyclo();
-			nos = context.getTopMethodNOS();
-		}
-		Method fmx = this.context.popMethod();
-		if (fmx != null) {
-			fmx.setNOS(nos);
-			fmx.setCyclo(cyclo);
-		}
+		closeMethodDeclaration();
 		super.endVisit(node);
 	}
 
@@ -410,7 +400,7 @@ public class VerveineVisitor extends ASTVisitor {
 		if (fmx != null) {
 			fmx.setIsStub(false);
 
-			this.context.pushMethod(fmx);
+			pushInitBlockMethod(fmx);
 			dico.addSourceAnchor(fmx, node);
 			dico.createFamixComment(node.getJavadoc(), fmx);
 
@@ -426,20 +416,39 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 	}
 
+	/**
+	 * Special method InitBlock may be "created" in various steps,
+	 * mainly when attributes are declared+initialized with the result of a method call.<br>
+	 * In such a case, we need to recover the previous metric values to add to them
+	 * @param fmx -- the InitBlock FamixMethod
+	 */
+	private void pushInitBlockMethod(Method fmx) {
+		this.context.pushMethod(fmx);
+		if ( (fmx.getNOS() != 0) || (fmx.getCyclo() != 0) ) {
+			context.setTopMethodNOS(fmx.getNOS());
+			context.setTopMethodCyclo(fmx.getCyclo());
+		}
+	}
+	
 	@Override
 	public void endVisit(Initializer node) {
-		int cyclo = 0;
-		int nos = 0;
-		if (context.topMethod() != null) {
-			cyclo = context.getTopMethodCyclo();
-			nos = context.getTopMethodNOS();
-		}
-		Method fmx = this.context.popMethod();
-		if (fmx != null) {
-			fmx.setNOS(nos);
-			fmx.setCyclo(cyclo);
-		}
+		closeMethodDeclaration();
 		super.endVisit(node);
+	}
+
+	/**
+	 * When closing a method declaration, we need to take care of some metrics that are also collected
+	 */
+	private void closeMethodDeclaration() {
+		if (context.topMethod() != null) {
+			int cyclo = context.getTopMethodCyclo();
+			int nos = context.getTopMethodNOS();
+			Method fmx = this.context.popMethod();
+			if (fmx != null) {
+				fmx.setNOS(nos);
+				fmx.setCyclo(cyclo);
+			}
+		}
 	}
 
 	@SuppressWarnings({ "unchecked" })
@@ -554,7 +563,16 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodInvocation node) {
+		boolean fieldInit = false;
 		Expression callingExpr = node.getExpression();
+		if (callingExpr == null) {
+			if (context.topMethod() == null) {
+				// probably a method call to initialize a field when declaring it
+				fieldInit = true;
+				Method ctxt = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), /*retType*/null, context.topType());
+				pushInitBlockMethod(ctxt);
+			}
+		}
 		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(callingExpr));
 		if (callingExpr instanceof SimpleName) {
 			visitSimpleName((SimpleName) callingExpr);
@@ -563,6 +581,10 @@ public class VerveineVisitor extends ASTVisitor {
 			if (a instanceof SimpleName) {
 				visitSimpleName((SimpleName) a);
 			}
+		}
+		
+		if (fieldInit) {
+			closeMethodDeclaration();
 		}
 
 		this.context.addTopMethodNOS(1);

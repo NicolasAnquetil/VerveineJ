@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 @SuppressWarnings("serial")
 public class Serializer {
 
-	public PrintWriter writer;
+	public PrintWriter writer = defaultWriter();
 	
 	public Serializer(OutputStream out) {
 		writer = new PrintWriter(out);
@@ -47,4 +47,7 @@ public class Serializer {
 		return string == null ? "" : string;
 	}
 	
+	private PrintWriter defaultWriter() {
+		return new PrintWriter(out);
+	}
 }
