@@ -411,13 +411,26 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testStaticInitializationBlock() {
-		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "<Initializer>");
-		assertNotNull(meth);
-		assertEquals("<Initializer>()", meth.getSignature());
-
 		fr.inria.verveine.core.gen.famix.Class card = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Card");
-		assertSame(card, meth.getParentType());
-		
-		assertEquals(3, meth.getOutgoingInvocations().size());
+		assertNotNull(card);
+		fr.inria.verveine.core.gen.famix.Class serial = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Serializer");
+		assertNotNull(serial);
+
+		Collection<Method> l_meth = TestVerveineUtils.listElements(repo, Method.class, "<Initializer>");
+		assertEquals(2, l_meth.size());
+		String unknownParent = null;
+		for (Method meth : l_meth) {
+			assertEquals("<Initializer>()", meth.getSignature());
+			if (meth.getParentType() == card) {
+				assertEquals(3, meth.getOutgoingInvocations().size());
+			}
+			else if (meth.getParentType() == serial) {
+				assertEquals(1, meth.getOutgoingInvocations().size());
+			}
+			else {
+				unknownParent = meth.getParentType().getName();
+			}
+		}
+		assertNull("Unknown class with an <Initializer> method: "+unknownParent, unknownParent);
 	}
 }
