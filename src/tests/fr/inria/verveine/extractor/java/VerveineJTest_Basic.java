@@ -2,6 +2,8 @@ package tests.fr.inria.verveine.extractor.java;
 
 import static org.junit.Assert.*;
 
+import java.util.Collection;
+
 import org.junit.Test;
 
 import test.fr.inria.verveine.core.TestVerveineUtils;
@@ -12,8 +14,10 @@ import fr.inria.verveine.core.gen.famix.Attribute;
 import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Invocation;
+import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
+import fr.inria.verveine.core.gen.famix.SourceLanguage;
 import fr.inria.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
@@ -131,5 +135,14 @@ public abstract class VerveineJTest_Basic {
 			}
 		}
 		assertTrue("System does not have an attribute 'out'", foundOut);
+	}
+	
+	@Test
+	public void testSourceLanguage() {
+		Collection<SourceLanguage> sl = TestVerveineUtils.selectElementsOfType(repo, SourceLanguage.class);
+		assertNotNull(sl);
+		assertEquals(1, sl.size());
+		SourceLanguage jsl = sl.iterator().next();
+		assertEquals(JavaSourceLanguage.class, jsl.getClass());
 	}
 }

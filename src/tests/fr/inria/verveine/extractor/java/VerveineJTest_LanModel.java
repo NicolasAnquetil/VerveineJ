@@ -79,7 +79,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		repo = parser.getFamixRepo();
 		parser.setOptions(new String[] {"test_src/LANModel/"});
 		parser.parse();
-		parser.outputMSE();
+		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 //*/
 	}
 
@@ -101,7 +101,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		parser.parse();
 		
 		new File(VerveineJParser.OUTPUT_FILE).delete();  // delete old MSE file
-		parser.outputMSE();  // to create a new one
+		parser.emitMSE(VerveineJParser.OUTPUT_FILE);  // to create a new one
 	}
 
 	@Test

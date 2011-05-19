@@ -10,7 +10,9 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 
 import fr.inria.verveine.core.VerveineParser;
+import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
 import fr.inria.verveine.core.gen.famix.Namespace;
+import fr.inria.verveine.core.gen.famix.SourceLanguage;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -40,7 +42,11 @@ public class VerveineJParser extends VerveineParser {
 
 		jdtParser = ASTParser.newParser(AST.JLS3);
 	}
-	
+
+	protected SourceLanguage getMyLgge() {
+		return new JavaSourceLanguage();
+	}
+
 	public void setOptions(String[] args) {
 		Collection<String> classPath = new ArrayList<String>();
 		argPath = new ArrayList<String>();
@@ -152,7 +158,7 @@ public class VerveineJParser extends VerveineParser {
 		VerveineJParser parser = new VerveineJParser();
 		parser.setOptions(args);
 		parser.parse();
-		parser.outputMSE();
+		parser.emitMSE(OUTPUT_FILE);
 	}
 
 	public void parse() {
@@ -211,5 +217,6 @@ public class VerveineJParser extends VerveineParser {
 			}
 		}
 	}
+
 	
 }
