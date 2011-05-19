@@ -51,7 +51,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		repo = parser.getFamixRepo();
 		parser.setOptions(new String[] {"test_src/ad_hoc"});
 		parser.parse();
-		parser.outputMSE();
+		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
 
 	@Test
