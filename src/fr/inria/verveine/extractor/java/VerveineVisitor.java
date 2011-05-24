@@ -86,6 +86,7 @@ import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.ParameterType;
 import fr.inria.verveine.core.gen.famix.ParameterizableClass;
+import fr.inria.verveine.core.gen.famix.Reference;
 import fr.inria.verveine.core.gen.famix.StructuralEntity;
 
 /**
@@ -206,7 +207,7 @@ public class VerveineVisitor extends ASTVisitor {
 	/**
 	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
 	 * we are in its parent node: a ClassInstanceCreation.
-	 * So we must keep this type from when visit method to the other.<br>
+	 * So we must keep this type from the visit(ClassInstanceCreation) to be used in visit(AnonymousClassDeclaration).<br>
 	 * Note that in some special cases one can also have an anonymous class definition without specifying its superclass.
 	 */
 	private Type anonymousSuperType;
@@ -215,12 +216,19 @@ public class VerveineVisitor extends ASTVisitor {
 	 * See {@link VerveineVisitor#anonymousSuperType}
 	 */
 	public boolean visit(ClassInstanceCreation node) {
-//		System.err.println("TRACE, Visiting ClassInstanceCreation");
+		//System.err.println("TRACE, Visiting ClassInstanceCreation");
 		if (node.getAnonymousClassDeclaration() != null) {
 			anonymousSuperType = node.getType();
 		}
 		else {
 			anonymousSuperType = null;
+
+			// treat the expression 'new A(...)'
+			fr.inria.verveine.core.gen.famix.Type fmx = null;
+			Type clazz = node.getType();
+			fmx = referedType(clazz, context.top());
+			Reference lastRef = context.getLastReference();
+			dico.addFamixReference(context.top(), fmx, lastRef);
 		}
 		return super.visit(node);
 	}

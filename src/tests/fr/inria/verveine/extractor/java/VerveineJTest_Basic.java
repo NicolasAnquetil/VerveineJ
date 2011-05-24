@@ -27,6 +27,12 @@ public abstract class VerveineJTest_Basic {
 
 	protected Repository repo;
 	protected VerveineJParser parser;
+	
+	private boolean testSystem = true;
+
+	public VerveineJTest_Basic(boolean system) {
+		testSystem = system;
+	}
 
 	@Test
 	public void testAssociation() {
@@ -120,21 +126,23 @@ public abstract class VerveineJTest_Basic {
 		}
 
 		// System
-		fr.inria.verveine.core.gen.famix.Class syst = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "System");
-		assertNotNull(syst);
-		assertSame(javaLang, syst.getContainer());
-		assertEquals(1, syst.getSuperInheritances().size());
-		assertEquals(obj, syst.getSuperInheritances().iterator().next().getSuperclass());
-		boolean foundOut = false;
-		for (Attribute att : syst.getAttributes()) {
-			if (att.getName().equals("out")) {
-				foundOut = true;
+		if (this.testSystem) {
+			fr.inria.verveine.core.gen.famix.Class syst = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "System");
+			assertNotNull(syst);
+			assertSame(javaLang, syst.getContainer());
+			assertEquals(1, syst.getSuperInheritances().size());
+			assertEquals(obj, syst.getSuperInheritances().iterator().next().getSuperclass());
+			boolean foundOut = false;
+			for (Attribute att : syst.getAttributes()) {
+				if (att.getName().equals("out")) {
+					foundOut = true;
+				}
+				else {
+					assertTrue( "Unexpected System attribute: "+att.getName(), att.getName().equals("err") );
+				}
 			}
-			else {
-				assertTrue( "Unexpected System attribute: "+att.getName(), att.getName().equals("err") );
-			}
+			assertTrue("System does not have an attribute 'out'", foundOut);
 		}
-		assertTrue("System does not have an attribute 'out'", foundOut);
 	}
 	
 	@Test

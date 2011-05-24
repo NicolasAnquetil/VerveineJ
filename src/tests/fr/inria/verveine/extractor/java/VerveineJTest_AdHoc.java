@@ -4,15 +4,23 @@
 package tests.fr.inria.verveine.extractor.java;
 
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.LinkedList;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import test.fr.inria.verveine.core.TestVerveineUtils;
+import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.AnnotationInstance;
 import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
@@ -41,6 +49,10 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
  */
 public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
+	public VerveineJTest_AdHoc() {
+		super(/*system*/true);  // yes please, test that System and members are created correctly
+	}
+
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -54,19 +66,25 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
 
-	@Test
+	//@ Test
 	public void testConstructorInvocations() {
 		//  TODO should test 'this()' and 'super()'
 	}
 
 	@Test
 	public void testDictionary() {
-		fr.inria.verveine.core.gen.famix.Class dico = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Dictionary");
+		ParameterizableClass dico = null;
+		for (ParameterizableClass d : TestVerveineUtils.listElements(repo, ParameterizableClass.class, "Dictionary")) {
+			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
+				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
+				dico = d;
+				break;
+			}
+		}
 		assertNotNull(dico);
 		assertEquals(7, dico.getMethods().size());
-
 		assertEquals(3, dico.getAttributes().size());
-		//fails because FieldDeclaration and FieldAccess have different bindings (so they are created twice) :-(
+
 		for (Attribute a : dico.getAttributes()) {
 			assertEquals(dico, a.getBelongsTo());
 			Type t = a.getDeclaredType();
@@ -188,9 +206,16 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testParameterizableClass() {
-		assertEquals(8, TestVerveineUtils.selectElementsOfType(repo, ParameterizableClass.class).size()); //Class,Comparable,List,ArrayList,Collection,Map,Iterable,Dictionary
+		assertEquals(17, TestVerveineUtils.selectElementsOfType(repo, ParameterizableClass.class).size());	// Class,Comparable,List,ArrayList,AbstractList,AbstractCollection,Collection,Map,Iterable,Dictionary<B>,Hashtable,Dictionary<K,V>,Map,LinkedList,AbstractSequentialList,Deque,Queue
 
-		ParameterizableClass dico = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Dictionary");
+		ParameterizableClass dico = null;
+		for (ParameterizableClass d : TestVerveineUtils.listElements(repo, ParameterizableClass.class, "Dictionary")) {
+			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
+				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
+				dico = d;
+				break;
+			}
+		}
 		assertNotNull(dico);
 		assertEquals("Dictionary", dico.getName());
 		assertEquals(6, dico.getTypes().size());  // <B> , ImplicitVars , Map<B,NamedEntity> , Map<String,Collection<NamedEntity>> , Collection<NamedEntity> , Map<Class,ImplicitVars>
