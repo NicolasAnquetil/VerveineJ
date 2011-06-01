@@ -1305,8 +1305,15 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx = ensureFamixMethod(bnd, name, sig, ret, owner);
 		}
 
-		if ( (fmx!=null) && (bnd != null) ) {
-			setNamedEntityModifiers(fmx, bnd.getModifiers());
+		if (fmx!=null) {
+			if (bnd != null) {
+				int mod = bnd.getModifiers();
+				setNamedEntityModifiers(fmx, mod);
+				fmx.setHasClassScope(Modifier.isStatic(mod));
+			}
+			else {
+				fmx.setHasClassScope(false);
+			}
 		}
 
 		if ( (fmx != null) && delayedRetTyp ) {
@@ -1389,7 +1396,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx.setParentType(owner);
 			fmx.setDeclaredType(type);	
 			if (bnd != null) {
-				setNamedEntityModifiers(fmx, bnd.getModifiers());
+				int mod = bnd.getModifiers();
+				setNamedEntityModifiers(fmx, mod);
+				fmx.setHasClassScope(Modifier.isStatic(mod));
 			}
 		}
 

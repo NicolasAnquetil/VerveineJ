@@ -331,7 +331,7 @@ public class VerveineVisitor extends ASTVisitor {
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 //		System.out.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier();
-		
+
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
 
@@ -350,7 +350,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			
+
 			// now will recompute the actual returnType
 			this.context.pushMethod(fmx);
 			if (! node.isConstructor()) {

@@ -1,4 +1,4 @@
-package adhoc.annotations;
+package ad_hoc.annotations;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;

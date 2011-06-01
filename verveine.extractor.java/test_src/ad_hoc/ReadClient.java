@@ -6,10 +6,10 @@ import java.io.IOException;
 
 @Override
 @Deprecated
-public class Client {
+public class ReadClient {
 	
-	@Override
-	@Deprecated
+	@Override()
+	@Deprecated()
 	private String num;
 	@Deprecated
 	private String nom;

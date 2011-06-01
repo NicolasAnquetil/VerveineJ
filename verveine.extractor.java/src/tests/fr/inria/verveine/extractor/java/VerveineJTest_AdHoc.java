@@ -14,7 +14,6 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -91,6 +90,25 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			assertEquals("Map", t.getName());
 			assertEquals(ParameterizedType.class, t.getClass());
 		}
+	}
+
+	@Test
+	public void testStaticMembers() {
+		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "methodWithClassScope");
+		assertNotNull(meth);
+		assertTrue(meth.getHasClassScope());
+
+		meth = TestVerveineUtils.detectElement(repo, Method.class, "methodWithInstanceScope");
+		assertNotNull(meth);
+		assertFalse(meth.getHasClassScope());
+
+		Attribute att = TestVerveineUtils.detectElement(repo, Attribute.class, "FIELD_WITH_CLASS_SCOPE");
+		assertNotNull(att);
+		assertTrue(att.getHasClassScope());
+
+		att = TestVerveineUtils.detectElement(repo, Attribute.class, "fieldWithInstanceScope");
+		assertNotNull(att);
+		assertFalse(att.getHasClassScope());
 	}
 
 	@Test
