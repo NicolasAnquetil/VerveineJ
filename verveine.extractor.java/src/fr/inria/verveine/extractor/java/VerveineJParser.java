@@ -87,8 +87,8 @@ public class VerveineJParser extends VerveineParser {
 			}
 		}
 
-		tracePath("classPath", classPath);
-		tracePath("sourcepath", argPath.toArray(new String[0]));
+		//tracePath("classPath", classPath);
+		//tracePath("sourcepath", argPath.toArray(new String[0]));
 		jdtParser.setEnvironment(classPath, argPath.toArray(new String[0]), null, true);
 		jdtParser.setResolveBindings(true);
 		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
