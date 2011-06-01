@@ -215,6 +215,7 @@ public class VerveineVisitor extends ASTVisitor {
 	/**
 	 * See {@link VerveineVisitor#anonymousSuperType}
 	 */
+	@SuppressWarnings("unchecked")
 	public boolean visit(ClassInstanceCreation node) {
 		//System.err.println("TRACE, Visiting ClassInstanceCreation");
 		if (node.getAnonymousClassDeclaration() != null) {
@@ -223,12 +224,21 @@ public class VerveineVisitor extends ASTVisitor {
 		else {
 			anonymousSuperType = null;
 
-			// treat the expression 'new A(...)'
+			// treat the expression 'new A(...)' by creating a Reference to 'A'
 			fr.inria.verveine.core.gen.famix.Type fmx = null;
 			Type clazz = node.getType();
 			fmx = referedType(clazz, context.top());
 			Reference lastRef = context.getLastReference();
 			dico.addFamixReference(context.top(), fmx, lastRef);
+			
+			// create an invocation of the constructor
+			methodInvocation(node.resolveConstructorBinding(), findTypeName(clazz), /*receiver*/null);
+			for (Expression a : (List<Expression>)node.arguments()) {
+				if (a instanceof SimpleName) {
+					visitSimpleName((SimpleName) a);
+				}
+			}
+
 		}
 		return super.visit(node);
 	}
@@ -674,7 +684,7 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 		else {
 			if (sender != null) {
-				if (receiver instanceof StructuralEntity) {
+				if ( (receiver != null) && (receiver instanceof StructuralEntity) ) {
 					fr.inria.verveine.core.gen.famix.Type varTyp = ((StructuralEntity)receiver).getDeclaredType();
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, /*owner*/varTyp);  // cast needed to desambiguate the call
 				}

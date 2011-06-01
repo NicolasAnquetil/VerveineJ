@@ -30,6 +30,7 @@ import fr.inria.verveine.core.gen.famix.CaughtException;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.DeclaredException;
 import fr.inria.verveine.core.gen.famix.EnumValue;
+import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
@@ -67,7 +68,20 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	//@ Test
 	public void testConstructorInvocations() {
-		//  TODO should test 'this()' and 'super()'
+		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "methodWithClassScope");
+		assertNotNull(meth);
+
+		// test outgoing invocation to constructor
+		assertEquals(2, meth.getOutgoingInvocations().size());
+
+		// test constructors
+		assertEquals(2, TestVerveineUtils.listElements(repo, Method.class, "DefaultConstructor").size());
+		for (Method m : TestVerveineUtils.listElements(repo, Method.class, "DefaultConstructor")) {
+			int nbParam = m.getParameters().size();
+			assertTrue( (nbParam == 0) || (nbParam == 1) );
+			assertEquals(1, m.getIncomingInvocations().size());
+			assertEquals(1, m.getOutgoingInvocations().size());
+		}
 	}
 
 	@Test
@@ -465,7 +479,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		for (Method meth : l_meth) {
 			assertEquals("<Initializer>()", meth.getSignature());
 			if (meth.getParentType() == card) {
-				assertEquals(3, meth.getOutgoingInvocations().size());
+				assertEquals(4, meth.getOutgoingInvocations().size());
 			}
 			else if (meth.getParentType() == serial) {
 				assertEquals(1, meth.getOutgoingInvocations().size());
