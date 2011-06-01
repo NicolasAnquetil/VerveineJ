@@ -2,6 +2,7 @@ package fr.inria.verveine.extractor.java;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -23,20 +24,20 @@ import fr.inria.verveine.core.gen.famix.SourceLanguage;
 public class VerveineJParser extends VerveineParser {
 
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
-	
+
 
 	protected String codeVers = null;
-	
-	
+
+
 	/**
 	 * The arguments that were passed to the parser
 	 * Needed to relativize the source file names
 	 */
 	private Collection<String> argPath;
 	private Collection<String> argFiles;
-	
+
 	private ASTParser jdtParser = null;
-	
+
 	public VerveineJParser() {
 		super();
 
@@ -48,48 +49,53 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	public void setOptions(String[] args) {
-		Collection<String> classPath = new ArrayList<String>();
+
+		String[] classPath = new String[] { };
 		argPath = new ArrayList<String>();
 		argFiles = new ArrayList<String>();
 
-        int i = 0;
-        while (i < args.length && args[i].startsWith("-")) {
-        	String arg = args[i++];
+		int i = 0;
+		while (i < args.length && args[i].startsWith("-")) {
+			String arg = args[i++];
 
-            if (arg.equals("-h")) {
-            	usage();
-            }
-            else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
-            	setCodeVersion(arg);
-            }
-            else if (arg.equals("-cp")) {
-                if (i < args.length) {
-                	classPath.add(args[i++]);
-                }
-                else {
-                	System.err.println("-cp requires a classPath");
-                }
+			if (arg.equals("-h")) {
+				usage();
+			} else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
+				setCodeVersion(arg);
+			} else if (arg.equals("-cp")) {
+				if (i < args.length) {
+					String[] tmpPath = args[i++].split(System.getProperty("path.separator"));
+					int oldlength = classPath.length;
+					int newlength = oldlength + tmpPath.length;
+					classPath = Arrays.copyOf(classPath, newlength);
+					for (int p=oldlength; p < newlength; p++) {
+						classPath[p] = tmpPath[p-oldlength];
+					}
+				} else {
+					System.err.println("-cp requires a classPath");
+				}
 
-            }
-        }
-        while (i < args.length) {
-        	String arg;
-            arg = args[i++];
-        	if ( arg.endsWith(".java") && new File(arg).isFile() ) {
-        		argFiles.add(arg);
-        	}
-        	else {
-        		argPath.add(arg);
-        	}
-        }
+			}
+		}
+		while (i < args.length) {
+			String arg;
+			arg = args[i++];
+			if (arg.endsWith(".java") && new File(arg).isFile()) {
+				argFiles.add(arg);
+			} else {
+				argPath.add(arg);
+			}
+		}
 
-		jdtParser.setEnvironment(classPath.toArray(new String[0]), argPath.toArray(new String[0]), null, true);
+		tracePath("classPath", classPath);
+		tracePath("sourcepath", argPath.toArray(new String[0]));
+		jdtParser.setEnvironment(classPath, argPath.toArray(new String[0]), null, true);
 		jdtParser.setResolveBindings(true);
 		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
 
 		@SuppressWarnings("unchecked")
-		Map<String,String> options = JavaCore.getOptions();
-		
+		Map<String, String> options = JavaCore.getOptions();
+
 		if (codeVers == null) {
 			codeVers = DEFAULT_CODE_VERSION;
 		}
@@ -100,6 +106,17 @@ public class VerveineJParser extends VerveineParser {
 		jdtParser.setCompilerOptions(options);
 	}
 
+	/**
+	 * @param classPath
+	 */
+	private void tracePath(String pathname, String[] path) {
+		System.err.print("TRACE: " + pathname + "= ");
+		for (String p : path) {
+			System.err.print(""+p+" , ");
+		}
+		System.err.println();
+	}
+
 	protected void usage() {
 		System.err.println("Usage: VerveineJ [-h] [-cp CLASSPATH] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.exit(0);
@@ -108,28 +125,21 @@ public class VerveineJParser extends VerveineParser {
 
 	protected void setCodeVersion(String arg) {
 		if (codeVers != null) {
-			System.err.println("Trying to set twice code versions: "+ codeVers + " and "+ arg);
+			System.err.println("Trying to set twice code versions: " + codeVers + " and " + arg);
 			usage();
-		}
-		else if (arg.equals("-1.1") || arg.equals("-1")) {
+		} else if (arg.equals("-1.1") || arg.equals("-1")) {
 			codeVers = JavaCore.VERSION_1_1;
-		}
-		else if (arg.equals("-1.2") || arg.equals("-2")) {
+		} else if (arg.equals("-1.2") || arg.equals("-2")) {
 			codeVers = JavaCore.VERSION_1_2;
-		}
-		else if (arg.equals("-1.3") || arg.equals("-3")) {
+		} else if (arg.equals("-1.3") || arg.equals("-3")) {
 			codeVers = JavaCore.VERSION_1_3;
-		}
-		else if (arg.equals("-1.4") || arg.equals("-4")) {
+		} else if (arg.equals("-1.4") || arg.equals("-4")) {
 			codeVers = JavaCore.VERSION_1_4;
-		}
-		else if (arg.equals("-1.5") || arg.equals("-5")) {
+		} else if (arg.equals("-1.5") || arg.equals("-5")) {
 			codeVers = JavaCore.VERSION_1_5;
-		}
-		else if (arg.equals("-1.6") || arg.equals("-6")) {
+		} else if (arg.equals("-1.6") || arg.equals("-6")) {
 			codeVers = JavaCore.VERSION_1_6;
-		}
-		else if (arg.equals("-1.7") || arg.equals("-7")) {
+		} else if (arg.equals("-1.7") || arg.equals("-7")) {
 			codeVers = JavaCore.VERSION_1_7;
 		}
 
@@ -144,14 +154,13 @@ public class VerveineJParser extends VerveineParser {
 	private void collectJavaFiles(File f, Collection<String> files) {
 		if (f.isFile() && f.getName().endsWith(".java")) {
 			files.add(f.getAbsolutePath());
-		}
-		else if (f.isDirectory()){
+		} else if (f.isDirectory()) {
 			for (File child : f.listFiles()) {
 				collectJavaFiles(child, files);
 			}
 		}
 		// else ignore it?
-		
+
 	}
 
 	public static void main(String[] args) {
@@ -174,7 +183,7 @@ public class VerveineJParser extends VerveineParser {
 		collectJavaFiles(argPath, sourceFiles);
 
 		jdtParser.createASTs(sourceFiles.toArray(new String[0]), null, new String[0], req, null);
-		
+
 		this.compressNamespacesNames();
 	}
 
@@ -187,7 +196,7 @@ public class VerveineJParser extends VerveineParser {
 			String name = ns.getName();
 			int last = name.lastIndexOf('.');
 			if (last >= 0) {
-				ns.setName(name.substring(last+1));
+				ns.setName(name.substring(last + 1));
 			}
 		}
 	}
@@ -198,25 +207,23 @@ public class VerveineJParser extends VerveineParser {
 	protected void expandNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
 			expandNamespaceName(ns);
-		}		
+		}
 	}
-	
+
 	private void expandNamespaceName(Namespace ns) {
 		String name = ns.getName();
 		if (name.indexOf('.') > 0) {
 			return;
-		}
-		else {
+		} else {
 			Namespace parent = (Namespace) ns.getParentScope();
 			if (parent == null) {
 				return;
-			}
-			else {
+			} else {
 				expandNamespaceName(parent);
-				ns.setName(parent.getName()+"."+ns.getName());
+				ns.setName(parent.getName() + "." + ns.getName());
 			}
 		}
 	}
 
-	
+
 }
