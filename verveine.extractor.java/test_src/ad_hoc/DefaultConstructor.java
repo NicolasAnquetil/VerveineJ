@@ -14,7 +14,7 @@ public class DefaultConstructor {
 		super(why);
 	}
 
-	public methodWithInstanceScope() {}
+	public void methodWithInstanceScope() {}
 		
 	public static void methodWithClassScope() {
 		DefaultConstructor x = new DefaultConstructor();

@@ -147,19 +147,23 @@ public class VerveineVisitor extends ASTVisitor {
 
 		IBinding importBnd = node.resolveBinding();
 		String importName = node.getName().getFullyQualifiedName();
-		if (importBnd instanceof IMethodBinding)  {
+		importName = dico.removeLastName(importName);  // remove Class name or '*'
+
+		if (importBnd == null) {
+			if (node.isStatic()) {
+				importName = dico.removeLastName(importName);  // remove Class name or '*'
+			}
+		}
+		else if (importBnd instanceof IMethodBinding)  {
 			importBnd = ((IMethodBinding)importBnd).getDeclaringClass().getPackage();
-			importName = dico.removeLastName(importName);
 			importName = dico.removeLastName(importName);
 		}
 		else if (importBnd instanceof IVariableBinding)  {
 			importBnd = ((IVariableBinding)importBnd).getDeclaringClass().getPackage();
 			importName = dico.removeLastName(importName);
-			importName = dico.removeLastName(importName);
 		}
 		else if (importBnd instanceof ITypeBinding)  {
 			importBnd = ((ITypeBinding)importBnd).getPackage();
-			importName = dico.removeLastName(importName);
 		}
 		Namespace fmxDest = dico.ensureFamixNamespace( (IPackageBinding)importBnd, importName);
 		context.setLastReference( dico.addFamixReference(fmxSrc, fmxDest, context.getLastReference()) );
@@ -232,13 +236,7 @@ public class VerveineVisitor extends ASTVisitor {
 			dico.addFamixReference(context.top(), fmx, lastRef);
 			
 			// create an invocation of the constructor
-			methodInvocation(node.resolveConstructorBinding(), findTypeName(clazz), /*receiver*/null);
-			for (Expression a : (List<Expression>)node.arguments()) {
-				if (a instanceof SimpleName) {
-					visitSimpleName((SimpleName) a);
-				}
-			}
-
+			methodInvocation(node.resolveConstructorBinding(), findTypeName(clazz), /*receiver*/null, node.arguments());
 		}
 		return super.visit(node);
 	}
@@ -591,14 +589,9 @@ public class VerveineVisitor extends ASTVisitor {
 				pushInitBlockMethod(ctxt);
 			}
 		}
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(callingExpr));
+		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(callingExpr), node.arguments());
 		if (callingExpr instanceof SimpleName) {
 			visitSimpleName((SimpleName) callingExpr);
-		}
-		for (Expression a : (List<Expression>)node.arguments()) {
-			if (a instanceof SimpleName) {
-				visitSimpleName((SimpleName) a);
-			}
 		}
 		
 		if (fieldInit) {
@@ -611,7 +604,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	public boolean visit(SuperMethodInvocation node) {
 		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(), context.topMethod());
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver);
+		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver, node.arguments());
 
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
@@ -648,10 +641,15 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param calledName of the method invoked
 	 * @param receiver of the call, i.e. the object to which the message is sent
 	 */
-	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver) {
+	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver, Collection<Expression> l_args) {
 		BehaviouralEntity sender = this.context.topMethod();
 		Method invoked = null;
 
+		if (calledBnd != null) {
+			// for parameterized methods there is a level of indirection, for other methods don't change anything
+			calledBnd = calledBnd.getMethodDeclaration();
+		}
+		
 		if ( (receiver != null) && (receiver.getName().equals("class")) && (calledBnd != null) && (calledBnd.getDeclaringClass()==null)) {
 			/*bug with JDT*/
 			invoked = (Method) dico.getEntityByKey(calledBnd);
@@ -694,6 +692,12 @@ public class VerveineVisitor extends ASTVisitor {
 				}
 				Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation());
 				context.setLastInvocation( invok );
+			}
+		}
+
+		for (Expression a : l_args) {
+			if (a instanceof SimpleName) {
+				visitSimpleName((SimpleName) a);
 			}
 		}
 	}
