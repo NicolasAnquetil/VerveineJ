@@ -5,16 +5,13 @@ package tests.fr.inria.verveine.extractor.java;
 
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 import java.io.File;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import test.fr.inria.verveine.core.TestVerveineUtils;
-import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
