@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="0" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" tests="16" time="5.202" timestamp="2011-04-30T23:37:16">
+<testsuite errors="0" failures="0" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" tests="17" time="6.092" timestamp="2011-06-06T12:54:29">
   <properties>
     <property name="ant.project.invoked-targets" value="junit" />
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
@@ -8,7 +8,7 @@
     <property name="java.vm.version" value="19.1-b02" />
     <property name="ant.library.dir" value="/usr/share/ant/lib" />
     <property name="ant.file.type.verveine.extractor.java" value="file" />
-    <property name="ant.version" value="Apache Ant version 1.8.0 compiled on May 9 2010" />
+    <property name="ant.version" value="Apache Ant version 1.8.1 compiled on October 13 2010" />
     <property name="ant.java.version" value="1.6" />
     <property name="java.vm.vendor" value="Sun Microsystems Inc." />
     <property name="java.vendor.url" value="http://java.sun.com/" />
@@ -42,7 +42,7 @@
     <property name="test.report.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/testrep" />
     <property name="sun.management.compiler" value="HotSpot Tiered Compilers" />
     <property name="ant.file.verveine.extractor.java" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/build.xml" />
-    <property name="os.version" value="2.6.35-28-generic" />
+    <property name="os.version" value="2.6.38-8-generic-pae" />
     <property name="dist.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib" />
     <property name="ant.file" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/build.xml" />
     <property name="docs.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/docs" />
@@ -51,7 +51,7 @@
     <property name="java.awt.printerjob" value="sun.print.PSPrinterJob" />
     <property name="java.specification.version" value="1.6" />
     <property name="file.encoding" value="UTF-8" />
-    <property name="java.class.path" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/bin:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/akuhn-util-r28011.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/fame.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/famix.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/junit.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.contenttype_3.4.100.v20100505-1235.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.jobs_3.5.0.v20100515.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.resources_3.6.0.v20100526-0737.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.runtime_3.6.0.v20100505.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.equinox.common_3.6.0.v20100503.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.equinox.preferences_3.3.0.v20100503.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.jdt.core_3.6.0.v_A58.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.osgi_3.6.0.v20100517.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.hamcrest.core_1.1.0.v20090501071000.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.core.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.extractor.java.jar:/usr/share/java/ant-launcher-1.8.0.jar:/usr/share/ant/lib/ant.jar:/usr/share/ant/lib/ant-junit.jar" />
+    <property name="java.class.path" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/bin:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/akuhn-util-r28011.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/fame.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/famix.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/junit.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.contenttype_3.4.100.v20100505-1235.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.jobs_3.5.0.v20100515.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.resources_3.6.0.v20100526-0737.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.runtime_3.6.0.v20100505.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.equinox.common_3.6.0.v20100503.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.equinox.preferences_3.3.0.v20100503.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.jdt.core_3.6.0.v_A58.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.osgi_3.6.0.v20100517.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.hamcrest.core_1.1.0.v20090501071000.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.core.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.extractor.java.jar:/usr/share/java/ant-launcher-1.8.1.jar:/usr/share/ant/lib/ant.jar:/usr/share/ant/lib/ant-junit.jar" />
     <property name="user.name" value="anquetin" />
     <property name="verveine.jar" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.extractor.java.jar" />
     <property name="java.vm.specification.version" value="1.0" />
@@ -74,22 +74,23 @@
     <property name="sun.desktop" value="gnome" />
     <property name="sun.cpu.isalist" value="" />
   </properties>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testConstructorInvocations" time="1.936" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testDictionary" time="0.244" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testExceptions" time="0.255" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAnnotation" time="0.498" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testClassVar" time="0.324" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterizableClass" time="0.259" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterTypeAsType" time="0.189" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodParameterArgumentTypes" time="0.188" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodLocalVariableArgumentTypes" time="0.144" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodReturnArgumentTypes" time="0.146" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumDecl" time="0.14" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumAccess" time="0.14" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testStaticInitializationBlock" time="0.137" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAssociation" time="0.259" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testBelongsTo" time="0.163" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testJavaCore" time="0.121" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testDictionary" time="2.404" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testStaticMembers" time="0.472" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testExceptions" time="0.421" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAnnotation" time="0.415" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testClassVar" time="0.21" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterizableClass" time="0.171" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testParameterTypeAsType" time="0.175" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodParameterArgumentTypes" time="0.173" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodLocalVariableArgumentTypes" time="0.312" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testMethodReturnArgumentTypes" time="0.268" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumDecl" time="0.157" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testEnumAccess" time="0.117" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testStaticInitializationBlock" time="0.107" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testAssociation" time="0.166" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testBelongsTo" time="0.153" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testJavaCore" time="0.167" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" name="testSourceLanguage" time="0.106" />
   <system-out><![CDATA[VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Book.java
@@ -97,7 +98,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -106,7 +109,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -115,7 +120,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -124,7 +131,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -133,7 +142,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -142,7 +153,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -151,7 +164,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -160,7 +175,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -169,7 +186,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -178,7 +197,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -187,7 +208,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -196,7 +219,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -205,7 +230,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -214,7 +241,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -223,7 +252,9 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 VerveineJ processing file: test_src/ad_hoc/ReadException.java
 VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
@@ -232,7 +263,20 @@ VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
 VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
 VerveineJ processing file: test_src/ad_hoc/Dictionary.java
 VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
 VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
+VerveineJ processing file: test_src/ad_hoc/ReadClient.java
+VerveineJ processing file: test_src/ad_hoc/ReadException.java
+VerveineJ processing file: test_src/ad_hoc/annotations/GetProperty.java
+VerveineJ processing file: test_src/ad_hoc/annotations/Book.java
+VerveineJ processing file: test_src/ad_hoc/annotations/SetProperty.java
+VerveineJ processing file: test_src/ad_hoc/annotations/Serializer.java
+VerveineJ processing file: test_src/ad_hoc/Dictionary.java
+VerveineJ processing file: test_src/ad_hoc/Planet.java
+VerveineJ processing file: test_src/ad_hoc/ComplexEnum.java
+VerveineJ processing file: test_src/ad_hoc/Card.java
+VerveineJ processing file: test_src/ad_hoc/DefaultConstructor.java
 VerveineJ processing file: test_src/ad_hoc/ReadClient.java
 ]]></system-out>
   <system-err><![CDATA[]]></system-err>

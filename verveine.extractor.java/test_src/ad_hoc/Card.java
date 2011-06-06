@@ -1,5 +1,8 @@
 package ad_hoc;
 
+import java.util.List;
+import java.util.ArrayList;
+
 public enum Suit { CLUBS, DIAMONDS, HEARTS, SPADES };
 
 public class Card {
