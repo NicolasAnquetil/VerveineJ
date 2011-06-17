@@ -79,6 +79,7 @@ import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.Enum;
 import fr.inria.verveine.core.gen.famix.EnumValue;
+import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.ImplicitVariable;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.Method;
@@ -554,16 +555,28 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 
 		if (typ.isParameterizedType()) {
-			ITypeBinding parameterizedBnd = typ.resolveBinding();
+			ITypeBinding parameterizedBnd = ((ParameterizedType)typ).resolveBinding();
 			ITypeBinding parameterizableBnd = (parameterizedBnd == null) ? null : parameterizedBnd.getErasure();
 			String tname = findTypeName(typ);
 			ParameterizableClass generic = null;
 			generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, tname, /*owner*/null, /*isGeneric*/true);
 
-			fmxTyp = dico.ensureFamixParameterizedType(parameterizedBnd, tname, generic, /*owner*/ctxt);
+			if (parameterizedBnd == parameterizableBnd) {
+				// JDT bug?
+				fmxTyp = dico.ensureFamixParameterizedType(null, tname, generic, /*owner*/ctxt);
+			}
+			else {
+				fmxTyp = dico.ensureFamixParameterizedType(parameterizedBnd, tname, generic, /*owner*/ctxt);
+			}
+//if (tname.equals("Class")) { System.err.println("**Parameterized Class in file "+ ((FileAnchor)ctxt.getSourceAnchor()).getFileName());}
 			for (Type targ : (List<Type>) ((ParameterizedType)typ).typeArguments()) {
 				fr.inria.verveine.core.gen.famix.Type fmxTArg = dico.ensureFamixType(targ.resolveBinding(), findTypeName(targ), /*owner*/null, ctxt);
-				((fr.inria.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
+				if (fmxTArg != null) {
+					((fr.inria.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
+//if (tname.equals("Class")){System.err.println("**       arg:"+fmxTArg.getName());}
+				}
+//else{if (tname.equals("Class"))
+//{System.err.println("**       null arg!");} }
 			}
 		}
 		else if ( typ.isSimpleType() && (typ.resolveBinding()==null) && (ctxt instanceof Method)) {

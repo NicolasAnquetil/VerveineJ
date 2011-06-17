@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java;
 
 import java.io.File;
+import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -12,8 +13,11 @@ import org.eclipse.jdt.core.dom.ASTParser;
 
 import fr.inria.verveine.core.VerveineParser;
 import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
+import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
+import fr.inria.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.core.gen.famix.SourceLanguage;
+import fr.inria.verveine.core.gen.famix.Type;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -36,6 +40,9 @@ public class VerveineJParser extends VerveineParser {
 	private Collection<String> argPath;
 	private Collection<String> argFiles;
 
+	/**
+	 * Java parser, provided by JDT
+	 */
 	private ASTParser jdtParser = null;
 
 	public VerveineJParser() {
@@ -60,9 +67,11 @@ public class VerveineJParser extends VerveineParser {
 
 			if (arg.equals("-h")) {
 				usage();
-			} else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
+			}
+			else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
 				setCodeVersion(arg);
-			} else if (arg.equals("-cp")) {
+			}
+			else if (arg.equals("-cp")) {
 				if (i < args.length) {
 					String[] tmpPath = args[i++].split(System.getProperty("path.separator"));
 					int oldlength = classPath.length;
@@ -71,10 +80,16 @@ public class VerveineJParser extends VerveineParser {
 					for (int p=oldlength; p < newlength; p++) {
 						classPath[p] = tmpPath[p-oldlength];
 					}
-				} else {
-					System.err.println("-cp requires a classPath");
 				}
-
+				else {
+					System.err.println("-cp requires a classPath");
+				}	
+			}
+			else {
+				int j = super.setOption(i, args);
+				if (j > 0) {
+					i += (j-1);  // 1 more will be added at the begining of the loop ("args[i++]")
+				}
 			}
 		}
 		while (i < args.length) {
@@ -104,17 +119,6 @@ public class VerveineJParser extends VerveineParser {
 		options.put(JavaCore.COMPILER_SOURCE, codeVers);
 
 		jdtParser.setCompilerOptions(options);
-	}
-
-	/**
-	 * @param classPath
-	 */
-	private void tracePath(String pathname, String[] path) {
-		System.err.print("TRACE: " + pathname + "= ");
-		for (String p : path) {
-			System.err.print(""+p+" , ");
-		}
-		System.err.println();
 	}
 
 	protected void usage() {
@@ -167,7 +171,17 @@ public class VerveineJParser extends VerveineParser {
 		VerveineJParser parser = new VerveineJParser();
 		parser.setOptions(args);
 		parser.parse();
-		parser.emitMSE(OUTPUT_FILE);
+		//parser.debug();
+		parser.emitMSE(parser.getOutputFileName());
+	}
+
+	private void debug() {
+		ParameterizedType m = new ParameterizedType();
+		Type t = new Type();
+		m.setName("toto()");
+		m.addArguments(t);
+		getFamixRepo().add(m);
+		t.setName("Toto");
 	}
 
 	public void parse() {
@@ -181,7 +195,6 @@ public class VerveineJParser extends VerveineParser {
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
-
 		jdtParser.createASTs(sourceFiles.toArray(new String[0]), null, new String[0], req, null);
 
 		this.compressNamespacesNames();
@@ -191,7 +204,7 @@ public class VerveineJParser extends VerveineParser {
 	 * As explained in JavaDictionary, Namespaces are created with their fully qualified name.
 	 * We need now to give them their simple name
 	 */
-	protected void compressNamespacesNames() {
+	private void compressNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
 			String name = ns.getName();
 			int last = name.lastIndexOf('.');
@@ -204,7 +217,7 @@ public class VerveineJParser extends VerveineParser {
 	/**
 	 * @see VerveineJParser.compressNamespacesNames()
 	 */
-	protected void expandNamespacesNames() {
+	private void expandNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
 			expandNamespaceName(ns);
 		}

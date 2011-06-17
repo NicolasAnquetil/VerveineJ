@@ -32,7 +32,7 @@
 		<mkdir dir="${test.report.dir}" />
 	</target>
 	
-	<!-- call ant on verveine.core DOES NOT WORK :-( -->
+	<!-- call ant on verveine.core -->
 	<target name="antcore">
 		<ant dir="${core.dir}" target="jar" inheritAll="false" />
 	</target>

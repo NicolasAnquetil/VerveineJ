@@ -50,7 +50,10 @@ import fr.inria.verveine.core.gen.famix.UnknownVariable;
  */
 public class JavaDictionary extends Dictionary<IBinding> {
 
-	// a property added to CompilationUnits to record the name of the source file name they come from
+	/**
+	 * A property added to CompilationUnits to record the name of the source file they belong to.
+	 * Used to create FileAnchors
+	 */
 	public static final String SOURCE_FILENAME_PROPERTY = "verveine-source-filename";
 
 	public static final String OBJECT_NAME = "Object";
@@ -59,7 +62,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String ARRAYS_NAME = "default[]";
 	public static final String INIT_BLOCK_NAME = "<Initializer>";
 
-	// result of utility methods for checking mathcing between two entities
+	/**
+	 * Result of utility methods for checking matching between two entities
+	 */
 	private enum CheckResult {
 		MATCH, UNDECIDED, FAIL;
 	}
