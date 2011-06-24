@@ -40,6 +40,7 @@ import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.core.gen.famix.ThrownException;
 import fr.inria.verveine.core.gen.famix.Type;
+import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
@@ -178,7 +179,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 		// Method annotations
 		fr.inria.verveine.core.gen.famix.Class book = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Book");
-		assertEquals(11, book.getMethods().size());
+		assertEquals(12, book.getMethods().size());
 		for (Method meth : book.getMethods()) {
 			Collection<AnnotationInstance> annInstances = meth.getAnnotationInstances();
 			if (meth.getName().startsWith("get")) {
@@ -397,7 +398,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "ad_hoc"), pl.getBelongsTo());
 		assertEquals(8, pl.getValues().size());
 		assertEquals(3, pl.getAttributes().size());
-		assertEquals(6+2, pl.getMethods().size()); // 6 methods + 2 implicit used: values(), toString()
+		assertEquals(6+3, pl.getMethods().size()); // 6 methods + 2 implicit used: values(), toString() + <initializer>
 	}
 
 	@Test
@@ -445,7 +446,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 
-		assertEquals(6+2, pl.getMethods().size());
+		assertEquals(6+3, pl.getMethods().size());
 		for (Method m : pl.getMethods()) {
 			if ( m.getName().equals("Planet") || m.getName().equals("main") ) {
 				assertEquals(0, m.getIncomingInvocations().size());
@@ -460,6 +461,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			else if (m.getName().equals("radius")) {
 				assertEquals(3, m.getIncomingInvocations().size());
 			}
+			else if (m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+				assertEquals(0, m.getIncomingInvocations().size());
+			}
 			else {
 				fail("Unknown method of Enum Planet: "+m.getName());
 			}
@@ -468,21 +472,25 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testStaticInitializationBlock() {
-		fr.inria.verveine.core.gen.famix.Class card = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Card");
-		assertNotNull(card);
-		fr.inria.verveine.core.gen.famix.Class serial = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Serializer");
-		assertNotNull(serial);
-
-		Collection<Method> l_meth = TestVerveineUtils.listElements(repo, Method.class, "<Initializer>");
-		assertEquals(2, l_meth.size());
+		Collection<Method> l_meth = TestVerveineUtils.listElements(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
+		assertEquals(5, l_meth.size());
 		String unknownParent = null;
 		for (Method meth : l_meth) {
-			assertEquals("<Initializer>()", meth.getSignature());
-			if (meth.getParentType() == card) {
-				assertEquals(4, meth.getOutgoingInvocations().size());
+			assertEquals(JavaDictionary.INIT_BLOCK_NAME+"()", meth.getSignature());
+			if (meth.getParentType().getName().equals("Card")) {
+				assertEquals(5, meth.getOutgoingInvocations().size());
 			}
-			else if (meth.getParentType() == serial) {
+			else if (meth.getParentType().getName().equals("Serializer")) {
 				assertEquals(1, meth.getOutgoingInvocations().size());
+			}
+			else if (meth.getParentType().getName().equals("Book")) {
+				assertEquals(1, meth.getOutgoingInvocations().size());
+			}
+			else if (meth.getParentType().getName().equals("Planet")) {
+				assertEquals(0, meth.getOutgoingInvocations().size());
+			}
+			else if (meth.getParentType().getName().equals("DefaultConstructor")) {
+				assertEquals(0, meth.getOutgoingInvocations().size());
 			}
 			else {
 				unknownParent = meth.getParentType().getName();

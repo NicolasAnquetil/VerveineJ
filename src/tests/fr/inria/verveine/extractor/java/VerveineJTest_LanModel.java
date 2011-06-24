@@ -112,7 +112,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testEntitiesNumber() {
 		assertEquals(11+14, TestVerveineUtils.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable}
 		assertEquals(3,     TestVerveineUtils.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
-		assertEquals(40+7,  TestVerveineUtils.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString}
+		assertEquals(40+8,  TestVerveineUtils.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10+1,  TestVerveineUtils.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
@@ -553,9 +553,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertFalse(clazz.getIsProtected());
 		assertFalse(clazz.getIsFinal());
 		
-		assertEquals(3, clazz.getMethods().size());
+		assertEquals(4, clazz.getMethods().size());
 		for (Method m : clazz.getMethods()) {
-			assertTrue(m.getIsPublic());
+			if (m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+				assertFalse(m.getIsPublic());
+			}
+			else {
+				assertTrue(m.getIsPublic());
+			}
 			assertFalse(m.getIsPrivate());
 			assertFalse(m.getIsProtected());
 			assertFalse(m.getIsFinal());

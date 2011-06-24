@@ -79,7 +79,6 @@ import fr.inria.verveine.core.gen.famix.Class;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.Enum;
 import fr.inria.verveine.core.gen.famix.EnumValue;
-import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.ImplicitVariable;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.Method;
@@ -105,6 +104,11 @@ public class VerveineVisitor extends ASTVisitor {
 	 * A stack that keeps the current definition context (package/class/method)
 	 */
 	protected EntityStack context;
+
+	/**
+	 * Useful to keep the FamixType created in the specific case of "new SomeClass().someMethod()"
+	 */
+	private fr.inria.verveine.core.gen.famix.Type classInstanceCreated = null;
 
 	public VerveineVisitor(JavaDictionary dico) {
 		this.dico = dico;
@@ -233,11 +237,12 @@ public class VerveineVisitor extends ASTVisitor {
 			fr.inria.verveine.core.gen.famix.Type fmx = null;
 			Type clazz = node.getType();
 			fmx = referedType(clazz, context.top());
+			this.classInstanceCreated = fmx;
 			Reference lastRef = context.getLastReference();
 			dico.addFamixReference(context.top(), fmx, lastRef);
 			
 			// create an invocation of the constructor
-			methodInvocation(node.resolveConstructorBinding(), findTypeName(clazz), /*receiver*/null, node.arguments());
+			methodInvocation(node.resolveConstructorBinding(), findTypeName(clazz), /*receiver*/null, /*methOwner*/fmx, node.arguments());
 		}
 		return super.visit(node);
 	}
@@ -339,7 +344,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-//		System.out.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier();
+		//System.out.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier());
 
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
@@ -480,6 +485,13 @@ public class VerveineVisitor extends ASTVisitor {
 		return super.visit(node);
 	}
 
+	public void endVisit(FieldDeclaration node) {
+		Method ctxtMeth = this.context.topMethod();
+		if 	( (ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) ) {
+			closeMethodDeclaration();
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationExpression node) {
 //		System.err.println("TRACE, Visiting VariableDeclarationExpression: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
@@ -527,6 +539,12 @@ public class VerveineVisitor extends ASTVisitor {
 			else if (node instanceof FieldDeclaration) {
 				// creating a class' field
 				fmx = dico.ensureFamixAttribute(bnd, name, varTyp, (fr.inria.verveine.core.gen.famix.Type) ctxt);
+				Method ctxtMeth = this.context.topMethod();
+				if ( (vd.getInitializer() != null) && 
+					 ( (ctxtMeth == null) || (! ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) ) ) {
+					ctxtMeth = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), /*retType*/null, context.topType());
+					pushInitBlockMethod(ctxtMeth);
+				}
 			}
 			else if ( (node instanceof VariableDeclarationExpression) || (node instanceof VariableDeclarationStatement) ) {
 				// creating a method's local variable
@@ -568,15 +586,12 @@ public class VerveineVisitor extends ASTVisitor {
 			else {
 				fmxTyp = dico.ensureFamixParameterizedType(parameterizedBnd, tname, generic, /*owner*/ctxt);
 			}
-//if (tname.equals("Class")) { System.err.println("**Parameterized Class in file "+ ((FileAnchor)ctxt.getSourceAnchor()).getFileName());}
+
 			for (Type targ : (List<Type>) ((ParameterizedType)typ).typeArguments()) {
 				fr.inria.verveine.core.gen.famix.Type fmxTArg = dico.ensureFamixType(targ.resolveBinding(), findTypeName(targ), /*owner*/null, ctxt);
 				if (fmxTArg != null) {
 					((fr.inria.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
-//if (tname.equals("Class")){System.err.println("**       arg:"+fmxTArg.getName());}
 				}
-//else{if (tname.equals("Class"))
-//{System.err.println("**       null arg!");} }
 			}
 		}
 		else if ( typ.isSimpleType() && (typ.resolveBinding()==null) && (ctxt instanceof Method)) {
@@ -596,13 +611,15 @@ public class VerveineVisitor extends ASTVisitor {
 		Expression callingExpr = node.getExpression();
 		if (callingExpr == null) {
 			if (context.topMethod() == null) {
+System.err.println("--INITIALIZER was not created (MethodDeclaration)");
 				// probably a method call to initialize a field when declaring it
 				fieldInit = true;
 				Method ctxt = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), /*retType*/null, context.topType());
 				pushInitBlockMethod(ctxt);
 			}
 		}
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), getReceiver(callingExpr), node.arguments());
+		NamedEntity receiver = getReceiver(callingExpr);
+		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver, getInvokedMethodOwner(callingExpr, receiver), node.arguments());
 		if (callingExpr instanceof SimpleName) {
 			visitSimpleName((SimpleName) callingExpr);
 		}
@@ -615,9 +632,12 @@ public class VerveineVisitor extends ASTVisitor {
 		return super.visit(node);
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(SuperMethodInvocation node) {
+if(context.topMethod()==null) {System.err.println("---null owner of implicit var (visit(SuperMethodInvocation)");}
 		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(), context.topMethod());
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver, node.arguments());
+		fr.inria.verveine.core.gen.famix.Type superClass = this.context.topType().getSuperInheritances().iterator().next().getSuperclass();
+		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver, /*methOwner*/superClass, node.arguments());
 
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
@@ -629,6 +649,7 @@ public class VerveineVisitor extends ASTVisitor {
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		String name = context.topMethod().getName();
 		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<String>)null, /*retType*/null, /*owner*/context.topType());  // cast needed to desambiguate the call
+if(context.topMethod()==null) {System.err.println("---null owner of implicit var (visit(ConstructorInvocation)");}
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, (Class) context.topType(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
@@ -641,6 +662,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*name*/null, /*paramTypes*/(Collection<String>)null, /*retType*/null, /*owner*/null);  // cast needed to desambiguate the call
+if(context.topMethod()==null) {System.err.println("---null owner of implicit var (visit(SuperConstructorInvocation)");}
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) context.topType(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
@@ -653,8 +675,10 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param calledBnd -- a binding for the method
 	 * @param calledName of the method invoked
 	 * @param receiver of the call, i.e. the object to which the message is sent
+	 * @param methOwner -- owner of the method invoked. Might be a subtype of the receiver's type
+	 * @param l_args -- list of the method's parameters
 	 */
-	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver, Collection<Expression> l_args) {
+	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver, fr.inria.verveine.core.gen.famix.Type methOwner, Collection<Expression> l_args) {
 		BehaviouralEntity sender = this.context.topMethod();
 		Method invoked = null;
 
@@ -696,8 +720,7 @@ public class VerveineVisitor extends ASTVisitor {
 		else {
 			if (sender != null) {
 				if ( (receiver != null) && (receiver instanceof StructuralEntity) ) {
-					fr.inria.verveine.core.gen.famix.Type varTyp = ((StructuralEntity)receiver).getDeclaredType();
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, /*owner*/varTyp);  // cast needed to desambiguate the call
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, methOwner);  // cast needed to desambiguate the call
 				}
 				else {
 					//  static method called on the class (or null receiver)
@@ -737,7 +760,6 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 		return super.visit(node);
 	}
-
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(InfixExpression node) {
@@ -947,6 +969,7 @@ public class VerveineVisitor extends ASTVisitor {
 	private NamedEntity getReceiver(Expression expr) {
 		// msg(), same as ThisExpression
 		if (expr == null) {
+if(context.topMethod()==null) {System.err.println("---null owner of implicit var (getReceiver)");}
 			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod());
 		}
 
@@ -955,7 +978,7 @@ public class VerveineVisitor extends ASTVisitor {
 			return getReceiver(((ArrayAccess) expr).getArray());
 		}
 
-		// new type[].msg() -- TODO similar to ClassInstanceCreation
+		// new type[].msg()
 		else if (expr instanceof ArrayCreation) {
 			//System.err.println("WARNING: Ignored receiver expression in method call: ArrayCreation");
 			return null;
@@ -971,7 +994,7 @@ public class VerveineVisitor extends ASTVisitor {
 			return getReceiver(((CastExpression) expr).getExpression());
 		}
 
-		// new Class().msg() -- TODO anonymous object of a known class ...
+		// new Class().msg()
 		else if (expr instanceof ClassInstanceCreation) {
 			//System.err.println("WARNING: Ignored receiver expression in method call: ClassInstanceCreation");
 			return null;
@@ -999,7 +1022,7 @@ public class VerveineVisitor extends ASTVisitor {
 			return null;
 		}
 
-		// msg1().msg() -- TODO similar to ClassInstanceCreation, 'msg()' is sent to the object returned by 'msg1()'
+		// msg1().msg()
 		else if (expr instanceof MethodInvocation) {
 			//System.err.println("WARNING: Ignored receiver expression in method call: MethodInvocation");
 
@@ -1039,7 +1062,7 @@ public class VerveineVisitor extends ASTVisitor {
 			return getReceiver(((ParenthesizedExpression) expr).getExpression());
 		}
 
-		// "string".msg() -- TODO similar to ClassInstanceCreation, anonymous String object
+		// "string".msg()
 		else if (expr instanceof StringLiteral) {
 			//System.err.println("WARNING: Ignored receiver expression in method call: StringLiteral");
 			return null;
@@ -1050,7 +1073,7 @@ public class VerveineVisitor extends ASTVisitor {
 			return createAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), /*typ*/null, /*owner*/null, /*accessor*/null);
 		}
 
-		// super.msg1().msg() -- TODO similar to ClassInstanceCreation, 'msg()' is sent to the object returned by 'msg1()'
+		// super.msg1().msg()
 		else if (expr instanceof SuperMethodInvocation) {
 			//System.err.println("WARNING: Ignored receiver expression in method call: SuperMethodInvocation");
 			
@@ -1059,6 +1082,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// this.msg()
 		else if (expr instanceof ThisExpression) {
+if(context.topMethod()==null) {System.err.println("---null owner of implicit var (getReceiver/ThisExpression) in "+expr.getRoot().getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));}
 			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod());
 		}
 
@@ -1078,6 +1102,76 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Tries its best to find the type of a receiver without using the bindings.
+	 * Most of the time, the type is that of the receiver, but not always (if there is a cast or if receiver is null)
+	 * @param expr -- the Java expression describing the receiver
+	 * @param receiver -- the FAMIX Entity describing the receiver
+	 * @return the Famix Entity or null if could not find it
+	 */
+	private fr.inria.verveine.core.gen.famix.Type getInvokedMethodOwner(Expression expr, NamedEntity receiver) {
+
+		// ((type)expr).msg()
+		if (expr instanceof CastExpression) {
+			Type tcast = ((CastExpression) expr).getType();
+			return dico.ensureFamixType(tcast.resolveBinding(), findTypeName(tcast), /*owner*/null, this.context.top());
+		}
+
+		// new Class().msg()
+		else if (expr instanceof ClassInstanceCreation) {
+			return this.classInstanceCreated;
+		}
+
+		// msg1().msg()
+		else if (expr instanceof MethodInvocation) {
+			IMethodBinding bnd = ((MethodInvocation) expr).resolveMethodBinding();
+			if (bnd != null) {
+				return dico.ensureFamixType((ITypeBinding)bnd.getReturnType(), /*name*/null, /*owner*/null, this.context.top());
+			}
+			else {
+				return null;
+			}
+		}
+
+		// (expr).msg()
+		else if (expr instanceof ParenthesizedExpression) {
+			return getInvokedMethodOwner(((ParenthesizedExpression) expr).getExpression(), receiver);
+		}
+
+		// "string".msg()
+		else if (expr instanceof StringLiteral) {
+			return dico.ensureFamixType(null, "String", dico.ensureFamixNamespaceJavaLang(null));  // creating FamixClass java.lang.String
+		}
+
+		// super.msg1().msg()
+		else if (expr instanceof SuperMethodInvocation) {
+			IMethodBinding bnd = ((MethodInvocation) expr).resolveMethodBinding();
+			if (bnd != null) {
+				return dico.ensureFamixType(bnd, null, null);
+			}
+			else {
+				return null;
+			}
+		}
+
+		// everything else, see the receiver
+		else {
+			if (receiver == null) {
+				return null;
+			}
+			else if (receiver instanceof StructuralEntity) {
+				return ((StructuralEntity)receiver).getDeclaredType();
+			}
+			else if (receiver instanceof fr.inria.verveine.core.gen.famix.Type)  {
+				return (fr.inria.verveine.core.gen.famix.Type) receiver;
+			}
+			// ... what else ?
+			else  {
+				return null;
+			}
+		}
 	}
 
 	private StructuralEntity createAccessedStructEntity(IVariableBinding bnd, String name, fr.inria.verveine.core.gen.famix.Type typ, ContainerEntity owner, BehaviouralEntity accessor) {
