@@ -122,6 +122,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	/**
 	 * Recovers or creates a Famix Type (see also {@link Dictionary#ensureFamixType(Object, String, ContainerEntity)}
+	 * @param bnd -- binding for the type to create
+	 * @param name of the type
+	 * @param owner of the type
+	 * @param ctxt -- context of use of the type
 	 */
 	public Type ensureFamixType(ITypeBinding bnd, String name, ContainerEntity owner, ContainerEntity ctxt) {
 		Type fmx = null;
