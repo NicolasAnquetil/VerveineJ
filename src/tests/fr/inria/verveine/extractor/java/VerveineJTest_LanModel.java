@@ -118,7 +118,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
 		assertEquals(6+24,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//6 internal + 24 from imported packages/classes
-		assertEquals(25,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
+		assertEquals(50,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size()); //Override
 		assertEquals(2,     TestVerveineUtils.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
@@ -483,10 +483,10 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			}
 		}
 		assertNotNull(output);
-		assertEquals(4, output.getAccesses().size());
+		assertEquals(5, output.getAccesses().size());
 		for (Access acc : output.getAccesses()) {
 			assertTrue("Unexpected field accessed: "+acc.getVariable().getName(),
-						acc.getVariable().getName().equals("out") || acc.getVariable().getName().equals("printer"));
+					acc.getVariable().getName().equals("thePacket") || acc.getVariable().getName().equals("out") || acc.getVariable().getName().equals("printer"));
 			assertEquals(output, acc.getAccessor());
 		}
 	}

@@ -86,6 +86,7 @@ import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.ParameterType;
 import fr.inria.verveine.core.gen.famix.ParameterizableClass;
+import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.Reference;
 import fr.inria.verveine.core.gen.famix.StructuralEntity;
 
@@ -110,9 +111,10 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	private fr.inria.verveine.core.gen.famix.Type classInstanceCreated = null;
 
-	public VerveineVisitor(JavaDictionary dico) {
+	public VerveineVisitor(JavaDictionary dico, boolean withLocal) {
 		this.dico = dico;
 		this.context = new EntityStack();
+		this.skipLocals = (withLocal ? null : new ArrayList<IBinding>());
 	}
 
 	// VISITOR METHODS
@@ -147,7 +149,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * not sure it is a good idea ?!?
 	 */
 	public boolean visit(ImportDeclaration node) {
-
+		/*
 		Namespace fmxSrc = this.context.topPckg();  // could access it through recursive node.getParent() ?
 
 		IBinding importBnd = node.resolveBinding();
@@ -172,12 +174,13 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 		Namespace fmxDest = dico.ensureFamixNamespace( (IPackageBinding)importBnd, importName);
 		context.setLastReference( dico.addFamixReference(fmxSrc, fmxDest, context.getLastReference()) );
-		
+		*/
 		return false; // don't visit children
 	}
 
 	/*
 	 * Can only be a class or interface declaration
+	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
 	public boolean visit(TypeDeclaration node) {
 //		System.out.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
@@ -222,7 +225,9 @@ public class VerveineVisitor extends ASTVisitor {
 	private Type anonymousSuperType;
 
 	/**
-	 * See {@link VerveineVisitor#anonymousSuperType}
+	 * See {@link VerveineVisitor#anonymousSuperType}<br>
+	 * We could test if it is a local type (inner/anonymous) and not define it in case it does not make any reference
+	 * to anything outside its owner class. But it would be a lot of work for probably little gain.
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(ClassInstanceCreation node) {
@@ -342,6 +347,10 @@ public class VerveineVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	/**
+	 * Local type: same as {@link VerveineVisitor#visit(ClassInstanceCreation)}, 
+	 * we create it even if it is a local method because their are too many ways it can access external things
+	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 		//System.out.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier());
@@ -496,9 +505,10 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(VariableDeclarationExpression node) {
 //		System.err.println("TRACE, Visiting VariableDeclarationExpression: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
-		// we don't declare (local) variables that have a primitive type
+		// Independently of 'withLocals()', we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them 
 		if (! node.getType().isPrimitiveType()) {
+			// And we may ignore variables with local declared type 
 			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod());
 			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
 				dico.addSourceAnchor(att, node);
@@ -512,8 +522,7 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(VariableDeclarationStatement node) {
 //		System.err.println("TRACE, Visiting VariableDeclarationStatement: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
-		// we don't declare (local) variables that have a primitive type
-		// because we are assuming that the user is not interested in them 
+		// locals: same discussion as for visit(VariableDeclarationExpression node)
 		if (! node.getType().isPrimitiveType()) {
 			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod());
 			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
@@ -527,6 +536,14 @@ public class VerveineVisitor extends ASTVisitor {
 	private Collection<StructuralEntity> visitVariablesDeclarations(ASTNode node, fr.inria.verveine.core.gen.famix.Type varTyp, List<VariableDeclaration> fragments, ContainerEntity ctxt) {
 		Collection<StructuralEntity> ret = new ArrayList<StructuralEntity>();
 
+		if ( (! withLocals()) && isLocalType(varTyp) ) {
+			for (VariableDeclaration vd : fragments ) {
+				this.skipLocals.add(vd.resolveBinding());
+			}
+			return ret;
+		}
+
+		// we can declare the variables ...
 		for (VariableDeclaration vd : fragments) {
 			StructuralEntity fmx;
 			IVariableBinding bnd = vd.resolveBinding();
@@ -547,8 +564,14 @@ public class VerveineVisitor extends ASTVisitor {
 				}
 			}
 			else if ( (node instanceof VariableDeclarationExpression) || (node instanceof VariableDeclarationStatement) ) {
-				// creating a method's local variable
-				fmx = dico.ensureFamixLocalVariable(bnd, name, varTyp, (Method) ctxt);
+				if (this.skipLocals == null) {
+					// creating a method's local variable
+					fmx = dico.ensureFamixLocalVariable(bnd, name, varTyp, (Method) ctxt);
+				}
+				else {
+					this.skipLocals.add(bnd);
+					fmx = null;
+				}
 			}
 			else {
 				fmx = null;
@@ -607,25 +630,11 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodInvocation node) {
-		boolean fieldInit = false;
 		Expression callingExpr = node.getExpression();
-		if (callingExpr == null) {
-			if (context.topMethod() == null) {
-System.err.println("--INITIALIZER was not created (MethodDeclaration)");
-				// probably a method call to initialize a field when declaring it
-				fieldInit = true;
-				Method ctxt = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), /*retType*/null, context.topType());
-				pushInitBlockMethod(ctxt);
-			}
-		}
 		NamedEntity receiver = getReceiver(callingExpr);
 		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver, getInvokedMethodOwner(callingExpr, receiver), node.arguments());
 		if (callingExpr instanceof SimpleName) {
 			visitSimpleName((SimpleName) callingExpr);
-		}
-		
-		if (fieldInit) {
-			closeMethodDeclaration();
 		}
 
 		this.context.addTopMethodNOS(1);
@@ -634,7 +643,6 @@ System.err.println("--INITIALIZER was not created (MethodDeclaration)");
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(SuperMethodInvocation node) {
-if(context.topMethod()==null) {System.err.println("---null owner of implicit var (visit(SuperMethodInvocation)");}
 		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(), context.topMethod());
 		fr.inria.verveine.core.gen.famix.Type superClass = this.context.topType().getSuperInheritances().iterator().next().getSuperclass();
 		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver, /*methOwner*/superClass, node.arguments());
@@ -649,7 +657,6 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		String name = context.topMethod().getName();
 		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<String>)null, /*retType*/null, /*owner*/context.topType());  // cast needed to desambiguate the call
-if(context.topMethod()==null) {System.err.println("---null owner of implicit var (visit(ConstructorInvocation)");}
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, (Class) context.topType(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
@@ -662,7 +669,6 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 		
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*name*/null, /*paramTypes*/(Collection<String>)null, /*retType*/null, /*owner*/null);  // cast needed to desambiguate the call
-if(context.topMethod()==null) {System.err.println("---null owner of implicit var (visit(SuperConstructorInvocation)");}
 		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) context.topType(), context.topMethod());
 		Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
 		context.setLastInvocation( invok );
@@ -681,6 +687,11 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver, fr.inria.verveine.core.gen.famix.Type methOwner, Collection<Expression> l_args) {
 		BehaviouralEntity sender = this.context.topMethod();
 		Method invoked = null;
+
+		// may ignore local method invocation
+		if ( (! withLocals()) && isLocalType(methOwner) ) {
+			return;
+		}
 
 		if (calledBnd != null) {
 			// for parameterized methods there is a level of indirection, for other methods don't change anything
@@ -713,9 +724,7 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 			// checks whether this is not an AnnotationType member
 			// similar to creating a FamixAttribute access
 			AnnotationTypeAttribute accessed =  dico.ensureFamixAnnotationTypeAttribute(calledBnd, calledName, /*owner*/null);
-			if ( (accessed != null) && (sender != null) ) {
-				context.setLastAccess( dico.addFamixAccess(sender, accessed, /*isWrite*/false, context.getLastAccess()) );
-			}
+			createAccess(sender, accessed);
 		}
 		else {
 			if (sender != null) {
@@ -743,7 +752,7 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 		BehaviouralEntity accessor = this.context.topMethod();
 		IVariableBinding bnd = node.resolveFieldBinding();
 		// FIXME if bnd == null we have a problem
-		createAccessedStructEntity(bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
+		ensureAccessedStructEntity(bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
 
 		return super.visit(node);
 	}
@@ -756,7 +765,7 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 		if (bnd instanceof IVariableBinding) {
 			// could be a field or an enumValue
 			BehaviouralEntity accessor = this.context.topMethod();
-			createAccessedStructEntity((IVariableBinding)bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
+			ensureAccessedStructEntity((IVariableBinding)bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
 		}
 		return super.visit(node);
 	}
@@ -954,7 +963,7 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 		if ( (bnd instanceof IVariableBinding) && (context.topMethod() != null) ) {
 			// could be a variable, a field, an enumValue, ...
 			BehaviouralEntity accessor = this.context.topMethod();
-			createAccessedStructEntity((IVariableBinding)bnd, expr.getIdentifier(), /*typ*/null, /*owner*/null, accessor);
+			ensureAccessedStructEntity((IVariableBinding)bnd, expr.getIdentifier(), /*typ*/null, /*owner*/null, accessor);
 		}
 	
 	}
@@ -969,7 +978,6 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 	private NamedEntity getReceiver(Expression expr) {
 		// msg(), same as ThisExpression
 		if (expr == null) {
-if(context.topMethod()==null) {System.err.println("---null owner of implicit var (getReceiver)");}
 			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod());
 		}
 
@@ -1013,7 +1021,7 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 
 		// field.msg()
 		else if (expr instanceof FieldAccess) {
-			return createAccessedStructEntity(((FieldAccess) expr).resolveFieldBinding(), ((FieldAccess) expr).getName().getIdentifier(), /*type*/null, /*owner*/null, /*accessor*/null);
+			return ensureAccessedStructEntity(((FieldAccess) expr).resolveFieldBinding(), ((FieldAccess) expr).getName().getIdentifier(), /*type*/null, /*owner*/null, /*accessor*/null);
 		}
 
 		// (left-expr oper right-expr).msg()
@@ -1044,7 +1052,7 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 			else if (bnd instanceof IVariableBinding) {
 				String varName = ( ((Name)expr).isSimpleName() ? ((SimpleName)expr).getFullyQualifiedName() : ((QualifiedName)expr).getName().getIdentifier());
 				if ( ((IVariableBinding)bnd).isField() ) {
-					return createAccessedStructEntity((IVariableBinding)bnd, varName, /*typ*/null, /*owner*/null, /*accessor*/null);
+					return ensureAccessedStructEntity((IVariableBinding)bnd, varName, /*typ*/null, /*owner*/null, /*accessor*/null);
 				}
 				else if ( ((IVariableBinding)bnd).isParameter() ) {
 					ret = dico.ensureFamixParameter( (IVariableBinding)bnd, varName, null, context.topMethod());
@@ -1070,7 +1078,7 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 
 		// super.field.msg()
 		else if (expr instanceof SuperFieldAccess) {
-			return createAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), /*typ*/null, /*owner*/null, /*accessor*/null);
+			return ensureAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), /*typ*/null, /*owner*/null, /*accessor*/null);
 		}
 
 		// super.msg1().msg()
@@ -1082,7 +1090,6 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 		
 		// this.msg()
 		else if (expr instanceof ThisExpression) {
-if(context.topMethod()==null) {System.err.println("---null owner of implicit var (getReceiver/ThisExpression) in "+expr.getRoot().getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));}
 			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod());
 		}
 
@@ -1174,8 +1181,9 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 		}
 	}
 
-	private StructuralEntity createAccessedStructEntity(IVariableBinding bnd, String name, fr.inria.verveine.core.gen.famix.Type typ, ContainerEntity owner, BehaviouralEntity accessor) {
+	private StructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name, fr.inria.verveine.core.gen.famix.Type typ, ContainerEntity owner, BehaviouralEntity accessor) {
 		StructuralEntity accessed = null;
+
 		if (bnd == null) {
 			// no way to know if it should be an attribute, EnumValue, variable, ...
 			return null;
@@ -1183,6 +1191,12 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 		else {
 			bnd = bnd.getVariableDeclaration();
 		}
+		
+		// ignore locals?
+		if ( (! this.withLocals()) && this.skipLocals.contains(bnd) ) {
+			return null;
+		}
+
 
 		// could also test: "owner instanceof Enum" in case bnd == null
 		if (bnd.isEnumConstant()) {
@@ -1204,11 +1218,22 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 			accessed =  (StructuralEntity) dico.getEntityByKey(bnd);
 		}
 		
-		// We don't create local accesses
-		if ( (accessed != null) && (accessor != null) && (accessed.getBelongsTo() != accessor)) {
-			context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
-		}
+		createAccess(accessor, accessed);
 		return accessed;
+	}
+
+	/**
+	 * Creates a FamixAccess between an accessor and an accessed. Checks before that we are not in a local access to ignore.
+	 * @param accessor
+	 * @param accessed
+	 */
+	private void createAccess(BehaviouralEntity accessor, StructuralEntity accessed) {
+		// create local accesses?
+		if ( (accessed != null) && (accessor != null)) {
+			if (withLocals() || (accessed.getBelongsTo() != accessor)) {
+				context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+			}
+		}
 	}
 
 	private String findTypeName(org.eclipse.jdt.core.dom.Type t) {
@@ -1239,6 +1264,34 @@ if(context.topMethod()==null) {System.err.println("---null owner of implicit var
 				return JavaDictionary.OBJECT_NAME;
 			}
 		}
+	}
+
+	/**
+	 * List of the bindings of the local variables to skip.<BR>
+	 * When null means we want local (see {@link VerveineVisitor#withLocals()}
+	 */
+	private Collection<IBinding> skipLocals;
+
+	private boolean withLocals() {
+		return this.skipLocals == null;
+	}
+
+	private boolean isLocalType(fr.inria.verveine.core.gen.famix.Type typ) {
+		if ( (typ == null) || (typ instanceof PrimitiveType) ) {
+			return true;
+		}
+
+		ContainerEntity topFmxOwnerType = typ;
+		while (! (topFmxOwnerType.getBelongsTo() instanceof Namespace) ) {
+			topFmxOwnerType = topFmxOwnerType.getBelongsTo();
+		}
+
+		ContainerEntity topCtxtType = this.context.topType();
+		while (! (topCtxtType.getBelongsTo() instanceof Namespace) ) {
+			topCtxtType = topCtxtType.getBelongsTo();
+		}
+
+		return (topFmxOwnerType == topCtxtType);
 	}
 
 }

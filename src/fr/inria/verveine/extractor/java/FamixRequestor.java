@@ -16,10 +16,13 @@ public class FamixRequestor extends FileASTRequestor {
 	private Collection<String> argsDir;
 	private Collection<String> argsFile;
 	
-	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile) {
+	private boolean withLocal = true;
+	
+	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean withLocal) {
 		this.famixRepo = r;
 		this.argsDir = argsDir;
 		this.argsFile = argsFile;
+		this.withLocal = withLocal;
 
 		this.famixDictionnary = new JavaDictionary(famixRepo);
 	}
@@ -29,7 +32,7 @@ public class FamixRequestor extends FileASTRequestor {
 		System.out.println("VerveineJ processing file: "+path);
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
-		ast.accept(new VerveineVisitor(this.famixDictionnary));
+		ast.accept(new VerveineVisitor(this.famixDictionnary, this.withLocal));
 	}
 
 	private String relativePath(String fullPath) {

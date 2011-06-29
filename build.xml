@@ -78,6 +78,7 @@
 			<!-- Output is XML, could also be plain-->
 			<formatter type="xml" />
 			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
+			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_noLocals" todir="${test.report.dir}" />
 			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
 			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
 		</junit>
