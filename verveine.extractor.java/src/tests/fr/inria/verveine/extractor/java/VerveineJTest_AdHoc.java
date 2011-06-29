@@ -227,7 +227,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 		
-		assertEquals(2, meth.getAccesses().size());  // ImplicitVariable.class, mapBind
+		assertEquals(12, meth.getAccesses().size());  // ImplicitVariable.class, mapBind
 		boolean classFieldFound = false;
 		for (Access acc : meth.getAccesses()) {
 			if (acc.getTo().getName().equals("class")) {

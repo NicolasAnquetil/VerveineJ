@@ -29,8 +29,15 @@ public class VerveineJParser extends VerveineParser {
 
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
 
-
+	/**
+	 * Option: The version of Java expected by the parser 
+	 */
 	protected String codeVers = null;
+
+	/**
+	 * Option: wether to generate local informations (local to a type) 
+	 */
+	protected boolean withLocal = true;
 
 
 	/**
@@ -70,6 +77,9 @@ public class VerveineJParser extends VerveineParser {
 			}
 			else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
 				setCodeVersion(arg);
+			}
+			else if (arg.equals("-l")) {
+				this.withLocal = false;
 			}
 			else if (arg.equals("-cp")) {
 				if (i < args.length) {
@@ -122,7 +132,7 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	protected void usage() {
-		System.err.println("Usage: VerveineJ [-h] [-cp CLASSPATH] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("Usage: VerveineJ [-h] [-l] [-cp CLASSPATH] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.exit(0);
 
 	}
@@ -175,6 +185,7 @@ public class VerveineJParser extends VerveineParser {
 		parser.emitMSE(parser.getOutputFileName());
 	}
 
+	@SuppressWarnings("unused")
 	private void debug() {
 		ParameterizedType m = new ParameterizedType();
 		Type t = new Type();
@@ -191,7 +202,7 @@ public class VerveineJParser extends VerveineParser {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, withLocal);
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
