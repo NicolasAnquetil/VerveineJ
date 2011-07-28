@@ -32,7 +32,12 @@ public class FamixRequestor extends FileASTRequestor {
 		System.out.println("VerveineJ processing file: "+path);
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
-		ast.accept(new VerveineVisitor(this.famixDictionnary, this.withLocal));
+		try {
+			ast.accept(new VerveineVisitor(this.famixDictionnary, this.withLocal));
+		}
+		catch (Exception e) {
+			System.err.println("*** VerveineJ got exception: "+e.getMessage()+" while processing file: "+path);
+		}
 	}
 
 	private String relativePath(String fullPath) {

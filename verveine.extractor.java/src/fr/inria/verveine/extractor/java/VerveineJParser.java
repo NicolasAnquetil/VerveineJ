@@ -185,16 +185,6 @@ public class VerveineJParser extends VerveineParser {
 		parser.emitMSE(parser.getOutputFileName());
 	}
 
-	@SuppressWarnings("unused")
-	private void debug() {
-		ParameterizedType m = new ParameterizedType();
-		Type t = new Type();
-		m.setName("toto()");
-		m.addArguments(t);
-		getFamixRepo().add(m);
-		t.setName("Toto");
-	}
-
 	public void parse() {
 		ArrayList<String> sourceFiles = new ArrayList<String>();
 
