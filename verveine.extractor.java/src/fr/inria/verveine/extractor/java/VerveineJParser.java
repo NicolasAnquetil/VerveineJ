@@ -1,7 +1,6 @@
 package fr.inria.verveine.extractor.java;
 
 import java.io.File;
-import java.io.ObjectInputStream.GetField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -14,33 +13,13 @@ import org.eclipse.jdt.core.dom.ASTParser;
 
 import fr.inria.verveine.core.VerveineParser;
 import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
-import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.core.gen.famix.SourceLanguage;
-import fr.inria.verveine.core.gen.famix.Type;
 
 /**
- * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main
- * (JDT-3.6) run with: java -cp
- * lib/org.eclipse.jdt.core_3.6.0.v_A48.jar:../Fame:
- * /usr/local/share/eclipse/plugins
- * /org.eclipse.equinox.common_3.5.1.R35x_v20090807
- * -1100.jar:/usr/local/share/eclipse
- * /plugins/org.eclipse.equinox.preferences_3.2
- * .301.R35x_v20091117.jar:/usr/local
- * /share/eclipse/plugins/org.eclipse.core.jobs_3
- * .4.100.v20090429-1800.jar:/usr/local
- * /share/eclipse/plugins/org.eclipse.core.contenttype_3
- * .4.1.R35x_v20090826-0451.
- * jar:/usr/local/share/eclipse/plugins/org.eclipse.core
- * .resources_3.5.2.R35x_v20091203
- * -1235.jar:/usr/local/share/eclipse/plugins/org.
- * eclipse.core.runtime_3.5.0.v20090525
- * .jar:/usr/local/share/eclipse/plugins/org.
- * eclipse.osgi_3.5.2.R35x_v20100126.jar
- * :../Fame/lib/akuhn-util-r28011.jar:lib/fame.jar:bin
- * fr.inria.verveine.extractor.java.VerveineJParser [files|directory]_to_parse
+ * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
+ * run with:
+ * java -cp lib/org.eclipse.jdt.core_3.6.0.v_A48.jar:../Fame:/usr/local/share/eclipse/plugins/org.eclipse.equinox.common_3.5.1.R35x_v20090807-1100.jar:/usr/local/share/eclipse/plugins/org.eclipse.equinox.preferences_3.2.301.R35x_v20091117.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.jobs_3.4.100.v20090429-1800.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.contenttype_3.4.1.R35x_v20090826-0451.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.resources_3.5.2.R35x_v20091203-1235.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.runtime_3.5.0.v20090525.jar:/usr/local/share/eclipse/plugins/org.eclipse.osgi_3.5.2.R35x_v20100126.jar:../Fame/lib/akuhn-util-r28011.jar:lib/fame.jar:bin fr.inria.verveine.extractor.java.VerveineJParser [files|directory]_to_parse
  */
 
 public class VerveineJParser extends VerveineParser {
@@ -48,18 +27,19 @@ public class VerveineJParser extends VerveineParser {
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
 
 	/**
-	 * Option: The version of Java expected by the parser
+	 * Option: The version of Java expected by the parser 
 	 */
 	protected String codeVers = null;
 
 	/**
-	 * Option: wether to generate local informations (local to a type)
+	 * Option: wether to generate local informations (local to a type) 
 	 */
 	protected boolean withLocal = true;
 
+
 	/**
-	 * The arguments that were passed to the parser Needed to relativize the
-	 * source file names
+	 * The arguments that were passed to the parser
+	 * Needed to relativize the source file names
 	 */
 	private Collection<String> argPath;
 	private Collection<String> argFiles;
@@ -108,18 +88,21 @@ public class VerveineJParser extends VerveineParser {
 
 	public void setOptions(String[] args) {
 
-		String[] classPath = new String[] {};
+		String[] classPath = new String[] { };
 		argPath = new ArrayList<String>();
 		argFiles = new ArrayList<String>();
+
 		int i = 0;
 		while (i < args.length && args[i].startsWith("-")) {
 			String arg = args[i++];
 
 			if (arg.equals("-h")) {
 				usage();
-			} else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
+			}
+			else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
 				setCodeVersion(arg);
-			} else if (arg.equals("-l")) {
+			}
+			else if (arg.equals("-l")) {
 				this.withLocal = false;
 			} else if (arg.equals("-autocp")) {
 				if (i < args.length) {
@@ -139,17 +122,18 @@ public class VerveineJParser extends VerveineParser {
 					int oldlength = classPath.length;
 					int newlength = oldlength + tmpPath.length;
 					classPath = Arrays.copyOf(classPath, newlength);
-					for (int p = oldlength; p < newlength; p++) {
-						classPath[p] = tmpPath[p - oldlength];
+					for (int p=oldlength; p < newlength; p++) {
+						classPath[p] = tmpPath[p-oldlength];
 					}
-				} else {
-					System.err.println("-cp requires a classPath");
 				}
-			} else {
+				else {
+					System.err.println("-cp requires a classPath");
+				}	
+			}
+			else {
 				int j = super.setOption(i, args);
-				if (j > 0) { // j is the number of args consumed
-					i += (j - 1); // 1 more will be added at the beginning of
-									// the loop ("args[i++]")
+				if (j > 0) {     // j is the number of args consumed
+					i += (j-1);  // 1 more will be added at the beginning of the loop ("args[i++]")
 				}
 			}
 		}
@@ -181,16 +165,24 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	protected void usage() {
-		System.err
-				.println("Usage: VerveineJ [-h] [-l] [-cp CLASSPATH] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		/* possible enhancements:
+		 * (1) allow to not generate some info
+		 * -nodep = do not create dependencies (access, reference, invocation)
+		 * -novar (or -noleaf) = do not create "variables", including attributes. Implies not creating accesses
+		 * -nobehavior = do not create methods. Implies not creating invocations
+		 * (2) allow to summarize some info
+		 * -classdep = generate dependencies between classes not between their members. Implies not creating accesses, reference, invocation but instead
+		 *   some new relation: classdep
+		 */
+		
+		System.err.println("Usage: VerveineJ [-h] [-l] [-cp CLASSPATH] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.exit(0);
 
 	}
 
 	protected void setCodeVersion(String arg) {
 		if (codeVers != null) {
-			System.err.println("Trying to set twice code versions: " + codeVers
-					+ " and " + arg);
+			System.err.println("Trying to set twice code versions: " + codeVers + " and " + arg);
 			usage();
 		} else if (arg.equals("-1.1") || arg.equals("-1")) {
 			codeVers = JavaCore.VERSION_1_1;
@@ -210,8 +202,7 @@ public class VerveineJParser extends VerveineParser {
 
 	}
 
-	private void collectJavaFiles(Collection<String> paths,
-			Collection<String> files) {
+	private void collectJavaFiles(Collection<String> paths, Collection<String> files) {
 		for (String p : paths) {
 			collectJavaFiles(new File(p), files);
 		}
@@ -233,7 +224,7 @@ public class VerveineJParser extends VerveineParser {
 		VerveineJParser parser = new VerveineJParser();
 		parser.setOptions(args);
 		parser.parse();
-		// parser.debug();
+		//parser.debug();
 		parser.emitMSE(parser.getOutputFileName());
 	}
 
@@ -244,20 +235,18 @@ public class VerveineJParser extends VerveineParser {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath,
-				argFiles, withLocal);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, withLocal);
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
-		jdtParser.createASTs(sourceFiles.toArray(new String[0]), null,
-				new String[0], req, null);
+		jdtParser.createASTs(sourceFiles.toArray(new String[0]), null, new String[0], req, null);
 
 		this.compressNamespacesNames();
 	}
 
 	/**
-	 * As explained in JavaDictionary, Namespaces are created with their fully
-	 * qualified name. We need now to give them their simple name
+	 * As explained in JavaDictionary, Namespaces are created with their fully qualified name.
+	 * We need now to give them their simple name
 	 */
 	private void compressNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
@@ -292,5 +281,6 @@ public class VerveineJParser extends VerveineParser {
 			}
 		}
 	}
+
 
 }

@@ -36,7 +36,7 @@ public class FamixRequestor extends FileASTRequestor {
 			ast.accept(new VerveineVisitor(this.famixDictionnary, this.withLocal));
 		}
 		catch (Exception e) {
-			System.err.println("*** VerveineJ got exception: "+e.getMessage()+" while processing file: "+path);
+			System.err.println("*** VerveineJ visitor got exception: '"+e.getMessage()+"' while processing file: "+path);
 		}
 	}
 
