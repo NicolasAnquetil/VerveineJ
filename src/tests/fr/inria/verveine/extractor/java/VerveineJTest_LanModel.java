@@ -607,16 +607,16 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			fr.inria.verveine.core.gen.famix.Class owner = (fr.inria.verveine.core.gen.famix.Class) m.getParentType();
 			assertNotNull(owner);
 			if (owner.getName().equals("OutputServer")) {
-			assertEquals(2, m.getCyclo());
-				assertEquals(6, m.getNOS());
+			assertEquals(2, m.getCyclomaticComplexity());
+				assertEquals(6, m.getNumberOfStatements());
 			}
 			else if (owner.getName().equals("Node")) {
-				assertEquals(1, m.getCyclo());
-				assertEquals(1, m.getNOS());
+				assertEquals(1, m.getCyclomaticComplexity());
+				assertEquals(1, m.getNumberOfStatements());
 			}
 			else if (owner.getName().equals("WorkStation")) {
-				assertEquals(2, m.getCyclo());
-				assertEquals(7, m.getNOS());
+				assertEquals(2, m.getCyclomaticComplexity());
+				assertEquals(7, m.getNumberOfStatements());
 			}
 		}		
 	}

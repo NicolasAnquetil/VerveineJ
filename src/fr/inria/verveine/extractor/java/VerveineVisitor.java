@@ -119,7 +119,7 @@ public class VerveineVisitor extends ASTVisitor {
 	// VISITOR METHODS
 
 	public boolean visit(CompilationUnit node) {
-//		System.out.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
+//		System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
 		Namespace fmx = null;
 		PackageDeclaration pckg = node.getPackage();
 		if (pckg==null) {
@@ -148,7 +148,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * not sure it is a good idea ?!?
 	 */
 	public boolean visit(ImportDeclaration node) {
-		/*
+		/* we don't create reference between packages anymore
 		Namespace fmxSrc = this.context.topPckg();  // could access it through recursive node.getParent() ?
 
 		IBinding importBnd = node.resolveBinding();
@@ -182,7 +182,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
 	public boolean visit(TypeDeclaration node) {
-//		System.out.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
+//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		@SuppressWarnings("unchecked")
 		List<TypeParameter> tparams = (List<TypeParameter>)node.typeParameters();
@@ -230,7 +230,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(ClassInstanceCreation node) {
-		//System.err.println("TRACE, Visiting ClassInstanceCreation");
+//		System.err.println("TRACE, Visiting ClassInstanceCreation");
 		if (node.getAnonymousClassDeclaration() != null) {
 			anonymousSuperType = node.getType();
 		}
@@ -255,7 +255,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * See {@link VerveineVisitor#anonymousSuperType}
 	 */
 	public boolean visit(AnonymousClassDeclaration node) {
-		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
+//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
 		fr.inria.verveine.core.gen.famix.Class fmx = null;
 		ITypeBinding bnd = node.resolveBinding();
 		String anonSuperTypeName = (anonymousSuperType != null) ? findTypeName(anonymousSuperType) : context.topType().getName();
@@ -353,7 +353,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-		//System.out.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier());
+//		System.err.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier());
 
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
@@ -376,7 +376,10 @@ public class VerveineVisitor extends ASTVisitor {
 
 			// now will recompute the actual returnType
 			this.context.pushMethod(fmx);
-			if (! node.isConstructor()) {
+			if (node.isConstructor()) {
+				// issue #721
+			}
+			else {
 				fmxRetTyp = referedType(node.getReturnType2(), fmx);
 				fmx.setDeclaredType(fmxRetTyp);
 			}
@@ -422,7 +425,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(Initializer node) {
-//		System.out.println("TRACE, Visiting Initializer: ");
+//		System.err.println("TRACE, Visiting Initializer: ");
 		
 		Collection<String> paramTypes = new ArrayList<String>();
 
@@ -454,10 +457,12 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param fmx -- the InitBlock FamixMethod
 	 */
 	private void pushInitBlockMethod(Method fmx) {
+		int nos   = (fmx.getNumberOfStatements() == null) ? 0 : fmx.getNumberOfStatements().intValue();
+		int cyclo = (fmx.getCyclomaticComplexity() == null) ? 0 : fmx.getCyclomaticComplexity().intValue();
 		this.context.pushMethod(fmx);
-		if ( (fmx.getNOS() != 0) || (fmx.getCyclo() != 0) ) {
-			context.setTopMethodNOS(fmx.getNOS());
-			context.setTopMethodCyclo(fmx.getCyclo());
+		if ( (nos != 0) || (cyclo != 0) ) {
+			context.setTopMethodNOS(nos);
+			context.setTopMethodCyclo(cyclo);
 		}
 	}
 	
@@ -476,8 +481,8 @@ public class VerveineVisitor extends ASTVisitor {
 			int nos = context.getTopMethodNOS();
 			Method fmx = this.context.popMethod();
 			if (fmx != null) {
-				fmx.setNOS(nos);
-				fmx.setCyclo(cyclo);
+				fmx.setNumberOfStatements(nos);
+				fmx.setCyclomaticComplexity(cyclo);
 			}
 		}
 	}
