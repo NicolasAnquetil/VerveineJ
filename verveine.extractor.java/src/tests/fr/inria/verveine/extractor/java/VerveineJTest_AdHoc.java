@@ -30,6 +30,7 @@ import fr.inria.verveine.core.gen.famix.CaughtException;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.DeclaredException;
 import fr.inria.verveine.core.gen.famix.EnumValue;
+import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
@@ -362,6 +363,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals("Rank", rk.getName());
 		assertEquals(13, rk.getValues().size());
 		assertSame(card, rk.getBelongsTo());
+		assertNotNull(rk.getSourceAnchor());
+		System.out.print(((FileAnchor) rk.getSourceAnchor()).getFileName());
 
 		EnumValue nine = TestVerveineUtils.detectElement(repo, EnumValue.class, "NINE");
 		assertNotNull(nine);

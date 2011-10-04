@@ -287,6 +287,7 @@ public class VerveineVisitor extends ASTVisitor {
 			fmx.setIsStub(Boolean.FALSE);
 
 			this.context.pushType(fmx);
+			dico.addSourceAnchor(fmx, node);
 
 			for (EnumConstantDeclaration ecst : (List<EnumConstantDeclaration>)node.enumConstants()) {
 				EnumValue ev = dico.ensureFamixEnumValue(ecst.resolveVariable(), ecst.getName().getIdentifier(), fmx);
