@@ -228,7 +228,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 		
-		assertEquals(12, meth.getAccesses().size());  // ImplicitVariable.class, mapBind
+		assertEquals(2, meth.getAccesses().size());  // ImplicitVariable.class, mapBind
 		boolean classFieldFound = false;
 		for (Access acc : meth.getAccesses()) {
 			if (acc.getTo().getName().equals("class")) {
@@ -364,7 +364,6 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(13, rk.getValues().size());
 		assertSame(card, rk.getBelongsTo());
 		assertNotNull(rk.getSourceAnchor());
-		System.out.print(((FileAnchor) rk.getSourceAnchor()).getFileName());
 
 		EnumValue nine = TestVerveineUtils.detectElement(repo, EnumValue.class, "NINE");
 		assertNotNull(nine);
