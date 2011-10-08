@@ -117,8 +117,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(6+24,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//6 internal + 24 from imported packages/classes
-		assertEquals(50,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
+		assertEquals(12+18, TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//12 internal + {Object=0,String=4,StringBuffer=3,AbstractStringBuilder=3,PrintStream=3,FilterOutputStream=1,OutputStream=3,System=1,Comparable=0,Serializable=0,Flushable=0,Appendable=0,CharSequence=0,Closeable=0}
+		assertEquals(25,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size()); //Override
 		assertEquals(2,     TestVerveineUtils.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
@@ -164,7 +164,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testNamedEntities() {
 		JavaDictionary dico = new JavaDictionary(repo);
 		
-		assertNotSame(dico.ensureFamixClass(null, A_CLASS_NAME, null),dico.ensureFamixClass(null, A_CLASS_NAME, null));
+		assertNotSame(dico.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true),dico.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true));
 		
 		Namespace javaLang = dico.ensureFamixNamespaceJavaLang(null);
 		assertEquals( JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());
@@ -483,7 +483,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			}
 		}
 		assertNotNull(output);
-		assertEquals(5, output.getAccesses().size());
+		assertEquals(4, output.getAccesses().size());
 		for (Access acc : output.getAccesses()) {
 			assertTrue("Unexpected field accessed: "+acc.getVariable().getName(),
 					acc.getVariable().getName().equals("thePacket") || acc.getVariable().getName().equals("out") || acc.getVariable().getName().equals("printer"));

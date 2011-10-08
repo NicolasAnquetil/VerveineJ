@@ -13,16 +13,20 @@ public class FamixRequestor extends FileASTRequestor {
 	
 	protected JavaDictionary famixDictionnary;
 
+	/**
+	 * Whether to summarize collected information at the level of classes or produce everything
+	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation
+	 */
+	private boolean classSummary = false;
+
 	private Collection<String> argsDir;
 	private Collection<String> argsFile;
 	
-	private boolean withLocal = true;
-	
-	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean withLocal) {
+	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary) {
 		this.famixRepo = r;
 		this.argsDir = argsDir;
 		this.argsFile = argsFile;
-		this.withLocal = withLocal;
+		this.classSummary = classSummary;
 
 		this.famixDictionnary = new JavaDictionary(famixRepo);
 	}
@@ -33,7 +37,7 @@ public class FamixRequestor extends FileASTRequestor {
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
-			ast.accept(new VerveineVisitor(this.famixDictionnary, this.withLocal));
+			ast.accept(new VerveineVisitor(this.famixDictionnary, classSummary));
 		}
 		catch (Exception e) {
 			System.err.println("*** VerveineJ visitor got exception: '"+e.getMessage()+"' while processing file: "+path);

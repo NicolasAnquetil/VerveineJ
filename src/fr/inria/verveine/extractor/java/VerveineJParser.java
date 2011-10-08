@@ -27,15 +27,22 @@ public class VerveineJParser extends VerveineParser {
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
 
 	/**
+	 * Whether to summarize collected information at the level of classes or produce everything.
+	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation.
+	 * <p>The general idea is that we create entities (Attribute, Method) "normally", but we don't persist them in the repository.
+	 * Then all associations to these entities need to be uplifted as references between their respective classes
+	 * e.g. "A.m1() invokes B.m2()" is uplifted to "A references B".</p>
+	 * <p>This is actually a dangerous business, because creating entities outside the repository (e.g. an attribute) that have links
+	 * to entities inside (e.g. the Type of the attribute) the repository can lead to errors.
+	 * More exactly, the problems occur when the entity inside links back to the entity outside.
+	 * And since all association are bidirectional, it can happen very easily.</p>
+	 */
+	private boolean classSummary = false;
+
+	/**
 	 * Option: The version of Java expected by the parser 
 	 */
 	protected String codeVers = null;
-
-	/**
-	 * Option: wether to generate local informations (local to a type) 
-	 */
-	protected boolean withLocal = true;
-
 
 	/**
 	 * The arguments that were passed to the parser
@@ -101,9 +108,8 @@ public class VerveineJParser extends VerveineParser {
 			}
 			else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
 				setCodeVersion(arg);
-			}
-			else if (arg.equals("-l")) {
-				this.withLocal = false;
+			} else if (arg.equals("-summary")) {
+				this.classSummary = true;
 			} else if (arg.equals("-autocp")) {
 				if (i < args.length) {
 					List<String> tmpPath = collectAllJars(args[i++]);
@@ -175,7 +181,7 @@ public class VerveineJParser extends VerveineParser {
 		 *   some new relation: classdep
 		 */
 		
-		System.err.println("Usage: VerveineJ [-h] [-l] [-cp CLASSPATH] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("Usage: VerveineJ [-h] [-nolocal | -summary] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.exit(0);
 
 	}
@@ -235,7 +241,7 @@ public class VerveineJParser extends VerveineParser {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, withLocal);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary);
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
@@ -281,6 +287,5 @@ public class VerveineJParser extends VerveineParser {
 			}
 		}
 	}
-
 
 }
