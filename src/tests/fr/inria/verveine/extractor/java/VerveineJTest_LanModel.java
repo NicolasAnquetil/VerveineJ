@@ -134,7 +134,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(2, nodeClass.getAttributes().size());
 		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "lan"), nodeClass.getContainer());
 		assertFalse(nodeClass.getIsInterface());
-
+		
 		fr.inria.verveine.core.gen.famix.Class interfce = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(interfce);
 		assertEquals("IPrinter", interfce.getName());
@@ -255,6 +255,17 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals("name()", n.getSignature());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "FileServer"), n.getParentType());
 		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String"), n.getDeclaredType());
+		
+		//constructors
+		for (Method m : TestVerveineUtils.selectElementsOfType(repo, Method.class)) {
+			if (m.getName().equals(m.getParentType().getName())) {
+				assertEquals("constructor", m.getKind());
+			}
+			else {
+				assertTrue((m.getKind() == null) || (! m.getKind().equals("constructor")));
+			}
+		}
+
 	}
 
 	@Test
