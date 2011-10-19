@@ -1603,7 +1603,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		Comment cmt = null;
 		if (jdoc != null) {
 			cmt = super.createFamixComment(jdoc.toString(), fmx);
-			addSourceAnchor(cmt, jdoc);
+			addSourceAnchor(cmt, jdoc, /*oneLineAnchor*/false);
 		}
 		return cmt;
 	}
@@ -1614,11 +1614,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
 	 * @param fmx -- Famix Entity to add the anchor to
 	 * @param ast -- JDT ASTNode, where the information are extracted
+	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some association happening within <b>ast</b>
 	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null) 
 	 */
-	public SourceAnchor addSourceAnchor(SourcedEntity fmx, ASTNode ast) {
+	public SourceAnchor addSourceAnchor(SourcedEntity fmx, ASTNode ast, boolean oneLineAnchor) {
 		FileAnchor fa = null;
-		
+
 		if ( (fmx != null) && (ast != null) ) {
 			// position in source file
 			int beg = ast.getStartPosition();
@@ -1637,13 +1638,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// now create the Famix SourceAnchor
 			fa = new FileAnchor();
 			fa.setFileName((String) ((CompilationUnit)ast).getProperty(SOURCE_FILENAME_PROPERTY));
-			fa.setStartLine(((CompilationUnit)ast).getLineNumber(beg));
-			int tmp= ((CompilationUnit)ast).getLineNumber(end);
-			fa.setEndLine(tmp);
+			fa.setStartLine(((CompilationUnit)ast).getLineNumber(beg)); // when oneLineAnchor is true and we are in a comment, should we go to the end of it?
+			fa.setEndLine( oneLineAnchor ? fa.getStartLine() : ((CompilationUnit)ast).getLineNumber(end) );
 			fmx.setSourceAnchor(fa);
 			famixRepo.add(fa);
 		}
-		
+
 		return fa;
 	}
 

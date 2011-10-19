@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<testsuite errors="0" failures="0" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" tests="20" time="12.919" timestamp="2011-10-03T16:12:01">
+<testsuite errors="0" failures="0" hostname="Merychippus" name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" tests="20" time="13.655" timestamp="2011-10-17T19:58:00">
   <properties>
     <property name="java.vendor" value="Sun Microsystems Inc." />
     <property name="sun.java.launcher" value="SUN_STANDARD" />
@@ -48,7 +48,7 @@
     <property name="java.vendor.url" value="http://java.sun.com/" />
     <property name="java.vm.vendor" value="Sun Microsystems Inc." />
     <property name="java.runtime.name" value="Java(TM) SE Runtime Environment" />
-    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true logtestlistenerevents=true formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/testrep/TEST-tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.xml crashfile=/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/junitvmwatcher5968267585119626065.properties propsfile=/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/junit6330832535177427771.properties" />
+    <property name="sun.java.command" value="org.apache.tools.ant.taskdefs.optional.junit.JUnitTestRunner tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel filtertrace=true haltOnError=false haltOnFailure=false formatter=org.apache.tools.ant.taskdefs.optional.junit.SummaryJUnitResultFormatter showoutput=false outputtoformatters=true logfailedtests=true logtestlistenerevents=true formatter=org.apache.tools.ant.taskdefs.optional.junit.XMLJUnitResultFormatter,/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/testrep/TEST-tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel.xml crashfile=/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/junitvmwatcher7243762436167653729.properties propsfile=/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/junit441017679630782498.properties" />
     <property name="java.class.path" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/bin:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/akuhn-util-r28011.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/fame-good.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/fame.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/famix.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/junit.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.contenttype_3.4.100.v20100505-1235.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.jobs_3.5.0.v20100515.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.resources_3.6.0.v20100526-0737.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.core.runtime_3.6.0.v20100505.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.equinox.common_3.6.0.v20100503.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.equinox.preferences_3.3.0.v20100503.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.jdt.core_3.6.0.v_A58.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.osgi_3.6.0.v20100517.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.eclipse.text_3.5.0.v20100601-1300.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/org.hamcrest.core_1.1.0.v20090501071000.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.core.jar:/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/lib/verveine.extractor.java.jar:/usr/share/java/ant-launcher-1.8.1.jar:/usr/share/ant/lib/ant.jar:/usr/share/ant/lib/ant-junit.jar" />
     <property name="ant.version" value="Apache Ant version 1.8.1 compiled on October 13 2010" />
     <property name="java.vm.specification.name" value="Java Virtual Machine Specification" />
@@ -75,26 +75,26 @@
     <property name="src.dir" value="/home/anquetin/Documents/RMod/Tools/VerveineOnGForge/verveine.extractor.java/src" />
     <property name="ant.project.invoked-targets" value="junit" />
   </properties>
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testEntitiesNumber" time="2.586" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testClassProperties" time="1.667" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testNamedEntities" time="0.824" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInheritance" time="0.57" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMethodProperties" time="0.538" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testFieldType" time="0.515" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testStubs" time="0.508" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testParameter" time="0.521" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testImplicitVar" time="0.415" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInvocation" time="0.507" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAccess" time="0.43" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testSourceAnchors" time="0.436" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testModifiers" time="0.41" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testComment" time="0.386" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMetric" time="0.402" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAnnotation" time="0.384" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAssociation" time="0.398" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testBelongsTo" time="0.39" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testJavaCore" time="0.389" />
-  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testSourceLanguage" time="0.407" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testEntitiesNumber" time="2.776" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testClassProperties" time="1.648" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testNamedEntities" time="1.398" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInheritance" time="0.849" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMethodProperties" time="0.601" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testFieldType" time="0.434" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testStubs" time="0.46" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testParameter" time="0.45" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testImplicitVar" time="0.526" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testInvocation" time="0.403" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAccess" time="0.409" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testSourceAnchors" time="0.396" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testModifiers" time="0.395" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testComment" time="0.387" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testMetric" time="0.375" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAnnotation" time="0.375" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testAssociation" time="0.378" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testBelongsTo" time="0.375" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testJavaCore" time="0.398" />
+  <testcase classname="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" name="testSourceLanguage" time="0.396" />
   <system-out><![CDATA[VerveineJ processing file: test_src/LANModel/moose/lan/AbstractDestinationAddress.java
 VerveineJ processing file: test_src/LANModel/moose/lan/Node.java
 VerveineJ processing file: test_src/LANModel/moose/lan/Packet.java
