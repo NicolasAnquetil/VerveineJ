@@ -17,12 +17,10 @@ import org.eclipse.jdt.core.dom.Modifier;
 
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.core.Dictionary;
-import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
 import fr.inria.verveine.core.gen.famix.Attribute;
-import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Comment;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.Enum;
@@ -466,6 +464,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			}
 		}
 
+		// --------------- implicit superclass: java.lang.Enum<>
+		Type sup;
+		ITypeBinding supbnd = null;
+		if (bnd != null) {
+			supbnd = bnd.getSuperclass();
+		}
+		if (supbnd != null) {
+			sup = ensureFamixType(supbnd, /*name*/null, /*owner*/null, /*ctxt*/null, /*alwaysPersist*/true);
+		}
+		else {
+			sup = ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/ensureFamixNamespaceJavaLang(null), /*isGeneric*/true, /*alwaysPersist*/true);
+		}
+		
+
 		// --------------- recover from name ?
 		for (fr.inria.verveine.core.gen.famix.Enum candidate : getEntityByName(fr.inria.verveine.core.gen.famix.Enum.class, name) ) {
 			if ( matchAndMapType(bnd, name, owner, candidate) ) {
@@ -478,8 +490,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx = super.ensureFamixEnum(bnd, name, owner, /*persistIt*/true);
 		}
 		
-		if ( (fmx!=null) && (bnd != null) ) {
-			setNamedEntityModifiers(fmx, bnd.getModifiers());
+		if (fmx != null) {
+			ensureFamixInheritance(sup, fmx, /*lastInheritance*/null);
+			if (bnd != null) {
+				setNamedEntityModifiers(fmx, bnd.getModifiers());
+			}
 		}
 
 		return fmx;

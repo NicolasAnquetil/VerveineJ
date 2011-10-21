@@ -2,20 +2,18 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.core.runtime_3.6.0.v20100505.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.core.resources_3.6.0.v20100526-0737.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.core.jobs_3.5.0.v20100515.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.core.contenttype_3.4.100.v20100505-1235.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.6.0.v20100517.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.6.0.v20100503.jar"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.equinox.preferences_3.3.0.v20100503.jar"/>
-	<classpathentry kind="lib" path="lib/org.hamcrest.core_1.1.0.v20090501071000.jar"/>
-	<classpathentry kind="lib" path="lib/junit.jar"/>
-	<classpathentry kind="lib" path="lib/fame.jar" sourcepath="/Fame"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core_3.6.0.v_A58.jar" sourcepath="/org.eclipse.jdt.core"/>
-	<classpathentry kind="lib" path="lib/akuhn-util-r28011.jar"/>
-	<classpathentry kind="lib" path="lib/famix.jar" sourcepath="/verveine.core/src"/>
-	<classpathentry kind="lib" path="lib/org.eclipse.text_3.5.0.v20100601-1300.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/verveine.core"/>
+	<classpathentry kind="lib" path="lib/akuhn-util-r28011.jar"/>
+	<classpathentry kind="lib" path="lib/fame.jar"/>
+	<classpathentry kind="lib" path="lib/famix.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.contenttype_3.4.100.v20110423-0524.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.jobs_3.5.100.v20110404.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.resources_3.7.100.v20110510-0712.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.core.runtime_3.7.0.v20110110.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.6.0.v20110523.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.equinox.preferences_3.4.1.R37x_v20110725.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core_3.7.1.v_B76_R37x.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.7.1.R37x_v20110808-1106.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
