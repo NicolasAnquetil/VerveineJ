@@ -160,7 +160,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
 		assertEquals(10+18,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, Access.class).size());
-		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Reference.class).size());  // TODO check that number
+		assertEquals(20,    TestVerveineUtils.selectElementsOfType(repo, Reference.class).size());  // TODO check that number
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size());  // TODO should be 1 ?
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, AnnotationInstance.class).size());  // TODO should be 2 ?

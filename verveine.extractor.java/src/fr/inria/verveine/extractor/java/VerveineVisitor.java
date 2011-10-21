@@ -381,7 +381,7 @@ public class VerveineVisitor extends ASTVisitor {
 			// we reset the return type to its proper value later
 			fmxRetTyp = dico.ensureFamixClassObject(null);
 		}
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/fmxRetTyp, context.topType(), /*persitIt*/!classSummary);
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/fmxRetTyp, /*owner*/context.topType(), /*persitIt*/!classSummary);
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
@@ -533,9 +533,9 @@ public class VerveineVisitor extends ASTVisitor {
 		// locals: same discussion as for visit(VariableDeclarationExpression node)
 		if (! node.getType().isPrimitiveType()) {
 			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod());
-			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
+			for (StructuralEntity var : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
 				if (! classSummary) {
-					dico.addSourceAnchor(att, node, /*oneLineAnchor*/false);
+					dico.addSourceAnchor(var, node, /*oneLineAnchor*/true);
 				}
 			}
 		}
@@ -549,7 +549,13 @@ public class VerveineVisitor extends ASTVisitor {
 
 		Expression callingExpr = node.getExpression();
 		NamedEntity receiver = getReceiver(callingExpr);
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver, getInvokedMethodOwner(callingExpr, receiver), node.arguments());
+		IMethodBinding bnd = node.resolveMethodBinding();
+		if (bnd == null) {
+			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, getInvokedMethodOwner(callingExpr, receiver), node.arguments());
+		}
+		else {
+			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, /*owner*/null, node.arguments());
+		}
 		if (callingExpr instanceof SimpleName) {
 			visitSimpleName((SimpleName) callingExpr);
 		}
@@ -1234,9 +1240,9 @@ public class VerveineVisitor extends ASTVisitor {
 
 		// msg1().msg()
 		else if (expr instanceof MethodInvocation) {
-			IMethodBinding bnd = ((MethodInvocation) expr).resolveMethodBinding();
-			if (bnd != null) {
-				return referedType(bnd.getReturnType(), this.context.top());
+			IMethodBinding callerBnd = ((MethodInvocation) expr).resolveMethodBinding();
+			if (callerBnd != null) {
+				return referedType(callerBnd.getReturnType(), this.context.top());
 			}
 			else {
 				return null;
@@ -1255,9 +1261,9 @@ public class VerveineVisitor extends ASTVisitor {
 
 		// super.msg1().msg()
 		else if (expr instanceof SuperMethodInvocation) {
-			IMethodBinding bnd = ((SuperMethodInvocation) expr).resolveMethodBinding();
-			if (bnd != null) {
-				return  this.referedType(bnd.getReturnType(), context.topType());
+			IMethodBinding superBnd = ((SuperMethodInvocation) expr).resolveMethodBinding();
+			if (superBnd != null) {
+				return  this.referedType(superBnd.getReturnType(), context.topType());
 			}
 			else {
 				return null;
@@ -1301,7 +1307,7 @@ public class VerveineVisitor extends ASTVisitor {
 			accessed =  dico.ensureFamixAttribute(bnd, name, typ, (fr.inria.verveine.core.gen.famix.Type) owner, /*persistIt*/!classSummary);
 			if (classSummary) {
 				if (! (accessed.getDeclaredType() instanceof PrimitiveType)) {
-					Reference ref = dico.addFamixReference(findHighestType(accessed.getBelongsTo()), findHighestType(accessed.getDeclaredType()), null);
+					dico.addFamixReference(findHighestType(accessed.getBelongsTo()), findHighestType(accessed.getDeclaredType()), null);
 				}
 			}
 
