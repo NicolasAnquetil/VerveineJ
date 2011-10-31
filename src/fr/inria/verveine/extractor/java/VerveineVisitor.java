@@ -2,6 +2,7 @@ package fr.inria.verveine.extractor.java;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -567,8 +568,20 @@ public class VerveineVisitor extends ASTVisitor {
 	@SuppressWarnings("unchecked")
 	public boolean visit(SuperMethodInvocation node) {
 		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(), context.topMethod(), /*persistIt*/!classSummary);
-		fr.inria.verveine.core.gen.famix.Type superClass = this.context.topType().getSuperInheritances().iterator().next().getSuperclass();
-		methodInvocation(node.resolveMethodBinding(), node.getName().getFullyQualifiedName(), receiver, /*methOwner*/superClass, node.arguments());
+		IMethodBinding bnd = node.resolveMethodBinding();
+		if (bnd == null) {
+			Iterator<Inheritance> iter = this.context.topType().getSuperInheritances().iterator();
+			fr.inria.verveine.core.gen.famix.Type superClass = iter.next().getSuperclass();
+			while ( (superClass instanceof fr.inria.verveine.core.gen.famix.Class) &&
+					(((fr.inria.verveine.core.gen.famix.Class)superClass).getIsInterface()) &&
+					iter.hasNext() ) {
+				iter.next().getSuperclass();
+			}
+			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, superClass, node.arguments());
+		}
+		else {
+			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, /*methOwner*/null, node.arguments());
+		}
 
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);

@@ -474,7 +474,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			sup = ensureFamixType(supbnd, /*name*/null, /*owner*/null, /*ctxt*/null, /*alwaysPersist*/true);
 		}
 		else {
-			sup = ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/ensureFamixNamespaceJavaLang(null), /*isGeneric*/true, /*alwaysPersist*/true);
+			ParameterizableClass generic = (ParameterizableClass) ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/ensureFamixNamespaceJavaLang(null), /*isGeneric*/true, /*alwaysPersist*/true);
+			sup = ensureFamixParameterizedType(/*bnd*/null, /*name*/"Enum", generic, owner, /*alwaysPersist*/true);
 		}
 		
 
@@ -1457,15 +1458,22 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 */
 	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
 		if (Modifier.isAbstract(mod)) {
-			// don't know why there are two different ways to mark abstract classes !!!
-			// But this is a pain!
 			fmx.addModifiers("abstract");
+			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
 		}
-		fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
+		if (Modifier.isPublic(mod)) {
+			fmx.addModifiers("public");
+			// fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
+		}
+		if (Modifier.isPrivate(mod)) {
+			fmx.addModifiers("private");
+			// fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
+		}
+		if (Modifier.isProtected(mod)) {
+			fmx.addModifiers("protected");
+			// fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
+		}
 		fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
-		fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
-		fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
-		fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
 	}
 
 	/**
@@ -1734,6 +1742,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
 			fmx.setContainer( ensureFamixNamespaceDefault());
 			
+			// may be not needed anymore now that we use modifiers
 			fmx.setIsAbstract(Boolean.FALSE);
 			fmx.setIsFinal(Boolean.FALSE);
 			fmx.setIsInterface(Boolean.FALSE);
