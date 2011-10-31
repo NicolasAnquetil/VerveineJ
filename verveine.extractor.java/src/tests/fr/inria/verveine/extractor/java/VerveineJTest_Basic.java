@@ -15,6 +15,7 @@ import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
+import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceLanguage;
@@ -70,6 +71,22 @@ public abstract class VerveineJTest_Basic {
 		}
 		for ( StructuralEntity e : repo.all(StructuralEntity.class) ) {
 			assertNotNull("a StructuralEntity '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
+		}
+	}
+
+	@Test
+	public void testMethodAndClassSourceAnchor() {
+		// related to issue #728 VerveineJ places methods in the wrong classes
+		// some methods were created without sourceAnchor whereas their parent did have one. This should not happen (or only in special cases)
+		for ( Method m : repo.all(Method.class) ) {
+			Type parent = m.getParentType();
+			if ( (parent != null) &&
+					(! (parent instanceof fr.inria.verveine.core.gen.famix.Enum)) &&   // for enums some methods are implicit
+					(! m.getName().equals(parent.getName())) &&   // for constructors are implicit
+					(! m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) &&
+					(parent.getSourceAnchor() != null) ) {
+				assertNotNull("Method '"+m.getName()+"' has no SourceAnchor, whereas its parent '"+parent.getName()+"' has one", m.getSourceAnchor());
+			}
 		}
 	}
 

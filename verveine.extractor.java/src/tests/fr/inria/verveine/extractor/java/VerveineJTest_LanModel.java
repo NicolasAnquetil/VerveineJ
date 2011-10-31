@@ -559,36 +559,36 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertFalse(clazz.getIsInterface());
 		assertTrue(clazz.getIsAbstract());
 		assertTrue(clazz.getModifiers().contains("abstract"));
-		assertTrue(clazz.getIsPublic());
-		assertFalse(clazz.getIsPrivate());
-		assertFalse(clazz.getIsProtected());
-		assertFalse(clazz.getIsFinal());
+		assertTrue(clazz.getModifiers().contains("public"));
+		assertFalse(clazz.getModifiers().contains("private"));
+		assertFalse(clazz.getModifiers().contains("protected"));
+		assertFalse(clazz.getModifiers().contains("final"));
 		
 		assertEquals(4, clazz.getMethods().size());
 		for (Method m : clazz.getMethods()) {
 			if (m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
-				assertFalse(m.getIsPublic());
+				assertFalse(m.getModifiers().contains("public"));
 			}
 			else {
-				assertTrue(m.getIsPublic());
+				assertTrue(m.getModifiers().contains("public"));
 			}
-			assertFalse(m.getIsPrivate());
-			assertFalse(m.getIsProtected());
-			assertFalse(m.getIsFinal());
+			assertFalse(m.getModifiers().contains("private"));
+			assertFalse(m.getModifiers().contains("protected"));
+			assertFalse(m.getModifiers().contains("final"));
 			if (m.getName().equals("output")) {
-				assertTrue(m.getIsAbstract());
+				assertTrue(m.getModifiers().contains("abstract"));
 			}
 			else {
-				assertFalse(m.getIsAbstract());
+				assertFalse(m.getModifiers().contains("abstract"));
 			}
 		}
 		
 		assertEquals(1, clazz.getAttributes().size());
 		Attribute a = clazz.getAttributes().iterator().next();
-		assertFalse(a.getIsPublic());
-		assertFalse(a.getIsPrivate());
-		assertTrue(a.getIsProtected());
-		assertFalse(a.getIsFinal());
+		assertFalse(a.getModifiers().contains("public"));
+		assertFalse(a.getModifiers().contains("private"));
+		assertTrue(a.getModifiers().contains("protected"));
+		assertFalse(a.getModifiers().contains("final"));
 	}
 
 	@Test
