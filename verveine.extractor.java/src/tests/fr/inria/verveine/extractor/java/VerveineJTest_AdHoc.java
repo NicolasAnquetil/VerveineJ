@@ -526,5 +526,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 		assertEquals(TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "SuperWrongOwner"), meth.getParentType());
 	}
+	
+	@Test
+	public void testModifiers() {
+		Attribute attribute = TestVerveineUtils.detectElement(repo, Attribute.class, "privateFinalAttribute");
+		assertNotNull(attribute);
+
+		assertEquals(2, attribute.getModifiers().size());
+		assertTrue(attribute.getModifiers().contains("private"));
+		assertTrue(attribute.getModifiers().contains("final"));
+	}
 
 }

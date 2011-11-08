@@ -1459,21 +1459,19 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
 		if (Modifier.isAbstract(mod)) {
 			fmx.addModifiers("abstract");
-			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
 		}
 		if (Modifier.isPublic(mod)) {
 			fmx.addModifiers("public");
-			// fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
 		}
 		if (Modifier.isPrivate(mod)) {
 			fmx.addModifiers("private");
-			// fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
 		}
 		if (Modifier.isProtected(mod)) {
 			fmx.addModifiers("protected");
-			// fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
 		}
-		fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
+		if (Modifier.isFinal(mod)) {
+			fmx.addModifiers("final");
+		}
 	}
 
 	/**
