@@ -540,12 +540,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	@Test
 	public void testMultipleSignatures() {
 		fr.inria.verveine.core.gen.famix.Class throwable = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Throwable");
+		assertNotNull(throwable);
 		assertEquals(2, throwable.getMethods().size());
 
 		Method regular =  TestVerveineUtils.detectElement(repo, Method.class, "callToRegularPrintStackTrace");
+		assertNotNull(regular);
 		assertEquals(1, regular.getOutgoingInvocations().size());
 		
 		Method withParam =  TestVerveineUtils.detectElement(repo, Method.class, "callToPrintStackTraceWithParam");
+		assertNotNull(withParam);
 		assertEquals(1, withParam.getOutgoingInvocations().size());
 	}
 }
