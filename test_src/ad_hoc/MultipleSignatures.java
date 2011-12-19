@@ -6,10 +6,10 @@ import java.io.StringWriter;
 public class MultipleSignatures {
 	
 	public void callToRegularPrintStackTrace(Throwable t) {
-		t.printStackTrace()
+		t.printStackTrace();
 	}
 	
 	public void callToPrintStackTraceWithParam(Throwable t) {
-		t.printStackTrace(new PrintWriter(new StringWriter()))
+		t.printStackTrace(new PrintWriter(new StringWriter()));
 	}
 }
