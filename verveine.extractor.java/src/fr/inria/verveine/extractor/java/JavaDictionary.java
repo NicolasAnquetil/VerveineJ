@@ -60,6 +60,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String ARRAYS_NAME = "default[]";
 	public static final String INIT_BLOCK_NAME = "<Initializer>";
 
+	public static final String MODIFIER_ABSTRACT = "abstract";
+	public static final String MODIFIER_PUBLIC   = "public";
+	public static final String MODIFIER_PRIVATE  = "private";
+	public static final String MODIFIER_PROTECTED= "protected";
+	public static final String MODIFIER_FINAL    = "final";
+
+
+	
 	/**
 	 * Result of utility methods for checking matching between two entities
 	 */
@@ -1466,22 +1474,25 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 */
 	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
 		if (Modifier.isAbstract(mod)) {
-			fmx.addModifiers("abstract");
+			fmx.addModifiers(MODIFIER_ABSTRACT);
 			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
 		}
 		if (Modifier.isPublic(mod)) {
-			fmx.addModifiers("public");
+			fmx.addModifiers(MODIFIER_PUBLIC);
 			// fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
 		}
 		if (Modifier.isPrivate(mod)) {
-			fmx.addModifiers("private");
+			fmx.addModifiers(MODIFIER_PRIVATE);
 			// fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
 		}
 		if (Modifier.isProtected(mod)) {
-			fmx.addModifiers("protected");
+			fmx.addModifiers(MODIFIER_PROTECTED);
 			// fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
 		}
-		fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
+		if (Modifier.isFinal(mod)) {
+			fmx.addModifiers(MODIFIER_FINAL);
+			// fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
+		}
 	}
 
 	/**
