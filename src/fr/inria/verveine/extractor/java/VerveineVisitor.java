@@ -7,6 +7,7 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -30,7 +31,10 @@ import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
+import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IExtendedModifier;
+import org.eclipse.jdt.core.dom.IMemberValuePairBinding;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
@@ -38,9 +42,11 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Initializer;
+import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.ParenthesizedExpression;
 import org.eclipse.jdt.core.dom.QualifiedName;
@@ -48,6 +54,7 @@ import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.SimpleType;
+import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
@@ -70,6 +77,8 @@ import org.eclipse.jdt.core.dom.WhileStatement;
 
 import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.core.EntityStack;
+import fr.inria.verveine.core.gen.famix.AnnotationInstance;
+import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
 import fr.inria.verveine.core.gen.famix.Attribute;
@@ -189,6 +198,7 @@ public class VerveineVisitor extends ASTVisitor {
 			if (persistIt) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				dico.addFamixAnnotationInstances(bnd, fmx, persistIt);
+				addUnboundAnnotationInstances(node, fmx, persistIt);
 				dico.createFamixComment(node.getJavadoc(), fmx);
 			}
 			else {
@@ -211,6 +221,44 @@ public class VerveineVisitor extends ASTVisitor {
 		else {
 			return false;
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addUnboundAnnotationInstances(TypeDeclaration typDecl, fr.inria.verveine.core.gen.famix.Class fmx,	boolean persistIt) {
+		for (IExtendedModifier mod : (List<IExtendedModifier>)typDecl.modifiers()) {
+			// create type of the annotation
+			if (mod.isAnnotation()) {
+				Annotation ann = (Annotation)mod;
+				// see if it was not already created by any chance
+				boolean found = false;
+				for (AnnotationInstance a : fmx.getAnnotationInstances()) {
+					if (a.getAnnotationType().getName().equals(ann.getTypeName().getFullyQualifiedName())) {
+						found = true;
+					}
+				}
+				if (! found) {
+					AnnotationType annType = dico.ensureFamixAnnotationType(/*bnd*/null, ann.getTypeName().getFullyQualifiedName(), /*owner*/dico.ensureFamixNamespaceDefault(), persistIt);	
+
+					// create all parameters of the annotation instance
+					Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>(); 
+					if (ann instanceof SingleMemberAnnotation) {
+						annAtts.add( dico.createFamixAnnotationInstanceAttribute( dico.ensureFamixAnnotationTypeAttribute(/*bnd*/null, "value", annType, persistIt),
+									 ( ((SingleMemberAnnotation)ann).getValue() != null) ? ((SingleMemberAnnotation)ann).getValue().toString() : ""));
+					}
+					else if (ann instanceof NormalAnnotation) {
+						for (MemberValuePair annPV : (List<MemberValuePair>) ((NormalAnnotation)ann).values()) {
+							annAtts.add( dico.createFamixAnnotationInstanceAttribute( dico.ensureFamixAnnotationTypeAttribute(/*bnd*/null, annPV.getName().getIdentifier(), annType, persistIt),
+																					  (annPV.getValue() != null) ? annPV.getValue().toString() : ""));
+						}
+					}
+
+					// create the annotation instance
+					dico.addFamixAnnotationInstance(fmx, annType, annAtts);
+				}
+			}
+
+		}
+
 	}
 
 	public void endVisit(TypeDeclaration node) {

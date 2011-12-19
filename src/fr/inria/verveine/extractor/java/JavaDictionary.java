@@ -95,7 +95,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			name = bnd.getName();
 		}
 
-		if (name.equals("")) {
+		if ( (name == null)  || name.equals("") ) {
 			return ensureFamixNamespaceDefault();
 		}
 		else {
@@ -646,7 +646,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		for (AnnotationTypeAttribute candidate : getEntityByName(AnnotationTypeAttribute.class, name) ) {
 			// JDT treats annotation type attributes as methods ...
 			// checkAndMapMethod wants a signature as 2nd argument so we add empty param list
-			if ( matchAndMapMethod(bnd, name+"()", null, owner, candidate) ) {
+			if ( (bnd != null) && matchAndMapMethod(bnd, name+"()", null, owner, candidate) ) {
+				fmx = candidate;
+				break;
+			}
+			// if the binding is null, the annotationTypeAttribute migth have been created
+			else if ( (bnd == null) && matchAndMapVariable(null, name, owner, candidate)) {
 				fmx = candidate;
 				break;
 			}
@@ -672,14 +677,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public void addFamixAnnotationInstances(IBinding bnd, NamedEntity fmx, boolean persistIt) {
 		if (bnd != null) {
 			for (IAnnotationBinding annBnd : bnd.getAnnotations()) {
+				// create type of the annotation
 				AnnotationType annType = ensureFamixAnnotationType(annBnd.getAnnotationType(), null, null, persistIt);
 
+				// create all parameters of the annotation instance
 				Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>(); 
 				for (IMemberValuePairBinding annPV : annBnd.getDeclaredMemberValuePairs()) {
 					annAtts.add( createFamixAnnotationInstanceAttribute(ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), annPV.getName(), annType, persistIt),
 																		(annPV.getValue() != null) ? annPV.getValue().toString() : ""));
 				}
 
+				// create the annotation instance
 				super.addFamixAnnotationInstance(fmx, annType, annAtts);
 			}
 		}
@@ -1459,19 +1467,21 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
 		if (Modifier.isAbstract(mod)) {
 			fmx.addModifiers("abstract");
+			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
 		}
 		if (Modifier.isPublic(mod)) {
 			fmx.addModifiers("public");
+			// fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
 		}
 		if (Modifier.isPrivate(mod)) {
 			fmx.addModifiers("private");
+			// fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
 		}
 		if (Modifier.isProtected(mod)) {
 			fmx.addModifiers("protected");
+			// fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
 		}
-		if (Modifier.isFinal(mod)) {
-			fmx.addModifiers("final");
-		}
+		fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
 	}
 
 	/**
