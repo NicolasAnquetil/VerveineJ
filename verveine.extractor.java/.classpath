@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/verveine.core"/>
 	<classpathentry kind="lib" path="lib/akuhn-util-r28011.jar"/>
 	<classpathentry kind="lib" path="lib/fame.jar"/>
 	<classpathentry kind="lib" path="lib/famix.jar"/>
@@ -15,5 +14,6 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.jdt.core_3.7.1.v_B76_R37x.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.7.1.R37x_v20110808-1106.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/verveine.core.jar" sourcepath="/home/anquetin/Documents/RMod/Tools/workspace/verveine.core/src"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
