@@ -281,7 +281,7 @@ public class VerveineVisitor extends ASTVisitor {
 			// treat the expression 'new A(...)' by creating a Reference to 'A'
 			fr.inria.verveine.core.gen.famix.Type fmx = null;
 			Type clazz = node.getType();
-			fmx = referedType(clazz, context.top());
+			fmx = referedType(clazz, context.top(), true);
 			this.classInstanceCreated = fmx;
 			
 			if (classSummary) {
@@ -439,7 +439,7 @@ public class VerveineVisitor extends ASTVisitor {
 				fmx.setKind(CONSTRUCTOR_KIND_MARKER);
 			}
 			else {
-				fmxRetTyp = referedType(node.getReturnType2(), fmx);
+				fmxRetTyp = referedType(node.getReturnType2(), fmx, false);
 				fmx.setDeclaredType(fmxRetTyp);
 
 				if ( classSummary && (! (fmxRetTyp instanceof PrimitiveType)) ) {
@@ -466,13 +466,13 @@ public class VerveineVisitor extends ASTVisitor {
 				paramAsVarList = new ArrayList<VariableDeclaration>(1);
 				paramAsVarList.add(param);
 
-				fr.inria.verveine.core.gen.famix.Type varTyp = referedType(param.getType(), fmx);
+				fr.inria.verveine.core.gen.famix.Type varTyp = referedType(param.getType(), fmx, false);
 				visitVariablesDeclarations(node, varTyp, paramAsVarList, fmx);
 			}
 
 			// Exceptions
 			for (Name excepName : (List<Name>)node.thrownExceptions()) {
-				fr.inria.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(excepName.resolveTypeBinding(), context.topType());
+				fr.inria.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(excepName.resolveTypeBinding(), context.topType(), true);
 				if (excepFmx != null) {
 					if (classSummary) {
 						dico.addFamixReference(findHighestType(fmx), findHighestType(excepFmx), null);
@@ -535,7 +535,7 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(FieldDeclaration node) {
 //		System.err.println("TRACE, Visiting FieldDeclaration");
 
-		fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topType());
+		fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topType(), false);
 
 		for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topType()) ) {
 			if (! classSummary) {
@@ -561,7 +561,7 @@ public class VerveineVisitor extends ASTVisitor {
 		// Independently of 'withLocals()', we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them 
 		if (! node.getType().isPrimitiveType()) {
-			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod());
+			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod(), false);
 
 			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
 				if (! classSummary) {
@@ -579,7 +579,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 		// locals: same discussion as for visit(VariableDeclarationExpression node)
 		if (! node.getType().isPrimitiveType()) {
-			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod());
+			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod(), false);
 			for (StructuralEntity var : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
 				if (! classSummary) {
 					dico.addSourceAnchor(var, node, /*oneLineAnchor*/true);
@@ -743,7 +743,7 @@ public class VerveineVisitor extends ASTVisitor {
 		if (meth != null) {
 			fr.inria.verveine.core.gen.famix.Class excepFmx = null;
 			if ( (excepClass instanceof SimpleType) || (excepClass instanceof QualifiedType) ) {
-				excepFmx = (Class) referedType(excepClass, meth);
+				excepFmx = (Class) referedType(excepClass, meth, true);
 			}
 			if (excepFmx != null) {
 				if (classSummary) {
@@ -767,7 +767,7 @@ public class VerveineVisitor extends ASTVisitor {
 		this.context.addTopMethodNOS(1);
 
 		Method meth = this.context.topMethod();
-		fr.inria.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(node.getExpression().resolveTypeBinding(), context.topType());
+		fr.inria.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(node.getExpression().resolveTypeBinding(), context.topType(), true);
 		if (excepFmx != null) {
 			if (classSummary) {
 				Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx), null);
@@ -958,7 +958,7 @@ public class VerveineVisitor extends ASTVisitor {
 					}
 				}
 				if (invoked == null) {
-					fr.inria.verveine.core.gen.famix.Type retType = this.referedType(calledBnd.getReturnType(), javaMetaClass);
+					fr.inria.verveine.core.gen.famix.Type retType = this.referedType(calledBnd.getReturnType(), javaMetaClass, false);
 					Collection<String> paramTypes = new ArrayList<String>();
 					// types of the method's parameters
 					for (ITypeBinding pt : calledBnd.getParameterTypes()) {
@@ -1057,25 +1057,29 @@ public class VerveineVisitor extends ASTVisitor {
 	/**
 	 * Ensures the proper creation of a FamixType for JDT typ in the given context.
 	 * Useful for parameterizedTypes, or classInstance.
+	 * @param isClass we are sure that the type is actually a class
 	 * @return a famix type or null
 	 */
-	private fr.inria.verveine.core.gen.famix.Type referedType(Type typ, ContainerEntity ctxt) {
+	private fr.inria.verveine.core.gen.famix.Type referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
 		if (typ == null) {
 			return null;
 		}
 		else if (typ.resolveBinding() != null) {
-			return this.referedType(typ.resolveBinding(), ctxt);
+			return this.referedType(typ.resolveBinding(), ctxt, isClass);
 		}
 		else {
 			// let's assume the owner is the context
-			return dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, ctxt, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+			if(isClass)
+				return dico.ensureFamixClass((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+			else
+				return dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, ctxt, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 		}
 	}
 
 	/**
-	 * Same as {@link VerveineVisitor#referedType(Type, ContainerEntity)} but with a type binding as first argument instead of a Type
+	 * Same as {@link VerveineVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
-	private fr.inria.verveine.core.gen.famix.Type referedType(ITypeBinding bnd, ContainerEntity ctxt) {
+	private fr.inria.verveine.core.gen.famix.Type referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
 		fr.inria.verveine.core.gen.famix.Type fmxTyp = null;
 
 		if (bnd == null) {
@@ -1104,13 +1108,14 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
-				fr.inria.verveine.core.gen.famix.Type fmxTArg = this.referedType(targ, ctxt);
+				fr.inria.verveine.core.gen.famix.Type fmxTArg = this.referedType(targ, ctxt, false);
 				if ( (fmxTArg != null) && persistClass(targ) ) {
 					((fr.inria.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
 				}
 			}
 		}
 		else {
+			// let's assume the owner is the context
 			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, ctxt, /*alwaysPersist?*/persistClass(bnd));
 		}
 
@@ -1213,8 +1218,8 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 			NamedEntity ret = null;
 			if (bnd instanceof ITypeBinding) {
-				// msg() is a static method of Name
-				ret = referedType((ITypeBinding)bnd, context.top());
+				// msg() is a static method of Name so name should be a class, except if its an Enum
+				ret = referedType((ITypeBinding)bnd, context.top(), ! ((ITypeBinding) bnd).isEnum());
 			}
 			else if (bnd instanceof IVariableBinding) {
 				String varName = ( ((Name)expr).isSimpleName() ? ((SimpleName)expr).getFullyQualifiedName() : ((QualifiedName)expr).getName().getIdentifier());
@@ -1289,7 +1294,7 @@ public class VerveineVisitor extends ASTVisitor {
 		// ((type)expr).msg()
 		if (expr instanceof CastExpression) {
 			Type tcast = ((CastExpression) expr).getType();
-			return referedType(tcast, this.context.top());
+			return referedType(tcast, this.context.top(), true);
 		}
 
 		// new Class().msg()
@@ -1301,7 +1306,7 @@ public class VerveineVisitor extends ASTVisitor {
 		else if (expr instanceof MethodInvocation) {
 			IMethodBinding callerBnd = ((MethodInvocation) expr).resolveMethodBinding();
 			if (callerBnd != null) {
-				return referedType(callerBnd.getReturnType(), this.context.top());
+				return referedType(callerBnd.getReturnType(), this.context.top(), true);
 			}
 			else {
 				return null;
@@ -1322,7 +1327,7 @@ public class VerveineVisitor extends ASTVisitor {
 		else if (expr instanceof SuperMethodInvocation) {
 			IMethodBinding superBnd = ((SuperMethodInvocation) expr).resolveMethodBinding();
 			if (superBnd != null) {
-				return  this.referedType(superBnd.getReturnType(), context.topType());
+				return  this.referedType(superBnd.getReturnType(), context.topType(),true);
 			}
 			else {
 				return null;

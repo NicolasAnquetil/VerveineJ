@@ -428,6 +428,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx = super.ensureFamixParameterizedType(bnd, name, generic, owner, persistIt);
 		}
 
+		// --------------- stub same as ParameterizableClass
+		if ( (generic == null) && (fmx != null) ) {
+			fmx.setIsStub(generic.getIsStub());
+		}
+		
 		return fmx;
 	}
 
