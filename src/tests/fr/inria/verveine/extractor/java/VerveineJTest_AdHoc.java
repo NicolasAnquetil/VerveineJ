@@ -151,6 +151,13 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertSame(meth, exC.getDefiningMethod());
 		assertSame(excepClass, exC.getExceptionClass());
 	}
+
+	@Test
+	public void testClassWithNoBindingCreatedAsType() {
+		fr.inria.verveine.core.gen.famix.Type clazz = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Type.class, "BackingStoreException");
+		assertNotNull(clazz);
+		assertEquals(fr.inria.verveine.core.gen.famix.Class.class, clazz.getClass());
+	}
 	
 	@Test
 	public void testAnnotation() {
