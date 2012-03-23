@@ -14,6 +14,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -207,10 +208,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 
-		// no Attribute annotations
-		assertEquals(5, book.getAttributes().size());
+		// one Attribute with annotation
+		assertEquals(6, book.getAttributes().size());
 		for (Attribute att : book.getAttributes()) {
-			assertEquals(0, att.getAnnotationInstances().size());
+			if (att.getName().equals("time")) {
+				assertEquals(1, att.getAnnotationInstances().size());
+			}
+			else {
+				assertEquals(0, att.getAnnotationInstances().size());
+			}
 		}
 
 	}
@@ -558,4 +564,36 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertNotNull(withParam);
 		assertEquals(3, withParam.getOutgoingInvocations().size());  // printStackTrace(new PrintWriter(new StringWriter()))
 	}
+	
+	@Test
+	public void testXmlElementAnnotation(){
+		Attribute time = TestVerveineUtils.detectElement(repo, Attribute.class, "time");
+		assertNotNull(time);
+
+		assertEquals(1, time.getAnnotationInstances().size());
+		AnnotationInstance xmle = time.getAnnotationInstances().iterator().next();
+		assertNotNull(xmle);
+		assertEquals("XmlElement", xmle.getAnnotationType().getName());
+		assertSame(xmle.getAnnotatedEntity(), time);
+		assertEquals(3, xmle.getAttributes().size());
+		
+		Iterator<AnnotationInstanceAttribute> iterator = xmle.getAttributes().iterator();
+		
+		for (String value: new String[] {"name", "required", "type"}) {
+			AnnotationInstanceAttribute swVal = iterator.next();
+			assertNotNull(swVal);
+			assertEquals(value, swVal.getAnnotationTypeAttribute().getName());
+		}
+		
+		for (AnnotationInstanceAttribute aia : xmle.getAttributes()) {
+			if (aia.getAnnotationTypeAttribute().getName().equals("type")) {
+				assertEquals("String.class", aia.getValue());
+			}
+			else {
+				assertTrue( aia.getAnnotationTypeAttribute().getName().equals("name") ||
+						    aia.getAnnotationTypeAttribute().getName().equals("required"));
+			}
+		}
+	}
+
 }
