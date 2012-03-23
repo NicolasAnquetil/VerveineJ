@@ -696,8 +696,22 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				// create all parameters of the annotation instance
 				Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>(); 
 				for (IMemberValuePairBinding annPV : annBnd.getDeclaredMemberValuePairs()) {
-					annAtts.add( createFamixAnnotationInstanceAttribute(ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), annPV.getName(), annType, persistIt),
-																		(annPV.getValue() != null) ? annPV.getValue().toString() : ""));
+					Object attJdtVal = annPV.getValue();
+					String attFamixVal = null;
+					if (attJdtVal == null) {
+						attFamixVal = "";
+					}
+					else if (attJdtVal instanceof ITypeBinding) {
+						// for Annotation attributes of the form <someclass>.class,
+						// attJdtVal contains the entire declaration of the class
+						// we want just its name
+						attFamixVal = ((ITypeBinding)attJdtVal).getName() + ".class";
+					}
+					else {
+						attFamixVal = attJdtVal.toString();
+					}
+					AnnotationTypeAttribute annoType = ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), annPV.getName(), annType, persistIt);
+					annAtts.add( createFamixAnnotationInstanceAttribute(annoType, attFamixVal) );
 				}
 
 				// create the annotation instance
