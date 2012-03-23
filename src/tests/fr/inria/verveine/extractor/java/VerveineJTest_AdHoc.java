@@ -566,7 +566,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 	
 	@Test
-	public void testXmlElementAnnotation(){
+	public void testAnnotParamIsClass(){
 		Attribute time = TestVerveineUtils.detectElement(repo, Attribute.class, "time");
 		assertNotNull(time);
 
@@ -576,15 +576,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals("XmlElement", xmle.getAnnotationType().getName());
 		assertSame(xmle.getAnnotatedEntity(), time);
 		assertEquals(3, xmle.getAttributes().size());
-		
-		Iterator<AnnotationInstanceAttribute> iterator = xmle.getAttributes().iterator();
-		
-		for (String value: new String[] {"name", "required", "type"}) {
-			AnnotationInstanceAttribute swVal = iterator.next();
-			assertNotNull(swVal);
-			assertEquals(value, swVal.getAnnotationTypeAttribute().getName());
-		}
-		
+
 		for (AnnotationInstanceAttribute aia : xmle.getAttributes()) {
 			if (aia.getAnnotationTypeAttribute().getName().equals("type")) {
 				assertEquals("String.class", aia.getValue());
