@@ -5,6 +5,8 @@ package ad_hoc.annotations;
  * (A comment with accent to test UTF-8)
  */
 
+import java.util.Date;
+
 public class Book {
 
 	public static final Book DESIGN_PATTERNS = new Book("Design Patterns", 
@@ -17,6 +19,9 @@ public class Book {
 	private String publication;
 
 	private String title;
+
+	@XmlElement(name = "Time", required = true, type = String.class)
+	protected Date time;
 	
 	public Book(String title, String author) {
 		this.author = author;
