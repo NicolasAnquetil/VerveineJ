@@ -104,11 +104,6 @@ import fr.inria.verveine.core.gen.famix.StructuralEntity;
  */
 public class VerveineVisitor extends ASTVisitor {
 
-	/**
-	 * An MSE marker for methods
-	 */
-	public static final String CONSTRUCTOR_KIND_MARKER = "constructor";
-
 	/** 
 	 * A dictionary allowing to recover created FAMIX Entities
 	 */
@@ -271,7 +266,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(ClassInstanceCreation node) {
-//		System.err.println("TRACE, Visiting ClassInstanceCreation");
+//		System.err.println("TRACE, Visiting ClassInstanceCreation: " + node);
 		if (node.getAnonymousClassDeclaration() != null) {
 			anonymousSuperType = node.getType();
 		}
@@ -436,7 +431,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 			// now will recompute the actual returnType
 			if (node.isConstructor()) {
-				fmx.setKind(CONSTRUCTOR_KIND_MARKER);
+				fmx.setKind(JavaDictionary.CONSTRUCTOR_KIND_MARKER);
 			}
 			else {
 				fmxRetTyp = referedType(node.getReturnType2(), fmx, false);
@@ -634,6 +629,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(ConstructorInvocation node) {
+//		System.err.println("TRACE, Visiting ConstructorInvocation: ");
 		this.context.addTopMethodNOS(1);
 		
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
@@ -982,8 +978,13 @@ public class VerveineVisitor extends ASTVisitor {
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, methOwner, /*persistIt*/!classSummary);  // cast on 'null' needed to desambiguate the call
 				}
 				else {
+				
+					fr.inria.verveine.core.gen.famix.Type owner;
+					
+						if(receiver != null) owner = (fr.inria.verveine.core.gen.famix.Type) receiver;
+						else owner = methOwner;
 					//  static method called on the class (or null receiver)
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, /*owner*/(fr.inria.verveine.core.gen.famix.Type)receiver, /*persistIt*/!classSummary);  // cast needed to desambiguate the call
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, /*owner*/owner, /*persistIt*/!classSummary);  // cast needed to desambiguate the call
 				}
 				if (classSummary) {
 					dico.addFamixReference(findHighestType(sender), findHighestType(methOwner), null);
@@ -1205,7 +1206,6 @@ public class VerveineVisitor extends ASTVisitor {
 		// msg1().msg()
 		else if (expr instanceof MethodInvocation) {
 			//System.err.println("WARNING: Ignored receiver expression in method call: MethodInvocation");
-
 			return null;
 		}
 

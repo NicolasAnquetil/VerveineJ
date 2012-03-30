@@ -67,13 +67,13 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
 
-	//@ Test
+	@ Test
 	public void testConstructorInvocations() {
 		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "methodWithClassScope");
 		assertNotNull(meth);
 
 		// test outgoing invocation to constructor
-		assertEquals(2, meth.getOutgoingInvocations().size());
+		assertEquals(3, meth.getOutgoingInvocations().size());
 
 		// test constructors
 		assertEquals(2, TestVerveineUtils.listElements(repo, Method.class, "DefaultConstructor").size());
@@ -83,6 +83,21 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			assertEquals(1, m.getIncomingInvocations().size());
 			assertEquals(1, m.getOutgoingInvocations().size());
 		}
+	}
+
+	@ Test
+	public void testStubConstructor() {
+		fr.inria.verveine.core.gen.famix.Class stubClass = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "JFrame");
+		assertNotNull(stubClass);
+
+		// test outgoing invocation to constructor
+		assertEquals(1, stubClass.getMethods().size());
+
+		Method stubConstructor = stubClass.getMethods().iterator().next();
+	
+		assertTrue(stubConstructor.getIsStub());
+		assertEquals( "constructor", stubConstructor.getKind());
+		
 	}
 
 	@Test

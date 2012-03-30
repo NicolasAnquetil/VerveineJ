@@ -65,15 +65,18 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_PRIVATE  = "private";
 	public static final String MODIFIER_PROTECTED= "protected";
 	public static final String MODIFIER_FINAL    = "final";
-
-
 	
+	/**
+	 * An MSE marker for methods
+	 */
+	public static final String CONSTRUCTOR_KIND_MARKER = "constructor";
 	/**
 	 * Result of utility methods for checking matching between two entities
 	 */
 	private enum CheckResult {
 		MATCH, UNDECIDED, FAIL;
 	}
+
 
   	public void mapKey(IBinding bnd, NamedEntity fmx) {
 		super.mapEntityToKey(bnd, fmx);
@@ -1395,6 +1398,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			else {
 				fmx.setHasClassScope(false);
 			}
+			
+			// if it's a constructor
+			if(fmx.getName().equals(fmx.getBelongsTo().getName()))
+				fmx.setKind(CONSTRUCTOR_KIND_MARKER);
 		}
 
 		if ( (fmx != null) && delayedRetTyp ) {

@@ -19,5 +19,7 @@ public class DefaultConstructor {
 	public static void methodWithClassScope() {
 		DefaultConstructor x = new DefaultConstructor();
 		x.methodWithInstanceScope();
+		// create an unknown object to test stub constructor
+		new JFrame("My title");
 	}
 }
