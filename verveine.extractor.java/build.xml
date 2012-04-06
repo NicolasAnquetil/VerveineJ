@@ -82,6 +82,7 @@
 			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
 			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_Summarized" todir="${test.report.dir}" />
 			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_JWSBasic" todir="${test.report.dir}" />
+			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_Configuration" todir="${test.report.dir}" />
 		</junit>
 	</target>
 

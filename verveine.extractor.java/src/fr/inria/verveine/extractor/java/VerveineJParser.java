@@ -137,7 +137,7 @@ public class VerveineJParser extends VerveineParser {
 				}	
 			}
 			else {
-				int j = super.setOption(i, args);
+				int j = super.setOption(i - 1, args);
 				if (j > 0) {     // j is the number of args consumed
 					i += (j-1);  // 1 more will be added at the beginning of the loop ("args[i++]")
 				}
