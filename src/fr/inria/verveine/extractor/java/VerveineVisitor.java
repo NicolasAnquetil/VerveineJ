@@ -936,7 +936,7 @@ public class VerveineVisitor extends ASTVisitor {
 		Method invoked = null;
 
 		if (calledBnd != null) {
-			// for parameterized methods there is a level of indirection, for other methods don't change anything
+			// for parameterized methods there is a level of indirection, for other methods doesn't change anything
 			calledBnd = calledBnd.getMethodDeclaration();
 		}
 		
@@ -1068,12 +1068,21 @@ public class VerveineVisitor extends ASTVisitor {
 		else if (typ.resolveBinding() != null) {
 			return this.referedType(typ.resolveBinding(), ctxt, isClass);
 		}
-		else {
-			// let's assume the owner is the context
-			if(isClass)
+		// from here, we assume the owner is the context
+		else if(isClass) {
 				return dico.ensureFamixClass((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
-			else
+			}
+		else {
+			while (typ.isArrayType()) {
+				typ = ((ArrayType)typ).getElementType();
+			}
+
+			if (typ.isPrimitiveType()) {
+				return dico.ensureFamixPrimitiveType((ITypeBinding)null, findTypeName(typ));
+			}
+			else {
 				return dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, ctxt, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+			}
 		}
 	}
 
@@ -1339,6 +1348,14 @@ public class VerveineVisitor extends ASTVisitor {
 			if (receiver == null) {
 				return null;
 			}
+/*			else if (receiver instanceof ImplicitVariable) {
+				if (receiver.getName().equals(JavaDictionary.SELF_NAME)) {
+					return context.topType();
+				}
+				else { // receiver.getName().equals(JavaDictionary.SUPER_NAME)
+					return context.topType().getSuperInheritances().iterator().next().getSuperclass();
+				}
+			}*/
 			else if (receiver instanceof StructuralEntity) {
 				return ((StructuralEntity)receiver).getDeclaredType();
 			}

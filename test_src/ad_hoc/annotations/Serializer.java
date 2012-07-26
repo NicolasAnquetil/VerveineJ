@@ -26,10 +26,11 @@ public class Serializer {
 	}
 	
 	private void serializeProperty(Object o, Method m) {
+		TypeNotFound someVar;
 		writer.print("\t");
 		writer.print(m.getAnnotation(GetProperty.class).value());
 		writer.print(" = ");
-		writer.print(this.readStringProperty(o, m));
+		writer.print(this.readStringProperty(someVar.someMethod(), m));  // here we are calling readStringProperty(Object, Method), but because TypeNotFound is unknown, binding resolution does not work so JDT does not know what method it is
 		writer.println();
 	}
 	

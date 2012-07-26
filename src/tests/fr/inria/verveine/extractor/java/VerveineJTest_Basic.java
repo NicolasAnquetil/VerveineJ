@@ -16,6 +16,7 @@ import fr.inria.verveine.core.gen.famix.Inheritance;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
 import fr.inria.verveine.core.gen.famix.Method;
+import fr.inria.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.core.gen.famix.PrimitiveType;
 import fr.inria.verveine.core.gen.famix.SourceLanguage;
@@ -169,5 +170,39 @@ public abstract class VerveineJTest_Basic {
 		assertEquals(1, sl.size());
 		SourceLanguage jsl = sl.iterator().next();
 		assertEquals(JavaSourceLanguage.class, jsl.getClass());
+	}
+
+	/**
+	 * Test that primitive types names are not used for something else
+	 */
+	@Test
+	public void testPrimitiveTypes() {
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "byte")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "short")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "int")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "long")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "float")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "double")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "boolean")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "char")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
+		for (NamedEntity t : TestVerveineUtils.listElements(repo, "void")) {
+			assertEquals(PrimitiveType.class, t.getClass());
+		}
 	}
 }

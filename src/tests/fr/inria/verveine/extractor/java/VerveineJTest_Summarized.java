@@ -151,14 +151,14 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(10+14, TestVerveineUtils.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size());
+		assertEquals(10+14, TestVerveineUtils.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)Autocloseable}
 		assertEquals(3,     TestVerveineUtils.selectElementsOfType(repo, PrimitiveType.class).size());
 		assertEquals(0, 	TestVerveineUtils.selectElementsOfType(repo, Method.class).size());
 		assertEquals(0, 	TestVerveineUtils.selectElementsOfType(repo, Attribute.class).size());
 		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(10+18,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());
+		assertEquals(7+21,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//7 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, Access.class).size());
 		assertEquals(20,    TestVerveineUtils.selectElementsOfType(repo, Reference.class).size());  // TODO check that number
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());

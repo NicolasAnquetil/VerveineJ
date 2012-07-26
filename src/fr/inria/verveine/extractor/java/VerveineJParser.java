@@ -108,9 +108,11 @@ public class VerveineJParser extends VerveineParser {
 			}
 			else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
 				setCodeVersion(arg);
-			} else if (arg.equals("-summary")) {
+			}
+			else if (arg.equals("-summary")) {
 				this.classSummary = true;
-			} else if (arg.equals("-autocp")) {
+			}
+			else if (arg.equals("-autocp")) {
 				if (i < args.length) {
 					List<String> tmpPath = collectAllJars(args[i++]);
 					int oldlength = classPath.length;
@@ -122,7 +124,8 @@ public class VerveineJParser extends VerveineParser {
 				} else {
 					System.err.println("-autocp requires a root folder");
 				}
-			} else if (arg.equals("-cp")) {
+			}
+			else if (arg.equals("-cp")) {
 				if (i < args.length) {
 					String[] tmpPath = args[i++].split(System.getProperty("path.separator"));
 					int oldlength = classPath.length;
