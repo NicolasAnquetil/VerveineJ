@@ -110,14 +110,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(11+14, TestVerveineUtils.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable}
+		assertEquals(11+14, TestVerveineUtils.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
 		assertEquals(3,     TestVerveineUtils.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+8,  TestVerveineUtils.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10+1,  TestVerveineUtils.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,    TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(54,    TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(12+18, TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//12 internal + {Object=0,String=4,StringBuffer=3,AbstractStringBuilder=3,PrintStream=3,FilterOutputStream=1,OutputStream=3,System=1,Comparable=0,Serializable=0,Flushable=0,Appendable=0,CharSequence=0,Closeable=0}
+		assertEquals(9+21, TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//9 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
 		assertEquals(25,    TestVerveineUtils.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size()); //Override
@@ -291,7 +291,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
 		Namespace ns = TestVerveineUtils.detectElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
-		assertEquals(9, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence
+		assertEquals(9, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence, +(java7)AutoCloseable
 		assertTrue(ns.getIsStub());
 
 		fr.inria.verveine.core.gen.famix.Class obj = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);

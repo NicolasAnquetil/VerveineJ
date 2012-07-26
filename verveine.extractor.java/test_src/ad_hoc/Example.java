@@ -42,12 +42,9 @@ public class Example extends AbstractUIPlugin {
      * found necessary.
      */
     public synchronized void saveConfigPrefs() {
-        /*
-         * Note: If multiple JVMs use the config preferences and the underlying
-         * backing store, they might not always work with latest data, e.g. when
-         * using multiple instances of the same eclipse installation.
-         */
-        if (configPrefs != null) {
+		int [] row = new int [1], column = new int [1]; 
+
+		if (configPrefs != null) {
             try {
                 configPrefs.flush();
             } catch (BackingStoreException e) {

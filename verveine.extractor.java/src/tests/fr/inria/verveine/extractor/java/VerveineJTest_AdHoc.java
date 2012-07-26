@@ -14,7 +14,6 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,10 +26,12 @@ import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
 import fr.inria.verveine.core.gen.famix.Attribute;
+import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
 import fr.inria.verveine.core.gen.famix.CaughtException;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.DeclaredException;
 import fr.inria.verveine.core.gen.famix.EnumValue;
+import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
 import fr.inria.verveine.core.gen.famix.Namespace;
@@ -603,4 +604,19 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 	}
 
+	@Test
+	public void testInvokSelfNoBinding(){
+		Method seri = TestVerveineUtils.detectElement(repo, Method.class, "serialize");
+		assertNotNull(seri);
+		ContainerEntity owner = seri.getBelongsTo(); 
+		assertEquals("Serializer", owner.getName());  // just checking
+		
+		for (Invocation invok : seri.getOutgoingInvocations()) {
+			BehaviouralEntity invoked = invok.getCandidates().iterator().next();
+			if (invoked.getName().equals("serializeProperty")) {
+				assertEquals(owner, invoked.getBelongsTo());
+			}
+		}
+	}
+	
 }
