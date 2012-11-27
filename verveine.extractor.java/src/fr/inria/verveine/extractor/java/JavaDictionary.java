@@ -402,7 +402,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			}
 		}
 
+		// --------------- generic
+		if ( (generic == null) && (bnd != null) ) {
+			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, alwaysPersist);
+		}
+
 		// --------------- owner
+		//owner = generic.getContainer();
 		if (owner == null) {
 			if (bnd == null) {
 				owner = ensureFamixNamespaceDefault();  // not really sure what to do here
@@ -410,11 +416,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			else {
 				owner = ensureOwner(bnd, alwaysPersist);
 			}
-		}
-
-		// --------------- generic
-		if ( (generic == null) && (bnd != null) ) {
-			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, alwaysPersist);
 		}
 
 		// --------------- recover from name ?
@@ -431,7 +432,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx = super.ensureFamixParameterizedType(bnd, name, generic, owner, persistIt);
 		}
 
-		// --------------- stub same as ParameterizableClass
+		// --------------- stub: same as ParameterizableClass
 		if ( (generic == null) && (fmx != null) ) {
 			fmx.setIsStub(generic.getIsStub());
 		}

@@ -17,7 +17,7 @@ import javax.jws.WebService;
 import org.junit.Before;
 import org.junit.Test;
 
-import test.fr.inria.verveine.core.TestVerveineUtils;
+import fr.inria.verveine.core.VerveineUtilsForTests;
 import fr.inria.verveine.core.gen.famix.AnnotationInstance;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
 import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
@@ -53,12 +53,12 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(5, TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size()); // @Session, @WebService, @SOAPBinding, @WLHttpTransport, @WebMethod
+		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); // @Session, @WebService, @SOAPBinding, @WLHttpTransport, @WebMethod
 	}
 
 	@Test
 	public void testAnnotation() {
-		AnnotationType sessionAnn = TestVerveineUtils.detectElement(repo,AnnotationType.class, "Session");
+		AnnotationType sessionAnn = VerveineUtilsForTests.detectElement(repo,AnnotationType.class, "Session");
 		assertNotNull(sessionAnn);
 		assertTrue(sessionAnn.getIsStub());
 		assertEquals(3, sessionAnn.getInstances().size());
@@ -70,9 +70,9 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		}
 
 		// Class annotation
-		Namespace defPckg = TestVerveineUtils.detectElement(repo,Namespace.class, JavaDictionary.DEFAULT_PCKG_NAME);
+		Namespace defPckg = VerveineUtilsForTests.detectElement(repo,Namespace.class, JavaDictionary.DEFAULT_PCKG_NAME);
 		assertNotNull(defPckg);
-		fr.inria.verveine.core.gen.famix.Class cl = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "SimpleBean");
+		fr.inria.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "SimpleBean");
 		assertNotNull(cl);
 		assertEquals(4, cl.getAnnotationInstances().size());
 		for (AnnotationInstance ai :cl.getAnnotationInstances() ) {
@@ -88,7 +88,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		}
 
 		// Method annotations
-		Method rep = TestVerveineUtils.detectElement(repo,Method.class, "orderResponse");
+		Method rep = VerveineUtilsForTests.detectElement(repo,Method.class, "orderResponse");
 		assertNotNull(rep);
 		Collection<AnnotationInstance> annInstances = rep.getAnnotationInstances();
 		assertEquals(1, annInstances.size());

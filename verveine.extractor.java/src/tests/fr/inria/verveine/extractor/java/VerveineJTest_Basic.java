@@ -6,8 +6,8 @@ import java.util.Collection;
 
 import org.junit.Test;
 
-import test.fr.inria.verveine.core.TestVerveineUtils;
 import ch.akuhn.fame.Repository;
+import fr.inria.verveine.core.VerveineUtilsForTests;
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.Association;
 import fr.inria.verveine.core.gen.famix.Attribute;
@@ -38,21 +38,21 @@ public abstract class VerveineJTest_Basic {
 
 	@Test
 	public void testAssociation() {
-		for (Association ass : TestVerveineUtils.selectElementsOfType(repo, Access.class) ) {
+		for (Association ass : VerveineUtilsForTests.selectElementsOfType(repo, Access.class) ) {
 			if (! (ass instanceof Invocation)) { // null receiver allowed for invocations
 				assertNotNull(ass.getClass().getSimpleName()+(ass.getTo()==null? "" : " to: "+ass.getTo().getName())+" as no From", ass.getFrom());
 			}
 			assertNotNull(ass.getClass().getSimpleName()+" from: "+ass.getFrom().getName()+" as no To", ass.getTo());
 		}
 
-		for (Association ass : TestVerveineUtils.selectElementsOfType(repo, Association.class) ) {
+		for (Association ass : VerveineUtilsForTests.selectElementsOfType(repo, Association.class) ) {
 			Association n = ass.getNext();
 			if (n!=null) {
 				assertSame(ass, n.getPrevious());
 			}
 		}
 		
-		for (Association ass : TestVerveineUtils.selectElementsOfType(repo, Association.class) ) {
+		for (Association ass : VerveineUtilsForTests.selectElementsOfType(repo, Association.class) ) {
 			Association p = ass.getPrevious();
 			if (p!=null) {
 				assertSame(ass, p.getNext());
@@ -99,39 +99,39 @@ public abstract class VerveineJTest_Basic {
 	public void testJavaCore() {
 		
 		// namespaces
-		Namespace java = TestVerveineUtils.detectElement(repo,Namespace.class, "java");
+		Namespace java = VerveineUtilsForTests.detectElement(repo,Namespace.class, "java");
 		assertNotNull(java);
 
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
-		Namespace javaLang = TestVerveineUtils.detectElement(repo,Namespace.class, javaLangName);
+		Namespace javaLang = VerveineUtilsForTests.detectElement(repo,Namespace.class, javaLangName);
 		assertNotNull(javaLang);
 		assertEquals(java, javaLang.getBelongsTo());
 		 // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence
 
-		Namespace javaIO = TestVerveineUtils.detectElement(repo,Namespace.class, "io");
+		Namespace javaIO = VerveineUtilsForTests.detectElement(repo,Namespace.class, "io");
 		assertNotNull(javaIO);
 		assertEquals(java, javaIO.getBelongsTo());
 
 		// Object
-		fr.inria.verveine.core.gen.famix.Class obj = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
+		fr.inria.verveine.core.gen.famix.Class obj = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(obj);
 		assertSame(javaLang, obj.getContainer());
 		assertEquals(0, obj.getSuperInheritances().size());
 
 		// String
-		fr.inria.verveine.core.gen.famix.Class charSeq = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "CharSequence");
+		fr.inria.verveine.core.gen.famix.Class charSeq = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "CharSequence");
 		assertNotNull(charSeq);
 		assertSame(javaLang, charSeq.getContainer());
 		assertTrue(charSeq.getIsInterface());
 		assertEquals(0, charSeq.getSuperInheritances().size());
 
-		fr.inria.verveine.core.gen.famix.Class serial = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Serializable");
+		fr.inria.verveine.core.gen.famix.Class serial = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Serializable");
 		assertNotNull(serial);
 		assertSame(javaIO, serial.getContainer());
 		assertTrue(serial.getIsInterface());
 		assertEquals(0, serial.getSuperInheritances().size());
 
-		fr.inria.verveine.core.gen.famix.Class str = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String");
+		fr.inria.verveine.core.gen.famix.Class str = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String");
 		assertNotNull(str);
 		assertSame(javaLang, str.getContainer());
 		assertEquals(4, str.getSuperInheritances().size());
@@ -145,7 +145,7 @@ public abstract class VerveineJTest_Basic {
 
 		// System
 		if (this.testSystem) {
-			fr.inria.verveine.core.gen.famix.Class syst = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "System");
+			fr.inria.verveine.core.gen.famix.Class syst = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "System");
 			assertNotNull(syst);
 			assertSame(javaLang, syst.getContainer());
 			assertEquals(1, syst.getSuperInheritances().size());
@@ -165,7 +165,7 @@ public abstract class VerveineJTest_Basic {
 	
 	@Test
 	public void testSourceLanguage() {
-		Collection<SourceLanguage> sl = TestVerveineUtils.selectElementsOfType(repo, SourceLanguage.class);
+		Collection<SourceLanguage> sl = VerveineUtilsForTests.selectElementsOfType(repo, SourceLanguage.class);
 		assertNotNull(sl);
 		assertEquals(1, sl.size());
 		SourceLanguage jsl = sl.iterator().next();
@@ -177,31 +177,31 @@ public abstract class VerveineJTest_Basic {
 	 */
 	@Test
 	public void testPrimitiveTypes() {
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "byte")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "byte")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "short")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "short")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "int")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "int")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "long")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "long")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "float")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "float")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "double")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "double")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "boolean")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "boolean")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "char")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "char")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : TestVerveineUtils.listElements(repo, "void")) {
+		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "void")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
 	}
