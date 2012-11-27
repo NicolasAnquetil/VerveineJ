@@ -135,6 +135,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	private void parseFile(String file) {
 		String[] args = new String[] {
 				"-summary",
+				"-i",
 				"-cp",
 				"test_src/LANModel/",
 				"test_src/LANModel/moose/lan/"+file
