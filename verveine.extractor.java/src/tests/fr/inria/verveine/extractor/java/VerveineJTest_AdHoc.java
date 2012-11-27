@@ -198,7 +198,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		AnnotationInstanceAttribute swVal = sw.getAttributes().iterator().next();
 		assertNotNull(swVal);
 		assertEquals("value", swVal.getAnnotationTypeAttribute().getName());
-		//FIXME this test does not pass anymore !!!!		assertEquals("serial", swVal.getValue());
+		assertEquals("serial", swVal.getValue());
 
 		// Method annotations
 		fr.inria.verveine.core.gen.famix.Class book = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Book");

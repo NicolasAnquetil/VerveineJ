@@ -711,6 +711,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 						// we want just its name
 						attFamixVal = ((ITypeBinding)attJdtVal).getName() + ".class";
 					}
+					else if (attJdtVal.getClass() == Object[].class) {
+						// VERY WEIRD behavior that seems to happen when giving @ AnAnnotation("valueForDefaultAnnotationAttribute")
+						// probably a bug
+						attFamixVal = ((Object[])attJdtVal)[0].toString();
+					}
 					else {
 						attFamixVal = attJdtVal.toString();
 					}
