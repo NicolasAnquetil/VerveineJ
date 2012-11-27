@@ -184,7 +184,7 @@ public class VerveineJParser extends VerveineParser {
 		 *   some new relation: classdep
 		 */
 		
-		System.err.println("Usage: VerveineJ [-h] [-nolocal | -summary] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-nolocal | -summary] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.exit(0);
 
 	}
@@ -234,7 +234,7 @@ public class VerveineJParser extends VerveineParser {
 		parser.setOptions(args);
 		parser.parse();
 		//parser.debug();
-		parser.emitMSE(parser.getOutputFileName());
+		parser.emitMSE();
 	}
 
 	public void parse() {

@@ -34,7 +34,7 @@
 	
 	<!-- call ant on verveine.core -->
 	<target name="antcore">
-		<ant dir="${core.dir}" target="jar" inheritAll="false" />
+		<ant dir="${core.dir}" target="junit" inheritAll="false" />
 	</target>
 
 	<!-- copies the jar from verveine.core -->
@@ -45,10 +45,10 @@
 
 	<!-- Compiles the java code (including the usage of library for JUnit -->
 	<target name="compile" depends="clean, corejars">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath" includeantruntime="false">
 		</javac>
 	</target>
-
+ 
 	<!-- Creates Javadoc -->
 	<target name="docs" depends="compile">
 		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
