@@ -94,6 +94,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	 */
 	private void parseFile(String file) {
 		String[] args = new String[] {
+				"-i",
 				"-cp",
 				"test_src/LANModel/",
 				"test_src/LANModel/moose/lan/"+file
