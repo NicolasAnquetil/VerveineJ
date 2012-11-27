@@ -11,7 +11,7 @@ import java.io.File;
 import org.junit.Before;
 import org.junit.Test;
 
-import test.fr.inria.verveine.core.TestVerveineUtils;
+import fr.inria.verveine.core.VerveineUtilsForTests;
 import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
@@ -41,8 +41,8 @@ public class VerveineJTest_ArrayListMatthias extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(8+7, TestVerveineUtils.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // Bla, <StubMethodContainer>, Object, String,
+		assertEquals(8+7, VerveineUtilsForTests.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // Bla, <StubMethodContainer>, Object, String,
 		//CharSequence, Serializable, Cloneable, RandomAccess + all ParameterizableClasses
-		assertEquals(7,  TestVerveineUtils.selectElementsOfType(repo, ParameterizableClass.class).size()); // List, Collection, AbstractList, ArrayList, Comparable, Iterable, AbstractCollection
+		assertEquals(7,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); // List, Collection, AbstractList, ArrayList, Comparable, Iterable, AbstractCollection
 	}
 }

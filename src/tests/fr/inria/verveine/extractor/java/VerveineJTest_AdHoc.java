@@ -18,8 +18,8 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 
-import test.fr.inria.verveine.core.TestVerveineUtils;
 import fr.inria.verveine.core.Dictionary;
+import fr.inria.verveine.core.VerveineUtilsForTests;
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.AnnotationInstance;
 import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
@@ -70,15 +70,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@ Test
 	public void testConstructorInvocations() {
-		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "methodWithClassScope");
+		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "methodWithClassScope");
 		assertNotNull(meth);
 
 		// test outgoing invocation to constructor
 		assertEquals(3, meth.getOutgoingInvocations().size());
 
 		// test constructors
-		assertEquals(2, TestVerveineUtils.listElements(repo, Method.class, "DefaultConstructor").size());
-		for (Method m : TestVerveineUtils.listElements(repo, Method.class, "DefaultConstructor")) {
+		assertEquals(2, VerveineUtilsForTests.listElements(repo, Method.class, "DefaultConstructor").size());
+		for (Method m : VerveineUtilsForTests.listElements(repo, Method.class, "DefaultConstructor")) {
 			int nbParam = m.getParameters().size();
 			assertTrue( (nbParam == 0) || (nbParam == 1) );
 			assertEquals(1, m.getIncomingInvocations().size());
@@ -88,7 +88,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@ Test
 	public void testStubConstructor() {
-		fr.inria.verveine.core.gen.famix.Class stubClass = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "JFrame");
+		fr.inria.verveine.core.gen.famix.Class stubClass = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "JFrame");
 		assertNotNull(stubClass);
 
 		// test outgoing invocation to constructor
@@ -104,7 +104,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	@Test
 	public void testDictionary() {
 		ParameterizableClass dico = null;
-		for (ParameterizableClass d : TestVerveineUtils.listElements(repo, ParameterizableClass.class, "Dictionary")) {
+		for (ParameterizableClass d : VerveineUtilsForTests.listElements(repo, ParameterizableClass.class, "Dictionary")) {
 			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
 				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
 				dico = d;
@@ -125,29 +125,29 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testStaticMembers() {
-		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "methodWithClassScope");
+		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "methodWithClassScope");
 		assertNotNull(meth);
 		assertTrue(meth.getHasClassScope());
 
-		meth = TestVerveineUtils.detectElement(repo, Method.class, "methodWithInstanceScope");
+		meth = VerveineUtilsForTests.detectElement(repo, Method.class, "methodWithInstanceScope");
 		assertNotNull(meth);
 		assertFalse(meth.getHasClassScope());
 
-		Attribute att = TestVerveineUtils.detectElement(repo, Attribute.class, "FIELD_WITH_CLASS_SCOPE");
+		Attribute att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "FIELD_WITH_CLASS_SCOPE");
 		assertNotNull(att);
 		assertTrue(att.getHasClassScope());
 
-		att = TestVerveineUtils.detectElement(repo, Attribute.class, "fieldWithInstanceScope");
+		att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "fieldWithInstanceScope");
 		assertNotNull(att);
 		assertFalse(att.getHasClassScope());
 	}
 
 	@Test
 	public void testExceptions() {
-		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "lire");
+		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "lire");
 		assertNotNull(meth);
 
-		fr.inria.verveine.core.gen.famix.Class excepClass = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "ReadException");
+		fr.inria.verveine.core.gen.famix.Class excepClass = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "ReadException");
 		assertNotNull(excepClass);
 
 		assertEquals(1, meth.getDeclaredExceptions().size());
@@ -160,7 +160,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertSame(meth, exT.getDefiningMethod());
 		assertSame(excepClass, exT.getExceptionClass());
 
-		excepClass = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "IOException");
+		excepClass = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "IOException");
 		assertNotNull(excepClass);
 
 		assertEquals(1,meth.getCaughtExceptions().size());
@@ -171,14 +171,14 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testClassWithNoBindingCreatedAsType() {
-		fr.inria.verveine.core.gen.famix.Type clazz = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Type.class, "BackingStoreException");
+		fr.inria.verveine.core.gen.famix.Type clazz = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Type.class, "BackingStoreException");
 		assertNotNull(clazz);
 		assertEquals(fr.inria.verveine.core.gen.famix.Class.class, clazz.getClass());
 	}
 	
 	@Test
 	public void testAnnotation() {
-		AnnotationType getProp = TestVerveineUtils.detectElement(repo,AnnotationType.class, "GetProperty");
+		AnnotationType getProp = VerveineUtilsForTests.detectElement(repo,AnnotationType.class, "GetProperty");
 		assertNotNull(getProp);
 		assertFalse(getProp.getIsStub());
 
@@ -188,7 +188,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(4, getProp.getInstances().size());
 
 		// Class annotation
-		fr.inria.verveine.core.gen.famix.Class cl = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Serializer");
+		fr.inria.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Serializer");
 		assertEquals(1, cl.getAnnotationInstances().size());
 		AnnotationInstance sw = cl.getAnnotationInstances().iterator().next();
 		assertNotNull(sw);
@@ -198,10 +198,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		AnnotationInstanceAttribute swVal = sw.getAttributes().iterator().next();
 		assertNotNull(swVal);
 		assertEquals("value", swVal.getAnnotationTypeAttribute().getName());
-		//FIXME this test does not pass anymore !!!!                  assertEquals("serial", swVal.getValue());
+		//FIXME this test does not pass anymore !!!!		assertEquals("serial", swVal.getValue());
 
 		// Method annotations
-		fr.inria.verveine.core.gen.famix.Class book = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Book");
+		fr.inria.verveine.core.gen.famix.Class book = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Book");
 		assertEquals(12, book.getMethods().size());
 		for (Method meth : book.getMethods()) {
 			Collection<AnnotationInstance> annInstances = meth.getAnnotationInstances();
@@ -239,7 +239,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testClassVar() {
-		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixEntity");
+		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "ensureFamixEntity");
 		assertNotNull(meth);
 		
 		assertEquals(3, meth.getParameters().size());
@@ -267,12 +267,43 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testParameterizableClass() {
-		for (ParameterizableClass p : TestVerveineUtils.selectElementsOfType(repo, ParameterizableClass.class)) {
-			System.out.println("ParameterizableClass:"+p.getName());
-		}
-		assertEquals(17, TestVerveineUtils.selectElementsOfType(repo, ParameterizableClass.class).size());	// Class,Comparable,List,ArrayList,AbstractList,AbstractCollection,Collection,Map,Iterable,Dictionary<B>,Hashtable,Dictionary<K,V>,LinkedList,AbstractSequentialList,Deque,Queue,Enum
+		assertEquals(17, VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());	// Class,Comparable,List,ArrayList,AbstractList,AbstractCollection,Collection,Map,Iterable,Dictionary<B>,Hashtable,Dictionary<K,V>,LinkedList,AbstractSequentialList,Deque,Queue,Enum
 
 		ParameterizableClass dico = null;
+		for (ParameterizableClass d : VerveineUtilsForTests.listElements(repo, ParameterizableClass.class, "Dictionary")) {
+			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
+				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
+				dico = d;
+				break;
+			}
+		}
+		assertNotNull(dico);
+		assertEquals("Dictionary", dico.getName());
+		assertEquals(6, dico.getTypes().size());  // <B> , ImplicitVars , Map<B,NamedEntity> , Map<String,Collection<NamedEntity>> , Collection<NamedEntity> , Map<Class,ImplicitVars>
+
+		assertEquals(1, dico.getParameters().size());
+
+		ParameterType dicoParam = VerveineUtilsForTests.detectElement(repo, ParameterType.class, "B");
+		assertNotNull(dicoParam);
+		assertEquals("B", dicoParam.getName());
+		
+		assertSame(dico, dicoParam.getContainer());
+		assertSame(dicoParam, dico.getParameters().iterator().next());
+
+		/* Collection<Object> is not seen as parameterizable by JDT */
+		ParameterizableClass collec = VerveineUtilsForTests.detectElement(repo, ParameterizableClass.class, "Collection");
+		assertNotNull(collec);
+	}
+
+	@Test
+	public void testParameterizedType() {
+//		public Dictionary(Repository famixRepo) {
+//			this.famixRepo = famixRepo;
+//			
+//			this.mapBind = new Hashtable<B,NamedEntity>();
+//			this.mapName = new Hashtable<String,Collection<NamedEntity>>();
+//			this.mapImpVar = new Hashtable<NamedEntity,ImplicitVars>();
+		/*ParameterizedType hashtab = null;
 		for (ParameterizableClass d : TestVerveineUtils.listElements(repo, ParameterizableClass.class, "Dictionary")) {
 			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
 				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
@@ -291,16 +322,12 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals("B", dicoParam.getName());
 		
 		assertSame(dico, dicoParam.getContainer());
-		assertSame(dicoParam, dico.getParameters().iterator().next());
-
-		/* Collection<Object> is not seen as parameterizable by JDT */
-		ParameterizableClass collec = TestVerveineUtils.detectElement(repo, ParameterizableClass.class, "Collection");
-		assertNotNull(collec);
+		assertSame(dicoParam, dico.getParameters().iterator().next()); */
 	}
 
 	@Test
 	public void testParameterTypeAsType() {
-		Method gebb = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByBinding");
+		Method gebb = VerveineUtilsForTests.detectElement(repo, Method.class, "getEntityByBinding");
 		assertNotNull(gebb);
 		assertSame(1, gebb.getParameters().size());
 		
@@ -321,7 +348,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	
 	@Test
 	public void testMethodParameterArgumentTypes() {
-		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "ensureFamixEntity");
+		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "ensureFamixEntity");
 		assertEquals(3, meth.getParameters().size());
 		for (Parameter param : meth.getParameters()) {
 			if (param.getName().equals("fmxClass")) {
@@ -348,7 +375,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	
 	@Test
 	public void testMethodLocalVariableArgumentTypes() {
-		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
+		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "getEntityByName");
 		assertNotNull(meth);
 		assertEquals(2, meth.getLocalVariables().size());
 		for (LocalVariable var : meth.getLocalVariables()) {
@@ -377,7 +404,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testMethodReturnArgumentTypes() {
-		Method fmxMethod = TestVerveineUtils.detectElement(repo, Method.class, "getEntityByName");
+		Method fmxMethod = VerveineUtilsForTests.detectElement(repo, Method.class, "getEntityByName");
 		assertNotNull(fmxMethod);
 		//assertEquals(1, fmxMethod.getDeclaredArgumentTypes().size());
 		//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxMethod.getDeclaredArgumentTypes().iterator().next());
@@ -385,15 +412,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testEnumDecl() {
-		fr.inria.verveine.core.gen.famix.Class javaLangEnum = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Enum");
+		fr.inria.verveine.core.gen.famix.Class javaLangEnum = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Enum");
 		assertNotNull(javaLangEnum);
 		assertEquals("lang", javaLangEnum.getBelongsTo().getName());
 		assertEquals(ParameterizableClass.class, javaLangEnum.getClass());
 		
-		fr.inria.verveine.core.gen.famix.Class card = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Card");
+		fr.inria.verveine.core.gen.famix.Class card = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Card");
 		assertNotNull(card);
 
-		fr.inria.verveine.core.gen.famix.Enum rk = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Rank");
+		fr.inria.verveine.core.gen.famix.Enum rk = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Rank");
 		assertNotNull(rk);
 		assertEquals("Rank", rk.getName());
 		assertEquals(13, rk.getValues().size());
@@ -404,12 +431,12 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(ParameterizedType.class, rkSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)rkSuper).getParameterizableClass());
 
-		EnumValue nine = TestVerveineUtils.detectElement(repo, EnumValue.class, "NINE");
+		EnumValue nine = VerveineUtilsForTests.detectElement(repo, EnumValue.class, "NINE");
 		assertNotNull(nine);
 		assertEquals("NINE", nine.getName());
 		assertSame(rk, nine.getParentEnum());
 
-		fr.inria.verveine.core.gen.famix.Enum st = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Suit");
+		fr.inria.verveine.core.gen.famix.Enum st = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Suit");
 		assertNotNull(st);
 		assertEquals("Suit", st.getName());
 		assertEquals(1, st.getSuperInheritances().size());
@@ -417,9 +444,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(ParameterizedType.class, stSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)stSuper).getParameterizableClass());
 		assertEquals(4, st.getValues().size());
-		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "ad_hoc"), st.getBelongsTo());
+		assertSame(VerveineUtilsForTests.detectElement(repo, Namespace.class, "ad_hoc"), st.getBelongsTo());
 
-		EnumValue hrt = TestVerveineUtils.detectElement(repo, EnumValue.class, "HEARTS");
+		EnumValue hrt = VerveineUtilsForTests.detectElement(repo, EnumValue.class, "HEARTS");
 		assertNotNull(hrt);
 		assertEquals("HEARTS", hrt.getName());
 		assertSame(st, hrt.getParentEnum());
@@ -437,14 +464,14 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 
-		fr.inria.verveine.core.gen.famix.Enum pl = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Planet");
+		fr.inria.verveine.core.gen.famix.Enum pl = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Planet");
 		assertNotNull(pl);
 		assertEquals("Planet", pl.getName());
 		assertEquals(1, pl.getSuperInheritances().size());
 		Type plSuper = pl.getSuperInheritances().iterator().next().getSuperclass();
 		assertEquals(ParameterizedType.class, plSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)plSuper).getParameterizableClass());
-		assertSame(TestVerveineUtils.detectElement(repo, Namespace.class, "ad_hoc"), pl.getBelongsTo());
+		assertSame(VerveineUtilsForTests.detectElement(repo, Namespace.class, "ad_hoc"), pl.getBelongsTo());
 		assertEquals(8, pl.getValues().size());
 		assertEquals(3, pl.getAttributes().size());
 		assertEquals(6+2, pl.getMethods().size()); // 6 methods + <initializer> + implicit used: values()
@@ -452,7 +479,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testEnumAccess() {
-		fr.inria.verveine.core.gen.famix.Enum st = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Suit");
+		fr.inria.verveine.core.gen.famix.Enum st = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Suit");
 		assertNotNull(st);
 		assertEquals(4, st.getValues().size());
 		boolean foundClubs = false;
@@ -466,7 +493,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 		assertTrue("Did not find CUBS EnumValue in Suit Enum", foundClubs);
 		
-		fr.inria.verveine.core.gen.famix.Enum pl = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Planet");
+		fr.inria.verveine.core.gen.famix.Enum pl = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Planet");
 		assertNotNull(pl);
 
 		assertEquals(8, pl.getValues().size());
@@ -521,7 +548,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testStaticInitializationBlock() {
-		Collection<Method> l_meth = TestVerveineUtils.listElements(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
+		Collection<Method> l_meth = VerveineUtilsForTests.listElements(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
 		assertEquals(5, l_meth.size());
 		String unknownParent = null;
 		for (Method meth : l_meth) {
@@ -550,15 +577,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	
 	@Test
 	public void testWrongMethodOwner() {
-		Method meth = TestVerveineUtils.detectElement(repo, Method.class, "methodWrongOwner");
+		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "methodWrongOwner");
 		assertNotNull(meth);
 
-		assertEquals(TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "SuperWrongOwner"), meth.getParentType());
+		assertEquals(VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "SuperWrongOwner"), meth.getParentType());
 	}
 	
 	@Test
 	public void testModifiers() {
-		Attribute attribute = TestVerveineUtils.detectElement(repo, Attribute.class, "privateFinalAttribute");
+		Attribute attribute = VerveineUtilsForTests.detectElement(repo, Attribute.class, "privateFinalAttribute");
 		assertNotNull(attribute);
 
 		assertEquals(2, attribute.getModifiers().size());
@@ -568,22 +595,22 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testMultipleSignatures() {
-		fr.inria.verveine.core.gen.famix.Class throwable = TestVerveineUtils.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Throwable");
+		fr.inria.verveine.core.gen.famix.Class throwable = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "Throwable");
 		assertNotNull(throwable);
 		assertEquals(3, throwable.getMethods().size()); // getMessage() in Dictionary, printStackTrace() & printStackTrace(PrintWriter) in MultipleSignatures
 
-		Method regular =  TestVerveineUtils.detectElement(repo, Method.class, "callToRegularPrintStackTrace");
+		Method regular =  VerveineUtilsForTests.detectElement(repo, Method.class, "callToRegularPrintStackTrace");
 		assertNotNull(regular);
 		assertEquals(1, regular.getOutgoingInvocations().size());
 		
-		Method withParam =  TestVerveineUtils.detectElement(repo, Method.class, "callToPrintStackTraceWithParam");
+		Method withParam =  VerveineUtilsForTests.detectElement(repo, Method.class, "callToPrintStackTraceWithParam");
 		assertNotNull(withParam);
 		assertEquals(3, withParam.getOutgoingInvocations().size());  // printStackTrace(new PrintWriter(new StringWriter()))
 	}
 	
 	@Test
 	public void testAnnotParamIsClass(){
-		Attribute time = TestVerveineUtils.detectElement(repo, Attribute.class, "time");
+		Attribute time = VerveineUtilsForTests.detectElement(repo, Attribute.class, "time");
 		assertNotNull(time);
 
 		assertEquals(1, time.getAnnotationInstances().size());
@@ -606,7 +633,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testInvokSelfNoBinding(){
-		Method seri = TestVerveineUtils.detectElement(repo, Method.class, "serialize");
+		Method seri = VerveineUtilsForTests.detectElement(repo, Method.class, "serialize");
 		assertNotNull(seri);
 		ContainerEntity owner = seri.getBelongsTo(); 
 		assertEquals("Serializer", owner.getName());  // just checking

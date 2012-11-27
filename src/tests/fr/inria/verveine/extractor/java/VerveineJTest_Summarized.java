@@ -72,7 +72,7 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 
-import test.fr.inria.verveine.core.TestVerveineUtils;
+import fr.inria.verveine.core.VerveineUtilsForTests;
 import fr.inria.verveine.core.gen.famix.Access;
 import fr.inria.verveine.core.gen.famix.AnnotationInstance;
 import fr.inria.verveine.core.gen.famix.AnnotationType;
@@ -151,20 +151,20 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(10+14, TestVerveineUtils.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)Autocloseable}
-		assertEquals(3,     TestVerveineUtils.selectElementsOfType(repo, PrimitiveType.class).size());
-		assertEquals(0, 	TestVerveineUtils.selectElementsOfType(repo, Method.class).size());
-		assertEquals(0, 	TestVerveineUtils.selectElementsOfType(repo, Attribute.class).size());
-		assertEquals(2+4,   TestVerveineUtils.selectElementsOfType(repo, Namespace.class).size());
-		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, Parameter.class).size());
-		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(7+21,  TestVerveineUtils.selectElementsOfType(repo, Inheritance.class).size());//7 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
-		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, Access.class).size());
-		assertEquals(20,    TestVerveineUtils.selectElementsOfType(repo, Reference.class).size());  // TODO check that number
-		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, LocalVariable.class).size());
-		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, AnnotationType.class).size());  // TODO should be 1 ?
-		assertEquals(0,     TestVerveineUtils.selectElementsOfType(repo, AnnotationInstance.class).size());  // TODO should be 2 ?
-		assertEquals(1,     TestVerveineUtils.selectElementsOfType(repo, ParameterizableClass.class).size());
+		assertEquals(10+14, VerveineUtilsForTests.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)Autocloseable}
+		assertEquals(3,     VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());
+		assertEquals(0, 	VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());
+		assertEquals(0, 	VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
+		assertEquals(2+4,   VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
+		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
+		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
+		assertEquals(7+21,  VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//7 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
+		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		assertEquals(20,    VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());  // TODO check that number
+		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
+		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());  // TODO should be 1 ?
+		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());  // TODO should be 2 ?
+		assertEquals(1,     VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
 	}
 
 	@Test
@@ -173,23 +173,23 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		Collection<Inheritance> superInheritances;
 		Inheritance inh, inh2 = null;
 		
-		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "PrintServer");
+		clazz = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(1, superInheritances.size());
 		inh = superInheritances.iterator().next();
 		assertSame(clazz, inh.getSubclass());
-		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
+		assertSame(VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
 
-		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node");
+		clazz = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(1, superInheritances.size());
 		inh = superInheritances.iterator().next();
 		assertSame(clazz, inh.getSubclass());
-		assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 		
-		clazz = TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "XPrinter");
+		clazz = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(2, superInheritances.size()); // superInheritances: Object and IPrinter (in this order)
@@ -199,12 +199,12 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 				inh2 = inheritance;
 				assertNull(inheritance.getNext());
 				assertSame(inheritance,inheritance.getPrevious().getNext());
-				assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
+				assertSame(VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
 			} else {
 				inh = inheritance;
 				assertNull(inheritance.getPrevious());
 				assertSame(inheritance,inheritance.getNext().getPrevious());
-				assertSame(TestVerveineUtils.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
+				assertSame(VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
 			}
 		}
 		assertSame(inh.getNext(), inh2);
