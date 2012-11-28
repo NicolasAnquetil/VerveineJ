@@ -408,15 +408,16 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// --------------- owner
-		//owner = generic.getContainer();
-		if (owner == null) {
+		owner = generic.getContainer();
+		/* Old behavior, see issue 868 
+		   if (owner == null) {
 			if (bnd == null) {
 				owner = ensureFamixNamespaceDefault();  // not really sure what to do here
 			}
 			else {
 				owner = ensureOwner(bnd, alwaysPersist);
 			}
-		}
+		}*/
 
 		// --------------- recover from name ?
 		for (ParameterizedType candidate : getEntityByName(ParameterizedType.class, name) ) {

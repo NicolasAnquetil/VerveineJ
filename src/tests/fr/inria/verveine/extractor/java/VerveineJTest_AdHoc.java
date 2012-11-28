@@ -39,6 +39,7 @@ import fr.inria.verveine.core.gen.famix.Parameter;
 import fr.inria.verveine.core.gen.famix.ParameterType;
 import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.core.gen.famix.ParameterizedType;
+import fr.inria.verveine.core.gen.famix.Reference;
 import fr.inria.verveine.core.gen.famix.ThrownException;
 import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
@@ -279,7 +280,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 		assertNotNull(dico);
 		assertEquals("Dictionary", dico.getName());
-		assertEquals(6, dico.getTypes().size());  // <B> , ImplicitVars , Map<B,NamedEntity> , Map<String,Collection<NamedEntity>> , Collection<NamedEntity> , Map<Class,ImplicitVars>
+		assertEquals(2, dico.getTypes().size());  // <B> , ImplicitVars
+		for (Type t : dico.getTypes()) {
+			String typName = t.getName();
+			assertTrue(typName.equals("B") || typName.equals("ImplicitVars"));
+		}
 
 		assertEquals(1, dico.getParameters().size());
 
@@ -297,32 +302,33 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testParameterizedType() {
-//		public Dictionary(Repository famixRepo) {
-//			this.famixRepo = famixRepo;
-//			
-//			this.mapBind = new Hashtable<B,NamedEntity>();
-//			this.mapName = new Hashtable<String,Collection<NamedEntity>>();
-//			this.mapImpVar = new Hashtable<NamedEntity,ImplicitVars>();
-		/*ParameterizedType hashtab = null;
-		for (ParameterizableClass d : TestVerveineUtils.listElements(repo, ParameterizableClass.class, "Dictionary")) {
-			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
-				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
-				dico = d;
+		fr.inria.verveine.core.gen.famix.Class arrList = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "ArrayList");
+		assertNotNull(arrList);
+
+		Method newDeck = VerveineUtilsForTests.detectElement(repo, Method.class, "newDeck");
+		assertNotNull(newDeck);
+
+		// newDeck() it makes a Reference to a Parameterized type
+		ParameterizedType refedArrList = null;
+		for (Reference r : newDeck.getOutgoingReferences()) {
+			if (r.getTarget() instanceof ParameterizedType) {
+				refedArrList = (ParameterizedType) r.getTarget();
 				break;
 			}
 		}
-		assertNotNull(dico);
-		assertEquals("Dictionary", dico.getName());
-		assertEquals(6, dico.getTypes().size());  // <B> , ImplicitVars , Map<B,NamedEntity> , Map<String,Collection<NamedEntity>> , Collection<NamedEntity> , Map<Class,ImplicitVars>
+		assertNotNull(refedArrList);
+		assertEquals("ArrayList", refedArrList.getName());
+		assertEquals(arrList, refedArrList.getParameterizableClass());
+		assertEquals(arrList.getContainer(), refedArrList.getContainer());
 
-		assertEquals(1, dico.getParameters().size());
-
-		ParameterType dicoParam = TestVerveineUtils.detectElement(repo, ParameterType.class, "B");
-		assertNotNull(dicoParam);
-		assertEquals("B", dicoParam.getName());
+		assertEquals(1, refedArrList.getArguments().size());
+		assertEquals("Card", refedArrList.getArguments().iterator().next().getName());
 		
-		assertSame(dico, dicoParam.getContainer());
-		assertSame(dicoParam, dico.getParameters().iterator().next()); */
+		assertEquals(2, refedArrList.getIncomingReferences().size());
+		for (Reference r : refedArrList.getIncomingReferences()) {
+			String refererName = r.getFrom().getName(); 
+			assertTrue(refererName.equals(newDeck.getName()) || refererName.equals(JavaDictionary.INIT_BLOCK_NAME));
+		}
 	}
 
 	@Test
