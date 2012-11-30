@@ -65,6 +65,7 @@ public class Dictionary<B> {
 
 	protected void testMethodRettype() {
 		NamedEntity ent = createFamixEntity(NamedEntity.class, "test");
+		mapBind.uniplementedMethod(ent, "2nd param");
 	}
 
 	protected <T extends NamedEntity> T createFamixEntity(Class<T> fmxClass, String name) {

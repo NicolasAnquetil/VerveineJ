@@ -144,6 +144,14 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 
 	@Test
+	public void testUnknownMethod() {
+		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "uniplementedMethod");
+		assertNotNull(meth);
+		
+		assertEquals("uniplementedMethod(?,?)", meth.getSignature());
+	}
+
+	@Test
 	public void testExceptions() {
 		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "lire");
 		assertNotNull(meth);

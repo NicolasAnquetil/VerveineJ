@@ -967,24 +967,31 @@ public class VerveineVisitor extends ASTVisitor {
 			// humm ... we never create the FamixInvocation ? Why is it so?
 		}
 		else if ( (calledBnd != null) && (calledBnd.isAnnotationMember()) ) {
-			// checks whether this is not an AnnotationType member
-			// and in this case it is similar to creating a FamixAttribute access
+			// if this is not an AnnotationType member, it is similar to creating a FamixAttribute access
 			AnnotationTypeAttribute accessed =  dico.ensureFamixAnnotationTypeAttribute(calledBnd, calledName, /*owner*/null, /*persistIt*/!classSummary);
 			createAccess(sender, accessed);
 		}
 		else {
+			Collection<String> unkwnArgs = new ArrayList<String>();
+			if (l_args != null) {
+				for (Expression a : l_args) {
+					unkwnArgs.add("?");
+				}
+			}
+			
 			if (sender != null) {
 				if ( (receiver != null) && (receiver instanceof StructuralEntity) ) {
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, methOwner, /*persistIt*/!classSummary);  // cast on 'null' needed to desambiguate the call
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner, /*persistIt*/!classSummary);  // cast on 'null' needed to desambiguate the call
 				}
 				else {
-				
 					fr.inria.verveine.core.gen.famix.Type owner;
 					
-						if(receiver != null) owner = (fr.inria.verveine.core.gen.famix.Type) receiver;
-						else owner = methOwner;
+					if(receiver != null)
+						owner = (fr.inria.verveine.core.gen.famix.Type) receiver;
+					else
+						owner = methOwner;
 					//  static method called on the class (or null receiver)
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, (Collection<String>)null, /*retType*/null, /*owner*/owner, /*persistIt*/!classSummary);  // cast needed to desambiguate the call
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, /*owner*/owner, /*persistIt*/!classSummary);  // cast needed to desambiguate the call
 				}
 				if (classSummary) {
 					dico.addFamixReference(findHighestType(sender), findHighestType(methOwner), null);
