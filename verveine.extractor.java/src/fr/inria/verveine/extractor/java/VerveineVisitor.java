@@ -1,5 +1,8 @@
 package fr.inria.verveine.extractor.java;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -19,6 +22,7 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConditionalExpression;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
@@ -133,6 +137,12 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	private fr.inria.verveine.core.gen.famix.Type classInstanceCreated = null;
 
+	/**
+	 * The source code of the visited AST.
+	 * Used to find back the contents of non-javadoc comments
+	 */
+	protected RandomAccessFile source;
+	
 	public VerveineVisitor(JavaDictionary dico, boolean classSummary) {
 		this.dico = dico;
 		this.context = new EntityStack();
@@ -143,6 +153,15 @@ public class VerveineVisitor extends ASTVisitor {
 
 	public boolean visit(CompilationUnit node) {
 //		System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
+		
+		// As this is the first node visited in an AST, set's the source file for this AST
+		try {
+			source = new RandomAccessFile( (String) ((CompilationUnit)node).getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY), "r");
+		} catch (FileNotFoundException e) {
+			source = null;
+			e.printStackTrace();
+		}
+
 		Namespace fmx = null;
 		PackageDeclaration pckg = node.getPackage();
 		if (pckg==null) {
@@ -159,6 +178,14 @@ public class VerveineVisitor extends ASTVisitor {
 
 	public void endVisit(CompilationUnit node) {
 		this.context.popPckg();
+		if (source != null) {
+			try {
+				source.close();
+			} catch (IOException e) {
+				// ignore error
+				e.printStackTrace();
+			}
+		}
 		super.endVisit(node);
 	}
 
@@ -192,7 +219,15 @@ public class VerveineVisitor extends ASTVisitor {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				dico.addFamixAnnotationInstances(bnd, fmx, persistIt);
 				addUnboundAnnotationInstances(node, fmx, persistIt);
-				dico.createFamixComment(node.getJavadoc(), fmx);
+				
+				//comments
+				if (dico.createFamixComment(node.getJavadoc(), fmx, source) == null) {
+					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
+					int iCmt = astRoot.firstLeadingCommentIndex(node);
+					if ( (source != null) && (iCmt > -1) ) {
+						dico.createFamixComment((Comment)astRoot.getCommentList().get(iCmt), fmx, source);
+					}
+				}
 			}
 			else {
 				for (Inheritance inh : fmx.getSuperInheritances()) {
@@ -209,6 +244,7 @@ public class VerveineVisitor extends ASTVisitor {
 					fmxParam.setIsStub(false);
 				}
 			}
+			
 			return super.visit(node);
 		}
 		else {
@@ -445,8 +481,16 @@ public class VerveineVisitor extends ASTVisitor {
 
 			if (! classSummary) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
-				dico.createFamixComment(node.getJavadoc(), fmx);
 				dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
+
+				//comments
+				if (dico.createFamixComment(node.getJavadoc(), fmx, source) == null) {
+					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
+					int iCmt = astRoot.firstLeadingCommentIndex(node);
+					if ( (source != null) && (iCmt > -1) ) {
+						dico.createFamixComment((Comment)astRoot.getCommentList().get(iCmt), fmx, source);
+					}
+				}
 			}
 
 			if (node.getBody() != null) {
@@ -505,7 +549,7 @@ public class VerveineVisitor extends ASTVisitor {
 			pushInitBlockMethod(fmx);
 			if (! classSummary) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
-				dico.createFamixComment(node.getJavadoc(), fmx);
+				dico.createFamixComment(node.getJavadoc(), fmx, source);
 			}
 
 			if (node.getBody() != null) {
@@ -535,7 +579,15 @@ public class VerveineVisitor extends ASTVisitor {
 		for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topType()) ) {
 			if (! classSummary) {
 				dico.addSourceAnchor(att, node, /*oneLineAnchor*/false);
-				dico.createFamixComment(node.getJavadoc(), att);
+
+				//comments
+				if (dico.createFamixComment(node.getJavadoc(), att, source) == null) {
+					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
+					int iCmt = astRoot.firstLeadingCommentIndex(node);
+					if ( (source != null) && (iCmt > -1) ) {
+						dico.createFamixComment((Comment)astRoot.getCommentList().get(iCmt), att, source);
+					}
+				}
 			}
 		}
 
