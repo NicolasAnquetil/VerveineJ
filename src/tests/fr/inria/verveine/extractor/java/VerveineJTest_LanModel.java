@@ -111,19 +111,20 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(11+14, VerveineUtilsForTests.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
-		assertEquals(3,     VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
-		assertEquals(40+8,  VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
-		assertEquals(10+1,  VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
-		assertEquals(2+4,   VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
-		assertEquals(26,    VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
-		assertEquals(54,    VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
+		assertEquals(11+14,VerveineUtilsForTests.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
+		assertEquals(3,    VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
+		assertEquals(40+8, VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
+		assertEquals(10+1, VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
+		assertEquals(2+4,  VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
+		assertEquals(26,   VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
+		assertEquals(54,   VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
 		assertEquals(9+21, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//9 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
-		assertEquals(25,    VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
-		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
-		assertEquals(1,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); //Override
-		assertEquals(2,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
-		assertEquals(1,     VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //Comparable
+		assertEquals(25,   VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
+		assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
+		assertEquals(1,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); //Override
+		assertEquals(2,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
+		assertEquals(1,    VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //Comparable
+		assertEquals(22,   VerveineUtilsForTests.selectElementsOfType(repo, Comment.class).size());  // FileServer=2, IPrinter=1, OutputServer=3, PrintServer=3, AbstractDestinationAddress=1, Node=3, Packet=1, SingleDestinationAddress=3, WorkStation=5
 	}
 
 	@Test
@@ -593,7 +594,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	}
 
 	@Test
-	public void testComment() {	
+	public void testComment() {
+		// testing javadoc
 		fr.inria.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
 		Collection<Comment> cmts = clazz.getComments();
@@ -610,6 +612,29 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(31, ((FileAnchor)anc).getStartLine());
 		assertEquals(34, ((FileAnchor)anc).getEndLine());
 
+		// testing the non javadoc comments (those that are treated)
+		clazz = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "WorkStation");
+		assertNotNull(clazz);
+		for (Method m : clazz.getMethods()) {
+			anc = m.getSourceAnchor();
+			cmts = m.getComments();
+			if (m.getName().equals("canOriginate")) {
+				assertEquals(0, cmts.size());
+			}
+			else {
+				assertEquals(1, cmts.size());
+				assertEquals("for method: WorkStation." + m.getName(),
+							 ((FileAnchor)anc).getStartLine().intValue() - 1,
+							 ((FileAnchor)cmts.iterator().next().getSourceAnchor()).getEndLine().intValue());
+			}
+		}
+
+		Attribute a = clazz.getAttributes().iterator().next();
+		assertEquals("type", a.getName());
+		cmts = a.getComments();
+		assertEquals(1, cmts.size());
+		anc = (FileAnchor)cmts.iterator().next().getSourceAnchor();
+		assertEquals(13, ((FileAnchor)anc).getStartLine().intValue());
 	}
 	
 	@Test

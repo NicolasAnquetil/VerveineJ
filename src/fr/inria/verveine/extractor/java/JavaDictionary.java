@@ -1,5 +1,7 @@
 package fr.inria.verveine.extractor.java;
 
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -1674,12 +1676,34 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jdoc, NamedEntity fmx) {
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, NamedEntity fmx, RandomAccessFile source) {
 		Comment cmt = null;
-		if (jdoc != null) {
-			cmt = super.createFamixComment(jdoc.toString(), fmx);
-			addSourceAnchor(cmt, jdoc, /*oneLineAnchor*/false);
+		String cmtContent = null;
+		boolean oneLineAnchor = false;
+		
+		if (jCmt != null) {
+			if (jCmt.isDocComment()) {
+				cmtContent = jCmt.toString();
+			}
+			else {
+				byte[] buffer = new byte[jCmt.getLength()];
+				try {
+					source.seek(jCmt.getStartPosition());
+					source.read(buffer, 0, jCmt.getLength());
+					cmtContent = new String(buffer);
+				} catch (IOException e) {
+					e.printStackTrace();
+					return(null);
+				}
+				
+				if (jCmt.isLineComment()) {
+					oneLineAnchor = true;
+				}
+			}
+			cmt = super.createFamixComment(cmtContent, fmx);
+			addSourceAnchor(cmt, jCmt, oneLineAnchor);
 		}
+
 		return cmt;
 	}
 
@@ -1699,8 +1723,16 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// position in source file
 			int beg = ast.getStartPosition();
 			int end = beg + ast.getLength()-1;
-			// find source file
-			while ( ! (ast instanceof CompilationUnit) ) {
+
+			// find source Compilation Unit
+			// there is a special case for the JDT Comment Nodes
+			if (ast instanceof org.eclipse.jdt.core.dom.Comment) {
+				ast = ((org.eclipse.jdt.core.dom.Comment) ast).getAlternateRoot();
+			}
+			else {
+				ast = ast.getRoot();
+			}
+			/*while ( ! (ast instanceof CompilationUnit) ) {
 				ASTNode tmp = ast.getParent();
 				if ( (ast == null) || (tmp == ast) ) {
 					// if we are here, then we reached the top node without finding a CompilationUnit. This should not happen
@@ -1709,7 +1741,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				else {
 					ast = tmp;
 				}
-			}
+			}*/
+
 			// now create the Famix SourceAnchor
 			fa = new FileAnchor();
 			fa.setFileName((String) ((CompilationUnit)ast).getProperty(SOURCE_FILENAME_PROPERTY));

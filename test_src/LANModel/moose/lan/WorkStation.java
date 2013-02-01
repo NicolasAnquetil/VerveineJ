@@ -10,6 +10,7 @@ package moose.lan;
  */
 public class WorkStation extends Node {
 
+	// this is a stupid comment related to the 'type' attribute
 	private String type;
 	
 	/*
