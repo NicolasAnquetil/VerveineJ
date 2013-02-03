@@ -419,24 +419,25 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(sdaClass);
 		for (Method mSDA : sdaClass.getMethods()) {
 			for (Invocation inv : mSDA.getOutgoingInvocations()) {
-				assertTrue( "Unexpected method signature: "+inv.getSignature(),
-							inv.getSignature().equals("equalsSingle(String)") || inv.getSignature().equals("id()") || inv.getSignature().equals("equals(Object)"));
-				if (inv.getSignature().equals("equalsSingle (String)")) {
+				assertEquals(1, inv.getCandidates().size());
+
+				BehaviouralEntity invoked = inv.getCandidates().iterator().next();
+
+				assertTrue( "Unexpected invoked method signature: "+invoked.getSignature(),
+						invoked.getSignature().equals("equalsSingle(String)") || invoked.getSignature().equals("id()") || invoked.getSignature().equals("equals(Object)"));
+				if (invoked.getSignature().equals("equalsSingle (String)")) {
 					assertSame(sdaClass, ((Method)inv.getSender()).getParentType());
 					assertEquals("self", inv.getReceiver().getName());
-					assertEquals(1, inv.getCandidates().size());
 					assertSame(VerveineUtilsForTests.detectElement(repo,Method.class, "equalsSingle"), inv.getCandidates().iterator().next());
 				}
-				else if (inv.getSignature().equals("id ()")) {
+				else if (invoked.getSignature().equals("id ()")) {
 					assertSame(VerveineUtilsForTests.detectElement(repo,Method.class, "equalsSingle"), inv.getSender());
 					assertEquals("self", inv.getReceiver().getName());
-					assertEquals(1, inv.getCandidates().size());
 					assertSame(sdaClass, ((Method)inv.getCandidates().iterator().next()).getParentType());
 				}
-				else if (inv.getSignature().equals("equals (Object)")) {
+				else if (invoked.getSignature().equals("equals (Object)")) {
 					assertSame(VerveineUtilsForTests.detectElement(repo,Method.class, "equalsSingle"), inv.getSender());
 					assertEquals(null, inv.getReceiver());
-					assertEquals(1, inv.getCandidates().size());
 					assertSame(VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String"), ((Method)inv.getCandidates().iterator().next()).getParentType());
 				}
 			}
