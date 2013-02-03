@@ -85,6 +85,27 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			assertEquals(1, m.getIncomingInvocations().size());
 			assertEquals(1, m.getOutgoingInvocations().size());
 		}
+		
+		// test invocations' signatures
+		for (Invocation invok : meth.getOutgoingInvocations()) {
+			BehaviouralEntity invoked = invok.getCandidates().iterator().next();
+			if (invoked.getName().equals("DefaultConstructor")) {
+				assertEquals("DefaultConstructor()", invok.getSignature());
+			}
+			else if (invoked.getName().equals("JFrame")) {
+				assertEquals("JFrame(\"My title\")", invok.getSignature());
+			}
+		}
+
+		for (Method m : VerveineUtilsForTests.listElements(repo, Method.class, "DefaultConstructor")) {
+			Invocation invok = m.getOutgoingInvocations().iterator().next();
+			if (m.getParameters().size() == 0) {
+				assertEquals("this(\"For testing\")", invok.getSignature());
+			}
+			else {
+				assertEquals("super(why)", invok.getSignature());
+			}
+		}
 	}
 
 	@ Test

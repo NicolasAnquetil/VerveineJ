@@ -686,7 +686,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		String name = context.topMethod().getName();
-		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name, (Collection<String>)null, /*retType*/null, /*owner*/context.topType(), /*persistIt*/!classSummary);  // cast needed to desambiguate the call
+		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name, /*paramTypes*/(Collection<String>)null, /*retType*/null, /*owner*/context.topType(), /*persistIt*/!classSummary);  // cast needed to desambiguate the call
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either
 
@@ -696,8 +696,15 @@ public class VerveineVisitor extends ASTVisitor {
 			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 		}
 		else {
+			String signature = node.toString();
+			if (signature.endsWith("\n")) {
+				signature = signature.substring(0, signature.length()-1);
+			}
+			if (signature.endsWith(";")) {
+				signature = signature.substring(0, signature.length()-1);
+			}
 			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, (Class) context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
-			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
+			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature, context.getLastInvocation());
 			context.setLastInvocation( invok );
 		}
 
@@ -717,8 +724,15 @@ public class VerveineVisitor extends ASTVisitor {
 			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 		}
 		else {
+			String signature = node.toString();
+			if (signature.endsWith("\n")) {
+				signature = signature.substring(0, signature.length()-1);
+			}
+			if (signature.endsWith(";")) {
+				signature = signature.substring(0, signature.length()-1);
+			}
 			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
-			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, context.getLastInvocation());
+			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature, context.getLastInvocation());
 			context.setLastInvocation( invok );
 		}
 
@@ -982,6 +996,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param receiver of the call, i.e. the object to which the message is sent
 	 * @param methOwner -- owner of the method invoked. Might be a subtype of the receiver's type
 	 * @param l_args -- list of the method's parameters
+	 * TODO Why are Invocations, Accesses and References not created through a method in JavaDictionnary ?
 	 */
 	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver, fr.inria.verveine.core.gen.famix.Type methOwner, Collection<Expression> l_args) {
 		BehaviouralEntity sender = this.context.topMethod();
@@ -1026,7 +1041,7 @@ public class VerveineVisitor extends ASTVisitor {
 		else {
 			Collection<String> unkwnArgs = new ArrayList<String>();
 			if (l_args != null) {
-				for (Expression a : l_args) {
+				for (@SuppressWarnings("unused") Expression a : l_args) {
 					unkwnArgs.add("?");
 				}
 			}
@@ -1049,7 +1064,19 @@ public class VerveineVisitor extends ASTVisitor {
 					dico.addFamixReference(findHighestType(sender), findHighestType(methOwner), null);
 				}
 				else {
-					Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, context.getLastInvocation());
+					String signature = calledName + "(";
+					boolean first = true;
+					for (Expression a : l_args) {
+						if (first) {
+							signature += a.toString();
+							first = false;
+						}
+						else {
+							signature += "," + a.toString();
+						}
+					}
+					signature += ")";
+					Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, signature, context.getLastInvocation());
 					context.setLastInvocation( invok );
 				}
 			}

@@ -22,20 +22,23 @@ public class FamixRequestor extends FileASTRequestor {
 	 */
 	private boolean classSummary = false;
 	
-	Map<String, String> dirMap;
-	Map<String, String> fileMap;
+	/**
+	 * Maps the arguments (file names or dir names) to their absolute path (well actually it is the other way around)
+	 */
+	protected Map<String, String> dirMap;
+	protected Map<String, String> fileMap;
 	
 	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary) {
 		super();
 		this.famixRepo = r;
 		
 		this.fileMap = new HashMap<String, String>();
-		// initialization of the Map with the complete absolute path
+		// initialization of the Map with the absolute paths
 		for(String tempArgFile : argsFile)
 			this.fileMap.put(new File(tempArgFile).getAbsolutePath(), tempArgFile);
 
 		this.dirMap = new HashMap<String, String>();
-		// initialization of the Map with the complete absolute path
+		// initialization of the Map with the absolute paths
 		for(String tempArgDir : argsDir)
 			this.dirMap.put(new File(tempArgDir).getAbsolutePath(), tempArgDir);
 		
@@ -58,31 +61,31 @@ public class FamixRequestor extends FileASTRequestor {
 	}
 
 	/**
-	 * Search in the program args the corresponding path of the provided fullPath
-	 * @param fullPath the provided fullPath
-	 * @return the corresponding path of the provided fullPath
+	 * Search in the program args the corresponding path of the provided fileAbsolutePath
+	 * @param fileAbsolutePath the absolute path of a parsed file
+	 * @return the path of the same file relative to the appropriate verveinej argument
 	 */
-	private String relativePath(String path) {
-
-		String fullPath = new File(path).getAbsolutePath();
+	private String relativePath(String fileAbsolutePath) {
+		File file = new File(fileAbsolutePath);
+		String fullPath = file.getAbsolutePath();
 
 		if (this.fileMap.containsKey(fullPath)) {
+			// parsed file was an argument of verveinej, return the path that was given as argument
 			return this.fileMap.get(fullPath);
 		}
 
-		File file = new File(fullPath);
-
-		while(file != null)
+		// file belongs to a directory that was a verveinej arg
+		// need to find back this arg
+		while (file != null)
 		{
-
 			String key = file.getAbsolutePath();
 
-			if(this.dirMap.containsKey(key)){
-				// if key is dot, we add a / behind
-				if(this.dirMap.get(key).equals(".")) 
-					return "./" + fullPath.substring(key.length() + 1);
+			if (this.dirMap.containsKey(key)){
+				// relative path = verveineJ arg + local-path-to-the-file
+				if (! this.dirMap.get(key).endsWith(File.separator)) 
+					return this.dirMap.get(key) + "/" + fullPath.substring(key.length() + 1);
 				else 
-					return this.dirMap.get(key) + fullPath.substring(key.length() + 1);
+					return this.dirMap.get(key) +       fullPath.substring(key.length() + 1);
 			}
 			else 
 				file = file.getParentFile();
