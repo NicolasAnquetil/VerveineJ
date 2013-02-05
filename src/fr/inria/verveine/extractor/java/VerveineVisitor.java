@@ -209,7 +209,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
-		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), /*owner*/context.top(), tparams.size()>0, /*alwaysPersist?*/persistIt);
+		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), /*owner*/context.top(), tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
 		if (fmx != null) {
 			fmx.setIsStub(false);
 
@@ -337,7 +337,8 @@ public class VerveineVisitor extends ASTVisitor {
 		fr.inria.verveine.core.gen.famix.Class fmx = null;
 		ITypeBinding bnd = node.resolveBinding();
 		String anonSuperTypeName = (anonymousSuperType != null) ? findTypeName(anonymousSuperType) : context.topType().getName();
-		fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+anonSuperTypeName+")", /*owner*/context.top(), /*isGeneric*/false, /*alwaysPersist?*/!classSummary);
+		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
+		fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+anonSuperTypeName+")", /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
 		if (fmx != null) {
 			fmx.setIsStub(false);
 
@@ -459,7 +460,7 @@ public class VerveineVisitor extends ASTVisitor {
 			// we reset the return type to its proper value later
 			fmxRetTyp = dico.ensureFamixClassObject(null);
 		}
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/fmxRetTyp, /*owner*/context.topType(), /*persitIt*/!classSummary);
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/fmxRetTyp, /*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
@@ -539,7 +540,7 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(Initializer node) {
 //		System.err.println("TRACE, Visiting Initializer: ");
 		
-		Method fmx = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), /*retType*/null, context.topType(), /*persistIt*/!classSummary);
+		Method fmx = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), /*retType*/null, context.topType(), node.getModifiers(), /*persistIt*/!classSummary);
 		// init-block don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create either
 
@@ -686,7 +687,8 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		String name = context.topMethod().getName();
-		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name, /*paramTypes*/(Collection<String>)null, /*retType*/null, /*owner*/context.topType(), /*persistIt*/!classSummary);  // cast needed to desambiguate the call
+		int modifiers = (node.resolveConstructorBinding() != null) ? node.resolveConstructorBinding().getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
+		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name, /*paramTypes*/(Collection<String>)null, /*retType*/null, /*owner*/context.topType(), modifiers, /*persistIt*/!classSummary);
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either
 
@@ -715,7 +717,7 @@ public class VerveineVisitor extends ASTVisitor {
 		this.context.addTopMethodNOS(1);
 		
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
-		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*name*/null, /*paramTypes*/(Collection<String>)null, /*retType*/null, /*owner*/null, /*persistIt*/!classSummary);  // cast needed to desambiguate the call
+		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!classSummary);
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create either
 
@@ -1027,7 +1029,7 @@ public class VerveineVisitor extends ASTVisitor {
 					for (ITypeBinding pt : calledBnd.getParameterTypes()) {
 							paramTypes.add(pt.getName());
 					}
-					invoked = this.dico.ensureFamixMethod(null, calledName, paramTypes, /*retType*/retType, /*owner*/javaMetaClass, /*persisitIt*/!classSummary);
+					invoked = this.dico.ensureFamixMethod(null, calledName, paramTypes, /*retType*/retType, /*owner*/javaMetaClass, /*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persisitIt*/!classSummary);
 					dico.mapKey(calledBnd, invoked);
 				}
 			}
@@ -1047,8 +1049,9 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 			
 			if (sender != null) {
+				int modifiers = (calledBnd != null) ? calledBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 				if ( (receiver != null) && (receiver instanceof StructuralEntity) ) {
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner, /*persistIt*/!classSummary);  // cast on 'null' needed to desambiguate the call
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner, modifiers, /*persistIt*/!classSummary);
 				}
 				else {
 					fr.inria.verveine.core.gen.famix.Type owner;
@@ -1058,7 +1061,7 @@ public class VerveineVisitor extends ASTVisitor {
 					else
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, /*owner*/owner, /*persistIt*/!classSummary);  // cast needed to desambiguate the call
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, /*owner*/owner, modifiers, /*persistIt*/!classSummary);
 				}
 				if (classSummary) {
 					dico.addFamixReference(findHighestType(sender), findHighestType(methOwner), null);
@@ -1110,7 +1113,7 @@ public class VerveineVisitor extends ASTVisitor {
 				Method ctxtMeth = this.context.topMethod();
 				if ( (vd.getInitializer() != null) && 
 					 ( (ctxtMeth == null) || (! ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) ) ) {
-					ctxtMeth = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), /*retType*/null, context.topType(), /*persistIt*/!classSummary);
+					ctxtMeth = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), /*retType*/null, context.topType(), /*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
 					// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
 					pushInitBlockMethod(ctxtMeth);
 				}
@@ -1156,7 +1159,7 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 		// from here, we assume the owner is the context
 		else if(isClass) {
-				return dico.ensureFamixClass((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+				return dico.ensureFamixClass((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false, JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 			}
 		else {
 			while (typ.isArrayType()) {
@@ -1167,7 +1170,7 @@ public class VerveineVisitor extends ASTVisitor {
 				return dico.ensureFamixPrimitiveType((ITypeBinding)null, findTypeName(typ));
 			}
 			else {
-				return dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, ctxt, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+				return dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, ctxt, JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 			}
 		}
 	}
@@ -1193,8 +1196,9 @@ public class VerveineVisitor extends ASTVisitor {
 			if (i > 0) {
 				name = name.substring(0, i);
 			}
-			ITypeBinding parameterizableBnd = (bnd == null) ? null : bnd.getErasure();
-			ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, /*alwaysPersist?*/persistClass(parameterizableBnd));
+			ITypeBinding parameterizableBnd = bnd.getErasure();
+			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
+			ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
 			if (bnd == parameterizableBnd) {
 				// JDT bug?
 				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, /*owner*/ctxt, persistClass(null));
@@ -1211,8 +1215,7 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 		}
 		else {
-			// let's assume the owner is the context
-			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, ctxt, /*alwaysPersist?*/persistClass(bnd));
+			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, ctxt, bnd.getModifiers(), /*alwaysPersist?*/persistClass(bnd));
 		}
 
 		return fmxTyp;

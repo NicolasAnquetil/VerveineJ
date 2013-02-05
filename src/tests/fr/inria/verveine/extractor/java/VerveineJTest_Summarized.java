@@ -152,14 +152,17 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(10+14, VerveineUtilsForTests.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)Autocloseable}
+		int nbClasses = (System.getProperty("java.version").startsWith("1.7")) ? 10+15 : 10+14;
+		int nbInherit = (System.getProperty("java.version").startsWith("1.7")) ? 7+22 : 7+21;
+
+		assertEquals(nbClasses, VerveineUtilsForTests.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)Autocloseable}
 		assertEquals(3,     VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());
 		assertEquals(0, 	VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());
 		assertEquals(0, 	VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
 		assertEquals(2+4,   VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(7+21,  VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//7 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
+		assertEquals(nbInherit,  VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//7 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
 		assertEquals(20,    VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());  // TODO check that number
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());

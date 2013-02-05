@@ -111,14 +111,17 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(11+14,VerveineUtilsForTests.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
+		int nbClasses = (System.getProperty("java.version").startsWith("1.7")) ? 11+15 : 11+14;
+		int nbInherit = (System.getProperty("java.version").startsWith("1.7")) ? 9+22 : 9+21;
+
+		assertEquals(nbClasses,VerveineUtilsForTests.selectElementsOfType(repo, fr.inria.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
 		assertEquals(3,    VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+8, VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10+1, VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,  VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,   VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(54,   VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(9+21, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//9 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
+		assertEquals(nbInherit, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//9 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
 		assertEquals(25,   VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); //Override
@@ -290,10 +293,11 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testStubs() {
+		int nbTypes = (System.getProperty("java.version").startsWith("1.7")) ? 10 : 9;
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
 		Namespace ns = VerveineUtilsForTests.detectElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
-		assertEquals(9, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence, +(java7)AutoCloseable
+		assertEquals(nbTypes, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence, +(java7)AutoCloseable
 		assertTrue(ns.getIsStub());
 
 		fr.inria.verveine.core.gen.famix.Class obj = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);

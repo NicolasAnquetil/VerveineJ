@@ -62,6 +62,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String ARRAYS_NAME = "default[]";
 	public static final String INIT_BLOCK_NAME = "<Initializer>";
 
+	public static final int UNKNOWN_MODIFIERS = 0;
 	public static final String MODIFIER_ABSTRACT = "abstract";
 	public static final String MODIFIER_PUBLIC   = "public";
 	public static final String MODIFIER_PRIVATE  = "private";
@@ -130,6 +131,15 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+	public Type ensureFamixType(ITypeBinding bnd, boolean alwaysPersist) {
+		return ensureFamixType(bnd, /*ctxt*/null, alwaysPersist);
+	}
+
+	public Type ensureFamixType(ITypeBinding bnd, ContainerEntity context, boolean alwaysPersist) {
+		int modifiers = (bnd != null) ? bnd.getModifiers() : UNKNOWN_MODIFIERS;
+		return ensureFamixType(bnd, /*name*/null, /*owner*/null, context, modifiers, alwaysPersist);
+	}
+
 	/**
 	 * Recovers or creates a Famix Type (see also {@link Dictionary#ensureFamixType(Object, String, ContainerEntity, boolean)}
 	 * @param bnd -- binding for the type to create
@@ -138,7 +148,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param ctxt -- context of use of the type
 	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 */
-	public Type ensureFamixType(ITypeBinding bnd, String name, ContainerEntity owner, ContainerEntity ctxt, boolean alwaysPersist) {
+	public Type ensureFamixType(ITypeBinding bnd, String name, ContainerEntity owner, ContainerEntity ctxt, int modifiers, boolean alwaysPersist) {
 		Type fmx = null;
 
 		if (bnd == null) {
@@ -179,7 +189,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 		
 		if (bnd.isRawType() || bnd.isGenericType()) {
-			return this.ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true, alwaysPersist);
+			return this.ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
 		}
 
 		if (bnd.isParameterizedType()) {
@@ -192,7 +202,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// it seems wise to test isClass after isGenericType, isParameterizedType, ... ? 
 		if (bnd.isClass() || bnd.isInterface()) {
-			return this.ensureFamixClass(bnd, name, owner, /*isGeneric*/false, alwaysPersist);
+			return this.ensureFamixClass(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
 		}
 
 		if (name == null) {
@@ -224,7 +234,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public fr.inria.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, boolean alwaysPersist) {
+	public fr.inria.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
 		fr.inria.verveine.core.gen.famix.Class fmx = null;
 
 		// --------------- some special cases
@@ -296,14 +306,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			if (! bnd.isInterface()) {
 				ITypeBinding supbnd = bnd.getSuperclass();
 				if (supbnd != null) {
-					sups.add(ensureFamixType(supbnd, /*name*/null, /*owner*/null, /*ctxt*/null, alwaysPersist));
+					sups.add(ensureFamixType(supbnd, alwaysPersist));
 				}
 				else {
 					sups.add( ensureFamixClassObject(null));
 				}
 			}
 			for (ITypeBinding intbnd : bnd.getInterfaces()) {
-				sups.add( ensureFamixType(intbnd, /*name*/null, /*owner*/null, /*ctxt*/owner, alwaysPersist));
+				sups.add( ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist));
 			}
 		}
 
@@ -350,12 +360,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		ContainerEntity owner = null;
 		IMethodBinding parentMtd = bnd.getDeclaringMethod();
 		if (parentMtd != null) {
-			owner = this.ensureFamixMethod(parentMtd, /*name*/null, /*paramTypes*/(Collection<String>)null, /*retTyp*/null, /*owner*/null, persistIt);  // cast needed to desambiguate the call
+			owner = this.ensureFamixMethod(parentMtd, persistIt);  // cast needed to desambiguate the call
 		}
 		else {
 			ITypeBinding parentClass = bnd.getDeclaringClass();
 			if (parentClass != null) {
-				Type tmpOwn = this.ensureFamixType(parentClass, /*name*/null, /*owner*/null, /*ctxt*/null, /*alwaysPersist?*/persistIt);
+				Type tmpOwn = this.ensureFamixType(parentClass, /*alwaysPersist?*/persistIt);
 				if (tmpOwn instanceof ParameterizedType) {
 					owner = ((ParameterizedType) tmpOwn).getParameterizableClass(); 
 				}
@@ -406,7 +416,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- generic
 		if ( (generic == null) && (bnd != null) ) {
-			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, alwaysPersist);
+			int modifiers = (bnd.getErasure() != null) ? bnd.getErasure().getModifiers() : UNKNOWN_MODIFIERS;
+			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
 		}
 
 		// --------------- owner
@@ -491,10 +502,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			supbnd = bnd.getSuperclass();
 		}
 		if (supbnd != null) {
-			sup = ensureFamixType(supbnd, /*name*/null, /*owner*/null, /*ctxt*/null, /*alwaysPersist*/true);
+			sup = ensureFamixType(supbnd, /*alwaysPersist*/true);
 		}
 		else {
-			ParameterizableClass generic = (ParameterizableClass) ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/ensureFamixNamespaceJavaLang(null), /*isGeneric*/true, /*alwaysPersist*/true);
+			ParameterizableClass generic = (ParameterizableClass) ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/ensureFamixNamespaceJavaLang(null), /*isGeneric*/true, /*modifiers*/Modifier.ABSTRACT&Modifier.PUBLIC, /*alwaysPersist*/true);
 			sup = ensureFamixParameterizedType(/*bnd*/null, /*name*/"Enum", generic, owner, /*alwaysPersist*/true);
 		}
 		
@@ -762,7 +773,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			else {
 				ITypeBinding parentClass = bnd.getDeclaringClass();
 				if (parentClass != null) {
-					owner = (ParameterizableClass) this.ensureFamixType(parentClass, /*name*/null, /*owner*/null, /*ctxt*/null, /*alwaysPersist?*/persistIt);
+					owner = (ParameterizableClass) this.ensureFamixType(parentClass, /*alwaysPersist?*/persistIt);
 				}
 				else {
 					owner = null;  // not really sure what to do here
@@ -1272,13 +1283,22 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 	}
 
+	public Method ensureFamixMethod(IMethodBinding bnd, boolean persistIt) {
+		int modifiers = UNKNOWN_MODIFIERS;
+		if (bnd != null) {
+			modifiers = bnd.getModifiers();
+		}
+		
+		return ensureFamixMethod(bnd, /*name*/null, /*paramsType*/(Collection<String>)null, /*returnType*/null, /*owner*/null, modifiers, persistIt);
+	}
+
 	/**
 	 * Returns a Famix Method associated with the IMethodBinding. The Entity is created if it does not exist.
 	 * The Entity is created if it does not exist.
 	 * Params: see {@link Dictionary#ensureFamixMethod(Object, String, String, Type, Type, boolean)}.
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type ret, Type owner, boolean persistIt) {
+	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type ret, Type owner, int modifiers, boolean persistIt) {
 		Method fmx = null;
 		String sig = "";
 		boolean first;
@@ -1358,7 +1378,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 						delayedRetTyp = true;
 					}
 					else {
-						ret = this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/null, /*ctxt*/owner, /*alwaysPersist?*/persistIt);
+						ret = this.ensureFamixType(retTypBnd, /*ctxt*/owner, /*alwaysPersist?*/persistIt);
 					}
 				}
 			}
@@ -1372,7 +1392,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			else {
 				ITypeBinding classBnd = bnd.getDeclaringClass();
 				if (classBnd != null) {
-					Type tmpOwn = ensureFamixType(classBnd, /*name*/null, /*owner*/null, /*ctxt*/null, /*alwaysPersist?*/persistIt);
+					Type tmpOwn = ensureFamixType(classBnd, /*alwaysPersist?*/persistIt);
 					if (tmpOwn instanceof ParameterizedType) {
 						owner = ((ParameterizedType) tmpOwn).getParameterizableClass();
 					}
@@ -1399,14 +1419,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		if (fmx!=null) {
-			if (bnd != null) {
-				int mod = bnd.getModifiers();
-				setNamedEntityModifiers(fmx, mod);
-				fmx.setHasClassScope(Modifier.isStatic(mod));
-			}
-			else {
-				fmx.setHasClassScope(false);
-			}
+			setNamedEntityModifiers(fmx, modifiers);
+			fmx.setHasClassScope(Modifier.isStatic(modifiers));
 			
 			// if it's a constructor
 			if(fmx.getName().equals(fmx.getBelongsTo().getName()))
@@ -1414,7 +1428,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		if ( (fmx != null) && delayedRetTyp ) {
-			fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/fmx, /*ctxt*/owner, /*alwaysPersist?*/persistIt));
+			int retTypModifiers = (retTypBnd != null) ? retTypBnd.getModifiers() : UNKNOWN_MODIFIERS;
+			fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/fmx, /*ctxt*/owner, retTypModifiers, /*alwaysPersist?*/persistIt));
 		}
 
 		return fmx;
@@ -1452,7 +1467,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				type = null;  // what else ?
 			}
 			else {
-				type = this.ensureFamixType(bnd.getType(), null, null, owner, /*alwaysPersist?*/persistIt);
+				type = this.ensureFamixType(bnd.getType(), /*ctxt*/owner, /*alwaysPersist?*/persistIt);
 			}
 		}
 
@@ -1464,7 +1479,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			else {
 				ITypeBinding classBnd = bnd.getDeclaringClass();
 				if (classBnd != null) {
-					Type tmpOwn = ensureFamixType(classBnd, /*name*/null, /*owner*/null, /*ctxt*/null, /*alwaysPersist?*/persistIt);
+					Type tmpOwn = ensureFamixType(classBnd, /*alwaysPersist?*/persistIt);
 					if (tmpOwn instanceof ParameterizedType) {
 						owner = ((ParameterizedType) tmpOwn).getParameterizableClass(); 
 					}
@@ -1562,7 +1577,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				owner = ensureFamixStubMethod("<"+name+"_owner>");
 			}
 			else {
-				owner = ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<String>)null, null, null, persistIt);  // cast needed to desambiguate the call
+				owner = ensureFamixMethod(bnd.getDeclaringMethod(), persistIt);
 			}
 		}
 		
@@ -1572,7 +1587,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				typ = null;  // what else ?
 			}
 			else {
-				typ = this.ensureFamixType(bnd.getType(), null, null, owner.getParentType(), /*alwaysPersist?*/persistIt);  // context of the parameter def = the class definition
+				typ = this.ensureFamixType(bnd.getType(), /*ctxt*/owner.getParentType(), /*alwaysPersist?*/persistIt);  // context of the parameter def = the class definition
 			}
 		}
 
@@ -1628,7 +1643,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				typ = null;  // what else ?
 			}
 			else {
-				typ = this.ensureFamixType(bnd.getType(), null, null, owner, /*alwaysPersist?*/persistIt);
+				typ = this.ensureFamixType(bnd.getType(), /*ctxt*/owner, /*alwaysPersist?*/persistIt);
 			}
 		}
 
@@ -1638,7 +1653,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				return null;  // what would be the interest of a local variable for which we ignore the declaring method?
 			}
 			else {
-				owner = ensureFamixMethod(bnd.getDeclaringMethod(), null, (Collection<String>)null, null, null, false);  // cast needed to desambiguate the call
+				owner = ensureFamixMethod(bnd.getDeclaringMethod(), false);
 			}
 		}
 
@@ -1761,7 +1776,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return the Famix Method
 	 */
 	public Method ensureFamixStubMethod(String name) {
-		return ensureFamixMethod(null, name, (Collection<String>)null, null, ensureFamixClassStubOwner(), false);  // cast needed to desambiguate the call
+		return ensureFamixMethod(null, name, /*paramType*/(Collection<String>)null, /*returnType*/null, ensureFamixClassStubOwner(), /*modifiers*/0, false);  // cast needed to desambiguate the call
 	}
 
 	/**
@@ -1795,7 +1810,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public fr.inria.verveine.core.gen.famix.Class ensureFamixMetaClass(ITypeBinding bnd) {
 		Namespace javaLang = ensureFamixNamespaceJavaLang( (bnd == null) ? null : bnd.getPackage());
 		// always persist the MetaClass whatever the value of VerveineJParser.classSummary
-		fr.inria.verveine.core.gen.famix.Class fmx =  this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, /*alwaysPersist?*/true);
+		fr.inria.verveine.core.gen.famix.Class fmx =  this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC&Modifier.FINAL, /*alwaysPersist?*/true);
 
 		if ( (fmx != null) && (fmx.getSuperInheritances() == null) ) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, null);
