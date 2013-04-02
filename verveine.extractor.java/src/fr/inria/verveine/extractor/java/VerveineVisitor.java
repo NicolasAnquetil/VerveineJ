@@ -142,6 +142,11 @@ public class VerveineVisitor extends ASTVisitor {
 	 * Used to find back the contents of non-javadoc comments
 	 */
 	protected RandomAccessFile source;
+
+	/**
+	 * Whether a variable access is lhs (write) or not
+	 */
+	protected boolean inAssignmentLHS = false;
 	
 	public VerveineVisitor(JavaDictionary dico, boolean classSummary) {
 		this.dico = dico;
@@ -742,7 +747,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(FieldAccess node) {
-//		System.err.println("TRACE, Visiting FieldAccess: "+node.getName().getIdentifier());
+//		System.err.println("TRACE, Visiting FieldAccess: "+node.getName().getIdentifier() + " inAssignmentLHS=" + inAssignmentLHS);
 		BehaviouralEntity accessor = this.context.topMethod();
 		IVariableBinding bnd = node.resolveFieldBinding();
 		// FIXME if bnd == null we have a problem
@@ -795,7 +800,7 @@ public class VerveineVisitor extends ASTVisitor {
 		BehaviouralEntity accessor = this.context.topMethod();
 
 		Attribute accessed =  dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass, /*persistIt*/!classSummary);
-		createAccess(accessor, accessed);
+		createAccess(accessor, accessed, inAssignmentLHS);
 
 		return super.visit(node);
 	}
@@ -856,18 +861,49 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(Assignment node) {
-//		System.err.println("TRACE, Visiting Assignment: "+node);
+//		System.err.println("TRACE, Visiting Assignment: "+node + " inAssignmentLHS=" + inAssignmentLHS);
 
+
+		inAssignmentLHS = true;
 		if (node.getLeftHandSide() instanceof SimpleName) {
 			visitSimpleName((SimpleName) node.getLeftHandSide());
 		}
+		else {
+			node.getLeftHandSide().accept(this);
+		}
+		inAssignmentLHS = false;
+		
 		if (node.getRightHandSide() instanceof SimpleName) {
 			visitSimpleName((SimpleName) node.getRightHandSide());
-		}		
+		}	
+		else {
+			node.getRightHandSide().accept(this);
+		}
 		this.context.addTopMethodNOS(1);
-		return super.visit(node);
-	}
 
+		return false;
+	}
+	
+	public boolean visit(ArrayAccess node) {
+//		System.err.println("TRACE, Visiting ArrayAccess: "+node + " inAssignmentLHS=" + inAssignmentLHS);
+		// an array might be accessed in writing (see visit(Assignment node) ),
+		// but it's index is accessed in reading
+		boolean tmp = inAssignmentLHS;
+		
+		node.getArray().accept(this);
+
+		inAssignmentLHS = false;
+		if (node.getIndex() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getIndex());
+		}
+		else {
+			node.getIndex().accept(this);
+		}
+		inAssignmentLHS = tmp;
+		
+		return false;
+	}
+	
 	public boolean visit(ContinueStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
@@ -1038,7 +1074,7 @@ public class VerveineVisitor extends ASTVisitor {
 		else if ( (calledBnd != null) && (calledBnd.isAnnotationMember()) ) {
 			// if this is not an AnnotationType member, it is similar to creating a FamixAttribute access
 			AnnotationTypeAttribute accessed =  dico.ensureFamixAnnotationTypeAttribute(calledBnd, calledName, /*owner*/null, /*persistIt*/!classSummary);
-			createAccess(sender, accessed);
+			createAccess(sender, accessed, inAssignmentLHS);
 		}
 		else {
 			Collection<String> unkwnArgs = new ArrayList<String>();
@@ -1229,7 +1265,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param expr -- the SimpleName expression
 	 */
 	private void visitSimpleName(SimpleName expr) {
-//		System.err.println("visitSimpleName(): "+expr.getIdentifier());
+//		System.err.println("visitSimpleName(): "+expr.getIdentifier() + " inAssignmentLHS=" + inAssignmentLHS);
 		IBinding bnd = expr.resolveBinding();
 		if ( (bnd instanceof IVariableBinding) && (context.topMethod() != null) ) {
 			// could be a variable, a field, an enumValue, ...
@@ -1497,24 +1533,25 @@ public class VerveineVisitor extends ASTVisitor {
 			accessed =  (StructuralEntity) dico.getEntityByKey(bnd);
 		}
 
-		createAccess(accessor, accessed);
+		createAccess(accessor, accessed, inAssignmentLHS);
 
 		return accessed;
 	}
 
 	/**
 	 * Creates a FamixAccess between an accessor and an accessed. Checks before that we are not in a local access to ignore.
-	 * @param accessor
-	 * @param accessed
+	 * @param accessor -- the method accessing
+	 * @param accessed -- the variable accessed
+	 * @param isLHS -- whether the access occurs on the LeftHandSide of an assignement (and therefore is a write access)
 	 */
-	private void createAccess(BehaviouralEntity accessor, StructuralEntity accessed) {
+	private void createAccess(BehaviouralEntity accessor, StructuralEntity accessed, boolean isLHS) {
 		// create local accesses?
 		if ( (accessed != null) && (accessor != null)) {
 			if (classSummary) {
 				dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), null);
 			}
 			else if (accessed.getBelongsTo() != accessor) {
-				context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/false, context.getLastAccess()) );
+				context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()) );
 			}
 		}
 	}

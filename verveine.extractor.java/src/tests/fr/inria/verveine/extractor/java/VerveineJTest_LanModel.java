@@ -474,23 +474,45 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testAccess() {
 		Attribute att;
+		Access acces;
 		BehaviouralEntity accessor;
 		
 		att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "name");
 		assertNotNull(att);
-		assertSame(2, att.getIncomingAccesses().size());
-		accessor = att.getIncomingAccesses().iterator().next().getAccessor();
-		assertSame(Method.class, accessor.getClass());
-		assertEquals("name", accessor.getName());
-		assertEquals("Node", ((Method)accessor).getParentType().getName());
+		assertEquals(2, att.getIncomingAccesses().size());
+		for (Access acc : att.getIncomingAccesses()) {
+			accessor = acc.getAccessor();
+			assertEquals("name", accessor.getName());
+
+			assertSame(Method.class, accessor.getClass());
+			assertEquals("Node", ((Method)accessor).getParentType().getName());
+
+			if ( accessor.getSignature().equals("name()") ) {
+				assertTrue("Wrong read/write property in access to:" + acc.getVariable().getName() + " from:" + accessor.getSignature(),
+						acc.getIsRead());
+				assertFalse("Wrong read/write property in access to:" + acc.getVariable().getName() + " from:" + accessor.getSignature(),
+						acc.getIsWrite());
+			}
+			else {
+				assertFalse("Wrong read/write property in access to:" + acc.getVariable().getName() + " from:" + accessor.getSignature(),
+						acc.getIsRead());
+				assertTrue("Wrong read/write property in access to:" + acc.getVariable().getName() + " from:" + accessor.getSignature(),
+						acc.getIsWrite());
+			}
+		}
 
 		att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "serverType");
 		assertNotNull(att);
-		assertSame(1, att.getIncomingAccesses().size());
-		accessor = att.getIncomingAccesses().iterator().next().getAccessor();
+		assertEquals(1, att.getIncomingAccesses().size());
+		acces = att.getIncomingAccesses().iterator().next();
+		accessor = acces.getAccessor();
+
 		assertSame(Method.class, accessor.getClass());
 		assertEquals("setServerType", accessor.getName());
 		assertEquals("FileServer", ((Method)accessor).getParentType().getName());
+
+		assertFalse( acces.getIsRead());
+		assertTrue( acces.getIsWrite());
 
 		// finds method PrintServer.output()
 		Method output = null;
@@ -503,9 +525,11 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(output);
 		assertEquals(4, output.getAccesses().size());
 		for (Access acc : output.getAccesses()) {
+			assertEquals(output, acc.getAccessor());
 			assertTrue("Unexpected field accessed: "+acc.getVariable().getName(),
 					acc.getVariable().getName().equals("thePacket") || acc.getVariable().getName().equals("out") || acc.getVariable().getName().equals("printer"));
-			assertEquals(output, acc.getAccessor());
+			assertTrue( acc.getIsRead());
+			assertFalse( acc.getIsWrite());
 		}
 	}
 
