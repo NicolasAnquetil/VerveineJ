@@ -508,8 +508,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(javaLangEnum, ((ParameterizedType)plSuper).getParameterizableClass());
 		assertSame(VerveineUtilsForTests.detectElement(repo, Namespace.class, "ad_hoc"), pl.getBelongsTo());
 		assertEquals(8, pl.getValues().size());
-		assertEquals(3, pl.getAttributes().size());
-		assertEquals(6+2, pl.getMethods().size()); // 6 methods + <initializer> + implicit used: values()
+		assertEquals(4, pl.getAttributes().size());
+		assertEquals(7+2, pl.getMethods().size()); // 7 methods + <initializer> + implicit used: values()
 	}
 
 	@Test
@@ -541,42 +541,76 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 
-		assertEquals(3, pl.getAttributes().size());
+		assertEquals(4, pl.getAttributes().size());
 		for (Attribute a : pl.getAttributes()) {
-			if (a.getName().equals("G")) {
+			if ( a.getName().equals("G") || a.getName().equals("i") ) {
 				assertEquals(1, a.getIncomingAccesses().size());
 			}
 			else if (a.getName().equals("radius")) {
 				assertEquals(2, a.getIncomingAccesses().size());
 			}
 			else if (a.getName().equals("mass")) {
-				assertEquals(3, a.getIncomingAccesses().size());
+				assertEquals(4, a.getIncomingAccesses().size());
 			}
 			else {
 				fail("Unknown attribute of Enum Planet: "+a.getName());
 			}
 		}
 
-		assertEquals(6+2, pl.getMethods().size());  // see testEnumDecl()
+		assertEquals(7+2, pl.getMethods().size());  // see testEnumDecl()
 		for (Method m : pl.getMethods()) {
-			if ( m.getName().equals("Planet") || m.getName().equals("main") ) {
+			if ( m.getName().equals("Planet") || m.getName().equals("main") || m.getName().equals("sillyArrayAssignement")
+					|| m.getName().equals(JavaDictionary.INIT_BLOCK_NAME) ) {
 				assertEquals(0, m.getIncomingInvocations().size());
 			}
-			else if ( m.getName().equals("mass") || m.getName().equals("surfaceWeight") ||
-					  m.getName().equals("values") || m.getName().equals("toString") ) {
+			else if ( m.getName().equals("mass") || m.getName().equals("surfaceWeight") || m.getName().equals("toString") ) {
 				assertEquals(1, m.getIncomingInvocations().size());
 			}
-			else if (m.getName().equals("surfaceGravity")) {
+			else if ( m.getName().equals("surfaceGravity")  || m.getName().equals("values") ) {
 				assertEquals(2, m.getIncomingInvocations().size());
 			}
 			else if (m.getName().equals("radius")) {
 				assertEquals(3, m.getIncomingInvocations().size());
 			}
-			else if (m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
-				assertEquals(0, m.getIncomingInvocations().size());
-			}
 			else {
 				fail("Unknown method of Enum Planet: "+m.getName());
+			}
+		}
+	}
+
+	@Test
+	public void testReadWriteAccess() {
+		Attribute i_att = null;
+		Attribute mass_att = null;
+		Access access = null;
+
+		fr.inria.verveine.core.gen.famix.Enum pl = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Enum.class, "Planet");
+		assertNotNull(pl);
+
+		assertEquals(4, pl.getAttributes().size());
+		for (Attribute a : pl.getAttributes()) {
+			if ( a.getName().equals("i") ) {
+				i_att = a;
+			}
+			else if (a.getName().equals("mass")) {
+				mass_att = a;
+			}
+		}
+		
+		assertNotNull("Attribute i in Planet not found", i_att);
+		assertEquals(1, i_att.getIncomingAccesses().size());
+		access = i_att.getIncomingAccesses().iterator().next();
+		assertFalse(access.getIsWrite());
+		
+		assertNotNull("Attribute mass in Planet not found", mass_att);
+		assertEquals(4, mass_att.getIncomingAccesses().size());
+		for (Access acc : mass_att.getIncomingAccesses() ) {
+			if ( acc.getAccessor().getName().equals("Planet") ||
+				 acc.getAccessor().getName().equals("sillyArrayAssignement") ) {
+				assertTrue(acc.getIsWrite());
+			}
+			else {
+				assertFalse("Access to mass is write in method: " + acc.getAccessor().getSignature(), acc.getIsWrite());
 			}
 		}
 	}
