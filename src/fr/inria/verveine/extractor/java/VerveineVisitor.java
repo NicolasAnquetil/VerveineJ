@@ -406,7 +406,8 @@ public class VerveineVisitor extends ASTVisitor {
 		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), context.top(), persistClass(bnd));
 		if (fmx != null) {
 			fmx.setIsStub(Boolean.FALSE);
-			
+			dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+
 			context.pushType(fmx);
 			return super.visit(node);
 		}
@@ -428,7 +429,8 @@ public class VerveineVisitor extends ASTVisitor {
 		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			
+			dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+
 			context.pushAnnotationMember(fmx);
 			return super.visit(node);
 		}
