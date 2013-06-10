@@ -31,6 +31,7 @@ import fr.inria.verveine.core.gen.famix.CaughtException;
 import fr.inria.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.core.gen.famix.DeclaredException;
 import fr.inria.verveine.core.gen.famix.EnumValue;
+import fr.inria.verveine.core.gen.famix.FileAnchor;
 import fr.inria.verveine.core.gen.famix.Invocation;
 import fr.inria.verveine.core.gen.famix.LocalVariable;
 import fr.inria.verveine.core.gen.famix.Method;
@@ -40,6 +41,7 @@ import fr.inria.verveine.core.gen.famix.ParameterType;
 import fr.inria.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.core.gen.famix.Reference;
+import fr.inria.verveine.core.gen.famix.SourceAnchor;
 import fr.inria.verveine.core.gen.famix.ThrownException;
 import fr.inria.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
@@ -713,6 +715,26 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 				assertEquals(owner, invoked.getBelongsTo());
 			}
 		}
+	}
+
+	@Test
+	public void testAnnotationTypeFileAnchor(){
+		AnnotationType xmle = VerveineUtilsForTests.detectElement(repo, AnnotationType.class, "XmlElement");
+		assertNotNull(xmle);
+		assertNotNull(xmle.getSourceAnchor());
+		assertEquals(FileAnchor.class, xmle.getSourceAnchor().getClass());
+		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((FileAnchor)xmle.getSourceAnchor()).getFileName());
+		assertEquals(5, ((FileAnchor)xmle.getSourceAnchor()).getStartLine());
+		assertEquals(13, ((FileAnchor)xmle.getSourceAnchor()).getEndLine());
+		
+		AnnotationTypeAttribute req = VerveineUtilsForTests.detectElement(repo, AnnotationTypeAttribute.class, "required");
+		assertNotNull(req);
+		assertNotNull(req.getSourceAnchor());
+		assertEquals(FileAnchor.class, req.getSourceAnchor().getClass());
+		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((FileAnchor)req.getSourceAnchor()).getFileName());
+		assertEquals(9, ((FileAnchor)req.getSourceAnchor()).getStartLine());
+		assertEquals(9, ((FileAnchor)req.getSourceAnchor()).getEndLine());
+
 	}
 	
 }
