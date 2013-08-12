@@ -76,15 +76,6 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		for (String f : files) {
 			parseFile(f);
 		}
-//*/
-/*
-		// or parsing the entire project in one pass ---
-		VerveineJParser parser = new VerveineJParser();
-		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"test_src/LANModel/"});
-		parser.parse();
-		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
-//*/
 	}
 
 	/**
@@ -300,20 +291,23 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(nbTypes, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence, +(java7)AutoCloseable
 		assertTrue(ns.getIsStub());
 
-		fr.inria.verveine.core.gen.famix.Class obj = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
-		assertNotNull(obj);
-		assertTrue(obj.getIsStub());
-		assertSame(ns, obj.getContainer());
+		fr.inria.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
+		assertNotNull(clazz);
+		assertTrue(clazz.getIsStub());
+		assertSame(ns, clazz.getContainer());
 		
-		fr.inria.verveine.core.gen.famix.Class str = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String");
-		assertNotNull(str);
-		assertTrue(str.getIsStub());
-		assertSame(ns, str.getContainer());
+		clazz = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String");
+		assertNotNull(clazz);
+		assertTrue(clazz.getIsStub());
+		assertSame(ns, clazz.getContainer());
 		
-		fr.inria.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node");
+		clazz = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsStub());
 		
+		Method mth = VerveineUtilsForTests.detectElement(repo, Method.class, "<Initializer>");
+		assertNotNull(mth);
+		assertFalse(mth.getIsStub());
 		/* [].length not used in the default test case 
 		Attribute att = TestVerveineUtils.detectElement(repo, Attribute.class, "length");
 		assertNotNull(att);

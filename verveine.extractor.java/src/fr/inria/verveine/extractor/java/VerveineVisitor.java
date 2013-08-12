@@ -1147,11 +1147,12 @@ public class VerveineVisitor extends ASTVisitor {
 				// creating a class' field
 				fmx = dico.ensureFamixAttribute(bnd, name, varTyp, (fr.inria.verveine.core.gen.famix.Type) ctxt, /*persistIt*/!classSummary);
 
-				// putting field's initialization code in a INIT_BLOCK_NAME method
+				// putting field's initialization code in an INIT_BLOCK_NAME method
 				Method ctxtMeth = this.context.topMethod();
 				if ( (vd.getInitializer() != null) && 
 					 ( (ctxtMeth == null) || (! ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) ) ) {
 					ctxtMeth = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), /*retType*/null, context.topType(), /*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
+					ctxtMeth.setIsStub(false);
 					// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
 					pushInitBlockMethod(ctxtMeth);
 				}
