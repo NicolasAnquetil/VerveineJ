@@ -214,9 +214,17 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
-		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), /*owner*/context.top(), tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
+		fr.inria.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), /*owner*/context.top(), /*isGeneric*/tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
 		if (fmx != null) {
 			fmx.setIsStub(false);
+			
+			// if it is a generic and some parameterizedTypes were created for it
+			// they are marked as stub which is not right
+			if (tparams.size()>0) {
+				for (ParameterizedType candidate : dico.getEntityByName(ParameterizedType.class, node.getName().getIdentifier())) {
+					candidate.setIsStub(false);
+				}
+			}
 
 			this.context.pushType(fmx);
 

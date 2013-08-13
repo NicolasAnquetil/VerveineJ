@@ -447,7 +447,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// --------------- stub: same as ParameterizableClass
-		if ( (generic == null) && (fmx != null) ) {
+		if ( (generic != null) && (fmx != null) ) {
 			fmx.setIsStub(generic.getIsStub());
 		}
 		
