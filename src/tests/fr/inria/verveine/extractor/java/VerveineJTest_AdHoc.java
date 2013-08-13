@@ -339,7 +339,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method newDeck = VerveineUtilsForTests.detectElement(repo, Method.class, "newDeck");
 		assertNotNull(newDeck);
 
-		// newDeck() it makes a Reference to a Parameterized type
+		// newDeck() makes a Reference to a Parameterized type
 		ParameterizedType refedArrList = null;
 		for (Reference r : newDeck.getOutgoingReferences()) {
 			if (r.getTarget() instanceof ParameterizedType) {
@@ -359,6 +359,13 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		for (Reference r : refedArrList.getIncomingReferences()) {
 			String refererName = r.getFrom().getName(); 
 			assertTrue(refererName.equals(newDeck.getName()) || refererName.equals(JavaDictionary.INIT_BLOCK_NAME));
+		}
+	}
+
+	@Test
+	public void testStubStatusParameterizedTypes() {
+		for (ParameterizedType typ : VerveineUtilsForTests.selectElementsOfType(repo, ParameterizedType.class)) {
+			assertEquals(typ.getParameterizableClass().getIsStub(), typ.getIsStub());
 		}
 	}
 

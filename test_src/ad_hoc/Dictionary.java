@@ -129,8 +129,9 @@ class ImplicitVariable extends NamedEntity {
 }
 
 class Repository {
+	protected Dictionary<String> dico;
 	public boolean isEmtpy() {
-		return false;
+		return dico == null;
 	}
 	public void add(NamedEntity f) {
 	}
