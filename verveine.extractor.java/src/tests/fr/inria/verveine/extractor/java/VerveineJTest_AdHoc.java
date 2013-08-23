@@ -362,7 +362,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 	}
 
-	@Test
+	@Test  // issue 960
 	public void testStubStatusParameterizedTypes() {
 		for (ParameterizedType typ : VerveineUtilsForTests.selectElementsOfType(repo, ParameterizedType.class)) {
 			assertEquals(typ.getParameterizableClass().getIsStub(), typ.getIsStub());
@@ -686,25 +686,25 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(3, withParam.getOutgoingInvocations().size());  // printStackTrace(new PrintWriter(new StringWriter()))
 	}
 	
-	@Test
+	@Test  // issue 714
 	public void testAnnotParamIsClass(){
-		Attribute time = VerveineUtilsForTests.detectElement(repo, Attribute.class, "time");
-		assertNotNull(time);
+		Attribute att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "time");
+		assertNotNull(att);
 
-		assertEquals(1, time.getAnnotationInstances().size());
-		AnnotationInstance xmle = time.getAnnotationInstances().iterator().next();
-		assertNotNull(xmle);
-		assertEquals("XmlElement", xmle.getAnnotationType().getName());
-		assertSame(xmle.getAnnotatedEntity(), time);
-		assertEquals(3, xmle.getAttributes().size());
+		assertEquals(1, att.getAnnotationInstances().size());
+		AnnotationInstance ann = att.getAnnotationInstances().iterator().next();
+		assertNotNull(ann);
+		assertEquals("XmlElement", ann.getAnnotationType().getName());
+		assertSame(ann.getAnnotatedEntity(), att);
+		assertEquals(3, ann.getAttributes().size());
 
-		for (AnnotationInstanceAttribute aia : xmle.getAttributes()) {
-			if (aia.getAnnotationTypeAttribute().getName().equals("type")) {
-				assertEquals("String.class", aia.getValue());
+		for (AnnotationInstanceAttribute annAtt : ann.getAttributes()) {
+			if (annAtt.getAnnotationTypeAttribute().getName().equals("type")) {
+				assertEquals("String.class", annAtt.getValue());
 			}
 			else {
-				assertTrue( aia.getAnnotationTypeAttribute().getName().equals("name") ||
-						    aia.getAnnotationTypeAttribute().getName().equals("required"));
+				assertTrue( annAtt.getAnnotationTypeAttribute().getName().equals("name") ||
+						    annAtt.getAnnotationTypeAttribute().getName().equals("required"));
 			}
 		}
 	}
