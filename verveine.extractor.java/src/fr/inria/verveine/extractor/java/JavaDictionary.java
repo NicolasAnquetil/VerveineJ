@@ -709,40 +709,70 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		if (bnd != null) {
 			for (IAnnotationBinding annBnd : bnd.getAnnotations()) {
 				// create type of the annotation
-				AnnotationType annType = ensureFamixAnnotationType(annBnd.getAnnotationType(), null, null, persistIt);
+				AnnotationType annType = ensureFamixAnnotationType(annBnd.getAnnotationType(), /*name*/null, /*owner*/null, persistIt);
 
 				// create all parameters of the annotation instance
-				Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>(); 
-				for (IMemberValuePairBinding annPV : annBnd.getDeclaredMemberValuePairs()) {
-					Object attJdtVal = annPV.getValue();
-					String attFamixVal = null;
-					if (attJdtVal == null) {
-						attFamixVal = "";
-					}
-					else {
-						if (attJdtVal.getClass() == Object[].class) {
-							// VERY WEIRD behavior 
-							attJdtVal = ((Object[])attJdtVal)[0];
-						}
+				Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>();
 
-						if (attJdtVal instanceof ITypeBinding) {
-							// for Annotation attributes of the form <someclass>.class,
-							// attJdtVal contains the entire declaration of the class
-							// we want just its name
-							attFamixVal = ((ITypeBinding)attJdtVal).getName() + ".class";
-						}
-						else {
-							attFamixVal = attJdtVal.toString();
-						}
-						AnnotationTypeAttribute annoType = ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), annPV.getName(), annType, persistIt);
-						annAtts.add( createFamixAnnotationInstanceAttribute(annoType, attFamixVal) );
-					}
+				for (IMemberValuePairBinding annPV : annBnd.getDeclaredMemberValuePairs()) {
+					// maybe should test that return of annInstAtt(...) is not null (and not add it in this case)
+					annAtts.add(annInstAtt(annPV, annType, persistIt));
 				}
 
 				// create the annotation instance
 				super.addFamixAnnotationInstance(fmx, annType, annAtts);
 			}
 		}
+	}
+
+	/**
+	 * creates an annotationInstance attribute
+	 * @param annPV -- Value pair: name of the attribute and its value (may be null)
+	 * @param annType -- the annotation type instantiated
+	 * @param persistIt -- whether to persist the data
+	 * @return the AnnotationInstanceAttribute created or null
+	 */
+	private AnnotationInstanceAttribute annInstAtt(IMemberValuePairBinding annPV, AnnotationType annType, boolean persistIt) {
+		Object attVal = annPV.getValue();
+		String attFamixVal = null;
+		if (attVal == null) {
+			return null;
+		}
+
+		if (attVal.getClass() == Object[].class) {
+			attFamixVal = annInstAttValAsString( ((Object[])attVal)[0] );
+			if (((Object[])attVal).length > 1) {
+				for (int i=1; i < ((Object[])attVal).length; i++) {
+					attFamixVal += ", " + annInstAttValAsString( ((Object[])attVal)[i] );
+				}
+				attFamixVal = "{" + attFamixVal + "}";
+			}
+
+		}
+		else {
+			attFamixVal = annInstAttValAsString(attVal);
+		}
+		AnnotationTypeAttribute annoAtt = ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), /*name*/annPV.getName(), /*owner*/annType, persistIt);
+		return( createFamixAnnotationInstanceAttribute(annoAtt, attFamixVal) );		
+	}
+
+	/**
+	 * represents the value of an AnnotationInstanceAttribute as a String
+	 * @param attVal
+	 * @return
+	 */
+	private String annInstAttValAsString(Object attVal) {
+		String attFamixVal;
+		if (attVal instanceof ITypeBinding) {
+			// for Annotation attributes of the form <someclass>.class,
+			// attVal may contains the entire declaration of the class
+			// we want just its name
+			attFamixVal = ((ITypeBinding)attVal).getName() + ".class";
+		}
+		else {
+			attFamixVal = attVal.toString();
+		}
+		return attFamixVal;
 	}
 
 	 /**
