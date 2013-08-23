@@ -719,22 +719,24 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					if (attJdtVal == null) {
 						attFamixVal = "";
 					}
-					else if (attJdtVal instanceof ITypeBinding) {
-						// for Annotation attributes of the form <someclass>.class,
-						// attJdtVal contains the entire declaration of the class
-						// we want just its name
-						attFamixVal = ((ITypeBinding)attJdtVal).getName() + ".class";
-					}
-					else if (attJdtVal.getClass() == Object[].class) {
-						// VERY WEIRD behavior that seems to happen when giving @ AnAnnotation("valueForDefaultAnnotationAttribute")
-						// probably a bug
-						attFamixVal = ((Object[])attJdtVal)[0].toString();
-					}
 					else {
-						attFamixVal = attJdtVal.toString();
+						if (attJdtVal.getClass() == Object[].class) {
+							// VERY WEIRD behavior 
+							attJdtVal = ((Object[])attJdtVal)[0];
+						}
+
+						if (attJdtVal instanceof ITypeBinding) {
+							// for Annotation attributes of the form <someclass>.class,
+							// attJdtVal contains the entire declaration of the class
+							// we want just its name
+							attFamixVal = ((ITypeBinding)attJdtVal).getName() + ".class";
+						}
+						else {
+							attFamixVal = attJdtVal.toString();
+						}
+						AnnotationTypeAttribute annoType = ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), annPV.getName(), annType, persistIt);
+						annAtts.add( createFamixAnnotationInstanceAttribute(annoType, attFamixVal) );
 					}
-					AnnotationTypeAttribute annoType = ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), annPV.getName(), annType, persistIt);
-					annAtts.add( createFamixAnnotationInstanceAttribute(annoType, attFamixVal) );
 				}
 
 				// create the annotation instance

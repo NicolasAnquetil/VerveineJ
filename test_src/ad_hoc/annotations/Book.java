@@ -5,6 +5,7 @@ package ad_hoc.annotations;
  * (A comment with accent to test UTF-8)
  */
 
+import java.lang.annotation.Retention;
 import java.util.Date;
 
 public class Book {
@@ -67,7 +68,7 @@ public class Book {
 	public void setTitle(String title) {
 		this.title = title;
 	}
-	
+
 	public String toString() {
 		return "\"" + title + "\" by " + author; 
 	}
