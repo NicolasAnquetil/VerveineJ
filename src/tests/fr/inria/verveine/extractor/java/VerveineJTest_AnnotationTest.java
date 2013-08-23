@@ -62,4 +62,44 @@ public class VerveineJTest_AnnotationTest {
 		assertEquals("InterceptorClass.class", att.getValue());
 
 	}
+
+	@Test
+	public void testAnnotationInstanceArrayOfOne() {
+		fr.inria.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "AThirdAnnotatedClass");
+		assertNotNull(clss);
+
+		assertEquals(1, clss.getAnnotationInstances().size());
+		AnnotationInstance inst = clss.getAnnotationInstances().iterator().next();
+		assertNotNull(inst);
+		assertEquals("Interceptors", inst.getAnnotationType().getName());
+		assertSame(inst.getAnnotatedEntity(), clss);
+
+		assertEquals(1, inst.getAttributes().size());
+		AnnotationInstanceAttribute att = inst.getAttributes().iterator().next();
+		assertNotNull(att);
+		assertEquals("value", att.getAnnotationTypeAttribute().getName());
+		
+		assertEquals("InterceptorClass.class", att.getValue());
+
+	}
+
+	@Test
+	public void testAnnotationInstanceArray() {
+		fr.inria.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "AnotherAnnotatedClass");
+		assertNotNull(clss);
+
+		assertEquals(1, clss.getAnnotationInstances().size());
+		AnnotationInstance inst = clss.getAnnotationInstances().iterator().next();
+		assertNotNull(inst);
+		assertEquals("Interceptors", inst.getAnnotationType().getName());
+		assertSame(inst.getAnnotatedEntity(), clss);
+
+		assertEquals(1, inst.getAttributes().size());
+		AnnotationInstanceAttribute att = inst.getAttributes().iterator().next();
+		assertNotNull(att);
+		assertEquals("value", att.getAnnotationTypeAttribute().getName());
+		
+		assertEquals("{InterceptorClass.class, AnotherInterceptorClass.class}", att.getValue());
+
+	}
 }

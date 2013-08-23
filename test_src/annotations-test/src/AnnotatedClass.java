@@ -1,4 +1,3 @@
-package annotationTest;
 
 import javax.interceptor.Interceptors;
 
