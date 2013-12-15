@@ -128,6 +128,12 @@ public class VerveineVisitor extends ASTVisitor {
 	private boolean classSummary = false;
 
 	/**
+	 * Whether to output all local variables (even those with primitive type or not (default is not).<br>
+	 * Note: allLocals = ! classSummary
+	 */
+	private boolean allLocals = false;
+	
+	/**
 	 * A stack that keeps the current definition context (package/class/method)
 	 */
 	protected EntityStack context;
@@ -148,10 +154,11 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 	
-	public VerveineVisitor(JavaDictionary dico, boolean classSummary) {
+	public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals) {
 		this.dico = dico;
 		this.context = new EntityStack();
 		this.classSummary = classSummary;
+		this.allLocals = allLocals;
 	}
 
 	// VISITOR METHODS
@@ -622,8 +629,8 @@ public class VerveineVisitor extends ASTVisitor {
 //		System.err.println("TRACE, Visiting VariableDeclarationExpression: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
 		// Independently of 'withLocals()', we don't declare (local) variables that have a primitive type
-		// because we are assuming that the user is not interested in them 
-		if (! node.getType().isPrimitiveType()) {
+		// because we are assuming that the user is not interested in them (non primitive types are important because of the dependence they create)
+		if (allLocals || (! node.getType().isPrimitiveType()) ) {
 			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod(), false);
 
 			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
@@ -641,7 +648,7 @@ public class VerveineVisitor extends ASTVisitor {
 //		System.err.println("TRACE, Visiting VariableDeclarationStatement: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
 		// locals: same discussion as for visit(VariableDeclarationExpression node)
-		if (! node.getType().isPrimitiveType()) {
+		if (allLocals || (! node.getType().isPrimitiveType()) ) {
 			fr.inria.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod(), false);
 			for (StructuralEntity var : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
 				if (! classSummary) {
@@ -1217,7 +1224,7 @@ public class VerveineVisitor extends ASTVisitor {
 				return dico.ensureFamixPrimitiveType((ITypeBinding)null, findTypeName(typ));
 			}
 			else {
-				return dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, ctxt, JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+				return dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, /*container*/ctxt, JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 			}
 		}
 	}
