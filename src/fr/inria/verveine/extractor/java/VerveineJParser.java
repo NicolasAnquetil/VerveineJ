@@ -28,7 +28,8 @@ public class VerveineJParser extends VerveineParser {
 
 	/**
 	 * Whether to summarize collected information at the level of classes or produce everything.
-	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation.
+	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation.<br>
+	 * Note: classSummary => not allLocals
 	 * <p>The general idea is that we create entities (Attribute, Method) "normally", but we don't persist them in the repository.
 	 * Then all associations to these entities need to be uplifted as references between their respective classes
 	 * e.g. "A.m1() invokes B.m2()" is uplifted to "A references B".</p>
@@ -38,6 +39,12 @@ public class VerveineJParser extends VerveineParser {
 	 * And since all association are bidirectional, it can happen very easily.</p>
 	 */
 	private boolean classSummary = false;
+
+	/**
+	 * Whether to output all local variables (even those with primitive type or not (default is not).<br>
+	 * Note: allLocals => not classSummary
+	 */
+	private boolean allLocals = false;
 
 	/**
 	 * Option: The version of Java expected by the parser 
@@ -111,6 +118,11 @@ public class VerveineJParser extends VerveineParser {
 			}
 			else if (arg.equals("-summary")) {
 				this.classSummary = true;
+				this.allLocals = false;
+			}
+			else if (arg.equals("-alllocals")) {
+				this.classSummary = false;
+				this.allLocals = true;
 			}
 			else if (arg.equals("-autocp")) {
 				if (i < args.length) {
@@ -184,7 +196,7 @@ public class VerveineJParser extends VerveineParser {
 		 *   some new relation: classdep
 		 */
 		
-		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-nolocal | -summary] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.exit(0);
 
 	}
@@ -244,7 +256,7 @@ public class VerveineJParser extends VerveineParser {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals);
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);

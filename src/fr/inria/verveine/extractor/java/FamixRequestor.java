@@ -21,14 +21,19 @@ public class FamixRequestor extends FileASTRequestor {
 	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation
 	 */
 	private boolean classSummary = false;
+
+	/**
+	 * Whether to output all local variables (even those with primitive type or not (default is not).
+	 */
+	private boolean allLocals;
 	
 	/**
 	 * Maps the arguments (file names or dir names) to their absolute path (well actually it is the other way around)
 	 */
 	protected Map<String, String> dirMap;
 	protected Map<String, String> fileMap;
-	
-	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary) {
+
+	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary, boolean allLocals) {
 		super();
 		this.famixRepo = r;
 		
@@ -41,8 +46,9 @@ public class FamixRequestor extends FileASTRequestor {
 		// initialization of the Map with the absolute paths
 		for(String tempArgDir : argsDir)
 			this.dirMap.put(new File(tempArgDir).getAbsolutePath(), tempArgDir);
-		
+
 		this.classSummary = classSummary;
+		this.allLocals = allLocals;
 
 		this.famixDictionnary = new JavaDictionary(famixRepo);
 	}
@@ -53,7 +59,7 @@ public class FamixRequestor extends FileASTRequestor {
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
-			ast.accept(new VerveineVisitor(this.famixDictionnary, classSummary));
+			ast.accept(new VerveineVisitor(this.famixDictionnary, classSummary, allLocals));
 		}
 		catch (Exception e) {
 			System.err.println("*** VerveineJ visitor got exception: '"+e+"' while processing file: "+path);
