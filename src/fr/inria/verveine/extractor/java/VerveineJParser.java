@@ -11,6 +11,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 
+import eu.synectique.licence.LicenceChecker;
 import fr.inria.verveine.core.VerveineParser;
 import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
 import fr.inria.verveine.core.gen.famix.Namespace;
@@ -241,14 +242,6 @@ public class VerveineJParser extends VerveineParser {
 
 	}
 
-	public static void main(String[] args) {
-		VerveineJParser parser = new VerveineJParser();
-		parser.setOptions(args);
-		parser.parse();
-		//parser.debug();
-		parser.emitMSE();
-	}
-
 	public void parse() {
 		ArrayList<String> sourceFiles = new ArrayList<String>();
 
@@ -301,6 +294,37 @@ public class VerveineJParser extends VerveineParser {
 				ns.setName(parent.getName() + "." + ns.getName());
 			}
 		}
+	}
+
+	public static void main(String[] args) {
+		LicenceChecker checker = new LicenceChecker();
+		int licenceCheck = checker.checkLicence();
+		
+		if (licenceCheck != LicenceChecker.OK) {
+			cannotContinue(checker, licenceCheck);
+		}
+		
+		VerveineJParser parser = new VerveineJParser();
+		parser.setOptions(args);
+		parser.parse();
+		//parser.debug();
+		parser.emitMSE();
+	}
+
+	/**
+	 * @param checker
+	 * @param licenceCheck 
+	 */
+	private static void cannotContinue(LicenceChecker checker, int licenceCheck) {
+		System.err.println("Authentication failure VerveineJ cannot continue");
+		if (licenceCheck == LicenceChecker.WRONG_LICENCE) {
+			System.err.println("    " + checker.getLineRead());
+		}
+		else {
+			System.err.println("    error " + licenceCheck);			
+		}
+		
+		System.exit(0);
 	}
 
 }
