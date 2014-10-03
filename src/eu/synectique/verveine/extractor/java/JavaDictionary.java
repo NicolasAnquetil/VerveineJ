@@ -1,4 +1,4 @@
-package fr.inria.verveine.extractor.java;
+package eu.synectique.verveine.extractor.java;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -18,34 +18,34 @@ import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.Modifier;
 
 import ch.akuhn.fame.Repository;
-import fr.inria.verveine.core.Dictionary;
-import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
-import fr.inria.verveine.core.gen.famix.AnnotationType;
-import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
-import fr.inria.verveine.core.gen.famix.Attribute;
-import fr.inria.verveine.core.gen.famix.Comment;
-import fr.inria.verveine.core.gen.famix.ContainerEntity;
-import fr.inria.verveine.core.gen.famix.Enum;
-import fr.inria.verveine.core.gen.famix.EnumValue;
-import fr.inria.verveine.core.gen.famix.FileAnchor;
-import fr.inria.verveine.core.gen.famix.Inheritance;
-import fr.inria.verveine.core.gen.famix.LocalVariable;
-import fr.inria.verveine.core.gen.famix.Method;
-import fr.inria.verveine.core.gen.famix.NamedEntity;
-import fr.inria.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.core.gen.famix.Parameter;
-import fr.inria.verveine.core.gen.famix.ParameterType;
-import fr.inria.verveine.core.gen.famix.ParameterizableClass;
-import fr.inria.verveine.core.gen.famix.ParameterizedType;
-import fr.inria.verveine.core.gen.famix.PrimitiveType;
-import fr.inria.verveine.core.gen.famix.SourceAnchor;
-import fr.inria.verveine.core.gen.famix.SourcedEntity;
-import fr.inria.verveine.core.gen.famix.StructuralEntity;
-import fr.inria.verveine.core.gen.famix.Type;
-import fr.inria.verveine.core.gen.famix.UnknownVariable;
+import eu.synectique.verveine.core.Dictionary;
+import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
+import eu.synectique.verveine.core.gen.famix.AnnotationType;
+import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
+import eu.synectique.verveine.core.gen.famix.Attribute;
+import eu.synectique.verveine.core.gen.famix.Comment;
+import eu.synectique.verveine.core.gen.famix.ContainerEntity;
+import eu.synectique.verveine.core.gen.famix.Enum;
+import eu.synectique.verveine.core.gen.famix.EnumValue;
+import eu.synectique.verveine.core.gen.famix.FileAnchor;
+import eu.synectique.verveine.core.gen.famix.Inheritance;
+import eu.synectique.verveine.core.gen.famix.LocalVariable;
+import eu.synectique.verveine.core.gen.famix.Method;
+import eu.synectique.verveine.core.gen.famix.NamedEntity;
+import eu.synectique.verveine.core.gen.famix.Namespace;
+import eu.synectique.verveine.core.gen.famix.Parameter;
+import eu.synectique.verveine.core.gen.famix.ParameterType;
+import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
+import eu.synectique.verveine.core.gen.famix.ParameterizedType;
+import eu.synectique.verveine.core.gen.famix.PrimitiveType;
+import eu.synectique.verveine.core.gen.famix.SourceAnchor;
+import eu.synectique.verveine.core.gen.famix.SourcedEntity;
+import eu.synectique.verveine.core.gen.famix.StructuralEntity;
+import eu.synectique.verveine.core.gen.famix.Type;
+import eu.synectique.verveine.core.gen.famix.UnknownVariable;
 
 /**
- * A {@link fr.inria.verveine.Dictionary} specialized for Java
+ * A {@link eu.synectique.verveine.Dictionary} specialized for Java
  * @author anquetil
  */
 public class JavaDictionary extends Dictionary<IBinding> {
@@ -68,6 +68,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_PRIVATE  = "private";
 	public static final String MODIFIER_PROTECTED= "protected";
 	public static final String MODIFIER_FINAL    = "final";
+	public static final String MODIFIER_STATIC    = "static";
 	
 	/**
 	 * An MSE marker for methods
@@ -234,8 +235,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public fr.inria.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
-		fr.inria.verveine.core.gen.famix.Class fmx = null;
+	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+		eu.synectique.verveine.core.gen.famix.Class fmx = null;
 
 		// --------------- some special cases
 		if (bnd!=null) {
@@ -248,7 +249,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// ---------------- to avoid useless computations if we can
-		fmx = (fr.inria.verveine.core.gen.famix.Class)getEntityByKey(bnd);	
+		fmx = (eu.synectique.verveine.core.gen.famix.Class)getEntityByKey(bnd);	
 		if (fmx != null) {
 			return fmx;
 		}
@@ -293,7 +294,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// --------------- recover from name ?
-		for (fr.inria.verveine.core.gen.famix.Class candidate : this.getEntityByName(fr.inria.verveine.core.gen.famix.Class.class, name)) {
+		for (eu.synectique.verveine.core.gen.famix.Class candidate : this.getEntityByName(eu.synectique.verveine.core.gen.famix.Class.class, name)) {
 			if ( matchAndMapClass(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
@@ -335,7 +336,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				setNamedEntityModifiers(fmx, bnd.getDeclaredModifiers());
 				if (fmx.getIsAbstract()) {
 					// don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
-					fmx.addModifiers("abstract");
+					fmx.addModifiers(MODIFIER_ABSTRACT);
+				}
+				if (Modifier.isStatic(modifiers)) {
+					fmx.addModifiers(MODIFIER_STATIC);
 				}
 			}
 			if (persistIt) {
@@ -466,11 +470,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return super.ensureFamixPrimitiveType(bnd, name);
 	}
 
-	public fr.inria.verveine.core.gen.famix.Enum ensureFamixEnum(ITypeBinding bnd, String name, ContainerEntity owner) {
-		fr.inria.verveine.core.gen.famix.Enum fmx = null;
+	public eu.synectique.verveine.core.gen.famix.Enum ensureFamixEnum(ITypeBinding bnd, String name, ContainerEntity owner) {
+		eu.synectique.verveine.core.gen.famix.Enum fmx = null;
 
 		// --------------- to avoid useless computations if we can
-		fmx = (fr.inria.verveine.core.gen.famix.Enum)getEntityByKey(bnd);
+		fmx = (eu.synectique.verveine.core.gen.famix.Enum)getEntityByKey(bnd);
 		if (fmx != null) {
 			return fmx;
 		}
@@ -511,7 +515,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		
 
 		// --------------- recover from name ?
-		for (fr.inria.verveine.core.gen.famix.Enum candidate : getEntityByName(fr.inria.verveine.core.gen.famix.Enum.class, name) ) {
+		for (eu.synectique.verveine.core.gen.famix.Enum candidate : getEntityByName(eu.synectique.verveine.core.gen.famix.Enum.class, name) ) {
 			if ( matchAndMapType(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
@@ -962,7 +966,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
 	private boolean matchAndMapClass(ITypeBinding bnd, String name, ContainerEntity owner, Type candidate) {
-		if (! (candidate instanceof fr.inria.verveine.core.gen.famix.Class)) {
+		if (! (candidate instanceof eu.synectique.verveine.core.gen.famix.Class)) {
 			return false;
 		}
 
@@ -1580,7 +1584,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Parameter associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixParameter(Object, String, Type, fr.inria.verveine.core.gen.famix.BehaviouralEntity, boolean)}.
+	 * Params: see {@link Dictionary#ensureFamixParameter(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}.
 	 * @param persistIt -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
@@ -1646,7 +1650,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix LocalVariable associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixLocalVariable(Object, String, Type, fr.inria.verveine.core.gen.famix.BehaviouralEntity, boolean)}
+	 * Params: see {@link Dictionary#ensureFamixLocalVariable(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}
 	 * @param persistIt  -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if <b>bnd</b> and <b>name</b> are null, or <b>bnd</b> and <b>owner</b> are null, or in case of a Famix error
 	 */
@@ -1828,8 +1832,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param bnd -- a potential binding for the java "Object" class
 	 * @return a Famix class for "Object"
 	 */
-	public fr.inria.verveine.core.gen.famix.Class ensureFamixClassObject(ITypeBinding bnd) {
-		fr.inria.verveine.core.gen.famix.Class fmx =  ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, bnd, OBJECT_NAME);
+	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClassObject(ITypeBinding bnd) {
+		eu.synectique.verveine.core.gen.famix.Class fmx =  ensureFamixUniqEntity(eu.synectique.verveine.core.gen.famix.Class.class, bnd, OBJECT_NAME);
 		
 		if (fmx != null) {
 			fmx.setContainer( ensureFamixNamespaceJavaLang(null));
@@ -1839,10 +1843,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	public fr.inria.verveine.core.gen.famix.Class ensureFamixMetaClass(ITypeBinding bnd) {
+	public eu.synectique.verveine.core.gen.famix.Class ensureFamixMetaClass(ITypeBinding bnd) {
 		Namespace javaLang = ensureFamixNamespaceJavaLang( (bnd == null) ? null : bnd.getPackage());
 		// always persist the MetaClass whatever the value of VerveineJParser.classSummary
-		fr.inria.verveine.core.gen.famix.Class fmx =  this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC&Modifier.FINAL, /*alwaysPersist?*/true);
+		eu.synectique.verveine.core.gen.famix.Class fmx =  this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC&Modifier.FINAL, /*alwaysPersist?*/true);
 
 		if ( (fmx != null) && (fmx.getSuperInheritances() == null) ) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, null);
@@ -1855,8 +1859,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Creates or recovers the Famix Class that will own all stub methods (for which the real owner is unknown)
 	 * @return a Famix class
 	 */
-	public fr.inria.verveine.core.gen.famix.Class ensureFamixClassStubOwner() {
-		fr.inria.verveine.core.gen.famix.Class fmx = super.ensureFamixClassStubOwner();
+	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClassStubOwner() {
+		eu.synectique.verveine.core.gen.famix.Class fmx = super.ensureFamixClassStubOwner();
 		ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
 
 		return fmx;
@@ -1868,8 +1872,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * JDT does not create a binding for these classes, so we create a stub one here. 
 	 * @return a Famix class
 	 */
-	public fr.inria.verveine.core.gen.famix.Class ensureFamixClassArray() {
-		fr.inria.verveine.core.gen.famix.Class fmx = ensureFamixUniqEntity(fr.inria.verveine.core.gen.famix.Class.class, null, ARRAYS_NAME);
+	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClassArray() {
+		eu.synectique.verveine.core.gen.famix.Class fmx = ensureFamixUniqEntity(eu.synectique.verveine.core.gen.famix.Class.class, null, ARRAYS_NAME);
 		if (fmx != null) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
 			fmx.setContainer( ensureFamixNamespaceDefault());

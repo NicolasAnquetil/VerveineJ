@@ -8,7 +8,7 @@
 	<property name="dist.dir"     location="lib" />
 	<property name="verveine.jar" location="${dist.dir}/verveine.extractor.java.jar" />
 	<property name="core.dir"     location="../verveine.core" />
-	<property name="test.dir" location="src/tests/fr/inria/verveine/extractor/java/" />
+	<property name="test.dir" location="src/tests/eu/synectique/verveine/extractor/java/" />
 	<property name="test.report.dir" location="testrep" />
 
 	<path id="build.classpath">
@@ -61,9 +61,10 @@
 
 	<!--Creates the deployable jar file  -->
 	<target name="jar" depends="compile">
-		<jar destfile="${verveine.jar}" basedir="${build.dir}">
-			<include name="fr/inria/verveine/extractor/java/*.class"/>
-		</jar>
+		<jar destfile="${verveine.jar}"
+		     basedir="${build.dir}"
+		     includes="eu/synectique/verveine/extractor/java/*.class eu/synectique/licence/*.class"
+		/>
 	</target>
 
 	<!-- Run the JUnit Tests -->
@@ -77,13 +78,13 @@
 			</classpath>
 			<!-- Output is XML, could also be plain-->
 			<formatter type="xml" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_AnnotationTest" todir="${test.report.dir}" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_Summarized" todir="${test.report.dir}" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_JWSBasic" todir="${test.report.dir}" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_Configuration" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_AnnotationTest" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_Summarized" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_JWSBasic" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_Configuration" todir="${test.report.dir}" />
 		</junit>
 	</target>
 
@@ -98,7 +99,7 @@
 				</fileset>
 			</classpath>
 			<formatter type="plain" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
 		</junit>
 	</target>
 

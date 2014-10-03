@@ -1,4 +1,4 @@
-package tests.fr.inria.verveine.extractor.java;
+package tests.eu.synectique.verveine.extractor.java;
 
 import static org.junit.Assert.*;
 
@@ -7,23 +7,23 @@ import java.util.Collection;
 import org.junit.Test;
 
 import ch.akuhn.fame.Repository;
-import fr.inria.verveine.core.VerveineUtilsForTests;
-import fr.inria.verveine.core.gen.famix.Access;
-import fr.inria.verveine.core.gen.famix.Association;
-import fr.inria.verveine.core.gen.famix.Attribute;
-import fr.inria.verveine.core.gen.famix.BehaviouralEntity;
-import fr.inria.verveine.core.gen.famix.Inheritance;
-import fr.inria.verveine.core.gen.famix.Invocation;
-import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
-import fr.inria.verveine.core.gen.famix.Method;
-import fr.inria.verveine.core.gen.famix.NamedEntity;
-import fr.inria.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.core.gen.famix.PrimitiveType;
-import fr.inria.verveine.core.gen.famix.SourceLanguage;
-import fr.inria.verveine.core.gen.famix.StructuralEntity;
-import fr.inria.verveine.core.gen.famix.Type;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
+import eu.synectique.verveine.core.VerveineUtilsForTests;
+import eu.synectique.verveine.extractor.java.JavaDictionary;
+import eu.synectique.verveine.extractor.java.VerveineJParser;
+import eu.synectique.verveine.core.gen.famix.Access;
+import eu.synectique.verveine.core.gen.famix.Association;
+import eu.synectique.verveine.core.gen.famix.Attribute;
+import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
+import eu.synectique.verveine.core.gen.famix.Inheritance;
+import eu.synectique.verveine.core.gen.famix.Invocation;
+import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
+import eu.synectique.verveine.core.gen.famix.Method;
+import eu.synectique.verveine.core.gen.famix.NamedEntity;
+import eu.synectique.verveine.core.gen.famix.Namespace;
+import eu.synectique.verveine.core.gen.famix.PrimitiveType;
+import eu.synectique.verveine.core.gen.famix.SourceLanguage;
+import eu.synectique.verveine.core.gen.famix.StructuralEntity;
+import eu.synectique.verveine.core.gen.famix.Type;
 
 public abstract class VerveineJTest_Basic {
 
@@ -82,7 +82,7 @@ public abstract class VerveineJTest_Basic {
 		for ( Method m : repo.all(Method.class) ) {
 			Type parent = m.getParentType();
 			if ( (parent != null) &&
-					(! (parent instanceof fr.inria.verveine.core.gen.famix.Enum)) &&   // for enums some methods are implicit
+					(! (parent instanceof eu.synectique.verveine.core.gen.famix.Enum)) &&   // for enums some methods are implicit
 					(! m.getName().equals(parent.getName())) &&   // for constructors are implicit
 					(! m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) &&
 					(parent.getSourceAnchor() != null) ) {
@@ -113,25 +113,25 @@ public abstract class VerveineJTest_Basic {
 		assertEquals(java, javaIO.getBelongsTo());
 
 		// Object
-		fr.inria.verveine.core.gen.famix.Class obj = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
+		eu.synectique.verveine.core.gen.famix.Class obj = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(obj);
 		assertSame(javaLang, obj.getContainer());
 		assertEquals(0, obj.getSuperInheritances().size());
 
 		// String
-		fr.inria.verveine.core.gen.famix.Class charSeq = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "CharSequence");
+		eu.synectique.verveine.core.gen.famix.Class charSeq = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "CharSequence");
 		assertNotNull(charSeq);
 		assertSame(javaLang, charSeq.getContainer());
 		assertTrue(charSeq.getIsInterface());
 		assertEquals(0, charSeq.getSuperInheritances().size());
 
-		fr.inria.verveine.core.gen.famix.Class serial = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "Serializable");
+		eu.synectique.verveine.core.gen.famix.Class serial = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Serializable");
 		assertNotNull(serial);
 		assertSame(javaIO, serial.getContainer());
 		assertTrue(serial.getIsInterface());
 		assertEquals(0, serial.getSuperInheritances().size());
 
-		fr.inria.verveine.core.gen.famix.Class str = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "String");
+		eu.synectique.verveine.core.gen.famix.Class str = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String");
 		assertNotNull(str);
 		assertSame(javaLang, str.getContainer());
 		assertEquals(4, str.getSuperInheritances().size());
@@ -145,7 +145,7 @@ public abstract class VerveineJTest_Basic {
 
 		// System
 		if (this.testSystem) {
-			fr.inria.verveine.core.gen.famix.Class syst = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "System");
+			eu.synectique.verveine.core.gen.famix.Class syst = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "System");
 			assertNotNull(syst);
 			assertSame(javaLang, syst.getContainer());
 			assertEquals(1, syst.getSuperInheritances().size());

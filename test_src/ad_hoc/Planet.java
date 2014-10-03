@@ -37,6 +37,10 @@ public enum Planet {
     }
     
     public void sillyArrayAssignement() {
+    	// to check that 'instanceof' creates a reference
+    	boolean check = (this instanceof java.io.IOException);
+
+
     	Planet ret[] = Planet.values();
     	ret[i].mass = 0.0;  // to test read/write property of accesses
     }
