@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2010 Anquetil Nicolas
  */
-package tests.fr.inria.verveine.extractor.java;
+package tests.eu.synectique.verveine.extractor.java;
 
 
 import static org.junit.Assert.assertEquals;
@@ -15,10 +15,10 @@ import org.junit.Test;
 
 import ch.akuhn.fame.Repository;
 
-import fr.inria.verveine.core.VerveineUtilsForTests;
-import fr.inria.verveine.core.gen.famix.AnnotationInstance;
-import fr.inria.verveine.core.gen.famix.AnnotationInstanceAttribute;
-import fr.inria.verveine.extractor.java.VerveineJParser;
+import eu.synectique.verveine.core.VerveineUtilsForTests;
+import eu.synectique.verveine.extractor.java.VerveineJParser;
+import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
+import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
 
 /**
  * @author Nicolas Anquetil
@@ -45,7 +45,7 @@ public class VerveineJTest_AnnotationTest {
 
 	@Test
 	public void testAnnotationInstanceAttribute() {
-		fr.inria.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "AnnotatedClass");
+		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnnotatedClass");
 		assertNotNull(clss);
 
 		assertEquals(1, clss.getAnnotationInstances().size());
@@ -65,7 +65,7 @@ public class VerveineJTest_AnnotationTest {
 
 	@Test
 	public void testAnnotationInstanceArrayOfOne() {
-		fr.inria.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "AThirdAnnotatedClass");
+		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AThirdAnnotatedClass");
 		assertNotNull(clss);
 
 		assertEquals(1, clss.getAnnotationInstances().size());
@@ -85,7 +85,7 @@ public class VerveineJTest_AnnotationTest {
 
 	@Test
 	public void testAnnotationInstanceArray() {
-		fr.inria.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, fr.inria.verveine.core.gen.famix.Class.class, "AnotherAnnotatedClass");
+		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnotherAnnotatedClass");
 		assertNotNull(clss);
 
 		assertEquals(1, clss.getAnnotationInstances().size());

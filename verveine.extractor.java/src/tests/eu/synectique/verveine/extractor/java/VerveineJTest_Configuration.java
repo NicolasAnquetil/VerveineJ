@@ -1,4 +1,4 @@
-package tests.fr.inria.verveine.extractor.java;
+package tests.eu.synectique.verveine.extractor.java;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,9 +10,9 @@ import org.junit.Test;
 
 import ch.akuhn.fame.Repository;
 
-import fr.inria.verveine.core.VerveineUtilsForTests;
-import fr.inria.verveine.core.gen.famix.LocalVariable;
-import fr.inria.verveine.extractor.java.VerveineJParser;
+import eu.synectique.verveine.core.VerveineUtilsForTests;
+import eu.synectique.verveine.extractor.java.VerveineJParser;
+import eu.synectique.verveine.core.gen.famix.LocalVariable;
 
 public class VerveineJTest_Configuration {
 
@@ -51,7 +51,7 @@ public class VerveineJTest_Configuration {
 		repo = parser.getFamixRepo();
 		parser.setOptions(new String[] {"-alllocals", "test_src/ad_hoc/Planet.java"});
 		parser.parse();
-		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());		
+		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());		
 	}
 
 }

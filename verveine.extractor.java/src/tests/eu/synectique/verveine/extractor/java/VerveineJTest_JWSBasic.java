@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2010 Anquetil Nicolas
  */
-package tests.fr.inria.verveine.extractor.java;
+package tests.eu.synectique.verveine.extractor.java;
 
 
 import static org.junit.Assert.assertEquals;
@@ -17,15 +17,15 @@ import javax.jws.WebService;
 import org.junit.Before;
 import org.junit.Test;
 
-import fr.inria.verveine.core.VerveineUtilsForTests;
-import fr.inria.verveine.core.gen.famix.AnnotationInstance;
-import fr.inria.verveine.core.gen.famix.AnnotationType;
-import fr.inria.verveine.core.gen.famix.AnnotationTypeAttribute;
-import fr.inria.verveine.core.gen.famix.Attribute;
-import fr.inria.verveine.core.gen.famix.Method;
-import fr.inria.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
+import eu.synectique.verveine.core.VerveineUtilsForTests;
+import eu.synectique.verveine.extractor.java.JavaDictionary;
+import eu.synectique.verveine.extractor.java.VerveineJParser;
+import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
+import eu.synectique.verveine.core.gen.famix.AnnotationType;
+import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
+import eu.synectique.verveine.core.gen.famix.Attribute;
+import eu.synectique.verveine.core.gen.famix.Method;
+import eu.synectique.verveine.core.gen.famix.Namespace;
 
 /**
  * @author Nicolas Anquetil
@@ -72,7 +72,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		// Class annotation
 		Namespace defPckg = VerveineUtilsForTests.detectElement(repo,Namespace.class, JavaDictionary.DEFAULT_PCKG_NAME);
 		assertNotNull(defPckg);
-		fr.inria.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectElement(repo,fr.inria.verveine.core.gen.famix.Class.class, "SimpleBean");
+		eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SimpleBean");
 		assertNotNull(cl);
 		assertEquals(4, cl.getAnnotationInstances().size());
 		for (AnnotationInstance ai :cl.getAnnotationInstances() ) {

@@ -1,4 +1,4 @@
-package fr.inria.verveine.extractor.java;
+package eu.synectique.verveine.extractor.java;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,15 +12,15 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 
 import eu.synectique.licence.LicenceChecker;
-import fr.inria.verveine.core.VerveineParser;
-import fr.inria.verveine.core.gen.famix.JavaSourceLanguage;
-import fr.inria.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.core.gen.famix.SourceLanguage;
+import eu.synectique.verveine.core.VerveineParser;
+import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
+import eu.synectique.verveine.core.gen.famix.Namespace;
+import eu.synectique.verveine.core.gen.famix.SourceLanguage;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
  * run with:
- * java -cp lib/org.eclipse.jdt.core_3.6.0.v_A48.jar:../Fame:/usr/local/share/eclipse/plugins/org.eclipse.equinox.common_3.5.1.R35x_v20090807-1100.jar:/usr/local/share/eclipse/plugins/org.eclipse.equinox.preferences_3.2.301.R35x_v20091117.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.jobs_3.4.100.v20090429-1800.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.contenttype_3.4.1.R35x_v20090826-0451.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.resources_3.5.2.R35x_v20091203-1235.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.runtime_3.5.0.v20090525.jar:/usr/local/share/eclipse/plugins/org.eclipse.osgi_3.5.2.R35x_v20100126.jar:../Fame/lib/akuhn-util-r28011.jar:lib/fame.jar:bin fr.inria.verveine.extractor.java.VerveineJParser [files|directory]_to_parse
+ * java -cp lib/org.eclipse.jdt.core_3.6.0.v_A48.jar:../Fame:/usr/local/share/eclipse/plugins/org.eclipse.equinox.common_3.5.1.R35x_v20090807-1100.jar:/usr/local/share/eclipse/plugins/org.eclipse.equinox.preferences_3.2.301.R35x_v20091117.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.jobs_3.4.100.v20090429-1800.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.contenttype_3.4.1.R35x_v20090826-0451.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.resources_3.5.2.R35x_v20091203-1235.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.runtime_3.5.0.v20090525.jar:/usr/local/share/eclipse/plugins/org.eclipse.osgi_3.5.2.R35x_v20100126.jar:../Fame/lib/akuhn-util-r28011.jar:lib/fame.jar:bin eu.synectique.verveine.extractor.java.VerveineJParser [files|directory]_to_parse
  */
 
 public class VerveineJParser extends VerveineParser {
@@ -197,7 +197,19 @@ public class VerveineJParser extends VerveineParser {
 		 *   some new relation: classdep
 		 */
 		
-		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-alllocals] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+//		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("      [-h] prints this message");
+		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
+		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: output.mse)");
+//		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
+//		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
+//		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
+		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\"");
+		System.err.println("      [-cp CLASSPATH] classpath where to look for stubs");
+		System.err.println("      [-autocp DIR] gather all jars in DIR and put them in the classpath");
+		System.err.println("      [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] specifies version of Java");
+		System.err.println("      <files-to-parse>|<dirs-to-parse> list of source files to parse or directories to search for source files");
 		System.exit(0);
 
 	}
@@ -300,9 +312,9 @@ public class VerveineJParser extends VerveineParser {
 		LicenceChecker checker = new LicenceChecker();
 		int licenceCheck = checker.checkLicence();
 		
-		if (licenceCheck != LicenceChecker.OK) {
-			cannotContinue(checker, licenceCheck);
-		}
+	//	if (licenceCheck != LicenceChecker.OK) {
+	//		cannotContinue(checker, licenceCheck);
+	//	}
 		
 		VerveineJParser parser = new VerveineJParser();
 		parser.setOptions(args);
