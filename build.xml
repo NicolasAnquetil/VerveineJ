@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="verveine.extractor.java" default="jar" basedir=".">
+<project name="verveine.extractor.java" default="build" basedir=".">
 	<!-- Sets variables which can later be used. -->
 	<!-- The value of a property is accessed via ${} -->
 	<property name="src.dir"      location="src" />
@@ -67,8 +67,15 @@
 		/>
 	</target>
 
+	<!--Build the distribution  -->
+	<target name="build" depends="jar">
+	  <exec executable="/bin/bash">
+	  	<arg value="buildKey.sh"/>
+	  </exec>
+	</target>
+
 	<!-- Run the JUnit Tests -->
-	<target name="junit" depends="jar">
+	<target name="junit" depends="build">
 		<junit printsummary="on" fork="true" haltonfailure="no">
 			<classpath>
 				<pathelement path="${build.dir}"/>
