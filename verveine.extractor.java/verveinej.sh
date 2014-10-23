@@ -40,6 +40,6 @@ for i in $BASELIB/*.jar; do
 done
 CLASSPATH=`echo $CLASSPATH | cut -c2-`
 
-echo $CLASSPATH
+#echo $CLASSPATH
 
-java $JOPT -cp $CLASSPATH fr.inria.verveine.extractor.java.VerveineJParser $VOPT
+java $JOPT -cp $CLASSPATH eu.synectique.verveine.extractor.java.VerveineJParser $VOPT

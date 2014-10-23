@@ -312,9 +312,9 @@ public class VerveineJParser extends VerveineParser {
 		LicenceChecker checker = new LicenceChecker();
 		int licenceCheck = checker.checkLicence();
 		
-	//	if (licenceCheck != LicenceChecker.OK) {
-	//		cannotContinue(checker, licenceCheck);
-	//	}
+		if (licenceCheck != LicenceChecker.OK) {
+			cannotContinue(checker, licenceCheck);
+		}
 		
 		VerveineJParser parser = new VerveineJParser();
 		parser.setOptions(args);
@@ -323,7 +323,7 @@ public class VerveineJParser extends VerveineParser {
 		parser.emitMSE();
 	}
 
-	/**
+	/** developer method to know what went wrong
 	 * @param checker
 	 * @param licenceCheck 
 	 */
