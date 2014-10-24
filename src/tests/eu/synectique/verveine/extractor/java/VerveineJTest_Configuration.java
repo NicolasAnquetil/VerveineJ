@@ -28,7 +28,13 @@ public class VerveineJTest_Configuration {
 	
 		String[] args = new String[] {"-o",VerveineJTest_Configuration.OTHER_OUTPUT_FILE, "test_src/LANModel/"};
 		
-		VerveineJParser.main(args);	
+		//VerveineJParser.main(args);
+		// Executing the instructions of the main() without calling the licence verification stuff
+		VerveineJParser parser = new VerveineJParser();
+		parser.setOptions(args);
+		parser.parse();
+		parser.emitMSE();
+
 		assertTrue(new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).exists());
 		assertFalse(new File(VerveineJParser.OUTPUT_FILE).exists());
 	}

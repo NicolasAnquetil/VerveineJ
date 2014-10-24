@@ -76,7 +76,7 @@ public class LicenceChecker {
 		String classPath = System.getProperty("java.class.path");
 		
 		for (String libpath : classPath.split(System.getProperty("path.separator"))) {
-			if (libpath.endsWith("/akuhn-util-r28011.jar")) {
+			if (libpath.endsWith("akuhn-util-r28011.jar")) {
 				keyPath = libpath;
 				break;
 			}
