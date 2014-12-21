@@ -70,7 +70,7 @@
 	<!--Build the distribution  -->
 	<target name="build" depends="jar">
 	  <exec executable="/bin/bash">
-	  	<arg value="buildKey.sh"/>
+	  	<arg value="utils/buildKey.sh"/>
 	  </exec>
 	</target>
 
