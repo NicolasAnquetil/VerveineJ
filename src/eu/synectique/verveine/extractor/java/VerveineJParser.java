@@ -28,6 +28,19 @@ public class VerveineJParser extends VerveineParser {
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
 
 	/**
+	 * Option for SourceAnchors: default=only entities
+	 */
+	public static final String ANCHOR_DEFAULT = "default";
+	/**
+	 * Option for SourceAnchors: none=no source anchor
+	 */
+	public static final String ANCHOR_NONE = "none";
+	/**
+	 * Option for SourceAnchors: assoc=entities and associations have source anchors
+	 */
+	public static final String ANCHOR_ASSOC = "assoc";
+
+	/**
 	 * Whether to summarize collected information at the level of classes or produce everything.
 	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation.<br>
 	 * Note: classSummary => not allLocals
@@ -51,6 +64,11 @@ public class VerveineJParser extends VerveineParser {
 	 * Option: The version of Java expected by the parser 
 	 */
 	protected String codeVers = null;
+
+	/**
+	 * Option: Whether to put Sourceanchor in the entities and/or associations
+	 */
+	protected String anchors = null;
 
 	/**
 	 * The arguments that were passed to the parser
@@ -152,6 +170,19 @@ public class VerveineJParser extends VerveineParser {
 					System.err.println("-cp requires a classPath");
 				}	
 			}
+			else if (arg.equals("-anchor")) {
+				if (i < args.length) {
+					String anchor = args[i++];
+					if (! (anchor.equals(ANCHOR_DEFAULT) || anchor.equals(ANCHOR_NONE) || anchor.equals(ANCHOR_ASSOC)) ) {
+						System.err.println("unknown option to -anchor: "+anchor);
+					}
+					else {
+						this.anchors = anchor;
+					}
+				} else {
+					System.err.println("-anchor requires an option (none|default|assoc)");
+				}
+			}
 			else {
 				int j = super.setOption(i - 1, args);
 				if (j > 0) {     // j is the number of args consumed
@@ -178,6 +209,9 @@ public class VerveineJParser extends VerveineParser {
 
 		if (codeVers == null) {
 			codeVers = DEFAULT_CODE_VERSION;
+		}
+		if (anchors == null) {
+			anchors = ANCHOR_DEFAULT;
 		}
 		options.put(JavaCore.COMPILER_COMPLIANCE, codeVers);
 		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, codeVers);
@@ -261,7 +295,7 @@ public class VerveineJParser extends VerveineParser {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals, anchors);
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);

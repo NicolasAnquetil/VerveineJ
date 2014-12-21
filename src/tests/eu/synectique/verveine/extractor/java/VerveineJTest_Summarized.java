@@ -152,8 +152,8 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = (System.getProperty("java.version").startsWith("1.7")) ? 10+15 : 10+14;
-		int nbInherit = (System.getProperty("java.version").startsWith("1.7")) ? 7+22 : 7+21;
+		int nbClasses = (System.getProperty("java.version").startsWith("1.7")) ? 10+15 : 10+14; // class Autocloseable in Java 7
+		int nbInherit = (System.getProperty("java.version").startsWith("1.7")) ? 7+22 : 7+21; // class Autocloseable in Java 7
 
 		assertEquals(nbClasses, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)Autocloseable}
 		assertEquals(3,     VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());
@@ -162,13 +162,46 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(2+4,   VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(nbInherit,  VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//7 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
+		assertEquals(nbInherit, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//7 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
-		assertEquals(20,    VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());  // TODO check that number
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());  // TODO should be 1 ?
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());  // TODO should be 2 ?
 		assertEquals(1,     VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
+		assertEquals(30,    VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());
+		/* list of known references
+			(access to self attribute generate a ref from the class to itself, invocation of self method does not generate a ref):
+			AbstractDestinationAddress -> String
+			FileServer -> OutputServer
+			FileServer -> Packet 
+			FileServer -> String 
+			FileServer -> System 
+			IPrinter -> String 
+			Node -> Node 
+			Node -> Packet 
+			Node -> String 
+			Node -> StringBuffer 
+			Node -> System 
+			OutputServer -> Packet 
+			OutputServer -> String 
+			Packet -> Node 
+			Packet -> Packet 
+			Packet -> SingleDestinationAddress 
+			Packet -> String 
+			Packet -> StringBuffer 
+			PrintServer -> IPrinter 
+			PrintServer -> Packet 
+			PrintServer -> PrintServer 
+			PrintServer -> String 
+			PrintServer -> System 
+			SingleDestinationAddress -> AbstractDestinationAddress 
+			SingleDestinationAddress -> SingleDestinationAddress 
+			SingleDestinationAddress -> String 
+			System -> PrintStream 
+			WorkStation -> Packet 
+			WorkStation -> String 
+			WorkStation -> System
+		 */
 	}
 
 	@Test

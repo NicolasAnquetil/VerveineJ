@@ -154,12 +154,18 @@ public class VerveineVisitor extends ASTVisitor {
 	 * Whether a variable access is lhs (write) or not
 	 */
 	protected boolean inAssignmentLHS = false;
+
+	/**
+	 * what sourceAnchors to create
+	 */
+	private String anchors;
 	
-	public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals) {
+	public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
 		this.dico = dico;
 		this.context = new EntityStack();
 		this.classSummary = classSummary;
 		this.allLocals = allLocals;
+		this.anchors = anchors;
 	}
 
 	// VISITOR METHODS
@@ -237,7 +243,9 @@ public class VerveineVisitor extends ASTVisitor {
 			this.context.pushType(fmx);
 
 			if (persistIt) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				if (! anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				}
 				dico.addFamixAnnotationInstances(bnd, fmx, persistIt);
 				addUnboundAnnotationInstances(node, fmx, persistIt);
 				
@@ -252,8 +260,12 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 			else {
 				for (Inheritance inh : fmx.getSuperInheritances()) {
-					Reference ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(inh.getSuperclass()), null);
-					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					Reference lastRef = (classSummary ? null : context.getLastReference());
+					Reference ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(inh.getSuperclass()), lastRef);
+					context.setLastReference(ref);
+					if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					}
 				}
 			}
 
@@ -335,16 +347,28 @@ public class VerveineVisitor extends ASTVisitor {
 			Type clazz = node.getType();
 			fmx = referedType(clazz, context.top(), true);
 			this.classInstanceCreated = fmx;
-			
+
+			Reference ref;
 			if (classSummary) {
-				Reference ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), null);
-				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+				ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
 			}
 			else {
-				Reference lastRef = context.getLastReference();
-				dico.addFamixReference(context.top(), fmx, lastRef);
+				ref = dico.addFamixReference(context.top(), fmx, context.getLastReference());
+				context.setLastReference(ref);
+
 				// create an invocation to the constructor
-				methodInvocation(node.resolveConstructorBinding(), findTypeName(clazz), /*receiver*/null, /*methOwner*/fmx, node.arguments());
+				String typName = findTypeName(clazz);
+				methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
+				Invocation lastInvok = context.getLastInvocation();
+				if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+						&& (lastInvok.getSender() == context.topMethod())
+						&& (lastInvok.getReceiver() == null)
+						&& (lastInvok.getSignature().startsWith(typName)) ) {
+					dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
+				}
+			}
+			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 			}
 		}
 		return super.visit(node);
@@ -365,13 +389,17 @@ public class VerveineVisitor extends ASTVisitor {
 
 			if (classSummary) {
 				for (Inheritance inh : fmx.getSuperInheritances()) {
-					Reference ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(inh.getSuperclass()), null);
-					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					Reference ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(inh.getSuperclass()), /*lastReference*/null);
+					if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					}
 				}
 			}
 			else {
 				dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				if ( (! anchors.equals(VerveineJParser.ANCHOR_NONE)) && (fmx != null) ) {
+					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				}
 			}
 			this.context.pushType(fmx);
 			return super.visit(node);
@@ -396,7 +424,9 @@ public class VerveineVisitor extends ASTVisitor {
 			fmx.setIsStub(Boolean.FALSE);
 
 			this.context.pushType(fmx);
-			dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+			if ( ! anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+			}
 
 			// possibly not persisting the enum's memebrs, i.e. enum-values
 			for (EnumConstantDeclaration ecst : (List<EnumConstantDeclaration>)node.enumConstants()) {
@@ -422,7 +452,9 @@ public class VerveineVisitor extends ASTVisitor {
 		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), context.top(), persistClass(bnd));
 		if (fmx != null) {
 			fmx.setIsStub(Boolean.FALSE);
-			dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+			if (! anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+			}
 
 			context.pushType(fmx);
 			return super.visit(node);
@@ -445,7 +477,9 @@ public class VerveineVisitor extends ASTVisitor {
 		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+			if  (! anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+			}
 
 			context.pushAnnotationMember(fmx);
 			return super.visit(node);
@@ -498,13 +532,17 @@ public class VerveineVisitor extends ASTVisitor {
 				fmx.setDeclaredType(fmxRetTyp);
 
 				if ( classSummary && (! (fmxRetTyp instanceof PrimitiveType)) ) {
-					Reference ref = dico.addFamixReference(findHighestType(fmx.getParentType()), findHighestType(fmxRetTyp), null);
-					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					Reference ref = dico.addFamixReference(findHighestType(fmx.getParentType()), findHighestType(fmxRetTyp), /*lastReference*/null);
+					if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					}
 				}
 			}
 
 			if (! classSummary) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				if ( !anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				}
 				dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
 
 				//comments
@@ -538,7 +576,10 @@ public class VerveineVisitor extends ASTVisitor {
 				eu.synectique.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(excepName.resolveTypeBinding(), context.topType(), true);
 				if (excepFmx != null) {
 					if (classSummary) {
-						dico.addFamixReference(findHighestType(fmx), findHighestType(excepFmx), null);
+						Reference ref = dico.addFamixReference(findHighestType(fmx), findHighestType(excepFmx), /*lastReference*/null);
+						if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+							dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+						}
 					}
 					else {
 						dico.createFamixDeclaredException(fmx, excepFmx);
@@ -572,7 +613,9 @@ public class VerveineVisitor extends ASTVisitor {
 
 			pushInitBlockMethod(fmx);
 			if (! classSummary) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				if (!anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				}
 				dico.createFamixComment(node.getJavadoc(), fmx, source);
 			}
 
@@ -602,7 +645,9 @@ public class VerveineVisitor extends ASTVisitor {
 
 		for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topType()) ) {
 			if (! classSummary) {
-				dico.addSourceAnchor(att, node, /*oneLineAnchor*/false);
+				if (! anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+					dico.addSourceAnchor(att, node, /*oneLineAnchor*/false);
+				}
 
 				//comments
 				if (dico.createFamixComment(node.getJavadoc(), att, source) == null) {
@@ -635,7 +680,7 @@ public class VerveineVisitor extends ASTVisitor {
 			eu.synectique.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod(), false);
 
 			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
-				if (! classSummary) {
+				if ( (! classSummary) && (! anchors.equals(VerveineJParser.ANCHOR_NONE)) ) {
 					dico.addSourceAnchor(att, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -652,7 +697,7 @@ public class VerveineVisitor extends ASTVisitor {
 		if (allLocals || (! node.getType().isPrimitiveType()) ) {
 			eu.synectique.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod(), false);
 			for (StructuralEntity var : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
-				if (! classSummary) {
+				if ( (! classSummary) && (! anchors.equals(VerveineJParser.ANCHOR_NONE)) ) {
 					dico.addSourceAnchor(var, node, /*oneLineAnchor*/true);
 				}
 			}
@@ -668,11 +713,19 @@ public class VerveineVisitor extends ASTVisitor {
 		Expression callingExpr = node.getExpression();
 		NamedEntity receiver = getReceiver(callingExpr);
 		IMethodBinding bnd = node.resolveMethodBinding();
+		String calledName = node.getName().getFullyQualifiedName();
 		if (bnd == null) {
-			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, getInvokedMethodOwner(callingExpr, receiver), node.arguments());
+			methodInvocation(bnd, calledName, receiver, getInvokedMethodOwner(callingExpr, receiver), node.arguments());
 		}
 		else {
-			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, /*owner*/null, node.arguments());
+			methodInvocation(bnd, calledName, receiver, /*owner*/null, node.arguments());
+		}
+		Invocation lastInvok = context.getLastInvocation();
+		if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+				&& (lastInvok.getSender() == context.topMethod())
+				&& (lastInvok.getReceiver() == receiver)
+				&& (lastInvok.getSignature().startsWith(calledName)) ) {
+			dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
 		}
 		if (callingExpr instanceof SimpleName) {
 			visitSimpleName((SimpleName) callingExpr);
@@ -717,8 +770,10 @@ public class VerveineVisitor extends ASTVisitor {
 
 		if (classSummary) {
 			// a reference of the class to itself
-			Reference ref = dico.addFamixReference(findHighestType(context.topType()), findHighestType(context.topType()), null);
-			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+			Reference ref = dico.addFamixReference(findHighestType(context.topType()), findHighestType(context.topType()), /*lastReference*/null);
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+			}
 		}
 		else {
 			String signature = node.toString();
@@ -731,6 +786,9 @@ public class VerveineVisitor extends ASTVisitor {
 			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, (Class) context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
 			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature, context.getLastInvocation());
 			context.setLastInvocation( invok );
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (invok != null) ) {
+				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
+			}
 		}
 
 		return super.visit(node);
@@ -745,8 +803,10 @@ public class VerveineVisitor extends ASTVisitor {
 		// also no parameters specified here, so no references to create either
 
 		if (classSummary) {
-			Reference ref = dico.addFamixReference(findHighestType(context.topMethod()), findHighestType(invoked), null);
-			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+			Reference ref = dico.addFamixReference(findHighestType(context.topMethod()), findHighestType(invoked), /*lastReference*/null);
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+			}
 		}
 		else {
 			String signature = node.toString();
@@ -759,6 +819,9 @@ public class VerveineVisitor extends ASTVisitor {
 			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
 			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature, context.getLastInvocation());
 			context.setLastInvocation( invok );
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
+			}
 		}
 
 		return super.visit(node);
@@ -814,14 +877,17 @@ public class VerveineVisitor extends ASTVisitor {
 		eu.synectique.verveine.core.gen.famix.Type fmx = null;
 		Type clazz = node.getRightOperand();
 		fmx = referedType(clazz, context.top(), true);
-		
+
+		Reference ref;
 		if (classSummary) {
-			Reference ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), null);
-			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+			ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
 		}
 		else {
-			Reference lastRef = context.getLastReference();
-			dico.addFamixReference(context.top(), fmx, lastRef);
+			ref = dico.addFamixReference(context.top(), fmx, context.getLastReference());
+			context.setLastReference(ref);
+		}
+		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 		}
 
 		return super.visit(node);
@@ -851,8 +917,10 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 			if (excepFmx != null) {
 				if (classSummary) {
-					Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx), null);
-					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx), /*lastReference*/null);
+					if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					}
 				}
 				else {
 					dico.createFamixCaughtException(meth, excepFmx);
@@ -874,8 +942,10 @@ public class VerveineVisitor extends ASTVisitor {
 		eu.synectique.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(node.getExpression().resolveTypeBinding(), context.topType(), true);
 		if (excepFmx != null) {
 			if (classSummary) {
-				Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx), null);
-				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+				Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx), /*lastReference*/null);
+				if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+				}
 			}
 			else {
 				dico.createFamixThrownException(meth, excepFmx);
@@ -1135,7 +1205,8 @@ public class VerveineVisitor extends ASTVisitor {
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, /*owner*/owner, modifiers, /*persistIt*/!classSummary);
 				}
 				if (classSummary) {
-					dico.addFamixReference(findHighestType(sender), findHighestType(methOwner), null);
+					dico.addFamixReference(findHighestType(sender), findHighestType(methOwner), /*lastReference*/null);
+					//TODO add FileAnchor to Reference
 				}
 				else {
 					String signature = calledName + "(";
@@ -1151,6 +1222,7 @@ public class VerveineVisitor extends ASTVisitor {
 					}
 					signature += ")";
 					Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, signature, context.getLastInvocation());
+					//TODO add FileAnchor to Invocation
 					context.setLastInvocation( invok );
 				}
 			}
@@ -1209,8 +1281,10 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		// if classSummarise is true, we might need to create a reference from the class "owning" the variables to the class of the varTyp
 		if (classSummary && (! (varTyp instanceof PrimitiveType)) ) {
-			Reference ref = dico.addFamixReference(findHighestType(ctxt), findHighestType(varTyp), null);
-			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+			Reference ref = dico.addFamixReference(findHighestType(ctxt), findHighestType(varTyp), /*lastReference*/null);
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+			}
 		}
 
 		return ret;
@@ -1549,7 +1623,8 @@ public class VerveineVisitor extends ASTVisitor {
 			accessed =  dico.ensureFamixAttribute(bnd, name, typ, (eu.synectique.verveine.core.gen.famix.Type) owner, /*persistIt*/!classSummary);
 			if (classSummary) {
 				if (! (accessed.getDeclaredType() instanceof PrimitiveType)) {
-					dico.addFamixReference(findHighestType(accessed.getBelongsTo()), findHighestType(accessed.getDeclaredType()), null);
+					dico.addFamixReference(findHighestType(accessed.getBelongsTo()), findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
+					//TODO add FileAnchor to Reference
 				}
 			}
 
@@ -1584,10 +1659,12 @@ public class VerveineVisitor extends ASTVisitor {
 		// create local accesses?
 		if ( (accessed != null) && (accessor != null)) {
 			if (classSummary) {
-				dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), null);
+				dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
+				//TODO set FileAnchor to Reference
 			}
 			else if (accessed.getBelongsTo() != accessor) {
 				context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()) );
+				//TODO set FileAnchor to Access
 			}
 		}
 	}
@@ -1658,7 +1735,7 @@ public class VerveineVisitor extends ASTVisitor {
 	private eu.synectique.verveine.core.gen.famix.Type findHighestType (NamedEntity e) {
 		eu.synectique.verveine.core.gen.famix.Type ret = null;
 
-		while (! (e instanceof Namespace) ) {
+		while ( (! (e instanceof Namespace)) && (e != null) ) {
 			if (e instanceof ParameterizedType) {
 				e = ((ParameterizedType)e).getParameterizableClass();
 			}

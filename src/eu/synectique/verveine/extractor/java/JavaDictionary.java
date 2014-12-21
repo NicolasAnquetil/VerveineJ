@@ -19,16 +19,20 @@ import org.eclipse.jdt.core.dom.Modifier;
 
 import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.core.Dictionary;
+import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
+import eu.synectique.verveine.core.gen.famix.Association;
 import eu.synectique.verveine.core.gen.famix.Attribute;
+import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
 import eu.synectique.verveine.core.gen.famix.Comment;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.Enum;
 import eu.synectique.verveine.core.gen.famix.EnumValue;
 import eu.synectique.verveine.core.gen.famix.FileAnchor;
 import eu.synectique.verveine.core.gen.famix.Inheritance;
+import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.NamedEntity;
@@ -38,6 +42,7 @@ import eu.synectique.verveine.core.gen.famix.ParameterType;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import eu.synectique.verveine.core.gen.famix.PrimitiveType;
+import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.SourceAnchor;
 import eu.synectique.verveine.core.gen.famix.SourcedEntity;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
@@ -93,6 +98,27 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		super(famixRepo);
 	}
 
+	@Override
+	public Inheritance ensureFamixInheritance(Type sup, Type sub, Association prev) {
+		return super.ensureFamixInheritance(sup, sub, prev);
+	}
+
+	@Override
+	public Reference addFamixReference(ContainerEntity src, ContainerEntity tgt, Association prev) {
+		return super.addFamixReference(src, tgt, prev);
+	}
+
+	@Override
+	public Invocation addFamixInvocation(BehaviouralEntity sender, BehaviouralEntity invoked, NamedEntity receiver, String signature, Association prev) {
+		return super.addFamixInvocation( sender, invoked, receiver, signature, prev);
+	}
+
+	@Override
+	public Access addFamixAccess(BehaviouralEntity accessor, StructuralEntity var, boolean isWrite, Association prev) {
+		return super.addFamixAccess(accessor, var, isWrite, prev);
+	}
+
+	
 	/**
 	 * Returns a Famix Namespace associated with its IPackageBinding and/or name.
 	 * The Entity is created if it does not exist (see also {@link Dictionary#ensureFamixNamespace(Object, String)}).
@@ -346,6 +372,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				Inheritance lastInheritance = null;
 				for (Type sup : sups) {
 					lastInheritance = ensureFamixInheritance(sup, fmx, lastInheritance);
+					// TODO create FileAnchor for each inheritance link ???
 				}
 			}
 		}
