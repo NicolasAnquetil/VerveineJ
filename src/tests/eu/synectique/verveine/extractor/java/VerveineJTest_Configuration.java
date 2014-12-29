@@ -101,7 +101,7 @@ public class VerveineJTest_Configuration {
 		}
 		
 		// testing invocation
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "anonymous(IPrinter)");
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(clazz);
 		Method mth = clazz.getMethods().iterator().next();  // first (and sole) method
 		assertNotNull(mth);

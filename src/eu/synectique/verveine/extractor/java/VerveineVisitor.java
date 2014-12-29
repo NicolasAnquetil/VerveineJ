@@ -362,6 +362,7 @@ public class VerveineVisitor extends ASTVisitor {
 				methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
 				Invocation lastInvok = context.getLastInvocation();
 				if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+						&& (lastInvok != null)
 						&& (lastInvok.getSender() == context.topMethod())
 						&& (lastInvok.getReceiver() == null)
 						&& (lastInvok.getSignature().startsWith(typName)) ) {
@@ -724,6 +725,7 @@ public class VerveineVisitor extends ASTVisitor {
 		Invocation lastInvok = context.getLastInvocation();
 		if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 				// check that lastInvocation correspond to current one
+				&& (lastInvok != null)
 				&& (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver)
 				&& (lastInvok.getSignature().startsWith(calledName)) ) {
@@ -838,6 +840,7 @@ public class VerveineVisitor extends ASTVisitor {
 		Access lastAccess = context.getLastAccess();
 		if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 				// check that lastAccess corresponds to current one
+				&& (lastAccess != null)
 				&& (lastAccess.getAccessor() == accessor)
 				&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier())) ) {
 			dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
@@ -859,6 +862,7 @@ public class VerveineVisitor extends ASTVisitor {
 			Access lastAccess = context.getLastAccess();
 			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 					// check that lastAccess corresponds to current one
+					&& (lastAccess != null)
 					&& (lastAccess.getAccessor() == accessor)
 					&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier())) ) {
 				dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
@@ -1400,6 +1404,7 @@ public class VerveineVisitor extends ASTVisitor {
 			Access lastAccess = context.getLastAccess();
 			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 					// check that lastAccess corresponds to current one
+					&& (lastAccess != null)
 					&& (lastAccess.getAccessor() == accessor)
 					&& (lastAccess.getVariable().getName().equals(expr.getIdentifier())) ) {
 				dico.addSourceAnchor(lastAccess, expr, /*oneLineAnchor*/true);
@@ -1466,6 +1471,7 @@ public class VerveineVisitor extends ASTVisitor {
 			Access lastAccess = context.getLastAccess();
 			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 					// check that lastAccess corresponds to current one
+					&& (lastAccess != null)
 					&& (lastAccess.getVariable() == dico.getEntityByKey(bnd))
 					&& (lastAccess.getSourceAnchor() == null) ) {
 				dico.addSourceAnchor(lastAccess, expr, /*oneLineAnchor*/true);
