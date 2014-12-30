@@ -110,7 +110,6 @@ public class VerveineJParser extends VerveineParser {
 		for (File file : faFiles) {
 			if (file.getName().endsWith("jar")) {
 				tmpPath.add(file.getAbsolutePath());
-				System.out.println(file.getAbsolutePath());
 			}
 			if (file.isDirectory()) {
 				tmpPath.addAll(collectAllJars(file.getAbsolutePath()));
