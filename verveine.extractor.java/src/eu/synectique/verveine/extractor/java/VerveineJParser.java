@@ -239,6 +239,10 @@ public class VerveineJParser extends VerveineParser {
 //		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
 //		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
 		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\"");
+		System.err.println("      [-anchor (none|default|assoc)] options for source anchor information:\n" +
+				   "                                     - no entity\n" +
+				   "                                     - only named entities\n" +
+				   "                                     - named entities+associations (i.e. accesses, invocations, references)");
 		System.err.println("      [-cp CLASSPATH] classpath where to look for stubs");
 		System.err.println("      [-autocp DIR] gather all jars in DIR and put them in the classpath");
 		System.err.println("      [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] specifies version of Java");

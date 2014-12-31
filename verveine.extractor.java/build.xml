@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="verveine.extractor.java" default="build" basedir=".">
+<project name="verveine.extractor.java" default="jar" basedir=".">
 	<!-- Sets variables which can later be used. -->
 	<!-- The value of a property is accessed via ${} -->
 	<property name="src.dir"      location="src" />
@@ -43,8 +43,13 @@
 		<copy todir="${dist.dir}" file="${core.dir}/lib/verveine.core.jar"/>
 	</target>
 
-	<!-- Compiles the java code (including the usage of library for JUnit -->
-	<target name="compile" depends="clean, corejars">
+	<!-- Compiles the java code (including the usage of library for JUnit) -->
+	<target name="licencesrc" depends="corejars">
+		<exec executable="../utils/updateSrcKeyPos.sh" dir="${src.dir}" failonerror="true"/>
+	</target>
+
+	<!-- Update source for licence checking -->
+	<target name="compile" depends="clean, licencesrc">
 		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath" includeantruntime="false">
 		</javac>
 	</target>
@@ -67,15 +72,8 @@
 		/>
 	</target>
 
-	<!--Build the distribution  -->
-	<target name="build" depends="jar">
-	  <exec executable="/bin/bash">
-	  	<arg value="utils/buildKey.sh"/>
-	  </exec>
-	</target>
-
 	<!-- Run the JUnit Tests -->
-	<target name="junit" depends="build">
+	<target name="junit" depends="jar">
 		<junit printsummary="on" fork="true" haltonfailure="no">
 			<classpath>
 				<pathelement path="${build.dir}"/>

@@ -31,7 +31,6 @@ import eu.synectique.verveine.core.gen.famix.Comment;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.Enum;
 import eu.synectique.verveine.core.gen.famix.EnumValue;
-import eu.synectique.verveine.core.gen.famix.FileAnchor;
 import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Inheritance;
 import eu.synectique.verveine.core.gen.famix.Invocation;
