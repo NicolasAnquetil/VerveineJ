@@ -1,9 +1,7 @@
 package eu.synectique.licence;
 
 import java.io.BufferedReader;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -26,8 +24,6 @@ public class LicenceChecker {
 	private static final int IO_EXCEPT_ON_CLOSE = 106;
 
 	// our errors
-	private static final int POS_FILE_NOT_FOUND = 11;
-	private static final int WRONG_POS_FORMAT = 12;
 	private static final int OPENING_KEY_FILE = 13;
 	private static final int READING_KEY_FILE = 14;
 	private static final int READING_OLD_KEY = 15;
@@ -37,11 +33,11 @@ public class LicenceChecker {
 	public static final int WRONG_LICENCE = 107;
 
 	private static final String KEY_FILE = "famix.jar";
-	private static final String POS_FILE = "key";
+	private static final long KEY_POS = 87730;
 
 	private String line = null;
 	private String keyDir;  // where the key file is
-	private long keyPos;  // where the key is
+	//private long keyPos;  // where the key is
 	private String key;  // the key
 	private RandomAccessFile keyFile;  // the key file 
 
@@ -49,10 +45,7 @@ public class LicenceChecker {
 		int ret;
 		ret = setKeyDir();
 		if (ret != OK) { return(ret); }
-			
-		ret = setKeyPos();
-		if (ret != OK) { return(ret); }
-		
+
 		ret = openKeyFile();
 		if (ret != OK) { return(ret); }
 		
@@ -88,26 +81,6 @@ public class LicenceChecker {
 		return OK;
 	}
 
-	private int setKeyPos() {
-		int ret;
-		try {
-			ret = readLineInStream( new FileInputStream(keyDir + POS_FILE) );
-		} catch (FileNotFoundException e) {
-			return POS_FILE_NOT_FOUND;
-		}
-		
-		if (ret == OK) {
-			try {
-				keyPos = Long.parseLong(line);
-			}
-			catch (NumberFormatException e) {
-				return WRONG_POS_FORMAT;
-			}
-		}
-
-		return OK;
-	}
-
 	private int openKeyFile() {
 		try {
 			keyFile = new RandomAccessFile(keyDir + KEY_FILE, "rw");
@@ -122,7 +95,7 @@ public class LicenceChecker {
 		byte[] buffer = new byte[20];
 
 		try {
-			keyFile.seek(keyPos);
+			keyFile.seek(KEY_POS);
 			ret = keyFile.read(buffer);
 		} catch (IOException e1) {
 			return(READING_KEY_FILE);
@@ -187,7 +160,7 @@ public class LicenceChecker {
 
 	private int updateKey() {
 		try {
-			keyFile.setLength(keyPos);  // truncates and does a seek
+			keyFile.setLength(KEY_POS);  // truncates and does a seek
 			keyFile.write(key.getBytes());
 		} catch (IOException e1) {
 			return(WRITING_KEY_FILE);
