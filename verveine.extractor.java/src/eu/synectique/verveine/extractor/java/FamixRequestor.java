@@ -69,7 +69,7 @@ public class FamixRequestor extends FileASTRequestor {
 		}
 		catch (Exception e) {
 			System.err.println("*** VerveineJ visitor got exception: '"+e+"' while processing file: "+path);
-			//e.printStackTrace();  // for debugging
+			e.printStackTrace();  // for debugging
 		}
 	}
 
