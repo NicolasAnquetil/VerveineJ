@@ -730,16 +730,16 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertNotNull(xmle.getSourceAnchor());
 		assertEquals(IndexedFileAnchor.class, xmle.getSourceAnchor().getClass());
 		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((IndexedFileAnchor)xmle.getSourceAnchor()).getFileName());
-		assertEquals(61, ((IndexedFileAnchor)xmle.getSourceAnchor()).getStartPos());
-		assertEquals(175, ((IndexedFileAnchor)xmle.getSourceAnchor()).getEndPos());
+		assertEquals(62, ((IndexedFileAnchor)xmle.getSourceAnchor()).getStartPos());
+		assertEquals(176, ((IndexedFileAnchor)xmle.getSourceAnchor()).getEndPos());
 		
 		AnnotationTypeAttribute req = VerveineUtilsForTests.detectElement(repo, AnnotationTypeAttribute.class, "required");
 		assertNotNull(req);
 		assertNotNull(req.getSourceAnchor());
 		assertEquals(IndexedFileAnchor.class, req.getSourceAnchor().getClass());
 		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((IndexedFileAnchor)req.getSourceAnchor()).getFileName());
-		assertEquals(119, ((IndexedFileAnchor)req.getSourceAnchor()).getStartPos());
-		assertEquals(144, ((IndexedFileAnchor)req.getSourceAnchor()).getEndPos());
+		assertEquals(120, ((IndexedFileAnchor)req.getSourceAnchor()).getStartPos());
+		assertEquals(145, ((IndexedFileAnchor)req.getSourceAnchor()).getEndPos());
 
 	}
 

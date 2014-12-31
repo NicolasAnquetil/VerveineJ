@@ -539,8 +539,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(clazz, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
 		assertEquals("test_src/LANModel/moose/lan/server/PrintServer.java", ((IndexedFileAnchor)anc).getFileName());
-		assertEquals(234, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(527, ((IndexedFileAnchor)anc).getEndPos());
+		assertEquals(235, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(528, ((IndexedFileAnchor)anc).getEndPos());
 
 		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
@@ -550,8 +550,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(clazz, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
 		assertTrue("Wrong file source for class Node", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Node.java"));
-		assertEquals(63, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(1280, ((IndexedFileAnchor)anc).getEndPos());
+		assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(1281, ((IndexedFileAnchor)anc).getEndPos());
 		
 		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "equalsMultiple");
 		assertNotNull(meth);
@@ -561,8 +561,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(meth, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
 		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/SingleDestinationAddress.java"));
-		assertEquals(663, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(750, ((IndexedFileAnchor)anc).getEndPos());
+		assertEquals(664, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(751, ((IndexedFileAnchor)anc).getEndPos());
 		
 		Attribute att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "originator");
 		assertNotNull(meth);
@@ -572,8 +572,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(att, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
 		assertTrue("Wrong file source for field Packet.originator", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Packet.java"));
-		assertEquals(216, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(239, ((IndexedFileAnchor)anc).getEndPos());
+		assertEquals(217, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(240, ((IndexedFileAnchor)anc).getEndPos());
 		
 	}
 
@@ -624,16 +624,16 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Collection<Comment> cmts = clazz.getComments();
 		assertEquals(1, cmts.size());
 		SourceAnchor anc = cmts.iterator().next().getSourceAnchor();
-		assertEquals(63, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(119, ((IndexedFileAnchor)anc).getEndPos());
+		assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(120, ((IndexedFileAnchor)anc).getEndPos());
 
 		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "equalsSingle");
 		assertNotNull(meth);
 		cmts = meth.getComments();
 		assertEquals(1, cmts.size());
 		anc = cmts.iterator().next().getSourceAnchor();
-		assertEquals(532, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(587, ((IndexedFileAnchor)anc).getEndPos());
+		assertEquals(533, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(588, ((IndexedFileAnchor)anc).getEndPos());
 
 		// testing the non javadoc comments (those that are treated)
 		clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
@@ -643,7 +643,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		cmts = a.getComments();
 		assertEquals(1, cmts.size());
 		anc = (IndexedFileAnchor)cmts.iterator().next().getSourceAnchor();
-		assertEquals(163, ((IndexedFileAnchor)anc).getStartPos().intValue());
+		assertEquals(164, ((IndexedFileAnchor)anc).getStartPos().intValue());
 	}
 	
 	@Test
