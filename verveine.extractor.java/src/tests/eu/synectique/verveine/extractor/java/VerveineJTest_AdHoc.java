@@ -34,6 +34,7 @@ import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.DeclaredException;
 import eu.synectique.verveine.core.gen.famix.EnumValue;
 import eu.synectique.verveine.core.gen.famix.FileAnchor;
+import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
@@ -729,18 +730,18 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		AnnotationType xmle = VerveineUtilsForTests.detectElement(repo, AnnotationType.class, "XmlElement");
 		assertNotNull(xmle);
 		assertNotNull(xmle.getSourceAnchor());
-		assertEquals(FileAnchor.class, xmle.getSourceAnchor().getClass());
-		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((FileAnchor)xmle.getSourceAnchor()).getFileName());
-		assertEquals(5, ((FileAnchor)xmle.getSourceAnchor()).getStartLine());
-		assertEquals(13, ((FileAnchor)xmle.getSourceAnchor()).getEndLine());
+		assertEquals(IndexedFileAnchor.class, xmle.getSourceAnchor().getClass());
+		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((IndexedFileAnchor)xmle.getSourceAnchor()).getFileName());
+		assertEquals(61, ((IndexedFileAnchor)xmle.getSourceAnchor()).getStartPos());
+		assertEquals(175, ((IndexedFileAnchor)xmle.getSourceAnchor()).getEndPos());
 		
 		AnnotationTypeAttribute req = VerveineUtilsForTests.detectElement(repo, AnnotationTypeAttribute.class, "required");
 		assertNotNull(req);
 		assertNotNull(req.getSourceAnchor());
-		assertEquals(FileAnchor.class, req.getSourceAnchor().getClass());
-		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((FileAnchor)req.getSourceAnchor()).getFileName());
-		assertEquals(9, ((FileAnchor)req.getSourceAnchor()).getStartLine());
-		assertEquals(9, ((FileAnchor)req.getSourceAnchor()).getEndLine());
+		assertEquals(IndexedFileAnchor.class, req.getSourceAnchor().getClass());
+		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((IndexedFileAnchor)req.getSourceAnchor()).getFileName());
+		assertEquals(119, ((IndexedFileAnchor)req.getSourceAnchor()).getStartPos());
+		assertEquals(144, ((IndexedFileAnchor)req.getSourceAnchor()).getEndPos());
 
 	}
 

@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.dom.Modifier;
 
 import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.core.Dictionary;
+import eu.synectique.verveine.core.gen.famix.AbstractFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
@@ -31,6 +32,7 @@ import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.Enum;
 import eu.synectique.verveine.core.gen.famix.EnumValue;
 import eu.synectique.verveine.core.gen.famix.FileAnchor;
+import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Inheritance;
 import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
@@ -1795,7 +1797,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null) 
 	 */
 	public SourceAnchor addSourceAnchor(SourcedEntity fmx, ASTNode ast, boolean oneLineAnchor) {
-		FileAnchor fa = null;
+		AbstractFileAnchor fa = null;
 
 		if ( (fmx != null) && (ast != null) ) {
 			// position in source file
@@ -1810,22 +1812,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			else {
 				ast = ast.getRoot();
 			}
-			/*while ( ! (ast instanceof CompilationUnit) ) {
-				ASTNode tmp = ast.getParent();
-				if ( (ast == null) || (tmp == ast) ) {
-					// if we are here, then we reached the top node without finding a CompilationUnit. This should not happen
-					return null;
-				}
-				else {
-					ast = tmp;
-				}
-			}*/
 
 			// now create the Famix SourceAnchor
+			/* old FAMIXSourceAnchor
 			fa = new FileAnchor();
+			((FileAnchor)fa).setStartLine(((CompilationUnit)ast).getLineNumber(beg)); // when oneLineAnchor is true and we are in a comment, should we go to the end of it?
+			((FileAnchor)fa).setEndLine( oneLineAnchor ? ((FileAnchor)fa).getStartLine() : ((CompilationUnit)ast).getLineNumber(end) );
+			*/
+
+			/* new FAMIXIndexedFileAnchor */
+			fa = new IndexedFileAnchor();
+			((IndexedFileAnchor)fa).setStartPos(beg);
+			((IndexedFileAnchor)fa).setEndPos(end);
+
 			fa.setFileName((String) ((CompilationUnit)ast).getProperty(SOURCE_FILENAME_PROPERTY));
-			fa.setStartLine(((CompilationUnit)ast).getLineNumber(beg)); // when oneLineAnchor is true and we are in a comment, should we go to the end of it?
-			fa.setEndLine( oneLineAnchor ? fa.getStartLine() : ((CompilationUnit)ast).getLineNumber(end) );
 			fmx.setSourceAnchor(fa);
 			famixRepo.add(fa);
 		}
