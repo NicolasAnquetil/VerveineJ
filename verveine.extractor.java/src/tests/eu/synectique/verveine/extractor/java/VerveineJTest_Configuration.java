@@ -95,8 +95,8 @@ public class VerveineJTest_Configuration {
 			assertEquals(IndexedFileAnchor.class, anc.getClass());
 			int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
 			int ep = (Integer) ((IndexedFileAnchor)anc).getEndPos();
-			assertTrue("wrong statPos for Access: " + sp, (sp == 557) || (sp == 944) );
-			assertTrue("wrong endPos for Access: " + ep, (ep == 568) || (ep == 955) );
+			assertTrue("wrong statPos for Access: " + sp, (sp == 558) || (sp == 945) );
+			assertTrue("wrong endPos for Access: " + ep, (ep == 569) || (ep == 956) );
 		}
 		
 		// testing invocation
@@ -110,8 +110,8 @@ public class VerveineJTest_Configuration {
 		anc = invok.getSourceAnchor(); 
 		assertNotNull(anc);
 		assertEquals(IndexedFileAnchor.class, anc.getClass());
-		assertEquals((Integer)944,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals((Integer)1025, (Integer) ((IndexedFileAnchor)anc).getEndPos());	
+		assertEquals((Integer)945,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals((Integer)1026, (Integer) ((IndexedFileAnchor)anc).getEndPos());	
 	}
 
 }

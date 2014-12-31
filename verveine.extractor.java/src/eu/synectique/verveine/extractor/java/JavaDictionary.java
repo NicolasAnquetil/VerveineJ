@@ -1800,7 +1800,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		if ( (fmx != null) && (ast != null) ) {
 			// position in source file
-			int beg = ast.getStartPosition();
+			int beg = ast.getStartPosition()+1; // Java starts at 0, Moose at 1
 			int end = beg + ast.getLength()-1;
 
 			// find source Compilation Unit
