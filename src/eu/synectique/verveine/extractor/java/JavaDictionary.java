@@ -1906,12 +1906,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx.setContainer( ensureFamixNamespaceDefault());
 			
 			// may be not needed anymore now that we use modifiers
-			fmx.setIsAbstract(Boolean.FALSE);
+			/*fmx.setIsAbstract(Boolean.FALSE);
 			fmx.setIsFinal(Boolean.FALSE);
 			fmx.setIsInterface(Boolean.FALSE);
 			fmx.setIsPrivate(Boolean.FALSE);
-			fmx.setIsProtected(Boolean.FALSE);
-			fmx.setIsPublic(Boolean.TRUE);
+			fmx.setIsProtected(Boolean.FALSE);*/
+			fmx.addModifiers("public");
 		}
 
 		return fmx;
