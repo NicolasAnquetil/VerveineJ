@@ -16,6 +16,7 @@ import eu.synectique.verveine.extractor.java.VerveineJParser;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.FileAnchor;
+import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
@@ -93,11 +94,11 @@ public class VerveineJTest_Configuration {
 		for (Access acc : prtr.getIncomingAccesses()) {
 			anc = acc.getSourceAnchor(); 
 			assertNotNull(anc);
-			assertEquals(FileAnchor.class, anc.getClass());
-			int sl = (Integer) ((FileAnchor)anc).getStartLine();
-			int el = (Integer) ((FileAnchor)anc).getEndLine();
-			assertTrue( (sl == 34) || (sl == 52) );
-			assertTrue(sl == el);
+			assertEquals(IndexedFileAnchor.class, anc.getClass());
+			int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
+			int ep = (Integer) ((IndexedFileAnchor)anc).getEndPos();
+			assertTrue("wrong statPos for Access: " + sp, (sp == 557) || (sp == 944) );
+			assertTrue("wrong endPos for Access: " + ep, (ep == 568) || (ep == 955) );
 		}
 		
 		// testing invocation
@@ -110,9 +111,9 @@ public class VerveineJTest_Configuration {
 		Invocation invok = mth.getIncomingInvocations().iterator().next();
 		anc = invok.getSourceAnchor(); 
 		assertNotNull(anc);
-		assertEquals(FileAnchor.class, anc.getClass());
-		assertEquals((Integer)52, (Integer) ((FileAnchor)anc).getStartLine());
-		assertEquals((Integer)52, (Integer) ((FileAnchor)anc).getEndLine());	
+		assertEquals(IndexedFileAnchor.class, anc.getClass());
+		assertEquals((Integer)944,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals((Integer)1025, (Integer) ((IndexedFileAnchor)anc).getEndPos());	
 	}
 
 }

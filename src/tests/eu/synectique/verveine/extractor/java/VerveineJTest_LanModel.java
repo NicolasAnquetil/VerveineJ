@@ -29,6 +29,7 @@ import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
 import eu.synectique.verveine.core.gen.famix.Comment;
 import eu.synectique.verveine.core.gen.famix.FileAnchor;
 import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
+import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Inheritance;
 import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
@@ -537,10 +538,10 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		anc = clazz.getSourceAnchor();
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
-		assertSame(FileAnchor.class, anc.getClass());
-		assertEquals("test_src/LANModel/moose/lan/server/PrintServer.java", ((FileAnchor)anc).getFileName());
-		assertEquals(17, ((FileAnchor)anc).getStartLine());
-		assertEquals(31, ((FileAnchor)anc).getEndLine());
+		assertSame(IndexedFileAnchor.class, anc.getClass());
+		assertEquals("test_src/LANModel/moose/lan/server/PrintServer.java", ((IndexedFileAnchor)anc).getFileName());
+		assertEquals(234, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(527, ((IndexedFileAnchor)anc).getEndPos());
 
 		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
@@ -548,10 +549,10 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		anc = clazz.getSourceAnchor();
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
-		assertSame(FileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for class Node", ((FileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Node.java"));
-		assertEquals(6, ((FileAnchor)anc).getStartLine());
-		assertEquals(70, ((FileAnchor)anc).getEndLine());
+		assertSame(IndexedFileAnchor.class, anc.getClass());
+		assertTrue("Wrong file source for class Node", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Node.java"));
+		assertEquals(63, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(1280, ((IndexedFileAnchor)anc).getEndPos());
 		
 		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "equalsMultiple");
 		assertNotNull(meth);
@@ -559,10 +560,10 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		anc = meth.getSourceAnchor();
 		assertNotNull(anc);
 		assertSame(meth, anc.getElement());
-		assertSame(FileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((FileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/SingleDestinationAddress.java"));
-		assertEquals(39, ((FileAnchor)anc).getStartLine());
-		assertEquals(41, ((FileAnchor)anc).getEndLine());
+		assertSame(IndexedFileAnchor.class, anc.getClass());
+		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/SingleDestinationAddress.java"));
+		assertEquals(663, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(750, ((IndexedFileAnchor)anc).getEndPos());
 		
 		Attribute att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "originator");
 		assertNotNull(meth);
@@ -570,10 +571,10 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		anc = att.getSourceAnchor();
 		assertNotNull(anc);
 		assertSame(att, anc.getElement());
-		assertSame(FileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for field Packet.originator", ((FileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Packet.java"));
-		assertEquals(15, ((FileAnchor)anc).getStartLine());
-		assertEquals(15, ((FileAnchor)anc).getEndLine());
+		assertSame(IndexedFileAnchor.class, anc.getClass());
+		assertTrue("Wrong file source for field Packet.originator", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Packet.java"));
+		assertEquals(216, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(239, ((IndexedFileAnchor)anc).getEndPos());
 		
 	}
 
@@ -624,40 +625,26 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Collection<Comment> cmts = clazz.getComments();
 		assertEquals(1, cmts.size());
 		SourceAnchor anc = cmts.iterator().next().getSourceAnchor();
-		assertEquals(6, ((FileAnchor)anc).getStartLine());
-		assertEquals(10, ((FileAnchor)anc).getEndLine());
+		assertEquals(63, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(119, ((IndexedFileAnchor)anc).getEndPos());
 
 		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "equalsSingle");
 		assertNotNull(meth);
 		cmts = meth.getComments();
 		assertEquals(1, cmts.size());
 		anc = cmts.iterator().next().getSourceAnchor();
-		assertEquals(31, ((FileAnchor)anc).getStartLine());
-		assertEquals(34, ((FileAnchor)anc).getEndLine());
+		assertEquals(532, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(587, ((IndexedFileAnchor)anc).getEndPos());
 
 		// testing the non javadoc comments (those that are treated)
 		clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
 		assertNotNull(clazz);
-		for (Method m : clazz.getMethods()) {
-			anc = m.getSourceAnchor();
-			cmts = m.getComments();
-			if (m.getName().equals("canOriginate")) {
-				assertEquals(0, cmts.size());
-			}
-			else {
-				assertEquals(1, cmts.size());
-				assertEquals("for method: WorkStation." + m.getName(),
-							 ((FileAnchor)anc).getStartLine().intValue() - 1,
-							 ((FileAnchor)cmts.iterator().next().getSourceAnchor()).getEndLine().intValue());
-			}
-		}
-
 		Attribute a = clazz.getAttributes().iterator().next();
 		assertEquals("type", a.getName());
 		cmts = a.getComments();
 		assertEquals(1, cmts.size());
-		anc = (FileAnchor)cmts.iterator().next().getSourceAnchor();
-		assertEquals(13, ((FileAnchor)anc).getStartLine().intValue());
+		anc = (IndexedFileAnchor)cmts.iterator().next().getSourceAnchor();
+		assertEquals(163, ((IndexedFileAnchor)anc).getStartPos().intValue());
 	}
 	
 	@Test
