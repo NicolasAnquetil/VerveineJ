@@ -55,7 +55,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 	@Test
 	public void testAnnotation() {
-		AnnotationType sessionAnn = VerveineUtilsForTests.detectElement(repo,AnnotationType.class, "Session");
+		AnnotationType sessionAnn = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "Session");
 		assertNotNull(sessionAnn);
 		assertTrue(sessionAnn.getIsStub());
 		assertEquals(3, sessionAnn.getInstances().size());
@@ -67,9 +67,9 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		}
 
 		// Class annotation
-		Namespace defPckg = VerveineUtilsForTests.detectElement(repo,Namespace.class, JavaDictionary.DEFAULT_PCKG_NAME);
+		Namespace defPckg = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, JavaDictionary.DEFAULT_PCKG_NAME);
 		assertNotNull(defPckg);
-		eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SimpleBean");
+		eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SimpleBean");
 		assertNotNull(cl);
 		assertEquals(4, cl.getAnnotationInstances().size());
 		for (AnnotationInstance ai :cl.getAnnotationInstances() ) {
@@ -85,7 +85,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		}
 
 		// Method annotations
-		Method rep = VerveineUtilsForTests.detectElement(repo,Method.class, "orderResponse");
+		Method rep = VerveineUtilsForTests.detectFamixElement(repo,Method.class, "orderResponse");
 		assertNotNull(rep);
 		Collection<AnnotationInstance> annInstances = rep.getAnnotationInstances();
 		assertEquals(1, annInstances.size());
