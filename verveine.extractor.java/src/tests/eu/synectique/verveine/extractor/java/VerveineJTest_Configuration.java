@@ -86,7 +86,7 @@ public class VerveineJTest_Configuration {
 
 		SourceAnchor anc;
 		// testing accesses
-		Attribute prtr = VerveineUtilsForTests.detectElement(repo, Attribute.class, "printer");
+		Attribute prtr = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "printer");
 		assertNotNull(prtr);
 		assertEquals(2, prtr.getIncomingAccesses().size());
 		for (Access acc : prtr.getIncomingAccesses()) {
@@ -100,7 +100,7 @@ public class VerveineJTest_Configuration {
 		}
 		
 		// testing invocation
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(clazz);
 		Method mth = clazz.getMethods().iterator().next();  // first (and sole) method
 		assertNotNull(mth);

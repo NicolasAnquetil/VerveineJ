@@ -123,36 +123,36 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testClassProperties() {
-		eu.synectique.verveine.core.gen.famix.Class nodeClass = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		eu.synectique.verveine.core.gen.famix.Class nodeClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(nodeClass);
 		assertEquals("Node", nodeClass.getName());
 		assertEquals(11, nodeClass.getMethods().size());
 		assertEquals(2, nodeClass.getAttributes().size());
-		assertSame(VerveineUtilsForTests.detectElement(repo, Namespace.class, "lan"), nodeClass.getContainer());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "lan"), nodeClass.getContainer());
 		assertFalse(nodeClass.getIsInterface());
 		
-		eu.synectique.verveine.core.gen.famix.Class interfce = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+		eu.synectique.verveine.core.gen.famix.Class interfce = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(interfce);
 		assertEquals("IPrinter", interfce.getName());
 		assertEquals(1, interfce.getMethods().size());
 		assertEquals(0, interfce.getAttributes().size());
-		assertSame(VerveineUtilsForTests.detectElement(repo, Namespace.class, "server"), interfce.getContainer());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "server"), interfce.getContainer());
 		assertTrue(interfce.getIsInterface());
 
-		eu.synectique.verveine.core.gen.famix.Class innerClass = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
+		eu.synectique.verveine.core.gen.famix.Class innerClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(innerClass);
 		assertEquals("XPrinter", innerClass.getName());
 		assertEquals(2, innerClass.getMethods().size());
 		assertEquals(1, innerClass.getAttributes().size());
-		assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer"), innerClass.getContainer());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer"), innerClass.getContainer());
 		assertFalse(innerClass.getIsInterface());
 
-		eu.synectique.verveine.core.gen.famix.Class anonClass = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "anonymous(IPrinter)");
+		eu.synectique.verveine.core.gen.famix.Class anonClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "anonymous(IPrinter)");
 		assertNotNull(anonClass);
 		assertEquals("anonymous(IPrinter)", anonClass.getName());
 		assertEquals(1, anonClass.getMethods().size());
 		assertEquals(0, anonClass.getAttributes().size());
-		assertSame(VerveineUtilsForTests.detectElement(repo,Method.class, "PrintServer"), anonClass.getContainer());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,Method.class, "PrintServer"), anonClass.getContainer());
 		assertFalse(anonClass.getIsInterface());
 	}
 
@@ -183,23 +183,23 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Collection<Inheritance> superInheritances;
 		Inheritance inh, inh2 = null;
 		
-		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(1, superInheritances.size());
 		inh = superInheritances.iterator().next();
 		assertSame(clazz, inh.getSubclass());
-		assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
 
-		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(1, superInheritances.size());
 		inh = superInheritances.iterator().next();
 		assertSame(clazz, inh.getSubclass());
-		assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 		
-		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(2, superInheritances.size()); // superInheritances: Object and IPrinter (in this order)
@@ -209,12 +209,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				inh2 = inheritance;
 				assertNull(inheritance.getNext());
 				assertSame(inheritance,inheritance.getPrevious().getNext());
-				assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
+				assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
 			} else {
 				inh = inheritance;
 				assertNull(inheritance.getPrevious());
 				assertSame(inheritance,inheritance.getNext().getPrevious());
-				assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
+				assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
 			}
 		}
 		assertSame(inh.getNext(), inh2);
@@ -223,21 +223,21 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testMethodProperties() {
-		Method mweb = VerveineUtilsForTests.detectElement(repo,Method.class, "methodWithEmptyBody");
+		Method mweb = VerveineUtilsForTests.detectFamixElement(repo,Method.class, "methodWithEmptyBody");
 		assertNotNull(mweb);
 		assertEquals("methodWithEmptyBody", mweb.getName());
 		assertEquals("methodWithEmptyBody()", mweb.getSignature());
-		assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node"), mweb.getParentType());
-		assertSame(VerveineUtilsForTests.detectElement(repo,PrimitiveType.class, "void"), mweb.getDeclaredType());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node"), mweb.getParentType());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,PrimitiveType.class, "void"), mweb.getDeclaredType());
 
-		Method em = VerveineUtilsForTests.detectElement(repo,Method.class, "equalsMultiple");
+		Method em = VerveineUtilsForTests.detectFamixElement(repo,Method.class, "equalsMultiple");
 		assertNotNull(em);
 		assertEquals("equalsMultiple", em.getName());
 		assertEquals("equalsMultiple(AbstractDestinationAddress)", em.getSignature());
-		assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress"), em.getParentType());
-		assertSame(VerveineUtilsForTests.detectElement(repo,PrimitiveType.class, "boolean"), em.getDeclaredType());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress"), em.getParentType());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,PrimitiveType.class, "boolean"), em.getDeclaredType());
 
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "FileServer");
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "FileServer");
 		assertNotNull(clazz);
 		Method n = null;
 		for (Method m : clazz.getMethods()) {
@@ -249,8 +249,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(n);
 		assertEquals("name", n.getName());
 		assertEquals("name()", n.getSignature());
-		assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "FileServer"), n.getParentType());
-		assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String"), n.getDeclaredType());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "FileServer"), n.getParentType());
+		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String"), n.getDeclaredType());
 		
 		//constructors
 		for (Method m : VerveineUtilsForTests.selectElementsOfType(repo, Method.class)) {
@@ -266,7 +266,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testFieldType() {
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		Collection<Attribute> l_atts = clazz.getAttributes();
 		assertEquals(2, l_atts.size());
@@ -277,7 +277,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			}
 			else if (a.getName().equals("name")) {
 				assertSame(clazz, a.getParentType());
-				assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String"), a.getDeclaredType());
+				assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String"), a.getDeclaredType());
 			}
 		}
 	}
@@ -286,26 +286,26 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testStubs() {
 		int nbTypes = (System.getProperty("java.version").startsWith("1.7")) ? 10 : 9;
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
-		Namespace ns = VerveineUtilsForTests.detectElement(repo,Namespace.class, javaLangName);
+		Namespace ns = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
 		assertEquals(nbTypes, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence, +(java7)AutoCloseable
 		assertTrue(ns.getIsStub());
 
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(clazz);
 		assertTrue(clazz.getIsStub());
 		assertSame(ns, clazz.getContainer());
 		
-		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String");
 		assertNotNull(clazz);
 		assertTrue(clazz.getIsStub());
 		assertSame(ns, clazz.getContainer());
 		
-		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsStub());
 		
-		Method mth = VerveineUtilsForTests.detectElement(repo, Method.class, "<Initializer>");
+		Method mth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "<Initializer>");
 		assertNotNull(mth);
 		assertFalse(mth.getIsStub());
 		/* [].length not used in the default test case 
@@ -318,7 +318,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testParameter() {
-		eu.synectique.verveine.core.gen.famix.Class nodeClass = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		eu.synectique.verveine.core.gen.famix.Class nodeClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(nodeClass);
 		for (Method mNode : nodeClass.getMethods()) {
 			if ( (mNode.getName().equals("Node")) ||
@@ -337,7 +337,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				assertEquals("Wrong number of parameter for method Node."+mNode.getName()+"()", 1, mNode.getParameters().size());
 			}
 		}
-		eu.synectique.verveine.core.gen.famix.Class iprintClass = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+		eu.synectique.verveine.core.gen.famix.Class iprintClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(iprintClass);
 		Method mPrint = iprintClass.getMethods().iterator().next();
 		assertEquals(2, mPrint.getParameters().size());
@@ -345,10 +345,10 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			assertSame(mPrint, p.getParentBehaviouralEntity());
 			assertTrue(p.getName().equals("contents") || p.getName().equals("rv"));
 			if (p.getName().equals("contents")) {
-				assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String"), p.getDeclaredType());
+				assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String"), p.getDeclaredType());
 			}
 			if (p.getName().equals("rv")) {
-				assertSame(VerveineUtilsForTests.detectElement(repo,PrimitiveType.class, "boolean"), p.getDeclaredType());
+				assertSame(VerveineUtilsForTests.detectFamixElement(repo,PrimitiveType.class, "boolean"), p.getDeclaredType());
 			}
 		}
 	}
@@ -356,7 +356,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testImplicitVar() {
 		boolean testRan = false;
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
 		for (Method m : clazz.getMethods()) {
 			if (m.getName().equals("isDestinationFor" )) {
@@ -372,7 +372,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertTrue("Test for SELF did not run, cause: SingleDestinationAddress.isDestinationFor() method not found", testRan);
 
 		testRan = false;
-		clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
 		assertNotNull(clazz);
 		for (Method m : clazz.getMethods()) {
 			if (m.getName().equals("name" )) {
@@ -391,7 +391,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testInvocation() {
-		eu.synectique.verveine.core.gen.famix.Class nodeClass = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		eu.synectique.verveine.core.gen.famix.Class nodeClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(nodeClass);
 		for (Method mNode : nodeClass.getMethods()) {
 			if ( (mNode.getName().equals("name")) ||
@@ -413,7 +413,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			}
 		}
 		
-		eu.synectique.verveine.core.gen.famix.Class sdaClass = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		eu.synectique.verveine.core.gen.famix.Class sdaClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(sdaClass);
 		for (Method mSDA : sdaClass.getMethods()) {
 			for (Invocation inv : mSDA.getOutgoingInvocations()) {
@@ -426,17 +426,17 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				if (invoked.getSignature().equals("equalsSingle (String)")) {
 					assertSame(sdaClass, ((Method)inv.getSender()).getParentType());
 					assertEquals("self", inv.getReceiver().getName());
-					assertSame(VerveineUtilsForTests.detectElement(repo,Method.class, "equalsSingle"), inv.getCandidates().iterator().next());
+					assertSame(VerveineUtilsForTests.detectFamixElement(repo,Method.class, "equalsSingle"), inv.getCandidates().iterator().next());
 				}
 				else if (invoked.getSignature().equals("id ()")) {
-					assertSame(VerveineUtilsForTests.detectElement(repo,Method.class, "equalsSingle"), inv.getSender());
+					assertSame(VerveineUtilsForTests.detectFamixElement(repo,Method.class, "equalsSingle"), inv.getSender());
 					assertEquals("self", inv.getReceiver().getName());
 					assertSame(sdaClass, ((Method)inv.getCandidates().iterator().next()).getParentType());
 				}
 				else if (invoked.getSignature().equals("equals (Object)")) {
-					assertSame(VerveineUtilsForTests.detectElement(repo,Method.class, "equalsSingle"), inv.getSender());
+					assertSame(VerveineUtilsForTests.detectFamixElement(repo,Method.class, "equalsSingle"), inv.getSender());
 					assertEquals(null, inv.getReceiver());
-					assertSame(VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String"), ((Method)inv.getCandidates().iterator().next()).getParentType());
+					assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String"), ((Method)inv.getCandidates().iterator().next()).getParentType());
 				}
 			}
 		}
@@ -471,7 +471,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Access acces;
 		BehaviouralEntity accessor;
 		
-		att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "name");
+		att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "name");
 		assertNotNull(att);
 		assertEquals(2, att.getIncomingAccesses().size());
 		for (Access acc : att.getIncomingAccesses()) {
@@ -495,7 +495,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			}
 		}
 
-		att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "serverType");
+		att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "serverType");
 		assertNotNull(att);
 		assertEquals(1, att.getIncomingAccesses().size());
 		acces = att.getIncomingAccesses().iterator().next();
@@ -510,7 +510,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		// finds method PrintServer.output()
 		Method output = null;
-		for (Method m : VerveineUtilsForTests.listElements(repo, Method.class, "output")) {
+		for (Method m : VerveineUtilsForTests.listFamixElements(repo, Method.class, "output")) {
 			if (m.getParentType().getName().equals("PrintServer")) {
 				output = m;
 				break;
@@ -531,7 +531,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testSourceAnchors() {
 		SourceAnchor anc = null;
 		
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
 
 		anc = clazz.getSourceAnchor();
@@ -542,7 +542,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(235, ((IndexedFileAnchor)anc).getStartPos());
 		assertEquals(528, ((IndexedFileAnchor)anc).getEndPos());
 
-		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
 
 		anc = clazz.getSourceAnchor();
@@ -553,7 +553,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
 		assertEquals(1281, ((IndexedFileAnchor)anc).getEndPos());
 		
-		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "equalsMultiple");
+		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "equalsMultiple");
 		assertNotNull(meth);
 
 		anc = meth.getSourceAnchor();
@@ -564,7 +564,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(664, ((IndexedFileAnchor)anc).getStartPos());
 		assertEquals(751, ((IndexedFileAnchor)anc).getEndPos());
 		
-		Attribute att = VerveineUtilsForTests.detectElement(repo, Attribute.class, "originator");
+		Attribute att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "originator");
 		assertNotNull(meth);
 
 		anc = att.getSourceAnchor();
@@ -579,7 +579,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testModifiers() {
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer");
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsInterface());
 		assertTrue(clazz.getIsAbstract());
@@ -619,7 +619,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testComment() {
 		// testing javadoc
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
 		Collection<Comment> cmts = clazz.getComments();
 		assertEquals(1, cmts.size());
@@ -627,7 +627,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
 		assertEquals(120, ((IndexedFileAnchor)anc).getEndPos());
 
-		Method meth = VerveineUtilsForTests.detectElement(repo, Method.class, "equalsSingle");
+		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "equalsSingle");
 		assertNotNull(meth);
 		cmts = meth.getComments();
 		assertEquals(1, cmts.size());
@@ -636,7 +636,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(588, ((IndexedFileAnchor)anc).getEndPos());
 
 		// testing the non javadoc comments (those that are treated)
-		clazz = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
 		assertNotNull(clazz);
 		Attribute a = clazz.getAttributes().iterator().next();
 		assertEquals("type", a.getName());
@@ -648,7 +648,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	
 	@Test
 	public void testMetric() {
-		for (Method m : VerveineUtilsForTests.listElements(repo, Method.class, "accept")) {
+		for (Method m : VerveineUtilsForTests.listFamixElements(repo, Method.class, "accept")) {
 			assertNotNull(m);
 			eu.synectique.verveine.core.gen.famix.Class owner = (eu.synectique.verveine.core.gen.famix.Class) m.getParentType();
 			assertNotNull(owner);
@@ -672,11 +672,11 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		eu.synectique.verveine.core.gen.famix.Class clazz;
 		Collection<AnnotationInstance> annInstances;
 		
-		AnnotationType annType = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.AnnotationType.class, "Override");
+		AnnotationType annType = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.AnnotationType.class, "Override");
 		assertNotNull(annType);
 		assertEquals("Override", annType.getName());
 		
-		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
 		for (Method method : clazz.getMethods()) {
 			annInstances = method.getAnnotationInstances();
@@ -690,7 +690,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				assertEquals(0, annInstances.size());
 			}
 		}
-		clazz = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
 		assertEquals(5, clazz.getMethods().size());
 		for (Method method : clazz.getMethods()) {

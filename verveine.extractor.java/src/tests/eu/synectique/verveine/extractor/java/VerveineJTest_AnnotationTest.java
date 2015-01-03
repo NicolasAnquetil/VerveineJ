@@ -45,7 +45,7 @@ public class VerveineJTest_AnnotationTest {
 
 	@Test
 	public void testAnnotationInstanceAttribute() {
-		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnnotatedClass");
+		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnnotatedClass");
 		assertNotNull(clss);
 
 		assertEquals(1, clss.getAnnotationInstances().size());
@@ -65,7 +65,7 @@ public class VerveineJTest_AnnotationTest {
 
 	@Test
 	public void testAnnotationInstanceArrayOfOne() {
-		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AThirdAnnotatedClass");
+		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AThirdAnnotatedClass");
 		assertNotNull(clss);
 
 		assertEquals(1, clss.getAnnotationInstances().size());
@@ -85,7 +85,7 @@ public class VerveineJTest_AnnotationTest {
 
 	@Test
 	public void testAnnotationInstanceArray() {
-		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnotherAnnotatedClass");
+		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnotherAnnotatedClass");
 		assertNotNull(clss);
 
 		assertEquals(1, clss.getAnnotationInstances().size());

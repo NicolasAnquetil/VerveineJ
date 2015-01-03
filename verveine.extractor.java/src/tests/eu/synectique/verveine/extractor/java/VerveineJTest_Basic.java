@@ -99,39 +99,39 @@ public abstract class VerveineJTest_Basic {
 	public void testJavaCore() {
 		
 		// namespaces
-		Namespace java = VerveineUtilsForTests.detectElement(repo,Namespace.class, "java");
+		Namespace java = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "java");
 		assertNotNull(java);
 
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
-		Namespace javaLang = VerveineUtilsForTests.detectElement(repo,Namespace.class, javaLangName);
+		Namespace javaLang = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, javaLangName);
 		assertNotNull(javaLang);
 		assertEquals(java, javaLang.getBelongsTo());
 		 // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence
 
-		Namespace javaIO = VerveineUtilsForTests.detectElement(repo,Namespace.class, "io");
+		Namespace javaIO = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "io");
 		assertNotNull(javaIO);
 		assertEquals(java, javaIO.getBelongsTo());
 
 		// Object
-		eu.synectique.verveine.core.gen.famix.Class obj = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
+		eu.synectique.verveine.core.gen.famix.Class obj = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(obj);
 		assertSame(javaLang, obj.getContainer());
 		assertEquals(0, obj.getSuperInheritances().size());
 
 		// String
-		eu.synectique.verveine.core.gen.famix.Class charSeq = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "CharSequence");
+		eu.synectique.verveine.core.gen.famix.Class charSeq = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "CharSequence");
 		assertNotNull(charSeq);
 		assertSame(javaLang, charSeq.getContainer());
 		assertTrue(charSeq.getIsInterface());
 		assertEquals(0, charSeq.getSuperInheritances().size());
 
-		eu.synectique.verveine.core.gen.famix.Class serial = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Serializable");
+		eu.synectique.verveine.core.gen.famix.Class serial = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Serializable");
 		assertNotNull(serial);
 		assertSame(javaIO, serial.getContainer());
 		assertTrue(serial.getIsInterface());
 		assertEquals(0, serial.getSuperInheritances().size());
 
-		eu.synectique.verveine.core.gen.famix.Class str = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String");
+		eu.synectique.verveine.core.gen.famix.Class str = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String");
 		assertNotNull(str);
 		assertSame(javaLang, str.getContainer());
 		assertEquals(4, str.getSuperInheritances().size());
@@ -145,7 +145,7 @@ public abstract class VerveineJTest_Basic {
 
 		// System
 		if (this.testSystem) {
-			eu.synectique.verveine.core.gen.famix.Class syst = VerveineUtilsForTests.detectElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "System");
+			eu.synectique.verveine.core.gen.famix.Class syst = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "System");
 			assertNotNull(syst);
 			assertSame(javaLang, syst.getContainer());
 			assertEquals(1, syst.getSuperInheritances().size());
@@ -177,31 +177,31 @@ public abstract class VerveineJTest_Basic {
 	 */
 	@Test
 	public void testPrimitiveTypes() {
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "byte")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "byte")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "short")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "short")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "int")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "int")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "long")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "long")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "float")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "float")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "double")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "double")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "boolean")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "boolean")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "char")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "char")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
-		for (NamedEntity t : VerveineUtilsForTests.listElements(repo, "void")) {
+		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "void")) {
 			assertEquals(PrimitiveType.class, t.getClass());
 		}
 	}
