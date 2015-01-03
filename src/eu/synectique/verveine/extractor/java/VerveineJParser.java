@@ -85,7 +85,7 @@ public class VerveineJParser extends VerveineParser {
 	public VerveineJParser() {
 		super();
 
-		jdtParser = ASTParser.newParser(AST.JLS3);
+		jdtParser = ASTParser.newParser(AST.JLS4);
 	}
 
 	protected SourceLanguage getMyLgge() {
