@@ -7,8 +7,9 @@
 	<property name="docs.dir"     location="docs" />
 	<property name="dist.dir"     location="lib" />
 	<property name="verveine.jar" location="${dist.dir}/verveine.extractor.java.jar" />
+	<property name="tests.jar"    location="${dist.dir}/verveine.extractor.java.tests.jar" />
 	<property name="core.dir"     location="../verveine.core" />
-	<property name="test.dir" location="src/tests/eu/synectique/verveine/extractor/java/" />
+	<property name="test.dir"     location="src/tests/eu/synectique/verveine/extractor/java/" />
 	<property name="test.report.dir" location="testrep" />
 
 	<path id="build.classpath">
@@ -39,6 +40,7 @@
 
 	<!-- copies the jar from verveine.core -->
 	<target name="corejars" depends="makedir, antcore">
+		<copy todir="${dist.dir}" file="${core.dir}/lib/fast.jar"/>
 		<copy todir="${dist.dir}" file="${core.dir}/lib/famix.jar"/>
 		<copy todir="${dist.dir}" file="${core.dir}/lib/verveine.core.jar"/>
 	</target>
@@ -70,6 +72,10 @@
 		     basedir="${build.dir}"
 		     includes="eu/synectique/verveine/extractor/java/*.class eu/synectique/licence/*.class"
 		/>
+		<jar destfile="${tests.jar}"
+		     basedir="${build.dir}"
+		     includes="tests/eu/synectique/verveine/extractor/java/*.class"
+		/>
 	</target>
 
 	<!-- Run the JUnit Tests -->
@@ -82,7 +88,7 @@
 				</fileset>
 			</classpath>
 			<!-- Output is XML, could also be plain-->
-			<formatter type="xml" />
+			<formatter type="plain" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
