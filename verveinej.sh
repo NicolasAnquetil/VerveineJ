@@ -19,9 +19,9 @@ VOPT=""
 # Any argument before "--" is for the JVM
 # Any argument after "--" is for verveine
 # Without "--" every argument goes to verveine
-while [ ${1:-"--"} != "--" ]
+while [ "$1" != "--" ] && [ "$1" != "" ]
 do
-	JOPT="$JOPT $1"
+	JOPT="$JOPT "$(printf %q "$1")
 	shift
 done
 

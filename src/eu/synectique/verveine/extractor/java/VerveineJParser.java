@@ -119,14 +119,13 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	public void setOptions(String[] args) {
-
 		String[] classPath = new String[] { };
 		argPath = new ArrayList<String>();
 		argFiles = new ArrayList<String>();
 
 		int i = 0;
-		while (i < args.length && args[i].startsWith("-")) {
-			String arg = args[i++];
+		while (i < args.length && args[i].trim().startsWith("-")) {
+		    String arg = args[i++].trim();
 
 			if (arg.equals("-h")) {
 				usage();
@@ -230,14 +229,13 @@ public class VerveineJParser extends VerveineParser {
 		 *   some new relation: classdep
 		 */
 		
-		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-alllocals] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
-//		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
 		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
 		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: output.mse)");
-//		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
-//		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
-//		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
+		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
+		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
+		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
 		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\"");
 		System.err.println("      [-anchor (none|default|assoc)] options for source anchor information:\n" +
 				   "                                     - no entity\n" +
@@ -302,7 +300,13 @@ public class VerveineJParser extends VerveineParser {
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
-		jdtParser.createASTs(sourceFiles.toArray(new String[0]), null, new String[0], req, null);
+
+		try {
+			jdtParser.createASTs(sourceFiles.toArray(new String[0]), /*encodings*/null, /*bindingKeys*/new String[0], req, /*monitor*/null);
+		}
+		catch (java.lang.IllegalStateException e) {
+			System.out.println("VerveineJ could not launch parser, received error: " + e.getMessage());
+		}
 
 		this.compressNamespacesNames();
 	}
@@ -347,12 +351,13 @@ public class VerveineJParser extends VerveineParser {
 
 	public static void main(String[] args) {
 		LicenceChecker checker = new LicenceChecker();
-		int licenceCheck = checker.checkLicence();
-		
+		int licenceCheck = LicenceChecker.OK; //checker.checkLicence();
+
 		if (licenceCheck != LicenceChecker.OK) {
 			cannotContinue(checker, licenceCheck);
 		}
 		
+
 		VerveineJParser parser = new VerveineJParser();
 		parser.setOptions(args);
 		parser.parse();
