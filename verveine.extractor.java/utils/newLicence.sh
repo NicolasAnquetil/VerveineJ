@@ -7,6 +7,8 @@
 
 SERVER="http://37.139.2.203/validator"
 TMPDIR="tmp.dir"
+ANTTARGET="jar"
+
 
 if [ "$#" != "2" ]
 then
@@ -18,7 +20,7 @@ else
 fi
 
 #rebuild everything too make sure we are clean
-ant -f ../build.xml build
+ant -f ../build.xml "${ANTTARGET}"
 
 # create user get new key
 echo ""

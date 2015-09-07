@@ -152,8 +152,15 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = (System.getProperty("java.version").startsWith("1.7")) ? 10+15 : 10+14; // class Autocloseable in Java 7
-		int nbInherit = (System.getProperty("java.version").startsWith("1.7")) ? 7+22 : 7+21; // class Autocloseable in Java 7
+		int nbClasses = 10+14;
+		int nbInherit = 7+21;
+		
+		if ( System.getProperty("java.version").startsWith("1.") &&
+				System.getProperty("java.version").charAt(2) >= '7' ) {
+			 // class Autocloseable starting in Java 7
+			nbClasses++;
+			nbInherit++;
+		}
 
 		assertEquals(nbClasses, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)Autocloseable}
 		assertEquals(3,     VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());

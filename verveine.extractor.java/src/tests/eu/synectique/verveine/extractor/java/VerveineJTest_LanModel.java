@@ -102,8 +102,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = (System.getProperty("java.version").startsWith("1.7")) ? 11+15 : 11+14;
-		int nbInherit = (System.getProperty("java.version").startsWith("1.7")) ? 9+22 : 9+21;
+		int nbClasses = 11+14;
+		int nbInherit =9+21;
+		
+		if ( System.getProperty("java.version").startsWith("1.") &&
+				System.getProperty("java.version").charAt(2) >= '7' ) {
+			 // class Autocloseable starting in Java 7
+			nbClasses++;
+			nbInherit++;
+		}
 
 		assertEquals(nbClasses,VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
 		assertEquals(3,    VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
@@ -284,7 +291,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testStubs() {
-		int nbTypes = (System.getProperty("java.version").startsWith("1.7")) ? 10 : 9;
+		int nbTypes = 9;
+		
+		if ( System.getProperty("java.version").startsWith("1.") &&
+				System.getProperty("java.version").charAt(2) >= '7' ) {
+			 // class Autocloseable starting in Java 7
+			nbTypes++;
+		}
+
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
 		Namespace ns = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
