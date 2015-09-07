@@ -72,10 +72,6 @@
 		     basedir="${build.dir}"
 		     includes="eu/synectique/verveine/extractor/java/*.class eu/synectique/licence/*.class"
 		/>
-		<jar destfile="${tests.jar}"
-		     basedir="${build.dir}"
-		     includes="tests/eu/synectique/verveine/extractor/java/*.class"
-		/>
 	</target>
 
 	<!-- Run the JUnit Tests -->

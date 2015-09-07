@@ -34,7 +34,12 @@ echo ""
 mkdir "${TMPDIR}"
 cd "${TMPDIR}"
 mkdir lib
-cp ../../lib/* lib
+cp ../../lib/org.eclipse.* lib
+cp ../../lib/verveine.* lib
+cp ../../lib/fame.jar lib
+cp ../../lib/famix.jar lib
+cp ../../lib/fast.jar lib
+cp ../../lib/akuhn-util-r28011.jar lib
 cp ../../verveinej.sh .
 cp ../../verveinej.bat .
 
