@@ -40,9 +40,9 @@
 
 	<!-- copies the jar from verveine.core -->
 	<target name="corejars" depends="makedir, antcore">
-		<copy todir="${dist.dir}" file="${core.dir}/lib/fast.jar"/>
-		<copy todir="${dist.dir}" file="${core.dir}/lib/famix.jar"/>
-		<copy todir="${dist.dir}" file="${core.dir}/lib/verveine.core.jar"/>
+		<copy todir="${dist.dir}" file="${core.dir}/lib/fast-20160614_1015.jar"/>
+		<copy todir="${dist.dir}" file="${core.dir}/lib/famix-20160614_1015.jar"/>
+		<copy todir="${dist.dir}" file="${core.dir}/lib/verveine.core-20160614_1015.jar"/>
 	</target>
 
 	<!-- Compiles the java code (including the usage of library for JUnit) -->
@@ -68,6 +68,14 @@
 
 	<!--Creates the deployable jar file  -->
 	<target name="jar" depends="compile">
+		<jar destfile="${verveine.jar}"
+		     basedir="${build.dir}"
+		     includes="eu/synectique/verveine/extractor/java/*.class eu/synectique/licence/*.class"
+		/>
+	</target>
+
+	<!--Creates the deployable jar file  -->
+	<target name="rebuild">
 		<jar destfile="${verveine.jar}"
 		     basedir="${build.dir}"
 		     includes="eu/synectique/verveine/extractor/java/*.class eu/synectique/licence/*.class"

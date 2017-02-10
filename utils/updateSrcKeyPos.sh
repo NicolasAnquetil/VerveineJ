@@ -5,11 +5,11 @@
 
 BASEDIR=`dirname $0`/..
 LICFILE="eu/synectique/licence/LicenceChecker.java"
-JARFILE="${BASEDIR}/lib/famix.jar"
+JARFILE="${BASEDIR}/lib/famix-20160614_1015.jar"
 TMPFILE="tmp.$$"
 
 KEYPOS=`wc -c < "${JARFILE}"`
 
-sed -e 's/KEY_POS = [0-9][0-9]*;/KEY_POS = '"${KEYPOS}"';/' "${LICFILE}" > "${TMPFILE}"
+sed -e 's/KEY_POS = [0-9]*;/KEY_POS = '"${KEYPOS}"';/' "${LICFILE}" > "${TMPFILE}"
 
 mv "${TMPFILE}" "${LICFILE}"

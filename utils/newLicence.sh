@@ -20,7 +20,7 @@ else
 fi
 
 #rebuild everything too make sure we are clean
-ant -f ../build.xml "${ANTTARGET}"
+#ant -f ../build.xml "${ANTTARGET}"
 
 # create user get new key
 echo ""
@@ -36,15 +36,15 @@ cd "${TMPDIR}"
 mkdir lib
 cp ../../lib/org.eclipse.* lib
 cp ../../lib/verveine.* lib
-cp ../../lib/fame.jar lib
-cp ../../lib/famix.jar lib
-cp ../../lib/fast.jar lib
+cp ../../lib/fame-*.jar lib
+cp ../../lib/famix-*.jar lib
+cp ../../lib/fast-*.jar lib
 cp ../../lib/akuhn-util-r28011.jar lib
 cp ../../verveinej.sh .
 cp ../../verveinej.bat .
 
 # register key
-echo -n $NEWKEY >> lib/famix.jar
+echo -n $NEWKEY >> lib/famix-*.jar
 
 #make zip file
 zip verveinej.zip lib/* verveinej.sh verveinej.bat

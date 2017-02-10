@@ -229,7 +229,7 @@ public class VerveineVisitor extends ASTVisitor {
 		
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
-		eu.synectique.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), /*owner*/context.top(), /*isGeneric*/tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
+		eu.synectique.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			
@@ -346,7 +346,7 @@ public class VerveineVisitor extends ASTVisitor {
 			// treat the expression 'new A(...)' by creating a Reference to 'A'
 			eu.synectique.verveine.core.gen.famix.Type fmx = null;
 			Type clazz = node.getType();
-			fmx = referedType(clazz, context.top(), true);
+			fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			this.classInstanceCreated = fmx;
 
 			Reference ref;
@@ -354,7 +354,7 @@ public class VerveineVisitor extends ASTVisitor {
 				ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
 			}
 			else {
-				ref = dico.addFamixReference(context.top(), fmx, context.getLastReference());
+				ref = dico.addFamixReference((ContainerEntity) context.top(), fmx, context.getLastReference());
 				context.setLastReference(ref);
 
 				// create an invocation to the constructor
@@ -385,7 +385,7 @@ public class VerveineVisitor extends ASTVisitor {
 		ITypeBinding bnd = node.resolveBinding();
 		String anonSuperTypeName = (anonymousSuperType != null) ? findTypeName(anonymousSuperType) : context.topType().getName();
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-		fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+anonSuperTypeName+")", /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
+		fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+anonSuperTypeName+")", (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
 		if (fmx != null) {
 			fmx.setIsStub(false);
 
@@ -421,7 +421,7 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(EnumDeclaration node) {
 //		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 
-		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), context.top());
+		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
 			fmx.setIsStub(Boolean.FALSE);
 
@@ -451,7 +451,7 @@ public class VerveineVisitor extends ASTVisitor {
 //		System.err.println("TRACE, Visiting AnnotationTypeDeclaration: "+node.getName().getIdentifier());
 
 		ITypeBinding bnd = node.resolveBinding();
-		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), context.top(), persistClass(bnd));
+		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top(), persistClass(bnd));
 		if (fmx != null) {
 			fmx.setIsStub(Boolean.FALSE);
 			if (! anchors.equals(VerveineJParser.ANCHOR_NONE)) {
@@ -574,8 +574,8 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 
 			// Exceptions
-			for (Name excepName : (List<Name>)node.thrownExceptions()) {
-				eu.synectique.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(excepName.resolveTypeBinding(), context.topType(), true);
+			for (Type excep : (List<Type>)node.thrownExceptionTypes()) {
+				eu.synectique.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(excep.resolveBinding(), context.topType(), true);
 				if (excepFmx != null) {
 					if (classSummary) {
 						Reference ref = dico.addFamixReference(findHighestType(fmx), findHighestType(excepFmx), /*lastReference*/null);
@@ -896,14 +896,14 @@ public class VerveineVisitor extends ASTVisitor {
 	public boolean visit(InstanceofExpression node) {
 		eu.synectique.verveine.core.gen.famix.Type fmx = null;
 		Type clazz = node.getRightOperand();
-		fmx = referedType(clazz, context.top(), true);
+		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 		Reference ref;
 		if (classSummary) {
 			ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
 		}
 		else {
-			ref = dico.addFamixReference(context.top(), fmx, context.getLastReference());
+			ref = dico.addFamixReference((ContainerEntity) context.top(), fmx, context.getLastReference());
 			context.setLastReference(ref);
 		}
 		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
@@ -1501,7 +1501,7 @@ public class VerveineVisitor extends ASTVisitor {
 			NamedEntity ret = null;
 			if (bnd instanceof ITypeBinding) {
 				// msg() is a static method of Name so name should be a class, except if its an Enum
-				ret = referedType((ITypeBinding)bnd, context.top(), ! ((ITypeBinding) bnd).isEnum());
+				ret = referedType((ITypeBinding)bnd, (ContainerEntity)context.top(), ! ((ITypeBinding) bnd).isEnum());
 			}
 			else if (bnd instanceof IVariableBinding) {
 				String varName = ( ((Name)expr).isSimpleName() ? ((SimpleName)expr).getFullyQualifiedName() : ((QualifiedName)expr).getName().getIdentifier());
@@ -1576,7 +1576,7 @@ public class VerveineVisitor extends ASTVisitor {
 		// ((type)expr).msg()
 		if (expr instanceof CastExpression) {
 			Type tcast = ((CastExpression) expr).getType();
-			return referedType(tcast, this.context.top(), true);
+			return referedType(tcast, (ContainerEntity) this.context.top(), true);
 		}
 
 		// new Class().msg()
@@ -1588,7 +1588,7 @@ public class VerveineVisitor extends ASTVisitor {
 		else if (expr instanceof MethodInvocation) {
 			IMethodBinding callerBnd = ((MethodInvocation) expr).resolveMethodBinding();
 			if (callerBnd != null) {
-				return referedType(callerBnd.getReturnType(), this.context.top(), true);
+				return referedType(callerBnd.getReturnType(), (ContainerEntity)this.context.top(), true);
 			}
 			else {
 				return null;
