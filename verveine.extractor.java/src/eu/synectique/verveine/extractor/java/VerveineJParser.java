@@ -1,6 +1,10 @@
 package eu.synectique.verveine.extractor.java;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -85,7 +89,7 @@ public class VerveineJParser extends VerveineParser {
 	public VerveineJParser() {
 		super();
 
-		jdtParser = ASTParser.newParser(AST.JLS4);
+		jdtParser = ASTParser.newParser(AST.JLS8);
 	}
 
 	protected SourceLanguage getMyLgge() {
@@ -118,6 +122,30 @@ public class VerveineJParser extends VerveineParser {
 		return tmpPath;
 	}
 
+	/** Reads all jar in classpath from a file, one per line
+	 * @param the filename of the file containing the jars of tyhe classpath
+	 * @return the collection of jar paths
+	 */
+	private List<String> readAllJars(String filename) {
+		List<String> tmpPath = new ArrayList<String>();
+		try {
+			BufferedReader fcp = new BufferedReader(new FileReader(filename));
+			String jarname = fcp.readLine();
+			while (jarname != null) {
+				tmpPath.add(jarname);
+				jarname = fcp.readLine();				
+			}
+			fcp.close();
+		} catch (FileNotFoundException e) {
+			System.err.println("** Error classpath file " + filename + " not found");
+			e.printStackTrace();
+		} catch (IOException e) {
+			System.err.println("** Error reading classpath file: " + filename);
+			e.printStackTrace();
+		}
+		return tmpPath;
+	}
+
 	public void setOptions(String[] args) {
 		String[] classPath = new String[] { };
 		argPath = new ArrayList<String>();
@@ -143,26 +171,21 @@ public class VerveineJParser extends VerveineParser {
 			}
 			else if (arg.equals("-autocp")) {
 				if (i < args.length) {
-					List<String> tmpPath = collectAllJars(args[i++]);
-					int oldlength = classPath.length;
-					int newlength = oldlength + tmpPath.size();
-					classPath = Arrays.copyOf(classPath, newlength);
-					for (int p = oldlength; p < newlength; p++) {
-						classPath[p] = tmpPath.get(p - oldlength);
-					}
+					classPath = addToClassPath(classPath,collectAllJars(args[i++]) );
 				} else {
 					System.err.println("-autocp requires a root folder");
 				}
 			}
+			else if (arg.equals("-filecp")) {
+				if (i < args.length) {
+					classPath = addToClassPath(classPath, readAllJars(args[i++]));
+				} else {
+					System.err.println("-filecp requires a filename");
+				}
+			}
 			else if (arg.equals("-cp")) {
 				if (i < args.length) {
-					String[] tmpPath = args[i++].split(System.getProperty("path.separator"));
-					int oldlength = classPath.length;
-					int newlength = oldlength + tmpPath.length;
-					classPath = Arrays.copyOf(classPath, newlength);
-					for (int p=oldlength; p < newlength; p++) {
-						classPath[p] = tmpPath[p-oldlength];
-					}
+					classPath = addToClassPath(classPath,  Arrays.asList(args[i++].split(System.getProperty("path.separator"))));
 				}
 				else {
 					System.err.println("-cp requires a classPath");
@@ -183,8 +206,13 @@ public class VerveineJParser extends VerveineParser {
 			}
 			else {
 				int j = super.setOption(i - 1, args);
-				if (j > 0) {     // j is the number of args consumed
-					i += (j-1);  // 1 more will be added at the beginning of the loop ("args[i++]")
+				if (j > 0) {     // j is the number of args consumed by super.setOption()
+					i += j;      // advance by that number of args
+					i--;         // 1 will be added at the beginning of the loop ("args[i++]")
+				}
+				else {
+					System.err.println("** Unrecognized option: " + arg);
+					usage();
 				}
 			}
 		}
@@ -198,7 +226,9 @@ public class VerveineJParser extends VerveineParser {
 			}
 		}
 
-		jdtParser.setEnvironment(classPath, argPath.toArray(new String[0]), null, true);
+for (int j =0; j<classPath.length; j++) { System.out.println("CLASSPATH:"+classPath[j]);}
+		
+		jdtParser.setEnvironment(classPath, /*sourcepathEntries*/argPath.toArray(new String[0]), /*encodings*/null, /*includeRunningVMBootclasspath*/true);
 		jdtParser.setResolveBindings(true);
 		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
 
@@ -216,6 +246,22 @@ public class VerveineJParser extends VerveineParser {
 		options.put(JavaCore.COMPILER_SOURCE, codeVers);
 
 		jdtParser.setCompilerOptions(options);
+	}
+
+
+	/**
+	 * @param classPath
+	 * @param tmpPath
+	 * @return
+	 */
+	private String[] addToClassPath(String[] classPath, List<String> tmpPath) {
+		int oldlength = classPath.length;
+		int newlength = oldlength + tmpPath.size();
+		classPath = Arrays.copyOf(classPath, newlength);
+		for (int p = oldlength; p < newlength; p++) {
+			classPath[p] = tmpPath.get(p - oldlength);
+		}
+		return classPath;
 	}
 
 	protected void usage() {
@@ -243,6 +289,7 @@ public class VerveineJParser extends VerveineParser {
 				   "                                     - named entities+associations (i.e. accesses, invocations, references)");
 		System.err.println("      [-cp CLASSPATH] classpath where to look for stubs");
 		System.err.println("      [-autocp DIR] gather all jars in DIR and put them in the classpath");
+		System.err.println("      [-filecp FILE] gather all jars listed in FILE (absolute paths) and put them in the classpath");
 		System.err.println("      [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] specifies version of Java");
 		System.err.println("      <files-to-parse>|<dirs-to-parse> list of source files to parse or directories to search for source files");
 		System.exit(0);
@@ -302,7 +349,7 @@ public class VerveineJParser extends VerveineParser {
 		collectJavaFiles(argPath, sourceFiles);
 
 		try {
-			jdtParser.createASTs(sourceFiles.toArray(new String[0]), /*encodings*/null, /*bindingKeys*/new String[0], req, /*monitor*/null);
+			jdtParser.createASTs(sourceFiles.toArray(new String[0]), /*encodings*/null, /*bindingKeys*/new String[0], /*requestor*/req, /*monitor*/null);
 		}
 		catch (java.lang.IllegalStateException e) {
 			System.out.println("VerveineJ could not launch parser, received error: " + e.getMessage());
@@ -351,11 +398,11 @@ public class VerveineJParser extends VerveineParser {
 
 	public static void main(String[] args) {
 		LicenceChecker checker = new LicenceChecker();
-		int licenceCheck = LicenceChecker.OK; //checker.checkLicence();
+		int licenceCheck = checker.checkLicence();
 
-		if (licenceCheck != LicenceChecker.OK) {
+		/*if (licenceCheck != LicenceChecker.OK) {
 			cannotContinue(checker, licenceCheck);
-		}
+		}*/
 		
 
 		VerveineJParser parser = new VerveineJParser();

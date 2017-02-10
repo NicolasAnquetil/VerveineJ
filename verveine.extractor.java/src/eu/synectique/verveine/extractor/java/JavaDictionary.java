@@ -75,11 +75,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_PROTECTED= "protected";
 	public static final String MODIFIER_FINAL    = "final";
 	public static final String MODIFIER_STATIC    = "static";
-	
-	/**
-	 * An MSE marker for methods
-	 */
-	public static final String CONSTRUCTOR_KIND_MARKER = "constructor";
+
 	/**
 	 * Result of utility methods for checking matching between two entities
 	 */
@@ -766,20 +762,20 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 */
 	private AnnotationInstanceAttribute annInstAtt(IMemberValuePairBinding annPV, AnnotationType annType, boolean persistIt) {
 		Object attVal = annPV.getValue();
-		String attFamixVal = null;
+		String attFamixVal = "";
 		if (attVal == null) {
 			return null;
 		}
 
 		if (attVal.getClass() == Object[].class) {
-			attFamixVal = annInstAttValAsString( ((Object[])attVal)[0] );
-			if (((Object[])attVal).length > 1) {
-				for (int i=1; i < ((Object[])attVal).length; i++) {
-					attFamixVal += ", " + annInstAttValAsString( ((Object[])attVal)[i] );
-				}
-				attFamixVal = "{" + attFamixVal + "}";
+			int nbVal = 0;
+			for (Object val : ((Object[])attVal)) {
+				attFamixVal += (nbVal>0?", " : "") + annInstAttValAsString( val );
+				nbVal++;
 			}
-
+			if (nbVal != 1) {  // '0' => {} ; '>1' => {val, val, ...}
+				attFamixVal = "{" + attFamixVal + "}";				
+			}
 		}
 		else {
 			attFamixVal = annInstAttValAsString(attVal);

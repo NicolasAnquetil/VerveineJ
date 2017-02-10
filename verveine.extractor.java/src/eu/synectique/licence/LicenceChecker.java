@@ -32,8 +32,8 @@ public class LicenceChecker {
 	
 	public static final int WRONG_LICENCE = 107;
 
-	private static final String KEY_FILE = "famix.jar";
-	private static final long KEY_POS = 90370;
+	private static final String KEY_FILE = "famix-20160614_1015.jar";
+	private static final long KEY_POS = 95060;
 
 	private String line = null;
 	private String keyDir;  // where the key file is
@@ -127,6 +127,19 @@ public class LicenceChecker {
 		}
 
 		try {
+			/* int java.net.HttpURLConnection.getResponseCode() throws IOException
+			 * Gets the status code from an HTTP response message. For example, in the case of
+			 * the following status lines:
+			 * 
+			 *  HTTP/1.0 200 OK
+			 *  HTTP/1.0 401 Unauthorized
+			 *  
+			 * It will return 200 and 401 respectively. Returns -1 if no code can be discerned from the response (i.e., the response is not valid HTTP).
+			 * Returns:
+			 * 		the HTTP Status-Code, or -1
+			 * Throws:
+			 * 		IOException - if an error occurred connecting to the server.
+			 */
 			if (conn.getResponseCode() != 200) {
 				if  (conn.getResponseCode() == 401) {
 					conn.disconnect();	
