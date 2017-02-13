@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Annotation;
@@ -19,6 +20,7 @@ import org.eclipse.jdt.core.dom.ArrayCreation;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.AssertStatement;
 import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CastExpression;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -134,7 +136,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * Note: allLocals = ! classSummary
 	 */
 	private boolean allLocals = false;
-	
+
 	/**
 	 * A stack that keeps the current definition context (package/class/method)
 	 */
@@ -160,7 +162,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * what sourceAnchors to create
 	 */
 	private String anchors;
-	
+
 	public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
 		this.dico = dico;
 		this.context = new EntityStack();
@@ -172,11 +174,12 @@ public class VerveineVisitor extends ASTVisitor {
 	// VISITOR METHODS
 
 	public boolean visit(CompilationUnit node) {
-//		System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
-		
+		//		System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
+
 		// As this is the first node visited in an AST, set's the source file for this AST
 		try {
-			source = new RandomAccessFile( (String) ((CompilationUnit)node).getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY), "r");
+			source = new RandomAccessFile(
+					(String) ((CompilationUnit) node).getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY), "r");
 		} catch (FileNotFoundException e) {
 			source = null;
 			e.printStackTrace();
@@ -184,10 +187,9 @@ public class VerveineVisitor extends ASTVisitor {
 
 		Namespace fmx = null;
 		PackageDeclaration pckg = node.getPackage();
-		if (pckg==null) {
+		if (pckg == null) {
 			fmx = dico.ensureFamixNamespaceDefault();
-		}
-		else {
+		} else {
 			fmx = dico.ensureFamixNamespace(pckg.resolveBinding(), pckg.getName().getFullyQualifiedName());
 			fmx.setIsStub(false);
 		}
@@ -222,21 +224,22 @@ public class VerveineVisitor extends ASTVisitor {
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
 	public boolean visit(TypeDeclaration node) {
-//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
+		//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		@SuppressWarnings("unchecked")
-		List<TypeParameter> tparams = (List<TypeParameter>)node.typeParameters();
-		
+		List<TypeParameter> tparams = (List<TypeParameter>) node.typeParameters();
+
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
 		eu.synectique.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			
+
 			// if it is a generic and some parameterizedTypes were created for it
 			// they are marked as stub which is not right
-			if (tparams.size()>0) {
-				for (ParameterizedType candidate : dico.getEntityByName(ParameterizedType.class, node.getName().getIdentifier())) {
+			if (tparams.size() > 0) {
+				for (ParameterizedType candidate : dico.getEntityByName(ParameterizedType.class,
+						node.getName().getIdentifier())) {
 					candidate.setIsStub(false);
 				}
 			}
@@ -244,25 +247,25 @@ public class VerveineVisitor extends ASTVisitor {
 			this.context.pushType(fmx);
 
 			if (persistIt) {
-				if (! anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 				dico.addFamixAnnotationInstances(bnd, fmx, persistIt);
 				addUnboundAnnotationInstances(node, fmx, persistIt);
-				
+
 				//comments
 				if (dico.createFamixComment(node.getJavadoc(), fmx, source) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
-					if ( (source != null) && (iCmt > -1) ) {
-						dico.createFamixComment((Comment)astRoot.getCommentList().get(iCmt), fmx, source);
+					if ((source != null) && (iCmt > -1)) {
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx, source);
 					}
 				}
-			}
-			else {
+			} else {
 				for (Inheritance inh : fmx.getSuperInheritances()) {
 					Reference lastRef = (classSummary ? null : context.getLastReference());
-					Reference ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(inh.getSuperclass()), lastRef);
+					Reference ref = dico.addFamixReference(findHighestType(context.top()),
+							findHighestType(inh.getSuperclass()), lastRef);
 					context.setLastReference(ref);
 					if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
 						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
@@ -273,15 +276,15 @@ public class VerveineVisitor extends ASTVisitor {
 			for (TypeParameter tp : tparams) {
 				// if there is a type parameter, then fmx will be a Famix ParameterizableClass
 				// note: owner of the ParameterType is the ParameterizableClass
-				ParameterType fmxParam = dico.ensureFamixParameterType( tp.resolveBinding(), tp.getName().getIdentifier(), (ParameterizableClass)fmx, /*persistIt*/!classSummary);
+				ParameterType fmxParam = dico.ensureFamixParameterType(tp.resolveBinding(),
+						tp.getName().getIdentifier(), (ParameterizableClass) fmx, /*persistIt*/!classSummary);
 				if (fmxParam != null) {
 					fmxParam.setIsStub(false);
 				}
 			}
-			
+
 			return super.visit(node);
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -291,7 +294,7 @@ public class VerveineVisitor extends ASTVisitor {
 		for (IExtendedModifier mod : (List<IExtendedModifier>)typDecl.modifiers()) {
 			// create type of the annotation
 			if (mod.isAnnotation()) {
-				Annotation ann = (Annotation)mod;
+				Annotation ann = (Annotation) mod;
 				// see if it was not already created by any chance
 				boolean found = false;
 				for (AnnotationInstance a : fmx.getAnnotationInstances()) {
@@ -299,19 +302,24 @@ public class VerveineVisitor extends ASTVisitor {
 						found = true;
 					}
 				}
-				if (! found) {
-					AnnotationType annType = dico.ensureFamixAnnotationType(/*bnd*/null, ann.getTypeName().getFullyQualifiedName(), /*owner*/dico.ensureFamixNamespaceDefault(), persistIt);	
+				if (!found) {
+					AnnotationType annType = dico.ensureFamixAnnotationType(/*bnd*/null,
+							ann.getTypeName().getFullyQualifiedName(), /*owner*/dico.ensureFamixNamespaceDefault(),
+							persistIt);
 
 					// create all parameters of the annotation instance
-					Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>(); 
+					Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>();
 					if (ann instanceof SingleMemberAnnotation) {
-						annAtts.add( dico.createFamixAnnotationInstanceAttribute( dico.ensureFamixAnnotationTypeAttribute(/*bnd*/null, "value", annType, persistIt),
-									 ( ((SingleMemberAnnotation)ann).getValue() != null) ? ((SingleMemberAnnotation)ann).getValue().toString() : ""));
-					}
-					else if (ann instanceof NormalAnnotation) {
-						for (MemberValuePair annPV : (List<MemberValuePair>) ((NormalAnnotation)ann).values()) {
-							annAtts.add( dico.createFamixAnnotationInstanceAttribute( dico.ensureFamixAnnotationTypeAttribute(/*bnd*/null, annPV.getName().getIdentifier(), annType, persistIt),
-																					  (annPV.getValue() != null) ? annPV.getValue().toString() : ""));
+						annAtts.add(dico.createFamixAnnotationInstanceAttribute(
+								dico.ensureFamixAnnotationTypeAttribute(/*bnd*/null, "value", annType, persistIt),
+								(((SingleMemberAnnotation) ann).getValue() != null)
+										? ((SingleMemberAnnotation) ann).getValue().toString() : ""));
+					} else if (ann instanceof NormalAnnotation) {
+						for (MemberValuePair annPV : (List<MemberValuePair>) ((NormalAnnotation) ann).values()) {
+							annAtts.add(dico.createFamixAnnotationInstanceAttribute(
+									dico.ensureFamixAnnotationTypeAttribute(/*bnd*/null,
+											annPV.getName().getIdentifier(), annType, persistIt),
+									(annPV.getValue() != null) ? annPV.getValue().toString() : ""));
 						}
 					}
 
@@ -336,11 +344,10 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(ClassInstanceCreation node) {
-//		System.err.println("TRACE, Visiting ClassInstanceCreation: " + node);
+		//		System.err.println("TRACE, Visiting ClassInstanceCreation: " + node);
 		if (node.getAnonymousClassDeclaration() != null) {
 			anonymousSuperType = node.getType();
-		}
-		else {
+		} else {
 			anonymousSuperType = null;
 
 			// treat the expression 'new A(...)' by creating a Reference to 'A'
@@ -351,9 +358,9 @@ public class VerveineVisitor extends ASTVisitor {
 
 			Reference ref;
 			if (classSummary) {
-				ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
-			}
-			else {
+				ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx),
+						/*lastReference*/null);
+			} else {
 				ref = dico.addFamixReference((ContainerEntity) context.top(), fmx, context.getLastReference());
 				context.setLastReference(ref);
 
@@ -380,7 +387,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * See {@link VerveineVisitor#anonymousSuperType}
 	 */
 	public boolean visit(AnonymousClassDeclaration node) {
-//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
+		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
 		ITypeBinding bnd = node.resolveBinding();
 		String anonSuperTypeName = (anonymousSuperType != null) ? findTypeName(anonymousSuperType) : context.topType().getName();
@@ -396,17 +403,15 @@ public class VerveineVisitor extends ASTVisitor {
 						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 					}
 				}
-			}
-			else {
+			} else {
 				dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
-				if ( (! anchors.equals(VerveineJParser.ANCHOR_NONE)) && (fmx != null) ) {
+				if ((!anchors.equals(VerveineJParser.ANCHOR_NONE)) && (fmx != null)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
 			this.context.pushType(fmx);
 			return super.visit(node);
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -419,7 +424,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(EnumDeclaration node) {
-//		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
+		//		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 
 		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
@@ -479,14 +484,13 @@ public class VerveineVisitor extends ASTVisitor {
 		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			if  (! anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+			if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 
 			context.pushAnnotationMember(fmx);
 			return super.visit(node);
-		}
-		else {
+		} else {
 			context.pushAnnotationMember(null);
 			return false;
 		}
@@ -503,46 +507,49 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-//		System.err.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier());
+		//		System.err.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier());
 
 		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
 
 		Collection<String> paramTypes = new ArrayList<String>();
-		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
-				paramTypes.add(findTypeName(param.getType()));
+		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
+			paramTypes.add(findTypeName(param.getType()));
 		}
 
 		eu.synectique.verveine.core.gen.famix.Type fmxRetTyp = null;
-		if (! node.isConstructor()) {
+		if (!node.isConstructor()) {
 			// we will create the method with a fake return type (Object) because we might need this FamixMethod to create the return type (if it is a ParameterizedType)
 			// we reset the return type to its proper value later
 			fmxRetTyp = dico.ensureFamixClassObject(null);
 		}
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/fmxRetTyp, /*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*retType*/fmxRetTyp,
+				/*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
+			// Insert for BodyHash computing
+			fmx.setBodyHash(this.computeHashForMethodBody(node));
 			this.context.pushMethod(fmx);
 
 			// now will recompute the actual returnType
 			if (node.isConstructor()) {
 				fmx.setKind(JavaDictionary.CONSTRUCTOR_KIND_MARKER);
-			}
-			else {
+			} else {
 				fmxRetTyp = referedType(node.getReturnType2(), fmx, false);
 				fmx.setDeclaredType(fmxRetTyp);
 
-				if ( classSummary && (! (fmxRetTyp instanceof PrimitiveType)) ) {
-					Reference ref = dico.addFamixReference(findHighestType(fmx.getParentType()), findHighestType(fmxRetTyp), /*lastReference*/null);
+				if (classSummary && (!(fmxRetTyp instanceof PrimitiveType))) {
+					Reference ref = dico.addFamixReference(findHighestType(fmx.getParentType()),
+							findHighestType(fmxRetTyp), /*lastReference*/null);
 					if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
 						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 					}
 				}
 			}
 
-			if (! classSummary) {
-				if ( !anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+			if (!classSummary) {
+				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 				dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
@@ -551,8 +558,8 @@ public class VerveineVisitor extends ASTVisitor {
 				if (dico.createFamixComment(node.getJavadoc(), fmx, source) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
-					if ( (source != null) && (iCmt > -1) ) {
-						dico.createFamixComment((Comment)astRoot.getCommentList().get(iCmt), fmx, source);
+					if ((source != null) && (iCmt > -1)) {
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx, source);
 					}
 				}
 			}
@@ -564,7 +571,7 @@ public class VerveineVisitor extends ASTVisitor {
 			// creating the method's parameters
 			// unless classSummary is true in which case we might need to create References between classes
 			List<VariableDeclaration> paramAsVarList;
-			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>)node.parameters()) {
+			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
 				// Note: method and ParamTyp bindings are null for ParameterType :-(
 				paramAsVarList = new ArrayList<VariableDeclaration>(1);
 				paramAsVarList.add(param);
@@ -578,23 +585,30 @@ public class VerveineVisitor extends ASTVisitor {
 				eu.synectique.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(excep.resolveBinding(), context.topType(), true);
 				if (excepFmx != null) {
 					if (classSummary) {
-						Reference ref = dico.addFamixReference(findHighestType(fmx), findHighestType(excepFmx), /*lastReference*/null);
+						Reference ref = dico.addFamixReference(findHighestType(fmx), findHighestType(excepFmx),
+								/*lastReference*/null);
 						if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
 							dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 						}
-					}
-					else {
+					} else {
 						dico.createFamixDeclaredException(fmx, excepFmx);
 					}
 				}
 			}
 
 			return super.visit(node);
-		}
-		else {
+		} else {
 			this.context.pushMethod(null);
 			return false;
 		}
+	}
+
+	private String computeHashForMethodBody(MethodDeclaration node) {
+		// not optimized but will work in a first version
+		Block body = node.getBody();
+		if (body == null)
+			return "0";
+		return DigestUtils.md5Hex(node.getBody().toString().replaceAll("\\r|\\n|\\t", ""));
 	}
 
 	public void endVisit(MethodDeclaration node) {
@@ -604,9 +618,11 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@Override
 	public boolean visit(Initializer node) {
-//		System.err.println("TRACE, Visiting Initializer: ");
-		
-		Method fmx = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), /*retType*/null, context.topType(), node.getModifiers(), /*persistIt*/!classSummary);
+		//		System.err.println("TRACE, Visiting Initializer: ");
+
+		Method fmx = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME,
+				/*paramTypes*/new ArrayList<String>(), /*retType*/null, context.topType(), node.getModifiers(),
+				/*persistIt*/!classSummary);
 		// init-block don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create either
 
@@ -614,8 +630,8 @@ public class VerveineVisitor extends ASTVisitor {
 			fmx.setIsStub(false);
 
 			pushInitBlockMethod(fmx);
-			if (! classSummary) {
-				if (!anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+			if (!classSummary) {
+				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 				dico.createFamixComment(node.getJavadoc(), fmx, source);
@@ -626,8 +642,7 @@ public class VerveineVisitor extends ASTVisitor {
 			}
 
 			return super.visit(node);
-		}
-		else {
+		} else {
 			this.context.pushMethod(null);
 			return false;
 		}
@@ -641,13 +656,14 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings({ "unchecked" })
 	public boolean visit(FieldDeclaration node) {
-//		System.err.println("TRACE, Visiting FieldDeclaration");
+		//		System.err.println("TRACE, Visiting FieldDeclaration");
 
 		eu.synectique.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topType(), false);
 
-		for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topType()) ) {
-			if (! classSummary) {
-				if (! anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+		for (StructuralEntity att : visitVariablesDeclarations(node, varTyp,
+				(List<VariableDeclaration>) node.fragments(), context.topType())) {
+			if (!classSummary) {
+				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 					dico.addSourceAnchor(att, node, /*oneLineAnchor*/false);
 				}
 
@@ -655,8 +671,8 @@ public class VerveineVisitor extends ASTVisitor {
 				if (dico.createFamixComment(node.getJavadoc(), att, source) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
-					if ( (source != null) && (iCmt > -1) ) {
-						dico.createFamixComment((Comment)astRoot.getCommentList().get(iCmt), att, source);
+					if ((source != null) && (iCmt > -1)) {
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), att, source);
 					}
 				}
 			}
@@ -667,22 +683,23 @@ public class VerveineVisitor extends ASTVisitor {
 
 	public void endVisit(FieldDeclaration node) {
 		Method ctxtMeth = this.context.topMethod();
-		if 	( (ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) ) {
+		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME))) {
 			closeMethodDeclaration();
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationExpression node) {
-//		System.err.println("TRACE, Visiting VariableDeclarationExpression: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
+		//		System.err.println("TRACE, Visiting VariableDeclarationExpression: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
 		// Independently of 'withLocals()', we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them (non primitive types are important because of the dependence they create)
-		if (allLocals || (! node.getType().isPrimitiveType()) ) {
+		if (allLocals || (!node.getType().isPrimitiveType())) {
 			eu.synectique.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod(), false);
 
-			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
-				if ( (! classSummary) && (! anchors.equals(VerveineJParser.ANCHOR_NONE)) ) {
+			for (StructuralEntity att : visitVariablesDeclarations(node, varTyp,
+					(List<VariableDeclaration>) node.fragments(), context.topMethod())) {
+				if ((!classSummary) && (!anchors.equals(VerveineJParser.ANCHOR_NONE))) {
 					dico.addSourceAnchor(att, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -693,13 +710,14 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationStatement node) {
-//		System.err.println("TRACE, Visiting VariableDeclarationStatement: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
+		//		System.err.println("TRACE, Visiting VariableDeclarationStatement: "+((VariableDeclaration)node.fragments().iterator().next()).getName().getIdentifier()+" (...)");
 
 		// locals: same discussion as for visit(VariableDeclarationExpression node)
-		if (allLocals || (! node.getType().isPrimitiveType()) ) {
+		if (allLocals || (!node.getType().isPrimitiveType())) {
 			eu.synectique.verveine.core.gen.famix.Type varTyp = referedType(node.getType(), context.topMethod(), false);
-			for (StructuralEntity var : visitVariablesDeclarations(node, varTyp, (List<VariableDeclaration>)node.fragments(), context.topMethod())) {
-				if ( (! classSummary) && (! anchors.equals(VerveineJParser.ANCHOR_NONE)) ) {
+			for (StructuralEntity var : visitVariablesDeclarations(node, varTyp,
+					(List<VariableDeclaration>) node.fragments(), context.topMethod())) {
+				if ((!classSummary) && (!anchors.equals(VerveineJParser.ANCHOR_NONE))) {
 					dico.addSourceAnchor(var, node, /*oneLineAnchor*/true);
 				}
 			}
@@ -710,7 +728,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodInvocation node) {
-//		System.err.println("TRACE, Visiting MethodInvocation");
+		//		System.err.println("TRACE, Visiting MethodInvocation");
 
 		Expression callingExpr = node.getExpression();
 		NamedEntity receiver = getReceiver(callingExpr);
@@ -718,17 +736,14 @@ public class VerveineVisitor extends ASTVisitor {
 		String calledName = node.getName().getFullyQualifiedName();
 		if (bnd == null) {
 			methodInvocation(bnd, calledName, receiver, getInvokedMethodOwner(callingExpr, receiver), node.arguments());
-		}
-		else {
+		} else {
 			methodInvocation(bnd, calledName, receiver, /*owner*/null, node.arguments());
 		}
 		Invocation lastInvok = context.getLastInvocation();
-		if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 				// check that lastInvocation correspond to current one
-				&& (lastInvok != null)
-				&& (lastInvok.getSender() == context.topMethod())
-				&& (lastInvok.getReceiver() == receiver)
-				&& (lastInvok.getSignature().startsWith(calledName)) ) {
+				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
+				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
 			dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
 		}
 		if (callingExpr instanceof SimpleName) {
@@ -741,20 +756,21 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(SuperMethodInvocation node) {
-		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(), context.topMethod(), /*persistIt*/!classSummary);
+		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(),
+				context.topMethod(), /*persistIt*/!classSummary);
 		IMethodBinding bnd = node.resolveMethodBinding();
 		if (bnd == null) {
 			Iterator<Inheritance> iter = this.context.topType().getSuperInheritances().iterator();
 			eu.synectique.verveine.core.gen.famix.Type superClass = iter.next().getSuperclass();
-			while ( (superClass instanceof eu.synectique.verveine.core.gen.famix.Class) &&
-					(((eu.synectique.verveine.core.gen.famix.Class)superClass).getIsInterface()) &&
-					iter.hasNext() ) {
+			while ((superClass instanceof eu.synectique.verveine.core.gen.famix.Class)
+					&& (((eu.synectique.verveine.core.gen.famix.Class) superClass).getIsInterface())
+					&& iter.hasNext()) {
 				iter.next().getSuperclass();
 			}
 			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, superClass, node.arguments());
-		}
-		else {
-			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, /*methOwner*/null, node.arguments());
+		} else {
+			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, /*methOwner*/null,
+					node.arguments());
 		}
 
 		this.context.addTopMethodNOS(1);
@@ -762,35 +778,40 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(ConstructorInvocation node) {
-//		System.err.println("TRACE, Visiting ConstructorInvocation: ");
+		//		System.err.println("TRACE, Visiting ConstructorInvocation: ");
 		this.context.addTopMethodNOS(1);
-		
+
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		String name = context.topMethod().getName();
-		int modifiers = (node.resolveConstructorBinding() != null) ? node.resolveConstructorBinding().getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name, /*paramTypes*/(Collection<String>)null, /*retType*/null, /*owner*/context.topType(), modifiers, /*persistIt*/!classSummary);
+		int modifiers = (node.resolveConstructorBinding() != null) ? node.resolveConstructorBinding().getModifiers()
+				: JavaDictionary.UNKNOWN_MODIFIERS;
+		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
+				/*paramTypes*/(Collection<String>) null, /*retType*/null, /*owner*/context.topType(), modifiers,
+				/*persistIt*/!classSummary);
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either
 
 		if (classSummary) {
 			// a reference of the class to itself
-			Reference ref = dico.addFamixReference(findHighestType(context.topType()), findHighestType(context.topType()), /*lastReference*/null);
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+			Reference ref = dico.addFamixReference(findHighestType(context.topType()),
+					findHighestType(context.topType()), /*lastReference*/null);
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null)) {
 				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 			}
-		}
-		else {
+		} else {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
-				signature = signature.substring(0, signature.length()-1);
+				signature = signature.substring(0, signature.length() - 1);
 			}
 			if (signature.endsWith(";")) {
-				signature = signature.substring(0, signature.length()-1);
+				signature = signature.substring(0, signature.length() - 1);
 			}
-			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, (Class) context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
-			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature, context.getLastInvocation());
-			context.setLastInvocation( invok );
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (invok != null) ) {
+			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME,
+					(Class) context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
+			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
+					context.getLastInvocation());
+			context.setLastInvocation(invok);
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (invok != null)) {
 				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -800,29 +821,31 @@ public class VerveineVisitor extends ASTVisitor {
 
 	public boolean visit(SuperConstructorInvocation node) {
 		this.context.addTopMethodNOS(1);
-		
+
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!classSummary);
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create either
 
 		if (classSummary) {
-			Reference ref = dico.addFamixReference(findHighestType(context.topMethod()), findHighestType(invoked), /*lastReference*/null);
+			Reference ref = dico.addFamixReference(findHighestType(context.topMethod()), findHighestType(invoked),
+					/*lastReference*/null);
 			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
 				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 			}
-		}
-		else {
+		} else {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
-				signature = signature.substring(0, signature.length()-1);
+				signature = signature.substring(0, signature.length() - 1);
 			}
 			if (signature.endsWith(";")) {
-				signature = signature.substring(0, signature.length()-1);
+				signature = signature.substring(0, signature.length() - 1);
 			}
-			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, (Class) context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
-			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature, context.getLastInvocation());
-			context.setLastInvocation( invok );
+			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME,
+					(Class) context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
+			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
+					context.getLastInvocation());
+			context.setLastInvocation(invok);
 			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
 				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 			}
@@ -832,17 +855,16 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(FieldAccess node) {
-//		System.err.println("TRACE, Visiting FieldAccess: "+node.getName().getIdentifier() + " inAssignmentLHS=" + inAssignmentLHS);
+		//		System.err.println("TRACE, Visiting FieldAccess: "+node.getName().getIdentifier() + " inAssignmentLHS=" + inAssignmentLHS);
 		BehaviouralEntity accessor = this.context.topMethod();
 		IVariableBinding bnd = node.resolveFieldBinding();
 		// FIXME if bnd == null we have a problem
 		ensureAccessedStructEntity(bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
 		Access lastAccess = context.getLastAccess();
-		if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 				// check that lastAccess corresponds to current one
-				&& (lastAccess != null)
-				&& (lastAccess.getAccessor() == accessor)
-				&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier())) ) {
+				&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
+				&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
 			dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
 		}
 		return super.visit(node);
@@ -852,19 +874,19 @@ public class VerveineVisitor extends ASTVisitor {
 	 * Could be a FieldAccess (see JDT javadoc: class FieldAccess) 
 	 */
 	public boolean visit(QualifiedName node) {
-//		System.err.println("TRACE, Visiting QualifiedName: "+node.getName().getIdentifier());
+		//		System.err.println("TRACE, Visiting QualifiedName: "+node.getName().getIdentifier());
 
 		IBinding bnd = node.resolveBinding();
 		if (bnd instanceof IVariableBinding) {
 			// could be a field or an enumValue
 			BehaviouralEntity accessor = this.context.topMethod();
-			ensureAccessedStructEntity((IVariableBinding)bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
+			ensureAccessedStructEntity((IVariableBinding) bnd, node.getName().getIdentifier(), /*typ*/null,
+					/*owner*/null, accessor);
 			Access lastAccess = context.getLastAccess();
-			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 					// check that lastAccess corresponds to current one
-					&& (lastAccess != null)
-					&& (lastAccess.getAccessor() == accessor)
-					&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier())) ) {
+					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
+					&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
 				dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
 			}
 
@@ -874,7 +896,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(InfixExpression node) {
-//		System.err.println("TRACE, Visiting InfixExpression: "+node);
+		//		System.err.println("TRACE, Visiting InfixExpression: "+node);
 
 		if (node.getLeftOperand() instanceof SimpleName) {
 			visitSimpleName((SimpleName) node.getLeftOperand());
@@ -883,7 +905,7 @@ public class VerveineVisitor extends ASTVisitor {
 			visitSimpleName((SimpleName) node.getRightOperand());
 		}
 		if (node.hasExtendedOperands()) {
-			for (Expression op : (List<Expression>)node.extendedOperands()) {
+			for (Expression op : (List<Expression>) node.extendedOperands()) {
 				if (op instanceof SimpleName) {
 					visitSimpleName((SimpleName) op);
 				}
@@ -917,10 +939,11 @@ public class VerveineVisitor extends ASTVisitor {
 	 * Another FieldAccess in disguise: SomeClass.class
 	 */
 	public boolean visit(TypeLiteral node) {
-		eu.synectique.verveine.core.gen.famix.Type javaMetaClass = dico.ensureFamixMetaClass(null); 
+		eu.synectique.verveine.core.gen.famix.Type javaMetaClass = dico.ensureFamixMetaClass(null);
 		BehaviouralEntity accessor = this.context.topMethod();
 
-		Attribute accessed =  dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass, /*persistIt*/!classSummary);
+		Attribute accessed = dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass,
+				/*persistIt*/!classSummary);
 		createAccess(accessor, accessed, inAssignmentLHS);
 
 		return super.visit(node);
@@ -932,17 +955,17 @@ public class VerveineVisitor extends ASTVisitor {
 		Type excepClass = node.getException().getType();
 		if (meth != null) {
 			eu.synectique.verveine.core.gen.famix.Class excepFmx = null;
-			if ( (excepClass instanceof SimpleType) || (excepClass instanceof QualifiedType) ) {
+			if ((excepClass instanceof SimpleType) || (excepClass instanceof QualifiedType)) {
 				excepFmx = (Class) referedType(excepClass, meth, true);
 			}
 			if (excepFmx != null) {
 				if (classSummary) {
-					Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx), /*lastReference*/null);
-					if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+					Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx),
+							/*lastReference*/null);
+					if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null)) {
 						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 					}
-				}
-				else {
+				} else {
 					dico.createFamixCaughtException(meth, excepFmx);
 				}
 			}
@@ -959,15 +982,16 @@ public class VerveineVisitor extends ASTVisitor {
 		this.context.addTopMethodNOS(1);
 
 		Method meth = this.context.topMethod();
-		eu.synectique.verveine.core.gen.famix.Class excepFmx = (Class) this.referedType(node.getExpression().resolveTypeBinding(), context.topType(), true);
+		eu.synectique.verveine.core.gen.famix.Class excepFmx = (Class) this
+				.referedType(node.getExpression().resolveTypeBinding(), context.topType(), true);
 		if (excepFmx != null) {
 			if (classSummary) {
-				Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx), /*lastReference*/null);
+				Reference ref = dico.addFamixReference(findHighestType(meth), findHighestType(excepFmx),
+						/*lastReference*/null);
 				if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
 					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 				}
-			}
-			else {
+			} else {
 				dico.createFamixThrownException(meth, excepFmx);
 			}
 		}
@@ -986,49 +1010,45 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public boolean visit(Assignment node) {
-//		System.err.println("TRACE, Visiting Assignment: "+node + " inAssignmentLHS=" + inAssignmentLHS);
-
+		//		System.err.println("TRACE, Visiting Assignment: "+node + " inAssignmentLHS=" + inAssignmentLHS);
 
 		inAssignmentLHS = true;
 		if (node.getLeftHandSide() instanceof SimpleName) {
 			visitSimpleName((SimpleName) node.getLeftHandSide());
-		}
-		else {
+		} else {
 			node.getLeftHandSide().accept(this);
 		}
 		inAssignmentLHS = false;
-		
+
 		if (node.getRightHandSide() instanceof SimpleName) {
 			visitSimpleName((SimpleName) node.getRightHandSide());
-		}	
-		else {
+		} else {
 			node.getRightHandSide().accept(this);
 		}
 		this.context.addTopMethodNOS(1);
 
 		return false;
 	}
-	
+
 	public boolean visit(ArrayAccess node) {
-//		System.err.println("TRACE, Visiting ArrayAccess: "+node + " inAssignmentLHS=" + inAssignmentLHS);
+		//		System.err.println("TRACE, Visiting ArrayAccess: "+node + " inAssignmentLHS=" + inAssignmentLHS);
 		// an array might be accessed in writing (see visit(Assignment node) ),
 		// but it's index is accessed in reading
 		boolean tmp = inAssignmentLHS;
-		
+
 		node.getArray().accept(this);
 
 		inAssignmentLHS = false;
 		if (node.getIndex() instanceof SimpleName) {
 			visitSimpleName((SimpleName) node.getIndex());
-		}
-		else {
+		} else {
 			node.getIndex().accept(this);
 		}
 		inAssignmentLHS = tmp;
-		
+
 		return false;
 	}
-	
+
 	public boolean visit(ContinueStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
@@ -1127,15 +1147,15 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param fmx -- the InitBlock FamixMethod
 	 */
 	private void pushInitBlockMethod(Method fmx) {
-		int nos   = (fmx.getNumberOfStatements() == null) ? 0 : fmx.getNumberOfStatements().intValue();
+		int nos = (fmx.getNumberOfStatements() == null) ? 0 : fmx.getNumberOfStatements().intValue();
 		int cyclo = (fmx.getCyclomaticComplexity() == null) ? 0 : fmx.getCyclomaticComplexity().intValue();
 		this.context.pushMethod(fmx);
-		if ( (nos != 0) || (cyclo != 0) ) {
+		if ((nos != 0) || (cyclo != 0)) {
 			context.setTopMethodNOS(nos);
 			context.setTopMethodCyclo(cyclo);
 		}
 	}
-	
+
 	/**
 	 * When closing a method declaration, we need to take care of some metrics that are also collected
 	 */
@@ -1161,7 +1181,8 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param l_args -- list of the method's parameters
 	 * TODO Why are Invocations, Accesses and References not created through a method in JavaDictionnary ?
 	 */
-	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver, eu.synectique.verveine.core.gen.famix.Type methOwner, Collection<Expression> l_args) {
+	private void methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver,
+			eu.synectique.verveine.core.gen.famix.Type methOwner, Collection<Expression> l_args) {
 		BehaviouralEntity sender = this.context.topMethod();
 		Method invoked = null;
 
@@ -1169,14 +1190,15 @@ public class VerveineVisitor extends ASTVisitor {
 			// for parameterized methods there is a level of indirection, for other methods doesn't change anything
 			calledBnd = calledBnd.getMethodDeclaration();
 		}
-		
-		if ( (receiver != null) && (receiver.getName().equals("class")) && (calledBnd != null) && (calledBnd.getDeclaringClass()==null)) {
+
+		if ((receiver != null) && (receiver.getName().equals("class")) && (calledBnd != null)
+				&& (calledBnd.getDeclaringClass() == null)) {
 			/*bug with JDT apparently has to do with invoking a method of a meta-class */
 			// Note: if classSummary is true, do we persist the meta-class and the references to it ?
 			// for now we ignore it, meaning we persist the meta-class, but don't record references to it
 			invoked = (Method) dico.getEntityByKey(calledBnd);
-			if ( (invoked==null) && (sender != null) ) {
-				eu.synectique.verveine.core.gen.famix.Class javaMetaClass = dico.ensureFamixMetaClass(null);  
+			if ((invoked == null) && (sender != null)) {
+				eu.synectique.verveine.core.gen.famix.Class javaMetaClass = dico.ensureFamixMetaClass(null);
 				for (Method m : javaMetaClass.getMethods()) {
 					if (m.getName().equals(calledName)) {
 						invoked = m;
@@ -1184,66 +1206,69 @@ public class VerveineVisitor extends ASTVisitor {
 					}
 				}
 				if (invoked == null) {
-					eu.synectique.verveine.core.gen.famix.Type retType = this.referedType(calledBnd.getReturnType(), javaMetaClass, false);
+					eu.synectique.verveine.core.gen.famix.Type retType = this.referedType(calledBnd.getReturnType(),
+							javaMetaClass, false);
 					Collection<String> paramTypes = new ArrayList<String>();
 					// types of the method's parameters
 					for (ITypeBinding pt : calledBnd.getParameterTypes()) {
-							paramTypes.add(pt.getName());
+						paramTypes.add(pt.getName());
 					}
-					invoked = this.dico.ensureFamixMethod(null, calledName, paramTypes, /*retType*/retType, /*owner*/javaMetaClass, /*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persisitIt*/!classSummary);
+					invoked = this.dico.ensureFamixMethod(null, calledName, paramTypes, /*retType*/retType,
+							/*owner*/javaMetaClass, /*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS,
+							/*persisitIt*/!classSummary);
 					dico.mapKey(calledBnd, invoked);
 				}
 			}
 			// humm ... we never create the FamixInvocation ? Why is it so?
-		}
-		else if ( (calledBnd != null) && (calledBnd.isAnnotationMember()) ) {
+		} else if ((calledBnd != null) && (calledBnd.isAnnotationMember())) {
 			// if this is not an AnnotationType member, it is similar to creating a FamixAttribute access
-			AnnotationTypeAttribute accessed =  dico.ensureFamixAnnotationTypeAttribute(calledBnd, calledName, /*owner*/null, /*persistIt*/!classSummary);
+			AnnotationTypeAttribute accessed = dico.ensureFamixAnnotationTypeAttribute(calledBnd, calledName,
+					/*owner*/null, /*persistIt*/!classSummary);
 			createAccess(sender, accessed, inAssignmentLHS);
-		}
-		else {
+		} else {
 			Collection<String> unkwnArgs = new ArrayList<String>();
 			if (l_args != null) {
-				for (@SuppressWarnings("unused") Expression a : l_args) {
+				for (@SuppressWarnings("unused")
+				Expression a : l_args) {
 					unkwnArgs.add("?");
 				}
 			}
-			
+
 			if (sender != null) {
 				int modifiers = (calledBnd != null) ? calledBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-				if ( (receiver != null) && (receiver instanceof StructuralEntity) ) {
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner, modifiers, /*persistIt*/!classSummary);
-				}
-				else {
+				if ((receiver != null) && (receiver instanceof StructuralEntity)) {
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner,
+							modifiers, /*persistIt*/!classSummary);
+				} else {
 					eu.synectique.verveine.core.gen.famix.Type owner;
-					
-					if(receiver != null)
+
+					if (receiver != null)
 						owner = (eu.synectique.verveine.core.gen.famix.Type) receiver;
 					else
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, /*owner*/owner, modifiers, /*persistIt*/!classSummary);
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null,
+							/*owner*/owner, modifiers, /*persistIt*/!classSummary);
 				}
 				if (classSummary) {
 					dico.addFamixReference(findHighestType(sender), findHighestType(methOwner), /*lastReference*/null);
 					//TODO add FileAnchor to Reference
-				}
-				else {
+				} else {
 					String signature = calledName + "(";
 					boolean first = true;
 					for (Expression a : l_args) {
 						if (first) {
 							signature += a.toString();
 							first = false;
-						}
-						else {
+						} else {
 							signature += "," + a.toString();
 						}
 					}
 					signature += ")";
-					Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, signature, context.getLastInvocation());
+					Invocation invok = dico.addFamixInvocation(sender, invoked, receiver, signature,
+							context.getLastInvocation());
 					//TODO add FileAnchor to Invocation
-					context.setLastInvocation( invok );
+					context.setLastInvocation(invok);
 				}
 			}
 		}
@@ -1255,7 +1280,9 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 	}
 
-	private Collection<StructuralEntity> visitVariablesDeclarations(ASTNode node, eu.synectique.verveine.core.gen.famix.Type varTyp, List<VariableDeclaration> fragments, ContainerEntity ctxt) {
+	private Collection<StructuralEntity> visitVariablesDeclarations(ASTNode node,
+			eu.synectique.verveine.core.gen.famix.Type varTyp, List<VariableDeclaration> fragments,
+			ContainerEntity ctxt) {
 		Collection<StructuralEntity> ret = new ArrayList<StructuralEntity>();
 
 		// we can declare the variables ...
@@ -1266,42 +1293,56 @@ public class VerveineVisitor extends ASTVisitor {
 
 			if (node instanceof MethodDeclaration) {
 				// creating the parameters of a method. In this case, 'fragment' is aList<SingleVariableDeclarationFragment> and 'varType' is null
-				fmx = dico.ensureFamixParameter(bnd, name, varTyp, (Method)ctxt, /*persistIt*/!classSummary);
-			}
-			else if (node instanceof FieldDeclaration) {
+				fmx = dico.ensureFamixParameter(bnd, name, varTyp, (Method) ctxt, /*persistIt*/!classSummary);
+			} else if (node instanceof FieldDeclaration) {
 				// creating a class' field
-				fmx = dico.ensureFamixAttribute(bnd, name, varTyp, (eu.synectique.verveine.core.gen.famix.Type) ctxt, /*persistIt*/!classSummary);
+				fmx = dico.ensureFamixAttribute(bnd, name, varTyp, (eu.synectique.verveine.core.gen.famix.Type) ctxt,
+						/*persistIt*/!classSummary);
 
 				// putting field's initialization code in an INIT_BLOCK_NAME method
 				Method ctxtMeth = this.context.topMethod();
-				if ( (vd.getInitializer() != null) && 
-					 ( (ctxtMeth == null) || (! ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) ) ) {
-					ctxtMeth = dico.ensureFamixMethod((IMethodBinding)null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), /*retType*/null, context.topType(), /*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
+				if (ctxtMeth != null && !ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+					ctxtMeth = null;
+				} else {
+					if (ctxtMeth != null && ctxtMeth.getParentType() != context.topType()) {
+						/* apparently we are in a field initialization, in an (anonymous class) which is created as another field initialization:
+						 * class Class1 {
+						 *   Class2 aField1 = new Class2() {
+						 *     Class3 aField2 = xyz;
+						 *   }}
+						 */
+						ctxtMeth = null;
+					}
+				}
+				if ((vd.getInitializer() != null) && (ctxtMeth == null)) {
+					ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME,
+							new ArrayList<String>(), /*retType*/null, context.topType(),
+							/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
 					ctxtMeth.setIsStub(false);
 					// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
 					pushInitBlockMethod(ctxtMeth);
 				}
-			}
-			else if ( (node instanceof VariableDeclarationExpression) || (node instanceof VariableDeclarationStatement) ) {
+			} else if ((node instanceof VariableDeclarationExpression)
+					|| (node instanceof VariableDeclarationStatement)) {
 				// creating a method's local variable
 				fmx = dico.ensureFamixLocalVariable(bnd, name, varTyp, (Method) ctxt, /*persistIt*/!classSummary);
-			}
-			else {
+			} else {
 				fmx = null;
 			}
 
 			if (fmx != null) {
 				fmx.setIsStub(false);
-				if (! classSummary) {
+				if (!classSummary) {
 					dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
 				}
 				ret.add(fmx);
 			}
 		}
-		
+
 		// if classSummarise is true, we might need to create a reference from the class "owning" the variables to the class of the varTyp
-		if (classSummary && (! (varTyp instanceof PrimitiveType)) ) {
-			Reference ref = dico.addFamixReference(findHighestType(ctxt), findHighestType(varTyp), /*lastReference*/null);
+		if (classSummary && (!(varTyp instanceof PrimitiveType))) {
+			Reference ref = dico.addFamixReference(findHighestType(ctxt), findHighestType(varTyp),
+					/*lastReference*/null);
 			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
 				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 			}
@@ -1319,24 +1360,23 @@ public class VerveineVisitor extends ASTVisitor {
 	private eu.synectique.verveine.core.gen.famix.Type referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
 		if (typ == null) {
 			return null;
-		}
-		else if (typ.resolveBinding() != null) {
+		} else if (typ.resolveBinding() != null) {
 			return this.referedType(typ.resolveBinding(), ctxt, isClass);
 		}
 		// from here, we assume the owner is the context
-		else if(isClass) {
-				return dico.ensureFamixClass((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false, JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
-			}
-		else {
+		else if (isClass) {
+			return dico.ensureFamixClass((ITypeBinding) null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false,
+					JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+		} else {
 			while (typ.isArrayType()) {
-				typ = ((ArrayType)typ).getElementType();
+				typ = ((ArrayType) typ).getElementType();
 			}
 
 			if (typ.isPrimitiveType()) {
-				return dico.ensureFamixPrimitiveType((ITypeBinding)null, findTypeName(typ));
-			}
-			else {
-				return dico.ensureFamixType((ITypeBinding)null, findTypeName(typ), /*owner*/ctxt, /*container*/ctxt, JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+				return dico.ensureFamixPrimitiveType((ITypeBinding) null, findTypeName(typ));
+			} else {
+				return dico.ensureFamixType((ITypeBinding) null, findTypeName(typ), /*owner*/ctxt, /*container*/ctxt,
+						JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 			}
 		}
 	}
@@ -1344,18 +1384,19 @@ public class VerveineVisitor extends ASTVisitor {
 	/**
 	 * Same as {@link VerveineVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
-	private eu.synectique.verveine.core.gen.famix.Type referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
+	private eu.synectique.verveine.core.gen.famix.Type referedType(ITypeBinding bnd, ContainerEntity ctxt,
+			boolean isClass) {
 		eu.synectique.verveine.core.gen.famix.Type fmxTyp = null;
 
 		if (bnd == null) {
 			return null;
 		}
-		
+
 		String name;
-		if (bnd.isArray() ) {
+		if (bnd.isArray()) {
 			bnd = bnd.getElementType();
 		}
-		name  = bnd.getName();
+		name = bnd.getName();
 
 		if (bnd.isParameterizedType()) {
 			int i = name.indexOf('<');
@@ -1363,25 +1404,26 @@ public class VerveineVisitor extends ASTVisitor {
 				name = name.substring(0, i);
 			}
 			ITypeBinding parameterizableBnd = bnd.getErasure();
-			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-			ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers()
+					: JavaDictionary.UNKNOWN_MODIFIERS;
+			ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, name,
+					/*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
 			if (bnd == parameterizableBnd) {
 				// JDT bug?
 				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, /*owner*/ctxt, persistClass(null));
-			}
-			else {
+			} else {
 				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, /*owner*/ctxt, persistClass(bnd));
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
 				eu.synectique.verveine.core.gen.famix.Type fmxTArg = this.referedType(targ, ctxt, false);
-				if ( (fmxTArg != null) && persistClass(targ) ) {
-					((eu.synectique.verveine.core.gen.famix.ParameterizedType)fmxTyp).addArguments(fmxTArg);
+				if ((fmxTArg != null) && persistClass(targ)) {
+					((eu.synectique.verveine.core.gen.famix.ParameterizedType) fmxTyp).addArguments(fmxTArg);
 				}
 			}
-		}
-		else {
-			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, ctxt, bnd.getModifiers(), /*alwaysPersist?*/persistClass(bnd));
+		} else {
+			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, ctxt, bnd.getModifiers(),
+					/*alwaysPersist?*/persistClass(bnd));
 		}
 
 		return fmxTyp;
@@ -1395,24 +1437,24 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param expr -- the SimpleName expression
 	 */
 	private void visitSimpleName(SimpleName expr) {
-//		System.err.println("visitSimpleName(): "+expr.getIdentifier() + " inAssignmentLHS=" + inAssignmentLHS);
+		//		System.err.println("visitSimpleName(): "+expr.getIdentifier() + " inAssignmentLHS=" + inAssignmentLHS);
 		IBinding bnd = expr.resolveBinding();
-		if ( (bnd instanceof IVariableBinding) && (context.topMethod() != null) ) {
+		if ((bnd instanceof IVariableBinding) && (context.topMethod() != null)) {
 			// could be a variable, a field, an enumValue, ...
 			BehaviouralEntity accessor = this.context.topMethod();
-			ensureAccessedStructEntity((IVariableBinding)bnd, expr.getIdentifier(), /*typ*/null, /*owner*/null, accessor);
+			ensureAccessedStructEntity((IVariableBinding) bnd, expr.getIdentifier(), /*typ*/null, /*owner*/null,
+					accessor);
 			Access lastAccess = context.getLastAccess();
-			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 					// check that lastAccess corresponds to current one
-					&& (lastAccess != null)
-					&& (lastAccess.getAccessor() == accessor)
-					&& (lastAccess.getVariable().getName().equals(expr.getIdentifier())) ) {
+					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
+					&& (lastAccess.getVariable().getName().equals(expr.getIdentifier()))) {
 				dico.addSourceAnchor(lastAccess, expr, /*oneLineAnchor*/true);
 			}
 		}
-	
+
 	}
-	
+
 	/**
 	 * Finds and/or create the Famix Entity receiving a message
 	 * Can be: ImplicitVariable (this, super), GlobalVariable, LocalVariable, Attribute, UnknownVariable, Parameter
@@ -1423,7 +1465,8 @@ public class VerveineVisitor extends ASTVisitor {
 	private NamedEntity getReceiver(Expression expr) {
 		// msg(), same as ThisExpression
 		if (expr == null) {
-			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod(), /*persistIt*/!classSummary);
+			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod(),
+					/*persistIt*/!classSummary);
 		}
 
 		// array[i].msg()
@@ -1467,13 +1510,13 @@ public class VerveineVisitor extends ASTVisitor {
 		// field.msg()
 		else if (expr instanceof FieldAccess) {
 			IVariableBinding bnd = ((FieldAccess) expr).resolveFieldBinding();
-			StructuralEntity fld = ensureAccessedStructEntity(bnd, ((FieldAccess) expr).getName().getIdentifier(), /*type*/null, /*owner*/null, /*accessor*/null);
+			StructuralEntity fld = ensureAccessedStructEntity(bnd, ((FieldAccess) expr).getName().getIdentifier(),
+					/*type*/null, /*owner*/null, /*accessor*/null);
 			Access lastAccess = context.getLastAccess();
-			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
 					// check that lastAccess corresponds to current one
-					&& (lastAccess != null)
-					&& (lastAccess.getVariable() == dico.getEntityByKey(bnd))
-					&& (lastAccess.getSourceAnchor() == null) ) {
+					&& (lastAccess != null) && (lastAccess.getVariable() == dico.getEntityByKey(bnd))
+					&& (lastAccess.getSourceAnchor() == null)) {
 				dico.addSourceAnchor(lastAccess, expr, /*oneLineAnchor*/true);
 			}
 			return fld;
@@ -1501,21 +1544,22 @@ public class VerveineVisitor extends ASTVisitor {
 			NamedEntity ret = null;
 			if (bnd instanceof ITypeBinding) {
 				// msg() is a static method of Name so name should be a class, except if its an Enum
-				ret = referedType((ITypeBinding)bnd, (ContainerEntity)context.top(), ! ((ITypeBinding) bnd).isEnum());
+				ret = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+			} else if (bnd instanceof IVariableBinding) {
+				String varName = (((Name) expr).isSimpleName() ? ((SimpleName) expr).getFullyQualifiedName()
+						: ((QualifiedName) expr).getName().getIdentifier());
+				if (((IVariableBinding) bnd).isField()) {
+					return ensureAccessedStructEntity((IVariableBinding) bnd, varName, /*typ*/null, /*owner*/null,
+							/*accessor*/null);
+				} else if (((IVariableBinding) bnd).isParameter()) {
+					ret = dico.ensureFamixParameter((IVariableBinding) bnd, varName, null, context.topMethod(),
+							/*persistIt*/!classSummary);
+				} else { // suppose it's a local variable
+					ret = dico.ensureFamixLocalVariable((IVariableBinding) bnd, varName, null, context.topMethod(),
+							/*persistIt*/!classSummary);
+				}
 			}
-			else if (bnd instanceof IVariableBinding) {
-				String varName = ( ((Name)expr).isSimpleName() ? ((SimpleName)expr).getFullyQualifiedName() : ((QualifiedName)expr).getName().getIdentifier());
-				if ( ((IVariableBinding)bnd).isField() ) {
-					return ensureAccessedStructEntity((IVariableBinding)bnd, varName, /*typ*/null, /*owner*/null, /*accessor*/null);
-				}
-				else if ( ((IVariableBinding)bnd).isParameter() ) {
-					ret = dico.ensureFamixParameter( (IVariableBinding)bnd, varName, null, context.topMethod(), /*persistIt*/!classSummary);
-				}
-				else { // suppose it's a local variable
-					ret = dico.ensureFamixLocalVariable( (IVariableBinding)bnd, varName, null, context.topMethod(), /*persistIt*/!classSummary);
-				}
-			}
-			
+
 			return ret;
 		}
 
@@ -1532,39 +1576,42 @@ public class VerveineVisitor extends ASTVisitor {
 
 		// super.field.msg()
 		else if (expr instanceof SuperFieldAccess) {
-			return ensureAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(), ((SuperFieldAccess) expr).getName().getIdentifier(), /*typ*/null, /*owner*/null, /*accessor*/null);
+			return ensureAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(),
+					((SuperFieldAccess) expr).getName().getIdentifier(), /*typ*/null, /*owner*/null, /*accessor*/null);
 		}
 
 		// super.msg1().msg()
 		else if (expr instanceof SuperMethodInvocation) {
 			//System.err.println("WARNING: Ignored receiver expression in method call: SuperMethodInvocation");
-			
+
 			return null;
 		}
-		
+
 		// this.msg()
 		else if (expr instanceof ThisExpression) {
-			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod(), /*persistIt*/!classSummary);
+			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod(),
+					/*persistIt*/!classSummary);
 		}
 
 		// type.class.msg()
 		else if (expr instanceof TypeLiteral) {
 			// similar to a field access
 			Attribute ret;
-			eu.synectique.verveine.core.gen.famix.Type javaMetaClass = dico.ensureFamixMetaClass(null); 
-			ret =  dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass, /*persistIt*/!classSummary);
+			eu.synectique.verveine.core.gen.famix.Type javaMetaClass = dico.ensureFamixMetaClass(null);
+			ret = dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass, /*persistIt*/!classSummary);
 
 			return ret;
 		}
 
 		// ... OTHER POSSIBLE EXPRESSIONS ?
-		else  {
-			System.err.println("WARNING: Unexpected receiver expression: "+expr.getClass().getName()+" (method called is" + expr.getClass().getName() + ".aMethod(...))");
+		else {
+			System.err.println("WARNING: Unexpected receiver expression: " + expr.getClass().getName()
+					+ " (method called is" + expr.getClass().getName() + ".aMethod(...))");
 		}
 
 		return null;
 	}
-	
+
 	/**
 	 * Tries its best to find the type of a receiver without using the bindings.
 	 * Most of the time, the type is that of the receiver, but not always (if there is a cast or if receiver is null)
@@ -1588,9 +1635,8 @@ public class VerveineVisitor extends ASTVisitor {
 		else if (expr instanceof MethodInvocation) {
 			IMethodBinding callerBnd = ((MethodInvocation) expr).resolveMethodBinding();
 			if (callerBnd != null) {
-				return referedType(callerBnd.getReturnType(), (ContainerEntity)this.context.top(), true);
-			}
-			else {
+				return referedType(callerBnd.getReturnType(), (ContainerEntity) this.context.top(), true);
+			} else {
 				return null;
 			}
 		}
@@ -1602,16 +1648,16 @@ public class VerveineVisitor extends ASTVisitor {
 
 		// "string".msg()
 		else if (expr instanceof StringLiteral) {
-			return dico.ensureFamixType(null, "String", dico.ensureFamixNamespaceJavaLang(null), /*alwaysPersist?*/true);  // creating FamixClass java.lang.String
+			return dico.ensureFamixType(null, "String", dico.ensureFamixNamespaceJavaLang(null),
+					/*alwaysPersist?*/true); // creating FamixClass java.lang.String
 		}
 
 		// super.msg1().msg()
 		else if (expr instanceof SuperMethodInvocation) {
 			IMethodBinding superBnd = ((SuperMethodInvocation) expr).resolveMethodBinding();
 			if (superBnd != null) {
-				return  this.referedType(superBnd.getReturnType(), context.topType(),true);
-			}
-			else {
+				return this.referedType(superBnd.getReturnType(), context.topType(), true);
+			} else {
 				return null;
 			}
 		}
@@ -1621,65 +1667,64 @@ public class VerveineVisitor extends ASTVisitor {
 			if (receiver == null) {
 				return null;
 			}
-/*			else if (receiver instanceof ImplicitVariable) {
-				if (receiver.getName().equals(JavaDictionary.SELF_NAME)) {
-					return context.topType();
-				}
-				else { // receiver.getName().equals(JavaDictionary.SUPER_NAME)
-					return context.topType().getSuperInheritances().iterator().next().getSuperclass();
-				}
-			}*/
+			/*			else if (receiver instanceof ImplicitVariable) {
+							if (receiver.getName().equals(JavaDictionary.SELF_NAME)) {
+								return context.topType();
+							}
+							else { // receiver.getName().equals(JavaDictionary.SUPER_NAME)
+								return context.topType().getSuperInheritances().iterator().next().getSuperclass();
+							}
+						}*/
 			else if (receiver instanceof StructuralEntity) {
-				return ((StructuralEntity)receiver).getDeclaredType();
-			}
-			else if (receiver instanceof eu.synectique.verveine.core.gen.famix.Type)  {
+				return ((StructuralEntity) receiver).getDeclaredType();
+			} else if (receiver instanceof eu.synectique.verveine.core.gen.famix.Type) {
 				return (eu.synectique.verveine.core.gen.famix.Type) receiver;
 			}
 			// ... what else ?
-			else  {
+			else {
 				return null;
 			}
 		}
 	}
 
-	private StructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name, eu.synectique.verveine.core.gen.famix.Type typ, ContainerEntity owner, BehaviouralEntity accessor) {
+	private StructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name,
+			eu.synectique.verveine.core.gen.famix.Type typ, ContainerEntity owner, BehaviouralEntity accessor) {
 		StructuralEntity accessed = null;
 
 		if (bnd == null) {
 			// no way to know if it should be an attribute, EnumValue, variable, ...
 			return null;
-		}
-		else {
+		} else {
 			bnd = bnd.getVariableDeclaration();
 		}
 
 		// could also test: "owner instanceof Enum" in case bnd == null
 		if (bnd.isEnumConstant()) {
-			accessed =  dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/!classSummary);
-		}
-		else if (bnd.isField()) {
-			accessed =  dico.ensureFamixAttribute(bnd, name, typ, (eu.synectique.verveine.core.gen.famix.Type) owner, /*persistIt*/!classSummary);
+			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/!classSummary);
+		} else if (bnd.isField()) {
+			accessed = dico.ensureFamixAttribute(bnd, name, typ, (eu.synectique.verveine.core.gen.famix.Type) owner,
+					/*persistIt*/!classSummary);
 			if (classSummary) {
-				if (! (accessed.getDeclaredType() instanceof PrimitiveType)) {
-					dico.addFamixReference(findHighestType(accessed.getBelongsTo()), findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
+				if (!(accessed.getDeclaredType() instanceof PrimitiveType)) {
+					dico.addFamixReference(findHighestType(accessed.getBelongsTo()),
+							findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
 					//TODO add FileAnchor to Reference
 				}
 			}
 
-			if ( (accessed != null) && (((Attribute) accessed).getParentType() == null) && (accessed.getName().equals("length")) ) {
+			if ((accessed != null) && (((Attribute) accessed).getParentType() == null)
+					&& (accessed.getName().equals("length"))) {
 				// special case: length attribute of arrays in Java
 				((Attribute) accessed).setParentType(dico.ensureFamixClassArray());
 			}
-		}
-		else if (bnd.isParameter()) {
-			if (! classSummary) {
-				accessed =  dico.ensureFamixParameter(bnd, name, typ, (Method) owner, /*persistIt*/!classSummary);
+		} else if (bnd.isParameter()) {
+			if (!classSummary) {
+				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, /*persistIt*/!classSummary);
 			}
-		}
-		else {
+		} else {
 			// it seems it is a variable.
 			// if it is not already defined, we assume we are not interested
-			accessed =  (StructuralEntity) dico.getEntityByKey(bnd);
+			accessed = (StructuralEntity) dico.getEntityByKey(bnd);
 		}
 
 		createAccess(accessor, accessed, inAssignmentLHS);
@@ -1695,13 +1740,13 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	private void createAccess(BehaviouralEntity accessor, StructuralEntity accessed, boolean isLHS) {
 		// create local accesses?
-		if ( (accessed != null) && (accessor != null)) {
+		if ((accessed != null) && (accessor != null)) {
 			if (classSummary) {
 				dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
 				//TODO set FileAnchor to Reference
-			}
-			else if (accessed.getBelongsTo() != accessor) {
-				context.setLastAccess( dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()) );
+			} else if (accessed.getBelongsTo() != accessor) {
+				context.setLastAccess(
+						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
 				//TODO set FileAnchor to Access
 			}
 		}
@@ -1711,27 +1756,21 @@ public class VerveineVisitor extends ASTVisitor {
 		if (t == null) {
 			return null;
 		}
-		
+
 		if (t.isPrimitiveType()) {
 			return t.toString();
-		}
-		else if (t.isSimpleType()) {
-			return ((SimpleType)t).getName().getFullyQualifiedName();
-		}
-		else if (t.isQualifiedType()) {
-			return ((QualifiedType)t).getName().getIdentifier();
-		}
-		else if (t.isArrayType()) {
-			return findTypeName( ((ArrayType)t).getElementType() );
-		}
-		else if (t.isParameterizedType()) {
-			return findTypeName(((org.eclipse.jdt.core.dom.ParameterizedType)t).getType());
-		}
-		else { // it is a WildCardType
-			if ( ((org.eclipse.jdt.core.dom.WildcardType)t).isUpperBound() ) {
-				return findTypeName( ((org.eclipse.jdt.core.dom.WildcardType)t).getBound() );
-			}
-			else {
+		} else if (t.isSimpleType()) {
+			return ((SimpleType) t).getName().getFullyQualifiedName();
+		} else if (t.isQualifiedType()) {
+			return ((QualifiedType) t).getName().getIdentifier();
+		} else if (t.isArrayType()) {
+			return findTypeName(((ArrayType) t).getElementType());
+		} else if (t.isParameterizedType()) {
+			return findTypeName(((org.eclipse.jdt.core.dom.ParameterizedType) t).getType());
+		} else { // it is a WildCardType
+			if (((org.eclipse.jdt.core.dom.WildcardType) t).isUpperBound()) {
+				return findTypeName(((org.eclipse.jdt.core.dom.WildcardType) t).getBound());
+			} else {
 				return JavaDictionary.OBJECT_NAME;
 			}
 		}
@@ -1748,21 +1787,19 @@ public class VerveineVisitor extends ASTVisitor {
 				// parameterized types seem to never belong to a method even when they are created within one
 				// so we kind of "force" persistClass to consider only context by passing a null binding to it
 				return persistClass(null);
-			}
-			else {
+			} else {
 				// let see if it is a type parameter
 				NamedEntity t = dico.getEntityByKey(bnd);
-				if ( (t != null) && (t instanceof ParameterType) ) {
-					return false; 
+				if ((t != null) && (t instanceof ParameterType)) {
+					return false;
 				}
 				// finally, the "normal" case
-				return (! classSummary) || (bnd.getDeclaringMethod() == null);
+				return (!classSummary) || (bnd.getDeclaringMethod() == null);
 			}
+		} else {
+			return (!classSummary) || (context.topMethod() == null);
 		}
-		else {
-			return (! classSummary) || (context.topMethod() == null);
-		}
-		
+
 	}
 
 	/**
@@ -1770,18 +1807,17 @@ public class VerveineVisitor extends ASTVisitor {
 	 * @param e
 	 * @return
 	 */
-	private eu.synectique.verveine.core.gen.famix.Type findHighestType (NamedEntity e) {
+	private eu.synectique.verveine.core.gen.famix.Type findHighestType(NamedEntity e) {
 		eu.synectique.verveine.core.gen.famix.Type ret = null;
 
-		while ( (! (e instanceof Namespace)) && (e != null) ) {
+		while ((!(e instanceof Namespace)) && (e != null)) {
 			if (e instanceof ParameterizedType) {
-				e = ((ParameterizedType)e).getParameterizableClass();
-			}
-			else if (e instanceof eu.synectique.verveine.core.gen.famix.Type) {
-				ret = (eu.synectique.verveine.core.gen.famix.Type)e;
+				e = ((ParameterizedType) e).getParameterizableClass();
+			} else if (e instanceof eu.synectique.verveine.core.gen.famix.Type) {
+				ret = (eu.synectique.verveine.core.gen.famix.Type) e;
 			}
 			e = e.getBelongsTo();
-		}			
+		}
 		return ret;
 	}
 
