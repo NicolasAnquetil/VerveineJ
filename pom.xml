@@ -1,0 +1,114 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>verveine.extractor.java</groupId>
+	<artifactId>verveine.extractor.java</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<repositories>
+		<repository>
+			<id>in-project</id>
+			<name>In Project Repo</name>
+			<url>file://${project.basedir}/mavenDependencies</url>
+		</repository>
+	</repositories>
+	
+	<!-- cmd to install jars:
+	    mvn install:install-file -Dfile=D:\ProjectsOO\Verveine\verveine.core\lib\famix-20170202_1613.jar -DgroupId=com.vreveinej \
+        -DartifactId=famix -Dversion=20170202_1613 -Dpackaging=jar
+         -->
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.verveinej</groupId>
+			<artifactId>akuhn.util</artifactId>
+			<version>r28011</version>
+		</dependency>
+		<dependency>
+			<groupId>com.verveinej</groupId>
+			<artifactId>fame</artifactId>
+			<version>201403040925</version>
+		</dependency>
+		<dependency>
+			<groupId>com.verveinej</groupId>
+			<artifactId>famix</artifactId>
+			<version>20170202_1613</version>
+		</dependency>
+		<dependency>
+			<groupId>com.verveinej</groupId>
+			<artifactId>fast</artifactId>
+			<version>20160614_1015</version>
+		</dependency>
+		<dependency>
+			<groupId>com.verveinej</groupId>
+			<artifactId>verveine.core</artifactId>
+			<version>20160614_1015</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.runtime</groupId>
+			<artifactId>org.eclipse.core.contenttype</artifactId>
+			<version>3.5.0.v20150421-2214</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.runtime</groupId>
+			<artifactId>org.eclipse.core.jobs</artifactId>
+			<version>3.7.0.v20150330-2103</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.runtime</groupId>
+			<artifactId>org.eclipse.core.resources</artifactId>
+			<version>3.10.0.v20150423-0755</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.runtime</groupId>
+			<artifactId>org.eclipse.core.runtime</artifactId>
+			<version>3.11.0.v20150405-1723</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.scout.sdk.deps</groupId>
+			<artifactId>org.eclipse.equinox.common</artifactId>
+			<version>3.7.0.v20150402-1709</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.birt.runtime</groupId>
+			<artifactId>org.eclipse.equinox.preferences</artifactId>
+			<version>3.5.300.v20150408-1437</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.tycho</groupId>
+			<artifactId>org.eclipse.jdt.core</artifactId>
+			<version>3.11.0.v20150602-1242</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.tycho</groupId>
+			<artifactId>org.eclipse.osgi</artifactId>
+			<version>3.10.100.v20150529-1857</version>
+		</dependency>
+		<!-- For body hash -->
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.4</version>
+		</dependency>
+	</dependencies>
+	<build>
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>tests</testSourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
