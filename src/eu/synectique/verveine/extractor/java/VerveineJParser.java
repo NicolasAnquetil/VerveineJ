@@ -65,7 +65,7 @@ public class VerveineJParser extends VerveineParser {
 	private boolean allLocals = false;
 
 	/**
-	 * Option: The version of Java expected by the parser 
+	 * Option: The version of Java expected by the parser
 	 */
 	protected String codeVers = null;
 
@@ -78,13 +78,13 @@ public class VerveineJParser extends VerveineParser {
 	 * The arguments that were passed to the parser
 	 * Needed to relativize the source file names
 	 */
-	private Collection<String> argPath;
-	private Collection<String> argFiles;
+	protected Collection<String> argPath;
+	protected Collection<String> argFiles;
 
 	/**
 	 * Java parser, provided by JDT
 	 */
-	private ASTParser jdtParser = null;
+	protected ASTParser jdtParser = null;
 
 	public VerveineJParser() {
 		super();
@@ -133,7 +133,7 @@ public class VerveineJParser extends VerveineParser {
 			String jarname = fcp.readLine();
 			while (jarname != null) {
 				tmpPath.add(jarname);
-				jarname = fcp.readLine();				
+				jarname = fcp.readLine();
 			}
 			fcp.close();
 		} catch (FileNotFoundException e) {
@@ -147,7 +147,7 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	public void setOptions(String[] args) {
-		String[] classPath = new String[] { };
+		String[] classPath = new String[] {};
 		argPath = new ArrayList<String>();
 		argFiles = new ArrayList<String>();
 
@@ -318,13 +318,13 @@ for (int j =0; j<classPath.length; j++) { System.out.println("CLASSPATH:"+classP
 
 	}
 
-	private void collectJavaFiles(Collection<String> paths, Collection<String> files) {
+	protected void collectJavaFiles(Collection<String> paths, Collection<String> files) {
 		for (String p : paths) {
 			collectJavaFiles(new File(p), files);
 		}
 	}
 
-	private void collectJavaFiles(File f, Collection<String> files) {
+	protected void collectJavaFiles(File f, Collection<String> files) {
 		if (f.isFile() && f.getName().endsWith(".java")) {
 			files.add(f.getAbsolutePath());
 		} else if (f.isDirectory()) {
@@ -408,13 +408,15 @@ for (int j =0; j<classPath.length; j++) { System.out.println("CLASSPATH:"+classP
 		VerveineJParser parser = new VerveineJParser();
 		parser.setOptions(args);
 		parser.parse();
-		//parser.debug();
+		// parser.debug();
 		parser.emitMSE();
 	}
 
-	/** developer method to know what went wrong
+	/**
+	 * developer method to know what went wrong
+	 * 
 	 * @param checker
-	 * @param licenceCheck 
+	 * @param licenceCheck
 	 */
 	private static void cannotContinue(LicenceChecker checker, int licenceCheck) {
 		System.err.println("Authentication failure VerveineJ cannot continue");
