@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2010 Nicolas Anquetil
  */
-package tests.eu.synectique.verveine.extractor.java;
+package eu.synectique.verveine.extractor.java;
 
 /*
 PrintServer
@@ -150,7 +150,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		parser.emitMSE(VerveineJParser.OUTPUT_FILE);  // to create a new one
 	}
 
-	@Test
+	@Test(timeout=100)
 	public void testEntitiesNumber() {
 		int nbClasses = 10+14;
 		int nbInherit = 7+21;

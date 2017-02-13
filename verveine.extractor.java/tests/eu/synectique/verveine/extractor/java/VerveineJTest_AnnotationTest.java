@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2010 Anquetil Nicolas
  */
-package tests.eu.synectique.verveine.extractor.java;
+package eu.synectique.verveine.extractor.java;
 
 
 import static org.junit.Assert.assertEquals;
@@ -80,6 +80,22 @@ public class VerveineJTest_AnnotationTest {
 		assertEquals("value", att.getAnnotationTypeAttribute().getName());
 		
 		assertEquals("InterceptorClass.class", att.getValue());
+
+	}
+
+	@Test
+	public void testAnnotationInstanceEmptyArrayForValue() {
+		eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnotherInterceptorClass");
+		assertNotNull(clss);
+
+		assertEquals(1, clss.getAnnotationInstances().size());
+		AnnotationInstance inst = clss.getAnnotationInstances().iterator().next();
+		assertNotNull(inst);
+
+		assertEquals(1, inst.getAttributes().size());
+		AnnotationInstanceAttribute att = inst.getAttributes().iterator().next();
+		assertNotNull(att);
+		assertEquals("{}", att.getValue());
 
 	}
 
