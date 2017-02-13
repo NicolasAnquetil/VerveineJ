@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2010 Nicolas Anquetil
  */
-package tests.eu.synectique.verveine.extractor.java;
+package eu.synectique.verveine.extractor.java;
 
 
 import static org.junit.Assert.assertEquals;
