@@ -13,7 +13,7 @@ import ch.akuhn.fame.Repository;
 public class FamixRequestor extends FileASTRequestor {
 
 	protected Repository famixRepo;
-	
+
 	protected JavaDictionary famixDictionnary;
 
 	/**
@@ -31,25 +31,26 @@ public class FamixRequestor extends FileASTRequestor {
 	 * what sourceAnchors to create
 	 */
 	private String anchors;
-	
+
 	/**
 	 * Maps the arguments (file names or dir names) to their absolute path (well actually it is the other way around)
 	 */
 	protected Map<String, String> dirMap;
 	protected Map<String, String> fileMap;
 
-	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary, boolean allLocals, String anchors) {
+	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary,
+			boolean allLocals, String anchors) {
 		super();
 		this.famixRepo = r;
-		
+
 		this.fileMap = new HashMap<String, String>();
 		// initialization of the Map with the absolute paths
-		for(String tempArgFile : argsFile)
+		for (String tempArgFile : argsFile)
 			this.fileMap.put(new File(tempArgFile).getAbsolutePath(), tempArgFile);
 
 		this.dirMap = new HashMap<String, String>();
 		// initialization of the Map with the absolute paths
-		for(String tempArgDir : argsDir)
+		for (String tempArgDir : argsDir)
 			this.dirMap.put(new File(tempArgDir).getAbsolutePath(), tempArgDir);
 
 		this.classSummary = classSummary;
@@ -61,15 +62,14 @@ public class FamixRequestor extends FileASTRequestor {
 
 	public void acceptAST(String sourceFilePath, CompilationUnit ast) {
 		String path = relativePath(sourceFilePath);
-		System.out.println("VerveineJ processing file: "+path);
+		System.out.println("Processing file: " + path);
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
 			ast.accept(new VerveineVisitor(this.famixDictionnary, classSummary, allLocals, anchors));
-		}
-		catch (Exception e) {
-			System.err.println("*** VerveineJ visitor got exception: '"+e+"' while processing file: "+path);
-			e.printStackTrace();  // for debugging
+		} catch (Exception e) {
+			System.err.println("*** Visitor got exception: '" + e + "' while processing file: " + path);
+			e.printStackTrace(); // for debugging
 		}
 	}
 
@@ -89,18 +89,16 @@ public class FamixRequestor extends FileASTRequestor {
 
 		// file belongs to a directory that was a verveinej arg
 		// need to find back this arg
-		while (file != null)
-		{
+		while (file != null) {
 			String key = file.getAbsolutePath();
 
-			if (this.dirMap.containsKey(key)){
+			if (this.dirMap.containsKey(key)) {
 				// relative path = verveineJ arg + local-path-to-the-file
-				if (! this.dirMap.get(key).endsWith(File.separator)) 
+				if (!this.dirMap.get(key).endsWith(File.separator))
 					return this.dirMap.get(key) + "/" + fullPath.substring(key.length() + 1);
-				else 
-					return this.dirMap.get(key) +       fullPath.substring(key.length() + 1);
-			}
-			else 
+				else
+					return this.dirMap.get(key) + fullPath.substring(key.length() + 1);
+			} else
 				file = file.getParentFile();
 		}
 		return fullPath;
