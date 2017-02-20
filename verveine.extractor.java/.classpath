@@ -10,7 +10,7 @@
 	<classpathentry kind="lib" path="lib/commons-codec-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/famix-20170220_1623.jar"/>
 	<classpathentry kind="lib" path="lib/fast-20170220_1623.jar"/>
-	<classpathentry kind="lib" path="lib/verveine.core-20170220_1623.jar"/>
+	<classpathentry kind="lib" path="lib/verveine.core-20170220_1623.jar" sourcepath="/verveine.core"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.equinox.common_3.7.0.v20150402-1709.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.core.contenttype_3.5.0.v20150421-2214.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.core.jobs_3.7.0.v20150330-2103.jar"/>
