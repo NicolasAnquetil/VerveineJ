@@ -654,6 +654,22 @@ public class VerveineVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	@SuppressWarnings("unchecked")
+	public boolean visit(EnumConstantDeclaration node) {
+		for (Expression expr : (List<Expression>)node.arguments()) {
+			if (expr != null) {
+				createInitBlock();
+				break;  // we created the INIT_BLOCK, no need to look for other arguments that would only ensure the same creation
+			}
+		}
+		return super.visit(node);
+	
+	}
+
+	public void endVisit(EnumConstantDeclaration node) {
+		optionalCloseInitBlock();
+	}
+
 	@SuppressWarnings({ "unchecked" })
 	public boolean visit(FieldDeclaration node) {
 		//		System.err.println("TRACE, Visiting FieldDeclaration");
@@ -682,6 +698,10 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	public void endVisit(FieldDeclaration node) {
+		optionalCloseInitBlock();
+	}
+
+	protected void optionalCloseInitBlock() {
 		Method ctxtMeth = this.context.topMethod();
 		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME))) {
 			closeMethodDeclaration();
@@ -1280,9 +1300,9 @@ public class VerveineVisitor extends ASTVisitor {
 		}
 	}
 
-	private Collection<StructuralEntity> visitVariablesDeclarations(ASTNode node,
-			eu.synectique.verveine.core.gen.famix.Type varTyp, List<VariableDeclaration> fragments,
-			ContainerEntity ctxt) {
+	private Collection<StructuralEntity> visitVariablesDeclarations(ASTNode parentNode,
+																	eu.synectique.verveine.core.gen.famix.Type varTyp, List<VariableDeclaration> fragments,
+																	ContainerEntity ctxt) {
 		Collection<StructuralEntity> ret = new ArrayList<StructuralEntity>();
 
 		// we can declare the variables ...
@@ -1291,39 +1311,18 @@ public class VerveineVisitor extends ASTVisitor {
 			IVariableBinding bnd = vd.resolveBinding();
 			String name = vd.getName().getIdentifier();
 
-			if (node instanceof MethodDeclaration) {
+			if (parentNode instanceof MethodDeclaration) {
 				// creating the parameters of a method. In this case, 'fragment' is aList<SingleVariableDeclarationFragment> and 'varType' is null
 				fmx = dico.ensureFamixParameter(bnd, name, varTyp, (Method) ctxt, /*persistIt*/!classSummary);
-			} else if (node instanceof FieldDeclaration) {
+			} else if (parentNode instanceof FieldDeclaration) {
 				// creating a class' field
 				fmx = dico.ensureFamixAttribute(bnd, name, varTyp, (eu.synectique.verveine.core.gen.famix.Type) ctxt,
 						/*persistIt*/!classSummary);
-
-				// putting field's initialization code in an INIT_BLOCK_NAME method
-				Method ctxtMeth = this.context.topMethod();
-				if (ctxtMeth != null && !ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
-					ctxtMeth = null;
-				} else {
-					if (ctxtMeth != null && ctxtMeth.getParentType() != context.topType()) {
-						/* apparently we are in a field initialization, in an (anonymous class) which is created as another field initialization:
-						 * class Class1 {
-						 *   Class2 aField1 = new Class2() {
-						 *     Class3 aField2 = xyz;
-						 *   }}
-						 */
-						ctxtMeth = null;
-					}
+				if (vd.getInitializer() != null) {
+					createInitBlock();
 				}
-				if ((vd.getInitializer() != null) && (ctxtMeth == null)) {
-					ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME,
-							new ArrayList<String>(), /*retType*/null, context.topType(),
-							/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
-					ctxtMeth.setIsStub(false);
-					// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
-					pushInitBlockMethod(ctxtMeth);
-				}
-			} else if ((node instanceof VariableDeclarationExpression)
-					|| (node instanceof VariableDeclarationStatement)) {
+			} else if ((parentNode instanceof VariableDeclarationExpression)
+					|| (parentNode instanceof VariableDeclarationStatement)) {
 				// creating a method's local variable
 				fmx = dico.ensureFamixLocalVariable(bnd, name, varTyp, (Method) ctxt, /*persistIt*/!classSummary);
 			} else {
@@ -1344,11 +1343,42 @@ public class VerveineVisitor extends ASTVisitor {
 			Reference ref = dico.addFamixReference(findHighestType(ctxt), findHighestType(varTyp),
 					/*lastReference*/null);
 			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
-				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+				dico.addSourceAnchor(ref, parentNode, /*oneLineAnchor*/true);
 			}
 		}
 
 		return ret;
+	}
+
+
+	/**
+	 * when we have an initialization in a variable declaration, we may need to create a faker
+	 * INIT_Block method if this variable is a field (for example) 
+	 */
+	protected void createInitBlock() {
+		// putting field's initialization code in an INIT_BLOCK_NAME method
+		Method ctxtMeth = this.context.topMethod();
+		if (ctxtMeth != null && !ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+			ctxtMeth = null;
+		} else {
+			if (ctxtMeth != null && ctxtMeth.getParentType() != context.topType()) {
+				/* apparently we are in a field initialization, in an (anonymous class) which is created as another field initialization:
+				 * class Class1 {
+				 *   Class2 aField1 = new Class2() {
+				 *     Class3 aField2 = xyz;
+				 *   }}
+				 */
+				ctxtMeth = null;
+			}
+		}
+		if (ctxtMeth == null) {
+			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME,
+					new ArrayList<String>(), /*retType*/null, context.topType(),
+					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
+			ctxtMeth.setIsStub(false);
+			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
+			pushInitBlockMethod(ctxtMeth);
+		}
 	}
 
 	/**
