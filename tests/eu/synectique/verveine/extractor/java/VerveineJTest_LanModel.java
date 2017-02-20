@@ -426,7 +426,30 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				assertEquals("Wrong number of outgoing invocation for Node.printOn()", 8, mNode.getOutgoingInvocations().size());
 			}
 		}
-		
+
+		// test that the chain (next/previous) of invocations is correct
+		for (Method mNode : nodeClass.getMethods()) {
+			if (mNode.getName().equals("accept")) {
+				Invocation invok = mNode.getOutgoingInvocations().iterator().next();
+				assertNull(invok.getPrevious());
+				assertNull(invok.getNext());
+			}
+			else if (mNode.getName().equals("send"))  {
+				int nbNull = 0;
+				for (Invocation invok : mNode.getOutgoingInvocations()) {
+					Invocation previous = (Invocation) invok.getPrevious();
+					if (previous == null) {
+						nbNull++;
+						assertTrue( invok.getSignature().startsWith("println("));
+					}
+					else {
+						assertSame(mNode, previous.getSender());
+					}					
+				}
+				assertEquals(1, nbNull);
+			}
+		}
+
 		eu.synectique.verveine.core.gen.famix.Class sdaClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(sdaClass);
 		for (Method mSDA : sdaClass.getMethods()) {
@@ -455,28 +478,6 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			}
 		}
 		
-		// test that the chain (next/previous) of invocations is correct
-		for (Method mNode : nodeClass.getMethods()) {
-			if (mNode.getName().equals("accept")) {
-				Invocation invok = mNode.getOutgoingInvocations().iterator().next();
-				assertNull(invok.getPrevious());
-				assertNull(invok.getNext());
-			}
-			else if (mNode.getName().equals("send"))  {
-				int nbNull = 0;
-				for (Invocation invok : mNode.getOutgoingInvocations()) {
-					Invocation previous = (Invocation) invok.getPrevious();
-					if (previous == null) {
-						nbNull++;
-					}
-					else {
-						assertSame(mNode, previous.getSender());
-					}					
-				}
-				assertEquals(1, nbNull);
-			}
-		}
-
 	}
 
 	@Test
@@ -668,7 +669,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			assertNotNull(owner);
 			if (owner.getName().equals("OutputServer")) {
 			assertEquals(2, m.getCyclomaticComplexity());
-				assertEquals(6, m.getNumberOfStatements());
+				assertEquals(3, m.getNumberOfStatements());
 			}
 			else if (owner.getName().equals("Node")) {
 				assertEquals(1, m.getCyclomaticComplexity());
@@ -676,7 +677,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			}
 			else if (owner.getName().equals("WorkStation")) {
 				assertEquals(2, m.getCyclomaticComplexity());
-				assertEquals(7, m.getNumberOfStatements());
+				assertEquals(4, m.getNumberOfStatements());
 			}
 		}		
 	}

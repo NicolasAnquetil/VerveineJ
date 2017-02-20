@@ -34,6 +34,7 @@ import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
 import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
@@ -566,6 +567,9 @@ public class VerveineVisitor extends ASTVisitor {
 
 			if (node.getBody() != null) {
 				context.setTopMethodCyclo(1);
+				context.setLastInvocation(null);
+				context.setLastReference(null);
+				context.setLastAccess(null);
 			}
 
 			// creating the method's parameters
@@ -770,7 +774,6 @@ public class VerveineVisitor extends ASTVisitor {
 			visitSimpleName((SimpleName) callingExpr);
 		}
 
-		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
@@ -793,7 +796,6 @@ public class VerveineVisitor extends ASTVisitor {
 					node.arguments());
 		}
 
-		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
@@ -1079,6 +1081,11 @@ public class VerveineVisitor extends ASTVisitor {
 			visitSimpleName((SimpleName) node.getExpression());
 		}
 		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	public boolean visit(ExpressionStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
