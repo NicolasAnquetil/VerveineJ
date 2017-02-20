@@ -1,0 +1,117 @@
+http://37.139.2.203/validator
+---
+ssh root@37.139.2.203
+passwd: zkarikadjcrt
+log de apache: /etc/apache2/logs/access_log 
+log de validator: /var/www/validator/image/PharoTranscript.log
+---
+
+Supported Commands
+
+add:name
+	Add a user with the given name in the system. Default period is 6 months
+add:name:numberOfMonths
+	Add a user with the given name in the system for provided number of months
+resetUser: name
+	Reset the key of a given user
+delete:name
+	Delete the user from the system
+Users
+	Show the list of registered users
+validate:key
+	Validate the user with a key
+setKey:username:key
+	assign a new key to a user
+
+
+========================================================================================
+DEBUG
+
+https://www.ip2location.com/demo:
+212.204.101.10 	Germany, Bayern, Munich
+80.219.58.235	Switzerland, Bern, Bern
+78.219.220.10	France, Nord-Pas-de-Calais, Wailly
+
+---
+
+78.219.220.103 - - [20/Apr/2016:06:44:23 +0000] "GET /validator/add:wettel@gmail.com:6 HTTP/1.1" 200 212
+2016-04-20 06:44:23 963946 D Executing request/response loop
+2016-04-20 06:44:23 963946 I Read a ZnRequest(GET /add:wettel@gmail.com:6)
+2016-04-20 06:44:24 963946 T GET /add:wettel@gmail.com:6 200 18B 46ms
+2016-04-20 06:44:24 963946 I Wrote a ZnResponse(200 OK text/plain;charset=utf-8 18B)
+2016-04-20 06:44:24 963946 D ZnUnknownHttpMethod bad request while parsing
+2016-04-20 06:44:24 963946 D ConnectionClosed: Cannot write data while writing response
+2016-04-20 06:44:24 963946 D Closing stream
+
+78.219.220.103 - - [20/Apr/2016:06:45:38 +0000] "GET /validator/users HTTP/1.1" 200 1582
+2016-04-20 06:45:38 392301 D Executing request/response loop
+2016-04-20 06:45:38 392301 I Read a ZnRequest(GET /users)
+2016-04-20 06:45:38 392301 T GET /users 200 3920B 2ms
+2016-04-20 06:45:38 392301 I Wrote a ZnResponse(200 OK text/html;charset=utf-8 3920B)
+2016-04-20 06:45:38 392301 D ZnUnknownHttpMethod bad request while parsing
+2016-04-20 06:45:38 392301 D ConnectionClosed: Cannot write data while writing response
+2016-04-20 06:45:38 392301 D Closing stream
+
+212.204.101.10 - - [20/Apr/2016:11:05:41 +0000] "GET /validator/validate:63877245441021977 HTTP/1.1" 401 332
+2016-04-20 11:05:41 342504 D Executing request/response loop
+2016-04-20 11:05:41 342504 I Read a ZnRequest(GET /validate:63877245441021977)
+2016-04-20 11:05:41 342504 T GET /validate:63877245441021977 401 14B 0ms
+2016-04-20 11:05:41 342504 I Wrote a ZnResponse(401 Unauthorized text/plain;charset=utf-8 14B)
+2016-04-20 11:05:41 342504 D ZnUnknownHttpMethod bad request while parsing
+2016-04-20 11:05:41 342504 D ConnectionClosed: Cannot write data while writing response
+2016-04-20 11:05:41 342504 D Closing stream
+
+212.204.101.10 - - [20/Apr/2016:11:05:52 +0000] "GET /validator/validate:63877245441021977 HTTP/1.1" 401 332
+2016-04-20 11:05:52 726825 D Executing request/response loop
+2016-04-20 11:05:52 726825 I Read a ZnRequest(GET /validate:63877245441021977)
+2016-04-20 11:05:52 726825 T GET /validate:63877245441021977 401 14B 0ms
+2016-04-20 11:05:52 726825 I Wrote a ZnResponse(401 Unauthorized text/plain;charset=utf-8 14B)
+2016-04-20 11:05:52 726825 D ConnectionClosed: Connection closed while waiting for data. while reading request
+2016-04-20 11:05:52 726825 D Closing stream
+
+80.219.58.235 - - [21/Apr/2016:18:46:02 +0000] "GET /validator/validate:103384695647115329 HTTP/1.1" 200 267
+2016-04-21 18:46:02 734917 D Executing request/response loop
+2016-04-21 18:46:02 734917 I Read a ZnRequest(GET /validate:103384695647115329)
+2016-04-21 18:46:02 734917 T GET /validate:103384695647115329 200 17B 24ms
+2016-04-21 18:46:02 734917 I Wrote a ZnResponse(200 OK text/plain;charset=utf-8 17B)
+2016-04-21 18:46:02 734917 D ZnUnknownHttpMethod bad request while parsing
+2016-04-21 18:46:02 734917 D ConnectionClosed: Cannot write data while writing response
+2016-04-21 18:46:02 734917 D Closing stream
+
+80.219.58.235 - - [21/Apr/2016:20:02:06 +0000] "GET /validator/validate:70450995849423345 HTTP/1.1" 200 267
+2016-04-21 20:02:06 471914 D Executing request/response loop
+2016-04-21 20:02:06 471914 I Read a ZnRequest(GET /validate:70450995849423345)
+2016-04-21 20:02:06 471914 T GET /validate:70450995849423345 200 17B 28ms
+2016-04-21 20:02:06 471914 I Wrote a ZnResponse(200 OK text/plain;charset=utf-8 17B)
+2016-04-21 20:02:06 471914 D ZnUnknownHttpMethod bad request while parsing
+2016-04-21 20:02:06 471914 D ConnectionClosed: Cannot write data while writing response
+2016-04-21 20:02:06 471914 D Closing stream
+
+193.124.183.62 - - [21/Apr/2016:21:13:41 +0000] "GET / HTTP/1.1" 200 384
+
+207.46.13.153 - - [22/Apr/2016:02:49:40 +0000] "GET / HTTP/1.1" 200 427
+
+222.85.138.75 - - [22/Apr/2016:03:56:36 +0000] "HEAD http://www.sina.com.cn HTTP/1.1" 200 256
+
+193.51.236.113 - - [22/Apr/2016:06:51:14 +0000] "GET /validator/users HTTP/1.1" 200 1581
+
+193.51.236.113 - - [22/Apr/2016:08:56:06 +0000] "GET /validator/validate:79849388511339409 HTTP/1.1" 200 267
+2016-04-22 08:56:06 138137 D Executing request/response loop
+2016-04-22 08:56:06 138137 I Read a ZnRequest(GET /validate:79849388511339409)
+2016-04-22 08:56:06 138137 T GET /validate:79849388511339409 200 17B 2ms
+2016-04-22 08:56:06 138137 I Wrote a ZnResponse(200 OK text/plain;charset=utf-8 17B)
+2016-04-22 08:56:06 138137 D ZnUnknownHttpMethod bad request while parsing
+2016-04-22 08:56:06 138137 D ConnectionClosed: Cannot write data while writing response
+2016-04-22 08:56:06 138137 D Closing stream
+2
+193.51.236.113 - - [22/Apr/2016:09:12:39 +0000] "GET /validator/validate:20597221325415741 HTTP/1.1" 200 267
+2016-04-22 09:12:39 477068 D Executing request/response loop
+2016-04-22 09:12:39 477068 I Read a ZnRequest(GET /validate:20597221325415741)
+2016-04-22 09:12:39 477068 T GET /validate:20597221325415741 200 17B 4ms
+2016-04-22 09:12:39 477068 I Wrote a ZnResponse(200 OK text/plain;charset=utf-8 17B)
+2016-04-22 09:12:39 477068 D ZnUnknownHttpMethod bad request while parsing
+2016-04-22 09:12:39 477068 D ConnectionClosed: Cannot write data while writing response
+2016-04-22 09:12:39 477068 D Closing stream
+
+---
+wettel@gmail.com 	20 October 2016 	12550672713649499
