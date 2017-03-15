@@ -11,6 +11,9 @@
 	<property name="core.dir"     location="../verveine.core" />
 	<property name="test.dir"     location="src/tests/eu/synectique/verveine/extractor/java/" />
 	<property name="test.report.dir" location="testrep" />
+	<property name="lib.fast" location="${dist.dir}/fast.jar" />
+	<property name="lib.famix" location="${dist.dir}/famix.jar" />
+	<property name="lib.verveine.core" location="${dist.dir}/verveine.core.jar" />
 
 	<path id="build.classpath">
 		<fileset dir="${dist.dir}">
@@ -24,6 +27,9 @@
 		<delete dir="${build.dir}" />
 		<delete dir="${docs.dir}" />
 		<delete file="${verveine.jar}" />
+		<delete file="${lib.fast}" />
+		<delete file="${lib.famix}" />
+		<delete file="${lib.verveine.core}" />
 	</target>
 
 	<!-- Re-creates the  build, docs and dist directory-->
