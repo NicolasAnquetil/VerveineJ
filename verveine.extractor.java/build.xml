@@ -52,12 +52,12 @@
 	</target>
 
 	<!-- Compiles the java code (including the usage of library for JUnit) -->
-	<target name="licencesrc" depends="corejars">
+	<target name="licencesrc">
 		<exec executable="../utils/updateSrcKeyPos.sh" dir="${src.dir}" failonerror="true"/>
 	</target>
 
 	<!-- Update source for licence checking -->
-	<target name="compile" depends="clean, licencesrc">
+	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath" includeantruntime="false">
 		</javac>
 	</target>

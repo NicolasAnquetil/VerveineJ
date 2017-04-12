@@ -226,7 +226,7 @@ public class VerveineJParser extends VerveineParser {
 			}
 		}
 
-for (int j =0; j<classPath.length; j++) { System.out.println("CLASSPATH:"+classPath[j]);}
+//for (int j =0; j<classPath.length; j++) { System.out.println("CLASSPATH:"+classPath[j]);}
 		
 		jdtParser.setEnvironment(classPath, /*sourcepathEntries*/argPath.toArray(new String[0]), /*encodings*/null, /*includeRunningVMBootclasspath*/true);
 		jdtParser.setResolveBindings(true);

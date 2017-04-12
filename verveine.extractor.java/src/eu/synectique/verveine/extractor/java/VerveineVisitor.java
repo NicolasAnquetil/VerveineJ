@@ -192,7 +192,7 @@ public class VerveineVisitor extends ASTVisitor {
 			fmx = dico.ensureFamixNamespaceDefault();
 		} else {
 			fmx = dico.ensureFamixNamespace(pckg.resolveBinding(), pckg.getName().getFullyQualifiedName());
-			fmx.setIsStub(false);
+			recursivelySetIsStub(fmx, false);
 		}
 		this.context.pushPckg(fmx);
 
@@ -234,7 +234,7 @@ public class VerveineVisitor extends ASTVisitor {
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
 		eu.synectique.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
 		if (fmx != null) {
-			fmx.setIsStub(false);
+			recursivelySetIsStub(fmx, false);
 
 			// if it is a generic and some parameterizedTypes were created for it
 			// they are marked as stub which is not right
@@ -395,7 +395,7 @@ public class VerveineVisitor extends ASTVisitor {
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 		fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+anonSuperTypeName+")", (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
 		if (fmx != null) {
-			fmx.setIsStub(false);
+			recursivelySetIsStub(fmx, false);
 
 			if (classSummary) {
 				for (Inheritance inh : fmx.getSuperInheritances()) {
@@ -425,11 +425,11 @@ public class VerveineVisitor extends ASTVisitor {
 
 	@SuppressWarnings("unchecked")
 	public boolean visit(EnumDeclaration node) {
-		//		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
+//		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 
 		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
-			fmx.setIsStub(Boolean.FALSE);
+			recursivelySetIsStub(fmx, false);
 
 			this.context.pushType(fmx);
 			if ( ! anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
@@ -439,7 +439,7 @@ public class VerveineVisitor extends ASTVisitor {
 			// possibly not persisting the enum's memebrs, i.e. enum-values
 			for (EnumConstantDeclaration ecst : (List<EnumConstantDeclaration>)node.enumConstants()) {
 				EnumValue ev = dico.ensureFamixEnumValue(ecst.resolveVariable(), ecst.getName().getIdentifier(), fmx, persistClass(node.resolveBinding()));
-				ev.setIsStub(Boolean.FALSE);
+				ev.setIsStub(false);
 			}
 			return super.visit(node);
 		}
@@ -459,7 +459,7 @@ public class VerveineVisitor extends ASTVisitor {
 		ITypeBinding bnd = node.resolveBinding();
 		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top(), persistClass(bnd));
 		if (fmx != null) {
-			fmx.setIsStub(Boolean.FALSE);
+			recursivelySetIsStub(fmx, false);
 			if (! anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
@@ -1856,6 +1856,16 @@ public class VerveineVisitor extends ASTVisitor {
 			e = e.getBelongsTo();
 		}
 		return ret;
+	}
+
+	private void recursivelySetIsStub(ContainerEntity fmx, boolean b) {
+		ContainerEntity owner;
+		fmx.setIsStub(b);
+		owner = fmx.getBelongsTo();
+		if ( (owner != null) && (owner.getIsStub() != b)) {
+			recursivelySetIsStub(owner, b);
+		}
+		
 	}
 
 }
