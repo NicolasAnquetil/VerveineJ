@@ -33,7 +33,7 @@ public class LicenceChecker {
 	public static final int WRONG_LICENCE = 107;
 
 	private static final String KEY_FILE = "famix-20160614_1015.jar";
-	private static final long KEY_POS = 95060;
+	private static final long KEY_POS = 0;
 
 	private String line = null;
 	private String keyDir;  // where the key file is

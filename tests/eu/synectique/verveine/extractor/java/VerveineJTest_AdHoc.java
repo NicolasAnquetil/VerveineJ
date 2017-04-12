@@ -19,7 +19,6 @@ import org.junit.Test;
 
 import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
 import eu.synectique.verveine.extractor.java.VerveineJParser;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;

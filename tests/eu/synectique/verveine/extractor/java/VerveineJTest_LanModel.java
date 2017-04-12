@@ -130,20 +130,28 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testClassProperties() {
+		Namespace pckg = VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "lan");
+		assertNotNull(pckg);
+		assertEquals("lan", pckg.getName());	
+
 		eu.synectique.verveine.core.gen.famix.Class nodeClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(nodeClass);
 		assertEquals("Node", nodeClass.getName());
 		assertEquals(11, nodeClass.getMethods().size());
 		assertEquals(2, nodeClass.getAttributes().size());
-		assertSame(VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "lan"), nodeClass.getContainer());
+		assertSame(pckg, nodeClass.getContainer());
 		assertFalse(nodeClass.getIsInterface());
 		
+		pckg = VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "server");
+		assertNotNull(pckg);
+		assertEquals("server", pckg.getName());
+
 		eu.synectique.verveine.core.gen.famix.Class interfce = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(interfce);
 		assertEquals("IPrinter", interfce.getName());
 		assertEquals(1, interfce.getMethods().size());
 		assertEquals(0, interfce.getAttributes().size());
-		assertSame(VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "server"), interfce.getContainer());
+		assertSame(pckg, interfce.getContainer());
 		assertTrue(interfce.getIsInterface());
 
 		eu.synectique.verveine.core.gen.famix.Class innerClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
@@ -164,6 +172,26 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	}
 
 	@Test
+	public void testStubPackages() {
+		Namespace pckg;
+
+		pckg = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "java");
+		assertNotNull(pckg);
+		assertTrue(pckg.getIsStub());
+
+		pckg = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "io");
+		assertNotNull(pckg);
+		assertTrue(pckg.getIsStub());
+
+		pckg = VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "lan");
+		assertNotNull(pckg);
+		assertFalse(pckg.getIsStub());
+
+		assertNotNull(pckg.getBelongsTo());
+		assertFalse(pckg.getBelongsTo().getIsStub());
+			}
+
+	@Test
 	public void testNamedEntities() {
 		JavaDictionary dico = new JavaDictionary(repo);
 		
@@ -172,6 +200,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Namespace javaLang = dico.ensureFamixNamespaceJavaLang(null);
 		assertEquals( JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());
 		assertSame(javaLang, dico.ensureFamixNamespaceJavaLang(null));
+		assertTrue(javaLang.getIsStub());
 
 		eu.synectique.verveine.core.gen.famix.Class obj = dico.ensureFamixClassObject(null);
 		assertEquals(JavaDictionary.OBJECT_NAME, obj.getName());
