@@ -1778,11 +1778,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 			//cmt = super.createFamixComment(cmtContent, fmx);
 
-			// I replace the previous commented code by the next one because, since we add a source anchor to the comment, we should not store the comment content in an ivar.
+			// I replace the previous commented code because, since we add a source anchor to the comment, we should not store the comment content in an ivar.
 			cmt = null;
 			if (cmtContent != null) {
 				cmt = new Comment();
-				"We do not set the content because we will set a source anchor. We should not store all the code in memory if we have a source anchor."
+				//We do not set the content because we will set a source anchor. We should not store all the code in memory if we have a source anchor.
 				this.famixRepo.add(fmx);
 			}
 
