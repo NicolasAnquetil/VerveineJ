@@ -1783,7 +1783,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			if (cmtContent != null && (fmx != null) ) {
 				cmt = new Comment();
 				//We do not set the content because we will set a source anchor. We should not store all the code in memory if we have a source anchor.
-				this.famixRepo.add(fmx);
+				this.famixRepo.add(cmt);
 				cmt.setContainer(fmx);
 			}
 
