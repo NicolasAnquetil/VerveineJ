@@ -3,33 +3,19 @@
 	<!-- Sets variables which can later be used. -->
 	<!-- The value of a property is accessed via ${} -->
 	<property name="src.dir"      location="src" />
+	<property name="testsrc.dir"  location="tests" />
 	<property name="build.dir"    location="bin" />
 	<property name="docs.dir"     location="docs" />
 	<property name="dist.dir"     location="lib" />
 	<property name="verveine.jar" location="${dist.dir}/verveine.extractor.java.jar" />
 	<property name="tests.jar"    location="${dist.dir}/verveine.extractor.java.tests.jar" />
-	<property name="core.dir"     location="../verveine.core" />
-	<property name="test.dir"     location="src/tests/eu/synectique/verveine/extractor/java/" />
 	<property name="test.report.dir" location="testrep" />
-	<property name="lib.fast" location="${dist.dir}/fast.jar" />
-	<property name="lib.famix" location="${dist.dir}/famix.jar" />
-	<property name="lib.verveine.core" location="${dist.dir}/verveine.core.jar" />
-
-	<path id="build.classpath">
-		<fileset dir="${dist.dir}">
-			<include name="*.jar" />
-		</fileset>
-	</path>
-
 
 	<!-- Deletes the existing build, docs and dist directory-->
 	<target name="clean">
 		<delete dir="${build.dir}" />
 		<delete dir="${docs.dir}" />
 		<delete file="${verveine.jar}" />
-		<delete file="${lib.fast}" />
-		<delete file="${lib.famix}" />
-		<delete file="${lib.verveine.core}" />
 	</target>
 
 	<!-- Re-creates the  build, docs and dist directory-->
@@ -37,18 +23,6 @@
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${docs.dir}" />
 		<mkdir dir="${test.report.dir}" />
-	</target>
-	
-	<!-- call ant on verveine.core -->
-	<target name="antcore">
-		<ant dir="${core.dir}" target="junit" inheritAll="false" />
-	</target>
-
-	<!-- copies the jar from verveine.core -->
-	<target name="corejars" depends="makedir, antcore">
-		<copy todir="${dist.dir}" file="${core.dir}/lib/fast.jar"/>
-		<copy todir="${dist.dir}" file="${core.dir}/lib/famix.jar"/>
-		<copy todir="${dist.dir}" file="${core.dir}/lib/verveine.core.jar"/>
 	</target>
 
 	<!-- Compiles the java code (including the usage of library for JUnit) -->
@@ -58,7 +32,19 @@
 
 	<!-- Update source for licence checking -->
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" classpathref="build.classpath" includeantruntime="false">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+		<javac srcdir="${testsrc.dir}" destdir="${build.dir}" includeantruntime="false">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
 		</javac>
 	</target>
  
@@ -76,7 +62,11 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${verveine.jar}"
 		     basedir="${build.dir}"
-		     includes="eu/synectique/verveine/extractor/java/*.class eu/synectique/licence/*.class"
+		     includes="eu/synectique/verveine/extractor/java/*.class"
+		/>
+		<jar destfile="${tests.jar}"
+		     basedir="${build.dir}"
+		     includes="tests/eu/synectique/verveine/extractor/java/*.class"
 		/>
 	</target>
 
@@ -84,7 +74,11 @@
 	<target name="rebuild">
 		<jar destfile="${verveine.jar}"
 		     basedir="${build.dir}"
-		     includes="eu/synectique/verveine/extractor/java/*.class eu/synectique/licence/*.class"
+		     includes="eu/synectique/verveine/extractor/java/*.class"
+		/>
+		<jar destfile="${tests.jar}"
+		     basedir="${build.dir}"
+		     includes="test/eu/synectique/verveine/extractor/java/*.class"
 		/>
 	</target>
 
@@ -92,7 +86,6 @@
 	<target name="junit" depends="jar">
 		<junit printsummary="on" fork="true" haltonfailure="no">
 			<classpath>
-				<pathelement path="${build.dir}"/>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
 				</fileset>
@@ -114,7 +107,6 @@
 	<target name="test_lan">
 		<junit printsummary="on" fork="true" haltonfailure="no">
 			<classpath>
-				<pathelement path="${build.dir}"/>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
 				</fileset>

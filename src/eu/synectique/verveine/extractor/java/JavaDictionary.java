@@ -101,7 +101,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	@Override
-	public Reference addFamixReference(ContainerEntity src, ContainerEntity tgt, Association prev) {
+	public Reference addFamixReference(BehaviouralEntity src, Type tgt, Association prev) {
 		return super.addFamixReference(src, tgt, prev);
 	}
 
@@ -258,6 +258,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
+	@SuppressWarnings("deprecation")
 	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
 
