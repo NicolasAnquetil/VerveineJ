@@ -15,7 +15,6 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 
-import eu.synectique.licence.LicenceChecker;
 import eu.synectique.verveine.core.VerveineParser;
 import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
 import eu.synectique.verveine.core.gen.famix.Namespace;
@@ -397,10 +396,10 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	public static void main(String[] args) {
-		LicenceChecker checker = new LicenceChecker();
+		/*LicenceChecker checker = new LicenceChecker();
 		int licenceCheck = checker.checkLicence();
 
-		/*if (licenceCheck != LicenceChecker.OK) {
+		if (licenceCheck != LicenceChecker.OK) {
 			cannotContinue(checker, licenceCheck);
 		}*/
 		
@@ -412,12 +411,12 @@ public class VerveineJParser extends VerveineParser {
 		parser.emitMSE();
 	}
 
-	/**
+	/* *
 	 * developer method to know what went wrong
 	 * 
 	 * @param checker
 	 * @param licenceCheck
-	 */
+	 * /
 	private static void cannotContinue(LicenceChecker checker, int licenceCheck) {
 		System.err.println("Authentication failure VerveineJ cannot continue");
 		if (licenceCheck == LicenceChecker.WRONG_LICENCE) {
@@ -429,5 +428,5 @@ public class VerveineJParser extends VerveineParser {
 		
 		System.exit(0);
 	}
-
+	*/
 }
