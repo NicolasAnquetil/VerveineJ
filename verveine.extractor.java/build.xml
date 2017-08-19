@@ -25,11 +25,6 @@
 		<mkdir dir="${test.report.dir}" />
 	</target>
 
-	<!-- Compiles the java code (including the usage of library for JUnit) -->
-	<target name="licencesrc">
-		<exec executable="../utils/updateSrcKeyPos.sh" dir="${src.dir}" failonerror="true"/>
-	</target>
-
 	<!-- Update source for licence checking -->
 	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
@@ -62,7 +57,7 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${verveine.jar}"
 		     basedir="${build.dir}"
-		     includes="eu/synectique/verveine/extractor/java/*.class"
+		     includes="eu/synectique/verveine/extractor/java/**/*.class"
 		/>
 		<jar destfile="${tests.jar}"
 		     basedir="${build.dir}"
