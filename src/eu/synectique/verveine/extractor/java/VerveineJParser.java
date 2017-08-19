@@ -8,17 +8,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 
 import eu.synectique.verveine.core.VerveineParser;
 import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.SourceLanguage;
+import eu.synectique.verveine.extractor.java.visitors.VerveineVisitor;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -337,24 +342,54 @@ public class VerveineJParser extends VerveineParser {
 
 	public void parse() {
 		ArrayList<String> sourceFiles = new ArrayList<String>();
+		Map<String,CompilationUnit> asts;
+		String[] allSources;
+
 
 		if (this.linkToExisting()) {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals, anchors);
-
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
 
+		allSources = sourceFiles.toArray(new String[0]);
+		asts = new HashMap<>(allSources.length);
+
+		// collect all asts
 		try {
-			jdtParser.createASTs(sourceFiles.toArray(new String[0]), /*encodings*/null, /*bindingKeys*/new String[0], /*requestor*/req, /*monitor*/null);
+//			FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals, anchors);
+			jdtParser.createASTs(allSources, /*encodings*/null, /*bindingKeys*/new String[0], /*requestor*/new FamixRequestor( argPath, argFiles, asts), /*monitor*/null);
 		}
 		catch (java.lang.IllegalStateException e) {
 			System.out.println("VerveineJ could not launch parser, received error: " + e.getMessage());
 		}
+		
+		// and visit them
+		applyVisitors(asts);
 
 		this.compressNamespacesNames();
+	}
+
+	/**
+	 * Applying all visitors on all ASTs
+	 */
+	private void applyVisitors(Map<String, CompilationUnit> asts) {
+		applyVisitor(new VerveineVisitor(new JavaDictionary(getFamixRepo()), classSummary, allLocals, anchors), asts);		
+	}
+
+	/**
+	 * applying 1 visitor on all ASTs
+	 */
+	protected void applyVisitor(ASTVisitor visit, Map<String, CompilationUnit> asts) {
+		for (Entry<String, CompilationUnit> astEntry : asts.entrySet()) {
+			try {
+				astEntry.getValue().accept(visit);
+			} catch (Exception e) {
+				System.err.println("*** Visitor got exception: '" + e + "' while processing file: " + astEntry.getKey());
+				e.printStackTrace(); // for debugging
+			}
+		}
 	}
 
 	/**
