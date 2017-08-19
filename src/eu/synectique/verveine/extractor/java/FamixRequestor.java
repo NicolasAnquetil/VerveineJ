@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
 import ch.akuhn.fame.Repository;
+import eu.synectique.verveine.extractor.java.visitors.VerveineVisitor;
 
 public class FamixRequestor extends FileASTRequestor {
 

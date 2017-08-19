@@ -299,30 +299,30 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testParameterizableClass() {
 		assertEquals(17, VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());	// Class,Comparable,List,ArrayList,AbstractList,AbstractCollection,Collection,Map,Iterable,Dictionary<B>,Hashtable,Dictionary<K,V>,LinkedList,AbstractSequentialList,Deque,Queue,Enum
 
-		ParameterizableClass dico = null;
-		for (ParameterizableClass d : VerveineUtilsForTests.listFamixElements(repo, ParameterizableClass.class, "Dictionary")) {
-			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
+		ParameterizableClass generic = null;
+		for (ParameterizableClass g : VerveineUtilsForTests.listFamixElements(repo, ParameterizableClass.class, "Dictionary")) {
+			if (g.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
 				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
-				dico = d;
+				generic = g;
 				break;
 			}
 		}
-		assertNotNull(dico);
-		assertEquals("Dictionary", dico.getName());
-		assertEquals(2, dico.getTypes().size());  // <B> , ImplicitVars
-		for (Type t : dico.getTypes()) {
+		assertNotNull(generic);
+		assertEquals("Dictionary", generic.getName());
+		assertEquals(2, generic.getTypes().size());  // <B> , ImplicitVars
+		for (Type t : generic.getTypes()) {
 			String typName = t.getName();
 			assertTrue(typName.equals("B") || typName.equals("ImplicitVars"));
 		}
 
-		assertEquals(1, dico.getParameters().size());
+		assertEquals(1, generic.getParameters().size());
 
 		ParameterType dicoParam = VerveineUtilsForTests.detectFamixElement(repo, ParameterType.class, "B");
 		assertNotNull(dicoParam);
 		assertEquals("B", dicoParam.getName());
 		
-		assertSame(dico, dicoParam.getContainer());
-		assertSame(dicoParam, dico.getParameters().iterator().next());
+		assertSame(generic, dicoParam.getContainer());
+		assertSame(dicoParam, generic.getParameters().iterator().next());
 
 		/* Collection<Object> is not seen as parameterizable by JDT */
 		ParameterizableClass collec = VerveineUtilsForTests.detectFamixElement(repo, ParameterizableClass.class, "Collection");

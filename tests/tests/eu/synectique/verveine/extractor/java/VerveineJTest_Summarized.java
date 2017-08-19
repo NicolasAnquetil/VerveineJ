@@ -175,7 +175,10 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());  // TODO should be 1 ?
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());  // TODO should be 2 ?
 		assertEquals(1,     VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
-		assertEquals(30,    VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());
+
+		// following redefinition of meta-model, Reference from class to class are no longer possible (must from method to class)
+		// so all reference creation was removed
+		//assertEquals(30,    VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());
 		/* list of known references
 			(access to self attribute generate a ref from the class to itself, invocation of self method does not generate a ref):
 			AbstractDestinationAddress -> String
