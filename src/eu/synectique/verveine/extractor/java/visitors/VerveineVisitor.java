@@ -340,7 +340,7 @@ public class VerveineVisitor extends AbstractVisitor {
 	 * See {@link VerveineVisitor#anonymousSuperType}
 	 */
 	public boolean visit(AnonymousClassDeclaration node) {
-		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
+//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
 		ITypeBinding bnd = node.resolveBinding();
 		String anonSuperTypeName = (anonymousSuperType != null) ? findTypeName(anonymousSuperType) : context.topType().getName();
