@@ -24,6 +24,8 @@ import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.SourceLanguage;
 import eu.synectique.verveine.extractor.java.visitors.VerveineVisitor;
+import eu.synectique.verveine.extractor.java.visitorsDef.CommentDefVisitor;
+import eu.synectique.verveine.extractor.java.visitorsDef.TypeDefVisitor;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -375,7 +377,8 @@ public class VerveineJParser extends VerveineParser {
 	 * Applying all visitors on all ASTs
 	 */
 	private void applyVisitors(Map<String, CompilationUnit> asts) {
-		applyVisitor(new VerveineVisitor(new JavaDictionary(getFamixRepo()), classSummary, allLocals, anchors), asts);		
+		applyVisitor(new TypeDefVisitor(new JavaDictionary(getFamixRepo()), classSummary, allLocals, anchors), asts);		
+		applyVisitor(new CommentDefVisitor(new JavaDictionary(getFamixRepo()), classSummary, allLocals, anchors), asts);		
 	}
 
 	/**
