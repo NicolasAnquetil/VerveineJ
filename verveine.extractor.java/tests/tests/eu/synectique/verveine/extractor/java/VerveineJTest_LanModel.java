@@ -195,7 +195,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testNamedEntities() {
 		JavaDictionary dico = new JavaDictionary(repo);
 		
-		assertNotSame(dico.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true), dico.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true));
+		assertNotSame(dico.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true),dico.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true));
 		
 		Namespace javaLang = dico.ensureFamixNamespaceJavaLang(null);
 		assertEquals( JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());

@@ -16,31 +16,34 @@ public class FamixRequestor extends FileASTRequestor {
 
 	protected Repository famixRepo;
 
+	protected JavaDictionary famixDictionnary;
+
 	/**
-	 * Maps the arguments (dir names) to their absolute path<br>
-	 * (well actually it is the other way around).<br>
-	 * See also {@link #fileMap}
+	 * Whether to summarize collected information at the level of classes or produce everything
+	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation
+	 */
+	private boolean classSummary = false;
+
+	/**
+	 * Whether to output all local variables (even those with primitive type or not (default is not).
+	 */
+	private boolean allLocals;
+
+	/**
+	 * what sourceAnchors to create
+	 */
+	private String anchors;
+
+	/**
+	 * Maps the arguments (file names or dir names) to their absolute path (well actually it is the other way around)
 	 */
 	protected Map<String, String> dirMap;
-
-	/**
-	 * Maps the arguments (file names) to their absolute path<br>
-	 * (well actually it is the other way around).<br>
-	 * See also {@link #dirMap}
-	 */
 	protected Map<String, String> fileMap;
 
-	protected JavaDictionary famixDictionnary;
-	
-	/**
-	 * A map of file path -> ASTs.<br>
-	 * The requestor fills this map in and ASTs are latter visited.
-	 */
-	Map<String,CompilationUnit> asts;
-	
-	public FamixRequestor(Collection<String> argsDir, Collection<String> argsFile, Map<String,CompilationUnit> asts) {
+	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary,
+			boolean allLocals, String anchors) {
 		super();
-		this.asts = asts;
+		this.famixRepo = r;
 
 		this.fileMap = new HashMap<String, String>();
 		// initialization of the Map with the absolute paths
@@ -51,14 +54,25 @@ public class FamixRequestor extends FileASTRequestor {
 		// initialization of the Map with the absolute paths
 		for (String tempArgDir : argsDir)
 			this.dirMap.put(new File(tempArgDir).getAbsolutePath(), tempArgDir);
+
+		this.classSummary = classSummary;
+		this.allLocals = allLocals;
+		this.anchors = anchors;
+
+		this.famixDictionnary = new JavaDictionary(famixRepo);
 	}
 
 	public void acceptAST(String sourceFilePath, CompilationUnit ast) {
 		String path = relativePath(sourceFilePath);
-		System.out.println("Parsing file: " + path);
+		System.out.println("Processing file: " + path);
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
-		asts.put(path, ast);
+		try {
+			ast.accept(new VerveineVisitor(this.famixDictionnary, classSummary, allLocals, anchors));
+		} catch (Exception e) {
+			System.err.println("*** Visitor got exception: '" + e + "' while processing file: " + path);
+			e.printStackTrace(); // for debugging
+		}
 	}
 
 	/**
