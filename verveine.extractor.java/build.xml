@@ -27,14 +27,14 @@
 
 	<!-- Update source for licence checking -->
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
 				</fileset>
 			</classpath>
 		</javac>
-		<javac srcdir="${testsrc.dir}" destdir="${build.dir}" includeantruntime="false">
+		<javac srcdir="${testsrc.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
