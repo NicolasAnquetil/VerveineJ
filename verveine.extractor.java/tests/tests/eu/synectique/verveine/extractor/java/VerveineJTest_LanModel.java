@@ -692,7 +692,9 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	
 	@Test
 	public void testMetric() {
-		for (Method m : VerveineUtilsForTests.listFamixElements(repo, Method.class, "accept")) {
+		Collection<Method> lMeths = VerveineUtilsForTests.listFamixElements(repo, Method.class, "accept");
+		assertEquals(3, lMeths.size());
+		for (Method m : lMeths) {
 			assertNotNull(m);
 			eu.synectique.verveine.core.gen.famix.Class owner = (eu.synectique.verveine.core.gen.famix.Class) m.getParentType();
 			assertNotNull(owner);
