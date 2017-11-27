@@ -11,6 +11,8 @@ import org.eclipse.jdt.core.dom.FileASTRequestor;
 
 import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.extractor.java.VerveineVisitor;
+import eu.synectique.verveine.extractor.java.visitors.VisitorClassMethodDef;
+import eu.synectique.verveine.extractor.java.visitors.VisitorPackageDef;
 
 public class FamixRequestor extends FileASTRequestor {
 
@@ -68,7 +70,8 @@ public class FamixRequestor extends FileASTRequestor {
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
-			ast.accept(new VerveineVisitor(this.famixDictionnary, classSummary, allLocals, anchors));
+			ast.accept(new VisitorPackageDef(this.famixDictionnary, classSummary, allLocals, anchors));
+			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, allLocals, anchors));
 		} catch (Exception e) {
 			System.err.println("*** Visitor got exception: '" + e + "' while processing file: " + path);
 			e.printStackTrace(); // for debugging

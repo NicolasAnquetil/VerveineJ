@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java;
+package eu.synectique.verveine.extractor.java.visitors;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -106,12 +106,14 @@ import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
+import eu.synectique.verveine.extractor.java.JavaDictionary;
+import eu.synectique.verveine.extractor.java.VerveineJParser;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
  * Famix entities are stored in a Map along with the IBindings to which they correspond
  */
-public class VerveineVisitor extends ASTVisitor {
+public class VisitorVarsDef extends ASTVisitor {
 
 	/** 
 	 * A dictionary allowing to recover created FAMIX Entities
@@ -164,7 +166,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	private String anchors;
 
-	public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
+	public VisitorVarsDef(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
 		this.dico = dico;
 		this.context = new EntityStack();
 		this.classSummary = classSummary;
@@ -331,7 +333,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * See {@link VerveineVisitor#anonymousSuperType}<br>
+	 * See {@link VisitorVarsDef#anonymousSuperType}<br>
 	 * We could test if it is a local type (inner/anonymous) and not define it in case it does not make any reference
 	 * to anything outside its owner class. But it would be a lot of work for probably little gain.
 	 */
@@ -377,7 +379,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * See {@link VerveineVisitor#anonymousSuperType}
+	 * See {@link VisitorVarsDef#anonymousSuperType}
 	 */
 	public boolean visit(AnonymousClassDeclaration node) {
 		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
@@ -488,7 +490,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * Local type: same as {@link VerveineVisitor#visit(ClassInstanceCreation)}, 
+	 * Local type: same as {@link VisitorVarsDef#visit(ClassInstanceCreation)}, 
 	 * we create it even if it is a local method because their are too many ways it can access external things
 	 */
 	@SuppressWarnings("unchecked")
@@ -1185,7 +1187,7 @@ public class VerveineVisitor extends ASTVisitor {
 
 	/**
 	 * Handles an invocation of a method by creating the corresponding Famix Entity.
-	 * That may be a reference between classes depending on {@link VerveineVisitor#classSummary}.
+	 * That may be a reference between classes depending on {@link VisitorVarsDef#classSummary}.
 	 * @param calledBnd -- a binding for the method invoked
 	 * @param calledName of the method invoked
 	 * @param receiver of the call, i.e. the object to which the message is sent
@@ -1404,7 +1406,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * Same as {@link VerveineVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
+	 * Same as {@link VisitorVarsDef#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
 	private eu.synectique.verveine.core.gen.famix.Type referedType(ITypeBinding bnd, ContainerEntity ctxt,
 			boolean isClass) {
@@ -1799,7 +1801,7 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * if {@link VerveineVisitor#classSummary} is true, we persist only classes that are not defined in methods.
+	 * if {@link VisitorVarsDef#classSummary} is true, we persist only classes that are not defined in methods.
 	 * @param bnd -- ITypeBinding for the class that we are checking, might be null and in this case, we check whether there is no method at the top of the context
 	 * @return whether to persist the class or its members
 	 */

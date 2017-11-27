@@ -324,7 +324,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				break;
 			}
 		}
-
+/*
 		// --------------- superclasses (including interfaces)
 		Collection<Type> sups = new LinkedList<Type>();
 		if (bnd != null) {
@@ -338,10 +338,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				}
 			}
 			for (ITypeBinding intbnd : bnd.getInterfaces()) {
-				sups.add( ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist));
+				sups.add( ensureFamixType(intbnd, /*ctxt* /owner, alwaysPersist));
 			}
 		}
-
+*/
 		// ---------------- create
 		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
@@ -366,6 +366,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					fmx.addModifiers(MODIFIER_STATIC);
 				}
 			}
+/*
 			if (persistIt) {
 				Inheritance lastInheritance = null;
 				for (Type sup : sups) {
@@ -373,6 +374,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					// TODO create FileAnchor for each inheritance link ???
 				}
 			}
+*/
 		}
 
 		return fmx;
@@ -1426,6 +1428,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					ret = null;
 				}
 				else {
+/*
 					// must create the return type
 					// but for method like "<T> T mtd()" where T belongs to mtd and mtd returns T,
 					// we need T to create the method and the method to create T ...
@@ -1439,8 +1442,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 						delayedRetTyp = true;
 					}
 					else {
-						ret = this.ensureFamixType(retTypBnd, /*ctxt*/owner, /*alwaysPersist?*/persistIt);
-					}
+*/
+//						ret = this.ensureFamixType(retTypBnd, /*ctxt*/owner, /*alwaysPersist?*/persistIt);
+//					}
 				}
 			}
 		}
