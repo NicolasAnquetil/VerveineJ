@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.Assignment;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.ContinueStatement;
@@ -23,12 +24,14 @@ import org.eclipse.jdt.core.dom.DoStatement;
 import org.eclipse.jdt.core.dom.EnhancedForStatement;
 import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.ExpressionStatement;
 import org.eclipse.jdt.core.dom.FieldAccess;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -52,6 +55,7 @@ import org.eclipse.jdt.core.dom.TryStatement;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.jdt.core.dom.TypeParameter;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
@@ -67,6 +71,7 @@ import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.ParameterType;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
+import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.extractor.java.JavaDictionary;
 import eu.synectique.verveine.extractor.java.VerveineJParser;
 
@@ -412,12 +417,26 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(EnumConstantDeclaration node) {
-		return false;
+		for (Expression expr : (List<Expression>)node.arguments()) {
+			if (expr != null) {
+				createInitBlock();
+				break;  // we created the INIT_BLOCK, no need to look for other arguments that would only ensure the same creation
+			}
+		}
+		return super.visit(node);
+	
 	}
 
-	@SuppressWarnings({ })
+	@SuppressWarnings("unchecked")
 	public boolean visit(FieldDeclaration node) {
+		for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
+			if (vardecl.getInitializer() != null) {
+				createInitBlock();
+				break;  // we created the INIT_BLOCK, no need to look for other arguments that would only ensure the same creation
+			}
+		}
 		return false;
 	}
 
@@ -575,6 +594,36 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	}
 
 	// UTILITY METHODS
+
+	/**
+	 * when we have an initialization in a variable declaration, we may need to create a faked
+	 * INIT_Block method if this variable is a field (for example) 
+	 */
+	protected void createInitBlock() {
+		// putting field's initialization code in an INIT_BLOCK_NAME method
+		Method ctxtMeth = this.context.topMethod();
+		if (ctxtMeth != null && !ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+			ctxtMeth = null;
+		} else {
+			if (ctxtMeth != null && ctxtMeth.getParentType() != context.topType()) {
+				/* apparently we are in a field initialization, in an (anonymous class) which is created as another field initialization:
+				 * class Class1 {
+				 *   Class2 aField1 = new Class2() {
+				 *     Class3 aField2 = xyz;
+				 *   }}
+				 */
+				ctxtMeth = null;
+			}
+		}
+		if (ctxtMeth == null) {
+			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME,
+					new ArrayList<String>(), /*retType*/null, context.topType(),
+					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
+			ctxtMeth.setIsStub(false);
+			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
+			pushInitBlockMethod(ctxtMeth);
+		}
+	}
 
 	/**
 	 * Special method InitBlock may be "created" in various steps,
