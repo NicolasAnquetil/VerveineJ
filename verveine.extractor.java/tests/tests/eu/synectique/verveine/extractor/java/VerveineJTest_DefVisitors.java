@@ -117,7 +117,7 @@ public class VerveineJTest_DefVisitors {
 
 		assertEquals(3,  VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());// moose, moose.lan, moose.lan.server
 		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // WorkStation, SingleDestinationAddress, Packet, Node, AbstractDestinationAddress, PrintServer, XPrinter, OutputServer, IPrinter, FileServer
-		assertEquals(39, VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size()); // WorkStation=4, SingleDestinationAddress=5, Packet=7, Node=11, AbstractDestinationAddress=1, PrintServer=2, XPrinter=2, OutputServer=3, IPrinter=1, FileServer=3
+		assertEquals(40, VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size()); // WorkStation=4, SingleDestinationAddress=5, Packet=7, Node=11, AbstractDestinationAddress=1, PrintServer=2, XPrinter=2, OutputServer=3+INIT_BLOCK, IPrinter=1, FileServer=3
 		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
 		assertEquals(26,   VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
@@ -155,8 +155,20 @@ public class VerveineJTest_DefVisitors {
 		assertEquals(2, nodeClass.getAttributes().size());
 		assertSame(pckg, nodeClass.getContainer());
 		assertFalse(nodeClass.getIsInterface());
+
+		eu.synectique.verveine.core.gen.famix.Class outputServ = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer");
+		assertNotNull(outputServ);
+		assertEquals("OutputServer", outputServ.getName());
+		assertEquals(4, outputServ.getMethods().size());
+		for (Method mth : outputServ.getMethods()) {
+			String nm = mth.getName();
+			assertTrue("Unknown method name: "+nm, nm.equals(JavaDictionary.INIT_BLOCK_NAME) || nm.equals("accept") || nm.equals("canOutput") || nm.equals("output") );
+		}
+		assertEquals(1, outputServ.getAttributes().size());
+		assertFalse(outputServ.getIsInterface());
 		
-		pckg = VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "server");
+		// Note: package names were not compressed
+		pckg = VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "moose.lan.server");
 		assertNotNull(pckg);
 		assertEquals("server", pckg.getName());
 
@@ -334,9 +346,14 @@ public class VerveineJTest_DefVisitors {
 		assertFalse(clazz.getModifiers().contains("protected"));
 		assertFalse(clazz.getModifiers().contains("final"));
 		
-		assertEquals(3, clazz.getMethods().size());
+		assertEquals(4, clazz.getMethods().size());
 		for (Method m : clazz.getMethods()) {
-			assertTrue(m.getModifiers().contains("public"));
+			if (m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+				assertFalse(m.getModifiers().contains("public"));
+			}
+			else {
+				assertTrue(m.getModifiers().contains("public"));
+			}
 			assertFalse(m.getModifiers().contains("private"));
 			assertFalse(m.getModifiers().contains("protected"));
 			assertFalse(m.getModifiers().contains("final"));
