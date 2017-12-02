@@ -13,6 +13,7 @@ import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.extractor.java.VerveineVisitor;
 import eu.synectique.verveine.extractor.java.visitors.VisitorClassMethodDef;
 import eu.synectique.verveine.extractor.java.visitors.VisitorPackageDef;
+import eu.synectique.verveine.extractor.java.visitors.VisitorVarsDef;
 
 public class FamixRequestor extends FileASTRequestor {
 
@@ -72,6 +73,7 @@ public class FamixRequestor extends FileASTRequestor {
 		try {
 			ast.accept(new VisitorPackageDef(this.famixDictionnary, classSummary, allLocals, anchors));
 			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, allLocals, anchors));
+			ast.accept(new VisitorVarsDef(this.famixDictionnary, classSummary, allLocals, anchors));
 		} catch (Exception e) {
 			System.err.println("*** Visitor got exception: '" + e + "' while processing file: " + path);
 			e.printStackTrace(); // for debugging

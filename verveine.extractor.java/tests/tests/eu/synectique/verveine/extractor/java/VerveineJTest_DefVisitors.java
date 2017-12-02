@@ -7,12 +7,12 @@ package tests.eu.synectique.verveine.extractor.java;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 
@@ -26,23 +26,16 @@ import org.junit.Test;
 
 import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
 import eu.synectique.verveine.core.gen.famix.Comment;
 import eu.synectique.verveine.core.gen.famix.FAMIXModel;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
 import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.SourceAnchor;
+import eu.synectique.verveine.extractor.java.FamixRequestor;
 import eu.synectique.verveine.extractor.java.JavaDictionary;
 import eu.synectique.verveine.extractor.java.VerveineJParser;
 import eu.synectique.verveine.extractor.java.visitors.VisitorClassMethodDef;
@@ -56,22 +49,18 @@ import eu.synectique.verveine.extractor.java.visitors.VisitorPackageDef;
 public class VerveineJTest_DefVisitors {
 
 	private static final String[] EMPTY_STRING_ARRAY = /*bindingKeys*/new String[0];
+	private static final String[] ALL_SRC_FILES =  new String[] {"test_src/LANModel/moose/lan/AbstractDestinationAddress.java",
+			"test_src/LANModel/moose/lan/Node.java",
+			"test_src/LANModel/moose/lan/Packet.java",
+			"test_src/LANModel/moose/lan/SingleDestinationAddress.java",
+			"test_src/LANModel/moose/lan/WorkStation.java",
+			"test_src/LANModel/moose/lan/server/FileServer.java",
+			"test_src/LANModel/moose/lan/server/IPrinter.java",
+			"test_src/LANModel/moose/lan/server/OutputServer.java",
+			"test_src/LANModel/moose/lan/server/PrintServer.java"};
 
-	private FileASTRequestor req;
 	private ASTParser jdtParser;
 	protected Repository repo;
-
-	protected String[] allSrcFiles() {
-		return new String[] {"test_src/LANModel/moose/lan/AbstractDestinationAddress.java",
-				"test_src/LANModel/moose/lan/Node.java",
-				"test_src/LANModel/moose/lan/Packet.java",
-				"test_src/LANModel/moose/lan/SingleDestinationAddress.java",
-				"test_src/LANModel/moose/lan/WorkStation.java",
-				"test_src/LANModel/moose/lan/server/FileServer.java",
-				"test_src/LANModel/moose/lan/server/IPrinter.java",
-				"test_src/LANModel/moose/lan/server/OutputServer.java",
-				"test_src/LANModel/moose/lan/server/PrintServer.java"};
-	}
 
 	protected ASTParser newJDTParser(String srcPath) {
 		ASTParser jdtParser = ASTParser.newParser(AST.JLS8);
@@ -99,25 +88,20 @@ public class VerveineJTest_DefVisitors {
 		JavaDictionary dico = new JavaDictionary(repo);
 		jdtParser = newJDTParser("test_src/LANModel/moose/lan");
 
-		req = new FileASTRequestor() {
-			public void acceptAST(String path, CompilationUnit ast) {
-				ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
+		/*					 parsedFiles	encodings	bindingKeys			requestor					monitor */
+		jdtParser.createASTs(ALL_SRC_FILES,	null,		EMPTY_STRING_ARRAY,	createTestRequestor(dico),	null);
+	}
 
-												/*	Dictionary	classSummary	allLocals	anchors							 */
-				ast.accept(new VisitorPackageDef(	dico,		false, 			false,		VerveineJParser.ANCHOR_DEFAULT));
-				ast.accept(new VisitorClassMethodDef(dico,		false,			false,		VerveineJParser.ANCHOR_DEFAULT));
-			}
-		};
-							/*parsedFiles	encodings	bindingKeys			requestor	monitor */
-		jdtParser.createASTs(allSrcFiles(),	null,		EMPTY_STRING_ARRAY,	req,		null);
+	protected FileASTRequestor createTestRequestor(JavaDictionary dico) {
+		return new FamixRequestor(repo, new ArrayList<String>(), Arrays.asList( ALL_SRC_FILES), /*classSummary*/false, /*allLocals*/false, /*anchors*/VerveineJParser.ANCHOR_DEFAULT);
 	}
 
 	@Test
 	public void testEntitiesNumber() {
 
 		assertEquals(3,  VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());// moose, moose.lan, moose.lan.server
-		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // WorkStation, SingleDestinationAddress, Packet, Node, AbstractDestinationAddress, PrintServer, XPrinter, OutputServer, IPrinter, FileServer
-		assertEquals(40, VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size()); // WorkStation=4, SingleDestinationAddress=5, Packet=7, Node=11, AbstractDestinationAddress=1, PrintServer=2, XPrinter=2, OutputServer=3+INIT_BLOCK, IPrinter=1, FileServer=3
+		assertEquals(11, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // WorkStation, SingleDestinationAddress, Packet, Node, AbstractDestinationAddress, PrintServer, XPrinter, OutputServer, IPrinter, anonymous-IPrinter, FileServer
+		assertEquals(41, VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size()); // WorkStation=4, SingleDestinationAddress=5, Packet=7, Node=11, AbstractDestinationAddress=1, PrintServer=2, XPrinter=2, OutputServer=3+INIT_BLOCK, IPrinter=1, anonymous-IPrinter=1, FileServer=3
 		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
 		assertEquals(26,   VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
@@ -170,7 +154,7 @@ public class VerveineJTest_DefVisitors {
 		// Note: package names were not compressed
 		pckg = VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "moose.lan.server");
 		assertNotNull(pckg);
-		assertEquals("server", pckg.getName());
+		assertEquals("moose.lan.server", pckg.getName());
 
 		eu.synectique.verveine.core.gen.famix.Class interfce = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(interfce);
