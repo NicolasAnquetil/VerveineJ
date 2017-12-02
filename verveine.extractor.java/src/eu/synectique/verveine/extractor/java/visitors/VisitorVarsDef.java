@@ -313,7 +313,6 @@ public class VisitorVarsDef extends ASTVisitor {
 	}
 
 	@Override
-	@SuppressWarnings({ "unchecked" })
 	public boolean visit(FieldDeclaration node) {
 		structuralType = StructuralEntityKinds.ATTRIBUTE;
 
@@ -321,7 +320,6 @@ public class VisitorVarsDef extends ASTVisitor {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationExpression node) {
 		// Independently of 'withLocals()', we don't declare (local) variables that have a primitive type
 		// because we are assuming that the user is not interested in them (non primitive types are important because of the dependence they create)
@@ -336,10 +334,7 @@ public class VisitorVarsDef extends ASTVisitor {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationStatement node) {
-		Collection<StructuralEntity> fmxVars;
-
 		// locals: same discussion as for visit(VariableDeclarationExpression node)
 		if (allLocals || (!node.getType().isPrimitiveType())) {
 			structuralType = StructuralEntityKinds.LOCALVAR;
