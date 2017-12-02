@@ -28,12 +28,6 @@ public class VisitorPackageDef extends ASTVisitor {
 	protected EntityStack context;
 
 	/**
-	 * The source code of the visited AST.
-	 * Used to find back the contents of non-javadoc comments
-	 */
-	protected RandomAccessFile source;
-
-	/**
 	 * Whether a variable access is lhs (write) or not
 	 */
 	protected boolean inAssignmentLHS = false;
@@ -62,14 +56,6 @@ public class VisitorPackageDef extends ASTVisitor {
 
 	public void endVisit(CompilationUnit node) {
 		this.context.popPckg();
-		if (source != null) {
-			try {
-				source.close();
-			} catch (IOException e) {
-				// ignore error
-				e.printStackTrace();
-			}
-		}
 		super.endVisit(node);
 	}
 
