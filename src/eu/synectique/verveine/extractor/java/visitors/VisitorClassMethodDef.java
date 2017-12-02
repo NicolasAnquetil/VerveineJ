@@ -73,6 +73,7 @@ import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.extractor.java.JavaDictionary;
+import eu.synectique.verveine.extractor.java.Util;
 import eu.synectique.verveine.extractor.java.VerveineJParser;
 
 /**
@@ -125,9 +126,9 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		Namespace fmx = null;
 		PackageDeclaration pckg = node.getPackage();
 		if (pckg == null) {
-			fmx = dico.ensureFamixNamespaceDefault();
+			fmx = dico.getFamixNamespaceDefault();
 		} else {
-			fmx = dico.ensureFamixNamespace(pckg.resolveBinding(), pckg.getName().getFullyQualifiedName());
+			fmx = (Namespace) dico.getEntityByKey(pckg.resolveBinding());
 		}
 		this.context.pushPckg(fmx);
 
@@ -209,7 +210,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	public boolean visit(ClassInstanceCreation node) {
 		//		System.err.println("TRACE, Visiting ClassInstanceCreation: " + node);
 		if (node.getAnonymousClassDeclaration() != null) {
-			anonymousSuperTypeName = findTypeName(node.getType());
+			anonymousSuperTypeName = Util.jdtTypeName(node.getType());
 		} else {
 			anonymousSuperTypeName = null;
 		}
@@ -223,9 +224,8 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
 		ITypeBinding bnd = node.resolveBinding();
-		String anonSuperTypeName = (anonymousSuperTypeName != null) ? anonymousSuperTypeName : context.topType().getName();
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-		fmx = this.dico.ensureFamixClass(bnd, /*name*/"anonymous("+anonSuperTypeName+")", (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
+		fmx = this.dico.ensureFamixClass(bnd, Util.makeAnonymousName(anonymousSuperTypeName, context), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
 		if (fmx != null) {
 			recursivelySetIsStub(fmx, false);
 
@@ -247,7 +247,6 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		super.endVisit(node);
 	}
 
-	@SuppressWarnings("unchecked")
 	public boolean visit(EnumDeclaration node) {
 //		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 
@@ -258,12 +257,6 @@ public class VisitorClassMethodDef extends ASTVisitor {
 			this.context.pushType(fmx);
 			if ( ! anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
-			}
-
-			// possibly not persisting the enum's memebrs, i.e. enum-values
-			for (EnumConstantDeclaration ecst : (List<EnumConstantDeclaration>)node.enumConstants()) {
-				EnumValue ev = dico.ensureFamixEnumValue(ecst.resolveVariable(), ecst.getName().getIdentifier(), fmx, persistClass(node.resolveBinding()));
-				ev.setIsStub(false);
 			}
 			return super.visit(node);
 		}
@@ -330,19 +323,14 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	 * Local type: same as {@link VisitorClassMethodDef#visit(ClassInstanceCreation)}, 
 	 * we create it even if it is a local method because their are too many ways it can access external things
 	 */
-	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-		//		System.err.println("TRACE, Visiting MethodDeclaration: "+node.getName().getIdentifier());
-
-		// some info needed to create the Famix Method
 		IMethodBinding bnd = node.resolveBinding();
 
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), /*paramTypes*/null, /*retType*/null,
-											/*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), /*paramTypes*/null, /*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			// Insert for BodyHash computing
+			// TODO change FamixMethod to add setBodyHash
 			//fmx.setBodyHash(this.computeHashForMethodBody(node));
 
 			this.context.pushMethod(fmx);
@@ -366,7 +354,8 @@ public class VisitorClassMethodDef extends ASTVisitor {
 			return false;
 		}
 	}
-
+	
+/* TODO change FamixMethod to add setBodyHash
 	private String computeHashForMethodBody(MethodDeclaration node) {
 		// not optimized but will work in a first version
 		Block body = node.getBody();
@@ -374,6 +363,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 			return "0";
 		return DigestUtils.md5Hex(node.getBody().toString().replaceAll("\\r|\\n|\\t", ""));
 	}
+*/
 
 	public void endVisit(MethodDeclaration node) {
 		closeMethodDeclaration();
@@ -384,9 +374,8 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	public boolean visit(Initializer node) {
 		//		System.err.println("TRACE, Visiting Initializer: ");
 
-		Method fmx = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME,
-				/*paramTypes*/new ArrayList<String>(), /*retType*/null, context.topType(), node.getModifiers(),
-				/*persistIt*/!classSummary);
+		Method fmx = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(),
+											context.topType(), node.getModifiers(),	/*persistIt*/!classSummary);
 		// init-block don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create either
 
@@ -487,11 +476,11 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	}
 
 	public boolean visit(InfixExpression node) {
-		return false;
+		return super.visit(node);
 	}
 
 	public boolean visit(InstanceofExpression node) {
-		return false;
+		return super.visit(node);
 	}
 
 	/* 
@@ -503,27 +492,28 @@ public class VisitorClassMethodDef extends ASTVisitor {
 
 	@Override
 	public boolean visit(CatchClause node) {
-		return false;
+		// useless Overriding, except for consistency ...
+		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(ThrowStatement node) {
 		this.context.addTopMethodNOS(1);
-		return false;
+		return super.visit(node);
 	}
 
 	public boolean visit(AssertStatement node) {
 		this.context.addTopMethodNOS(1);
-		return false;
+		return super.visit(node);
 	}
 
 	public boolean visit(Assignment node) {
 		this.context.addTopMethodNOS(1);
-		return false;
+		return super.visit(node);
 	}
 
 	public boolean visit(ArrayAccess node) {
-		return false;
+		return super.visit(node);
 	}
 
 	public boolean visit(ContinueStatement node) {
@@ -616,8 +606,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 			}
 		}
 		if (ctxtMeth == null) {
-			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME,
-					new ArrayList<String>(), /*retType*/null, context.topType(),
+			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), context.topType(),
 					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
 			ctxtMeth.setIsStub(false);
 			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
@@ -652,30 +641,6 @@ public class VisitorClassMethodDef extends ASTVisitor {
 			if (fmx != null) {
 				fmx.setNumberOfStatements(nos);
 				fmx.setCyclomaticComplexity(cyclo);
-			}
-		}
-	}
-
-	protected String findTypeName(org.eclipse.jdt.core.dom.Type t) {
-		if (t == null) {
-			return null;
-		}
-
-		if (t.isPrimitiveType()) {
-			return t.toString();
-		} else if (t.isSimpleType()) {
-			return ((SimpleType) t).getName().getFullyQualifiedName();
-		} else if (t.isQualifiedType()) {
-			return ((QualifiedType) t).getName().getIdentifier();
-		} else if (t.isArrayType()) {
-			return findTypeName(((ArrayType) t).getElementType());
-		} else if (t.isParameterizedType()) {
-			return findTypeName(((org.eclipse.jdt.core.dom.ParameterizedType) t).getType());
-		} else { // it is a WildCardType
-			if (((org.eclipse.jdt.core.dom.WildcardType) t).isUpperBound()) {
-				return findTypeName(((org.eclipse.jdt.core.dom.WildcardType) t).getBound());
-			} else {
-				return JavaDictionary.OBJECT_NAME;
 			}
 		}
 	}
