@@ -1,22 +1,17 @@
 package eu.synectique.verveine.extractor.java.visitors;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ArrayAccess;
-import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.AssertStatement;
 import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CatchClause;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ConstructorInvocation;
 import org.eclipse.jdt.core.dom.ContinueStatement;
@@ -31,7 +26,6 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.ForStatement;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
@@ -41,10 +35,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.MethodInvocation;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
 import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.SwitchCase;
@@ -64,14 +55,12 @@ import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.EnumValue;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.ParameterType;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.extractor.java.JavaDictionary;
 import eu.synectique.verveine.extractor.java.Util;
 import eu.synectique.verveine.extractor.java.VerveineJParser;
@@ -120,6 +109,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 
 	// VISITOR METHODS
 
+	@Override
 	public boolean visit(CompilationUnit node) {
 		//		System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
 
@@ -135,15 +125,18 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		return super.visit(node);
 	}
 
+	@Override
 	public void endVisit(CompilationUnit node) {
 		this.context.popPckg();
 		super.endVisit(node);
 	}
 
+	@Override
 	public boolean visit(PackageDeclaration node) {
 		return false; // no need to visit children of the declaration
 	}
 
+	@Override
 	public boolean visit(ImportDeclaration node) {
 		return false; // no need to visit children of the declaration	
 	}
@@ -152,6 +145,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	 * Can only be a class or interface declaration
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
+	@Override
 	public boolean visit(TypeDeclaration node) {
 		//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
@@ -197,6 +191,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		}
 	}
 
+	@Override
 	public void endVisit(TypeDeclaration node) {
 		this.context.popType();
 		super.endVisit(node);
@@ -207,6 +202,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	 * We could test if it is a local type (inner/anonymous) and not define it in case it does not make any reference
 	 * to anything outside its owner class. But it would be a lot of work for probably little gain.
 	 */
+	@Override
 	public boolean visit(ClassInstanceCreation node) {
 		//		System.err.println("TRACE, Visiting ClassInstanceCreation: " + node);
 		if (node.getAnonymousClassDeclaration() != null) {
@@ -220,6 +216,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	/**
 	 * See field {@link VisitorClassMethodDef#anonymousSuperTypeName}
 	 */
+	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
@@ -241,12 +238,14 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		}
 	}
 
+	@Override
 	public void endVisit(AnonymousClassDeclaration node) {
 		anonymousSuperTypeName = null;
 		this.context.popType();
 		super.endVisit(node);
 	}
 
+	@Override
 	public boolean visit(EnumDeclaration node) {
 //		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 
@@ -265,11 +264,13 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		}
 	}
 
+	@Override
 	public void endVisit(EnumDeclaration node) {
 		this.context.popType();
 		super.endVisit(node);
 	}
 
+	@Override
 	public boolean visit(AnnotationTypeDeclaration node) {
 //		System.err.println("TRACE, Visiting AnnotationTypeDeclaration: "+node.getName().getIdentifier());
 
@@ -290,11 +291,13 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		}
 	}
 
+	@Override
 	public void endVisit(AnnotationTypeDeclaration node) {
 		this.context.popType();
 		super.endVisit(node);
 	}
 
+	@Override
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
 //		System.err.println("TRACE, Visiting AnnotationTypeMemberDeclaration: "+node.getName().getIdentifier());
 		IMethodBinding bnd = node.resolveBinding();
@@ -314,6 +317,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		}
 	}
 
+	@Override
 	public void endVisit(AnnotationTypeMemberDeclaration node) {
 		this.context.popAnnotationMember();
 		super.endVisit(node);
@@ -323,6 +327,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	 * Local type: same as {@link VisitorClassMethodDef#visit(ClassInstanceCreation)}, 
 	 * we create it even if it is a local method because their are too many ways it can access external things
 	 */
+	@Override
 	public boolean visit(MethodDeclaration node) {
 		IMethodBinding bnd = node.resolveBinding();
 
@@ -365,6 +370,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	}
 */
 
+	@Override
 	public void endVisit(MethodDeclaration node) {
 		closeMethodDeclaration();
 		super.endVisit(node);
@@ -407,6 +413,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public boolean visit(EnumConstantDeclaration node) {
 		for (Expression expr : (List<Expression>)node.arguments()) {
 			if (expr != null) {
@@ -419,6 +426,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
 	public boolean visit(FieldDeclaration node) {
 		for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
 			if (vardecl.getInitializer() != null) {
@@ -429,71 +437,17 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		return false;
 	}
 
-	protected void optionalCloseInitBlock() {
-		Method ctxtMeth = this.context.topMethod();
-		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME))) {
-			closeMethodDeclaration();
-		}
-	}
-
-	public boolean visit(VariableDeclarationExpression node) {
-		return false;
-	}
-
-	public boolean visit(VariableDeclarationStatement node) {
-		// ??? this.context.addTopMethodNOS(1);
-		return false;
-	}
-
-	public boolean visit(MethodInvocation node) {
-		return false;
-	}
-
-	public boolean visit(SuperMethodInvocation node) {
-		return false;
-	}
-
+	@Override
 	public boolean visit(ConstructorInvocation node) {
 		//		System.err.println("TRACE, Visiting ConstructorInvocation: ");
 		this.context.addTopMethodNOS(1);
 		return false;
 	}
 
+	@Override
 	public boolean visit(SuperConstructorInvocation node) {
 		this.context.addTopMethodNOS(1);
 		return false;
-	}
-
-	public boolean visit(FieldAccess node) {
-		return false;
-	}
-
-	/*
-	 * Could be a FieldAccess (see JDT javadoc: class FieldAccess) 
-	 */
-	public boolean visit(QualifiedName node) {
-		return false;
-	}
-
-	public boolean visit(InfixExpression node) {
-		return super.visit(node);
-	}
-
-	public boolean visit(InstanceofExpression node) {
-		return super.visit(node);
-	}
-
-	/* 
-	 * Another FieldAccess in disguise: SomeClass.class
-	 */
-	public boolean visit(TypeLiteral node) {
-		return false;
-	}
-
-	@Override
-	public boolean visit(CatchClause node) {
-		// useless Overriding, except for consistency ...
-		return super.visit(node);
 	}
 
 	@Override
@@ -502,81 +456,91 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(AssertStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(Assignment node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
-	public boolean visit(ArrayAccess node) {
-		return super.visit(node);
-	}
-
+	@Override
 	public boolean visit(ContinueStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(DoStatement node) {
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(ExpressionStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(EnhancedForStatement node) {
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(ForStatement node) {
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(IfStatement node) {
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(ReturnStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(SwitchCase node) {
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(SwitchStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(SynchronizedStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(TryStatement node) {
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
+	@Override
 	public boolean visit(WhileStatement node) {
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
@@ -627,6 +591,13 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		if ((nos != 0) || (cyclo != 0)) {
 			context.setTopMethodNOS(nos);
 			context.setTopMethodCyclo(cyclo);
+		}
+	}
+
+	protected void optionalCloseInitBlock() {
+		Method ctxtMeth = this.context.topMethod();
+		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME))) {
+			closeMethodDeclaration();
 		}
 	}
 
