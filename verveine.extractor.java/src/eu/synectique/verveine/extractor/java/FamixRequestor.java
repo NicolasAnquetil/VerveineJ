@@ -5,13 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
 import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.extractor.java.VerveineVisitor;
 import eu.synectique.verveine.extractor.java.visitors.VisitorClassMethodDef;
+import eu.synectique.verveine.extractor.java.visitors.VisitorComments;
 import eu.synectique.verveine.extractor.java.visitors.VisitorPackageDef;
 import eu.synectique.verveine.extractor.java.visitors.VisitorVarsDef;
 
@@ -74,6 +73,7 @@ public class FamixRequestor extends FileASTRequestor {
 			ast.accept(new VisitorPackageDef(this.famixDictionnary, classSummary, allLocals, anchors));
 			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, allLocals, anchors));
 			ast.accept(new VisitorVarsDef(this.famixDictionnary, classSummary, allLocals, anchors));
+			ast.accept(new VisitorComments(this.famixDictionnary));
 		} catch (Exception e) {
 			System.err.println("*** Visitor got exception: '" + e + "' while processing file: " + path);
 			e.printStackTrace(); // for debugging
