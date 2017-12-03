@@ -354,6 +354,7 @@ public class VisitorVarsDef extends ASTVisitor {
 
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
+		// actually, here structuralType must be PARAMETER
 		createStructuralEntity( structuralType, node, context.top());
 		return super.visit(node);
 	}

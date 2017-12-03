@@ -257,11 +257,11 @@ public class VerveineVisitor extends ASTVisitor {
 				addUnboundAnnotationInstances(node, fmx, persistIt);
 
 				//comments
-				if (dico.createFamixComment(node.getJavadoc(), fmx, source) == null) {
+				if (dico.createFamixComment(node.getJavadoc(), fmx/*, source*/) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
 					if ((source != null) && (iCmt > -1)) {
-						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx, source);
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx/*, source*/);
 					}
 				}
 			}
@@ -541,11 +541,11 @@ public class VerveineVisitor extends ASTVisitor {
 				dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
 
 				//comments
-				if (dico.createFamixComment(node.getJavadoc(), fmx, source) == null) {
+				if (dico.createFamixComment(node.getJavadoc(), fmx/*, source*/) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
 					if ((source != null) && (iCmt > -1)) {
-						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx, source);
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx/*, source*/);
 					}
 				}
 			}
@@ -623,7 +623,7 @@ public class VerveineVisitor extends ASTVisitor {
 				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
-				dico.createFamixComment(node.getJavadoc(), fmx, source);
+				dico.createFamixComment(node.getJavadoc(), fmx/*, source*/);
 			}
 
 			if (node.getBody() != null) {
@@ -673,11 +673,11 @@ public class VerveineVisitor extends ASTVisitor {
 				}
 
 				//comments
-				if (dico.createFamixComment(node.getJavadoc(), att, source) == null) {
+				if (dico.createFamixComment(node.getJavadoc(), att/*, source*/) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
 					if ((source != null) && (iCmt > -1)) {
-						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), att, source);
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), att/*, source*/);
 					}
 				}
 			}

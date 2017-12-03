@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -393,6 +392,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+	/**
+	 * helper method, we know the type exists, ensureFamixClass will recover it
+	 */
 	public Class getFamixClass(ITypeBinding bnd, String name, ContainerEntity owner) {
 		return ensureFamixClass(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
 	}
@@ -580,6 +582,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+	/**
+	 * helper method, we know the type exists, ensureFamixEnum will recover it
+	 */
 	public eu.synectique.verveine.core.gen.famix.Enum getFamixEnum(ITypeBinding bnd, String name, ContainerEntity owner) {
 		return ensureFamixEnum(bnd, name, owner);
 	}
@@ -629,6 +634,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		return fmx;
+	}
+
+	/**
+	 * helper method, we know the type enumValue, ensureFamixEnumValue will recover it
+	 */
+	public EnumValue getFamixEnumValue(IVariableBinding bnd, String name, Enum owner) {
+		return ensureFamixEnumValue(bnd, name, owner, /*persistIt*/false);
 	}
 
 	/**
@@ -690,7 +702,17 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+	/**
+	 * helper method, we know the type exists, ensureFamixAnnotationType will recover it
+	 */
 	public AnnotationType getFamixAnnotationType(ITypeBinding bnd, String name, ContainerEntity owner) {
+		return ensureFamixAnnotationType(bnd, name, owner, /*alwaysPersist*/false);
+	}
+
+	/**
+	 * helper method, we know the type exists, ensureFamixAnnotationType will recover it
+	 */
+	public AnnotationType getFamixAnnotationType(IMethodBinding bnd, String name, ContainerEntity owner) {
 		return ensureFamixAnnotationType(bnd, name, owner, /*alwaysPersist*/false);
 	}
 
@@ -755,8 +777,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	public AnnotationType getFamixAnnotationType(IMethodBinding bnd, String name, ContainerEntity owner) {
-		return ensureFamixAnnotationType(bnd, name, owner, /*alwaysPersist*/false);
+	/**
+	 * helper method, we know the attribute exists, ensureFamixAnnotationTypeAttribute will recover it
+	 */
+	public AnnotationTypeAttribute getFamixAnnotationTypeAttribute(IMethodBinding bnd, String name, AnnotationType owner) {
+		return ensureFamixAnnotationTypeAttribute( bnd, name, owner, /*persistIt*/false);
 	}
 
 	/**
@@ -1538,8 +1563,42 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
+	/** Sets the modifiers (abstract, public, ...) of a FamixNamedEntity
+	 * @param fmx -- the FamixNamedEntity
+	 * @param mod -- a description of the modifiers as understood by org.eclipse.jdt.core.dom.Modifier
+	 */
+	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
+		if (Modifier.isAbstract(mod)) {
+			fmx.addModifiers(MODIFIER_ABSTRACT);
+			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
+		}
+		if (Modifier.isPublic(mod)) {
+			fmx.addModifiers(MODIFIER_PUBLIC);
+			// fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
+		}
+		if (Modifier.isPrivate(mod)) {
+			fmx.addModifiers(MODIFIER_PRIVATE);
+			// fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
+		}
+		if (Modifier.isProtected(mod)) {
+			fmx.addModifiers(MODIFIER_PROTECTED);
+			// fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
+		}
+		if (Modifier.isFinal(mod)) {
+			fmx.addModifiers(MODIFIER_FINAL);
+			// fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
+		}
+	}
+
 	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, Type owner, boolean persistIt) {
 		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, persistIt);
+	}
+
+	/**
+	 * helper method, we know the var exists, ensureFamixAttribute will recover it
+	 */
+	public Attribute getFamixAttribute(IVariableBinding bnd, String name, Type owner) {
+		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, /*persistIt*/false);
 	}
 
 	/**
@@ -1625,35 +1684,15 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	/** Sets the modifiers (abstract, public, ...) of a FamixNamedEntity
-	 * @param fmx -- the FamixNamedEntity
-	 * @param mod -- a description of the modifiers as understood by org.eclipse.jdt.core.dom.Modifier
-	 */
-	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
-		if (Modifier.isAbstract(mod)) {
-			fmx.addModifiers(MODIFIER_ABSTRACT);
-			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
-		}
-		if (Modifier.isPublic(mod)) {
-			fmx.addModifiers(MODIFIER_PUBLIC);
-			// fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
-		}
-		if (Modifier.isPrivate(mod)) {
-			fmx.addModifiers(MODIFIER_PRIVATE);
-			// fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
-		}
-		if (Modifier.isProtected(mod)) {
-			fmx.addModifiers(MODIFIER_PROTECTED);
-			// fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
-		}
-		if (Modifier.isFinal(mod)) {
-			fmx.addModifiers(MODIFIER_FINAL);
-			// fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
-		}
-	}
-
 	public Parameter ensureFamixParameter(IVariableBinding bnd, String name, Method owner, boolean persistIt) {
 		return ensureFamixParameter(bnd, name, /*declared type*/null, owner, persistIt);
+	}
+
+	/**
+	 * helper method, we know the var exists, ensureFamixParameter will recover it
+	 */
+	public Parameter getFamixParameter(IVariableBinding bnd, String name, Method owner) {
+		return ensureFamixParameter(bnd, name, /*declared type*/null, owner, /*persistIt*/false);
 	}
 
 	/**
@@ -1724,6 +1763,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, String name, Method owner, boolean persistIt) {
 		return ensureFamixLocalVariable(bnd, name, /*declared type*/null, owner, persistIt);
+	}
+
+	/**
+	 * helper method, we know the var exists, ensureFamixLocalVariable will recover it
+	 */
+	public LocalVariable getFamixLocalVariable(IVariableBinding bnd, String name, Method owner) {
+		return ensureFamixLocalVariable(bnd, name, /*declared type*/null, owner, /*persistIt*/false);
 	}
 
 	/**
@@ -1806,46 +1852,32 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, NamedEntity fmx, RandomAccessFile source) {
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, NamedEntity fmx) {
 		Comment cmt = null;
-		String cmtContent = null;
-		boolean oneLineAnchor = false;
 
-		if (jCmt != null) {
-			if (jCmt.isDocComment()) {
-				cmtContent = jCmt.toString();
-			}
-			else {
-				byte[] buffer = new byte[jCmt.getLength()];
-				try {
-					source.seek(jCmt.getStartPosition());
-					source.read(buffer, 0, jCmt.getLength());
-					cmtContent = new String(buffer);
-				} catch (IOException e) {
-					e.printStackTrace();
-					return(null);
-				}
-
-				if (jCmt.isLineComment()) {
-					oneLineAnchor = true;
-				}
-			}
-
-			//cmt = super.createFamixComment(cmtContent, fmx);
-
-			// I replace the previous commented code because, since we add a source anchor to the comment, we should not store the comment content in an ivar.
-			cmt = null;
-			if (cmtContent != null && (fmx != null) ) {
-				cmt = new Comment();
-				//We do not set the content because we will set a source anchor. We should not store all the code in memory if we have a source anchor.
-				this.famixRepo.add(cmt);
-				cmt.setContainer(fmx);
-			}
-
-			addSourceAnchor(cmt, jCmt, oneLineAnchor);
+		if ( (jCmt != null) && (fmx != null) && (! commentAlreadyRecorded(fmx, jCmt)) ) {
+			
+			cmt = new Comment();
+			addSourceAnchor(cmt, jCmt, /*oneLineAnchor*/jCmt.isLineComment());
+			this.famixRepo.add(cmt);
+			cmt.setContainer(fmx);
 		}
 
 		return cmt;
+	}
+
+	private boolean commentAlreadyRecorded(NamedEntity fmx, org.eclipse.jdt.core.dom.Comment jCmt) {
+		int startPos = jCmt.getStartPosition();
+		boolean found = false;
+
+		for (Comment cmt : fmx.getComments()) {
+			if (((IndexedFileAnchor)cmt.getSourceAnchor()).getStartPos().intValue() == startPos) {
+				found = true;
+				break;
+			}
+		}
+
+		return found;
 	}
 
 	/**
@@ -1853,40 +1885,32 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Location informations are: <b>name</b> of the source file and <b>line</b> position in this file. They are found in the JDT ASTNode: ast.
 	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
 	 * @param fmx -- Famix Entity to add the anchor to
-	 * @param ast -- JDT ASTNode, where the information are extracted
+	 * @param jdtCmt -- JDT ASTNode, where the information are extracted
 	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some association happening within <b>ast</b>
 	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null)
 	 */
-	public SourceAnchor addSourceAnchor(SourcedEntity fmx, ASTNode ast, boolean oneLineAnchor) {
+	public SourceAnchor addSourceAnchor(SourcedEntity fmx, ASTNode jdtCmt, boolean oneLineAnchor) {
 		AbstractFileAnchor fa = null;
 
-		if ( (fmx != null) && (ast != null) ) {
+		if ( (fmx != null) && (jdtCmt != null) ) {
 			// position in source file
-			int beg = ast.getStartPosition()+1; // Java starts at 0, Moose at 1
-			int end = beg + ast.getLength()-1;
+			int beg = jdtCmt.getStartPosition()+1; // Java starts at 0, Moose at 1
+			int end = beg + jdtCmt.getLength()-1;
 
 			// find source Compilation Unit
 			// there is a special case for the JDT Comment Nodes
-			if (ast instanceof org.eclipse.jdt.core.dom.Comment) {
-				ast = ((org.eclipse.jdt.core.dom.Comment) ast).getAlternateRoot();
+			if (jdtCmt instanceof org.eclipse.jdt.core.dom.Comment) {
+				jdtCmt = ((org.eclipse.jdt.core.dom.Comment) jdtCmt).getAlternateRoot();
 			}
 			else {
-				ast = ast.getRoot();
+				jdtCmt = jdtCmt.getRoot();
 			}
 
-			// now create the Famix SourceAnchor
-			/* old FAMIXSourceAnchor
-			fa = new FileAnchor();
-			((FileAnchor)fa).setStartLine(((CompilationUnit)ast).getLineNumber(beg)); // when oneLineAnchor is true and we are in a comment, should we go to the end of it?
-			((FileAnchor)fa).setEndLine( oneLineAnchor ? ((FileAnchor)fa).getStartLine() : ((CompilationUnit)ast).getLineNumber(end) );
-			*/
-
-			/* new FAMIXIndexedFileAnchor */
 			fa = new IndexedFileAnchor();
 			((IndexedFileAnchor)fa).setStartPos(beg);
 			((IndexedFileAnchor)fa).setEndPos(end);
 
-			fa.setFileName((String) ((CompilationUnit)ast).getProperty(SOURCE_FILENAME_PROPERTY));
+			fa.setFileName((String) ((CompilationUnit)jdtCmt).getProperty(SOURCE_FILENAME_PROPERTY));
 			fmx.setSourceAnchor(fa);
 			famixRepo.add(fa);
 		}

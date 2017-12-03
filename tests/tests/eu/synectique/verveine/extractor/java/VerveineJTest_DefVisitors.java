@@ -105,7 +105,13 @@ public class VerveineJTest_DefVisitors {
 		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
 		assertEquals(26,   VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
-		assertEquals(22,   VerveineUtilsForTests.selectElementsOfType(repo, Comment.class).size());  // FileServer=2, IPrinter=1, OutputServer=3, PrintServer=3, AbstractDestinationAddress=1, Node=3, Packet=1, SingleDestinationAddress=3, WorkStation=5
+		
+		for(Comment c : VerveineUtilsForTests.selectElementsOfType(repo, Comment.class)) {
+			IndexedFileAnchor a = (IndexedFileAnchor) c.getSourceAnchor();
+			System.err.println(a.getFileName() + " @ "+a.getStartPos());
+		}
+
+		assertEquals(32, VerveineUtilsForTests.selectElementsOfType(repo, Comment.class).size()); // WorkStation=6, SingleDestinationAddress=5, Packet=2, Node=4, AbstractDestinationAddress=2, PrintServer=3, XPrinter=1, OutputServer=4, IPrinter=2, anonymous-IPrinter=0, FileServer=3
 	}
 
 	@Test
@@ -302,8 +308,8 @@ public class VerveineJTest_DefVisitors {
 		assertSame(meth, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
 		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/SingleDestinationAddress.java"));
-		assertEquals(664, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(751, ((IndexedFileAnchor)anc).getEndPos());
+		assertEquals(695, ((IndexedFileAnchor)anc).getStartPos());
+		assertEquals(782, ((IndexedFileAnchor)anc).getEndPos());
 		
 		Attribute att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "originator");
 		assertNotNull(att);
@@ -363,10 +369,8 @@ public class VerveineJTest_DefVisitors {
 		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
 		Collection<Comment> cmts = clazz.getComments();
-		assertEquals(1, cmts.size());
+		assertEquals(2, cmts.size());
 		SourceAnchor anc = cmts.iterator().next().getSourceAnchor();
-		assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(120, ((IndexedFileAnchor)anc).getEndPos());
 
 		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "equalsSingle");
 		assertNotNull(meth);
@@ -375,10 +379,18 @@ public class VerveineJTest_DefVisitors {
 		anc = cmts.iterator().next().getSourceAnchor();
 		assertEquals(533, ((IndexedFileAnchor)anc).getStartPos());
 		assertEquals(588, ((IndexedFileAnchor)anc).getEndPos());
+		
+		Parameter p = meth.getParameters().iterator().next();
+		assertEquals("id", p.getName());
+		cmts = p.getComments();
+		assertEquals(1, cmts.size());
+		anc = (IndexedFileAnchor)cmts.iterator().next().getSourceAnchor();
+		assertEquals(619, ((IndexedFileAnchor)anc).getStartPos().intValue());
 
 		// testing the non javadoc comments (those that are treated)
 		clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
 		assertNotNull(clazz);
+
 		Attribute a = clazz.getAttributes().iterator().next();
 		assertEquals("type", a.getName());
 		cmts = a.getComments();
