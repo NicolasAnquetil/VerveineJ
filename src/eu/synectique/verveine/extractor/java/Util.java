@@ -12,7 +12,7 @@ public class Util {
 	/**
 	 * Little helper to "normalize" an anonymous type name
 	 */
-	public static String makeAnonymousName(String anonymousSuperTypeName, EntityStack context) {
+	public static String stringForAnonymousName(String anonymousSuperTypeName, EntityStack context) {
 		String anonSuperTypeName = (anonymousSuperTypeName != null) ? anonymousSuperTypeName : context.topType().getName();
 		return "anonymous("+anonSuperTypeName+")";
 	}

@@ -38,8 +38,8 @@ import eu.synectique.verveine.core.gen.famix.SourceAnchor;
 import eu.synectique.verveine.extractor.java.FamixRequestor;
 import eu.synectique.verveine.extractor.java.JavaDictionary;
 import eu.synectique.verveine.extractor.java.VerveineJParser;
-import eu.synectique.verveine.extractor.java.visitors.VisitorClassMethodDef;
-import eu.synectique.verveine.extractor.java.visitors.VisitorPackageDef;
+import eu.synectique.verveine.extractor.java.defvisitors.VisitorClassMethodDef;
+import eu.synectique.verveine.extractor.java.defvisitors.VisitorPackageDef;
 
 /**
  * @author Nicolas Anquetil
