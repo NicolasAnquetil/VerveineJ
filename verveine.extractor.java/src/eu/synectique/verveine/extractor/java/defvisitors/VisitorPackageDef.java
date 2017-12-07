@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.visitors;
+package eu.synectique.verveine.extractor.java.defvisitors;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;

@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.visitors;
+package eu.synectique.verveine.extractor.java.defvisitors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +62,7 @@ import eu.synectique.verveine.core.gen.famix.ParameterType;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import eu.synectique.verveine.extractor.java.JavaDictionary;
+import eu.synectique.verveine.extractor.java.RefVisitor;
 import eu.synectique.verveine.extractor.java.Util;
 import eu.synectique.verveine.extractor.java.VerveineJParser;
 
@@ -69,20 +70,7 @@ import eu.synectique.verveine.extractor.java.VerveineJParser;
  * AST Visitor that defines all the (Famix) entities of interest
  * Famix entities are stored in a Map along with the IBindings to which they correspond
  */
-public class VisitorClassMethodDef extends ASTVisitor {
-
-	/** 
-	 * A dictionary allowing to recover created FAMIX Entities
-	 */
-	protected JavaDictionary dico;
-
-	/**
-	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
-	 * we are in its parent node: a ClassInstanceCreation.
-	 * So we must keep this type from the visit(ClassInstanceCreation) to be used in visit(AnonymousClassDeclaration).<br>
-	 * Note that in some special cases one can also have an anonymous class definition without specifying its superclass.
-	 */
-	protected String anonymousSuperTypeName;
+public class VisitorClassMethodDef extends RefVisitor {
 
 	/**
 	 * Whether to summarize collected information at the level of classes or produce everything
@@ -91,18 +79,12 @@ public class VisitorClassMethodDef extends ASTVisitor {
 	protected boolean classSummary = false;
 
 	/**
-	 * A stack that keeps the current definition context (package/class/method)
-	 */
-	protected EntityStack context;
-
-	/**
 	 * what sourceAnchors to create
 	 */
 	protected String anchors;
 
 	public VisitorClassMethodDef(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
-		this.dico = dico;
-		this.context = new EntityStack();
+		super( dico);
 		this.classSummary = classSummary;
 		this.anchors = anchors;
 	}
@@ -111,34 +93,13 @@ public class VisitorClassMethodDef extends ASTVisitor {
 
 	@Override
 	public boolean visit(CompilationUnit node) {
-		//		System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
-
-		Namespace fmx = null;
-		PackageDeclaration pckg = node.getPackage();
-		if (pckg == null) {
-			fmx = dico.getFamixNamespaceDefault();
-		} else {
-			fmx = (Namespace) dico.getEntityByKey(pckg.resolveBinding());
-		}
-		this.context.pushPckg(fmx);
-
+		visitCompilationUnit(node);
 		return super.visit(node);
 	}
 
 	@Override
 	public void endVisit(CompilationUnit node) {
-		this.context.popPckg();
-		super.endVisit(node);
-	}
-
-	@Override
-	public boolean visit(PackageDeclaration node) {
-		return false; // no need to visit children of the declaration
-	}
-
-	@Override
-	public boolean visit(ImportDeclaration node) {
-		return false; // no need to visit children of the declaration	
+		endVisitCompilationUnit(node);
 	}
 
 	/*
@@ -222,7 +183,7 @@ public class VisitorClassMethodDef extends ASTVisitor {
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
 		ITypeBinding bnd = node.resolveBinding();
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-		fmx = this.dico.ensureFamixClass(bnd, Util.makeAnonymousName(anonymousSuperTypeName, context), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
+		fmx = this.dico.ensureFamixClass(bnd, Util.stringForAnonymousName(anonymousSuperTypeName, context), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
 		if (fmx != null) {
 			recursivelySetIsStub(fmx, false);
 

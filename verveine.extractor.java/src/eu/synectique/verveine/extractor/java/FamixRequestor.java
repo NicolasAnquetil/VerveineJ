@@ -9,10 +9,10 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
 import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.extractor.java.visitors.VisitorClassMethodDef;
-import eu.synectique.verveine.extractor.java.visitors.VisitorComments;
-import eu.synectique.verveine.extractor.java.visitors.VisitorPackageDef;
-import eu.synectique.verveine.extractor.java.visitors.VisitorVarsDef;
+import eu.synectique.verveine.extractor.java.defvisitors.VisitorClassMethodDef;
+import eu.synectique.verveine.extractor.java.defvisitors.VisitorComments;
+import eu.synectique.verveine.extractor.java.defvisitors.VisitorPackageDef;
+import eu.synectique.verveine.extractor.java.defvisitors.VisitorVarsDef;
 
 public class FamixRequestor extends FileASTRequestor {
 

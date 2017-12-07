@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.visitors;
+package eu.synectique.verveine.extractor.java.defvisitors;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,6 +39,7 @@ import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.ParameterType;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.extractor.java.JavaDictionary;
+import eu.synectique.verveine.extractor.java.RefVisitor;
 import eu.synectique.verveine.extractor.java.Util;
 import eu.synectique.verveine.extractor.java.VerveineJParser;
 
@@ -46,20 +47,7 @@ import eu.synectique.verveine.extractor.java.VerveineJParser;
  * AST Visitor that defines all the (Famix) entities of interest
  * Famix entities are stored in a Map along with the IBindings to which they correspond
  */
-public class VisitorVarsDef extends ASTVisitor {
-
-	/** 
-	 * A dictionary allowing to recover created FAMIX Entities
-	 */
-	protected JavaDictionary dico;
-
-	/**
-	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
-	 * we are in its parent node: a ClassInstanceCreation.
-	 * So we must keep this type from the visit(ClassInstanceCreation) to be used in visit(AnonymousClassDeclaration).<br>
-	 * Note that in some special cases one can also have an anonymous class definition without specifying its superclass.
-	 */
-	protected String anonymousSuperTypeName;
+public class VisitorVarsDef extends RefVisitor {
 
 	/**
 	 * Whether to summarize collected information at the level of classes or produce everything
@@ -72,11 +60,6 @@ public class VisitorVarsDef extends ASTVisitor {
 	 * Note: allLocals = ! classSummary
 	 */
 	private boolean allLocals = false;
-
-	/**
-	 * A stack that keeps the current definition context (package/class/method)
-	 */
-	protected EntityStack context;
 
 	/**
 	 * what sourceAnchors to create
@@ -96,8 +79,7 @@ public class VisitorVarsDef extends ASTVisitor {
 	}
 
 	public VisitorVarsDef(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
-		this.dico = dico;
-		this.context = new EntityStack();
+		super(dico);
 		this.classSummary = classSummary;
 		this.allLocals = allLocals;
 		this.anchors = anchors;
@@ -107,49 +89,18 @@ public class VisitorVarsDef extends ASTVisitor {
 
 	@Override
 	public boolean visit(CompilationUnit node) {
-		//		System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
-
-		Namespace fmx = null;
-		PackageDeclaration pckg = node.getPackage();
-		if (pckg == null) {
-			fmx = dico.getFamixNamespaceDefault();
-		} else {
-			fmx = (Namespace) dico.getEntityByKey(pckg.resolveBinding());
-		}
-		this.context.pushPckg(fmx);
-
+		visitCompilationUnit(node);
 		return super.visit(node);
 	}
 
 	@Override
 	public void endVisit(CompilationUnit node) {
-		this.context.popPckg();
-		super.endVisit(node);
+		endVisitCompilationUnit(node);
 	}
 
-	@Override
-	public boolean visit(PackageDeclaration node) {
-		return false; // no need to visit children of the declaration
-	}
-
-	@Override
-	public boolean visit(ImportDeclaration node) {
-		return false; // no need to visit children of the declaration	
-	}
-
-	/*
-	 * Can only be a class or interface declaration
-	 * Local type: see comment of visit(ClassInstanceCreation node)
-	 */
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
-		ITypeBinding bnd = node.resolveBinding();
-		// The class should exist, we call ensure... to recover it
-		// so only the first 3 parameters are meaningful
-		eu.synectique.verveine.core.gen.famix.Class fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
-		if (fmx != null) {
-			this.context.pushType(fmx);
+		if (visitTypeDeclaration( node) != null) {
 			return super.visit(node);
 		} else {
 			return false;
@@ -158,54 +109,39 @@ public class VisitorVarsDef extends ASTVisitor {
 
 	@Override
 	public void endVisit(TypeDeclaration node) {
-		this.context.popType();
-		super.endVisit(node);
+		endVisitTypeDeclaration(node);
 	}
 
 	/**
-	 * See field {@link VisitorClassMethodDef#anonymousSuperTypeName}<br>
-	 * We could test if it is a local type (inner/anonymous) and not define it in case it does not make any reference
-	 * to anything outside its owner class. But it would be a lot of work for probably little gain.
+	 * Sets field {@link RefVisitor#anonymousSuperTypeName}
 	 */
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
-		if (node.getAnonymousClassDeclaration() != null) {
-			anonymousSuperTypeName = Util.jdtTypeName(node.getType());
-		} else {
-			anonymousSuperTypeName = null;
-		}
+		visitClassInstanceCreation( node);
 		return super.visit(node);
 	}
 
 	/**
-	 * See field {@link VisitorClassMethodDef#anonymousSuperTypeName}
+	 * Uses field {@link  RefVisitor#anonymousSuperTypeName}
 	 */
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
-		eu.synectique.verveine.core.gen.famix.Class fmx = null;
-
-		ITypeBinding bnd = node.resolveBinding();
-		fmx = this.dico.getFamixClass(bnd, Util.makeAnonymousName(anonymousSuperTypeName,context), /*owner*/(ContainerEntity)context.top());
-		if (fmx != null) {
-			this.context.pushType(fmx);
+		if (visitAnonymousClassDeclaration( node) != null) {
 			return super.visit(node);
-		} else {
+		}
+		else {
 			return false;
 		}
 	}
 
 	@Override
 	public void endVisit(AnonymousClassDeclaration node) {
-		super.endVisit(node);
+		endVisitAnonymousClassDeclaration( node);
 	}
 
 	@Override
 	public boolean visit(EnumDeclaration node) {
-//		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
-
-		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.getFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), (ContainerEntity) context.top());
-		if (fmx != null) {
-			this.context.pushType(fmx);
+		if (visitEnumDeclaration( node) != null) {
 			return super.visit(node);
 		}
 		else {
@@ -215,28 +151,22 @@ public class VisitorVarsDef extends ASTVisitor {
 
 	@Override
 	public void endVisit(EnumDeclaration node) {
-		this.context.popType();
-		super.endVisit(node);
+		endVisitEnumDeclaration( node);
 	}
 
 	@Override
 	public boolean visit(AnnotationTypeDeclaration node) {
-		ITypeBinding bnd = node.resolveBinding();
-		AnnotationType fmx = dico.getFamixAnnotationType(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
-		if (fmx != null) {
-			context.pushType(fmx);
+		if (visitAnnotationTypeDeclaration( node) != null) {
 			return super.visit(node);
 		}
 		else {
-			context.pushType(null);
 			return false;
 		}
 	}
 
 	@Override
 	public void endVisit(AnnotationTypeDeclaration node) {
-		this.context.popType();
-		super.endVisit(node);
+		endVisitAnnotationTypeDeclaration(node);
 	}
 
 	@Override
@@ -264,40 +194,17 @@ public class VisitorVarsDef extends ASTVisitor {
 		super.endVisit(node);
 	}
 
-	/**
-	 * Local type: same as {@link VisitorVarsDef#visit(ClassInstanceCreation)}, 
-	 * we create it even if it is a local method because their are too many ways it can access external things
-	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
-		IMethodBinding bnd = node.resolveBinding();
+		visitMethodDeclaration( node);
+		structuralType = StructuralEntityKinds.PARAMETER;
 
-		Collection<String> paramTypes = new ArrayList<String>();
-		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
-			paramTypes.add( Util.jdtTypeName(param.getType()));
-		}
-
-		Method fmx = dico.getFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*owner*/context.topType());
-
-		if (fmx != null) {
-			fmx.setIsStub(false);
-			this.context.pushMethod(fmx);
-
-			structuralType = StructuralEntityKinds.PARAMETER;
-
-			return super.visit(node);
-		} else {
-			this.context.pushMethod(null);
-			return false;
-		}
+		return super.visit(node);
 	}
 
 	@Override
 	public void endVisit(MethodDeclaration node) {
-		context.popMethod();
-
-		super.endVisit(node);
+		endVisitMethodDeclaration(node);
 	}
 
 	@Override
