@@ -1,0 +1,114 @@
+<?xml version="1.0"?>
+<project name="verveine.extractor.java" default="jar" basedir=".">
+	<!-- Sets variables which can later be used. -->
+	<!-- The value of a property is accessed via ${} -->
+	<property name="src.dir"      location="src" />
+	<property name="testsrc.dir"  location="tests" />
+	<property name="build.dir"    location="bin" />
+	<property name="docs.dir"     location="docs" />
+	<property name="dist.dir"     location="lib" />
+	<property name="verveine.jar" location="${dist.dir}/verveine.extractor.java.jar" />
+	<property name="tests.jar"    location="${dist.dir}/verveine.extractor.java.tests.jar" />
+	<property name="test.report.dir" location="testrep" />
+
+	<!-- Deletes the existing build, docs and dist directory-->
+	<target name="clean">
+		<delete dir="${build.dir}" />
+		<delete dir="${docs.dir}" />
+		<delete file="${verveine.jar}" />
+	</target>
+
+	<!-- Re-creates the  build, docs and dist directory-->
+	<target name="makedir">
+		<mkdir dir="${build.dir}" />
+		<mkdir dir="${docs.dir}" />
+		<mkdir dir="${test.report.dir}" />
+	</target>
+
+	<!-- Update source for licence checking -->
+	<target name="compile" depends="clean, makedir">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+		<javac srcdir="${testsrc.dir}" destdir="${build.dir}" includeantruntime="false">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
+	</target>
+ 
+	<!-- Creates Javadoc -->
+	<target name="docs" depends="compile">
+		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
+			<!-- Define which files / directory should get included, we include all -->
+			<fileset dir="${src.dir}">
+				<include name="**" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<!--Creates the deployable jar file  -->
+	<target name="jar" depends="compile">
+		<jar destfile="${verveine.jar}"
+		     basedir="${build.dir}"
+		     includes="eu/synectique/verveine/extractor/java/**/*.class"
+		/>
+		<jar destfile="${tests.jar}"
+		     basedir="${build.dir}"
+		     includes="tests/eu/synectique/verveine/extractor/java/*.class"
+		/>
+	</target>
+
+	<!--Creates the deployable jar file  -->
+	<target name="rebuild">
+		<jar destfile="${verveine.jar}"
+		     basedir="${build.dir}"
+		     includes="eu/synectique/verveine/extractor/java/*.class"
+		/>
+		<jar destfile="${tests.jar}"
+		     basedir="${build.dir}"
+		     includes="test/eu/synectique/verveine/extractor/java/*.class"
+		/>
+	</target>
+
+	<!-- Run the JUnit Tests -->
+	<target name="junit" depends="jar">
+		<junit printsummary="on" fork="true" haltonfailure="no">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<!-- Output is XML, could also be plain-->
+			<formatter type="plain" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_AnnotationTest" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_Summarized" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_JWSBasic" todir="${test.report.dir}" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_Configuration" todir="${test.report.dir}" />
+		</junit>
+	</target>
+
+	<!-- Run the JUnit Tests -->
+	<!-- Output is XML, could also be plain-->
+	<target name="test_lan">
+		<junit printsummary="on" fork="true" haltonfailure="no">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<formatter type="plain" />
+			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
+		</junit>
+	</target>
+
+</project>
