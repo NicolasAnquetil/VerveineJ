@@ -44,6 +44,7 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
+import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
@@ -81,6 +82,7 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import eu.synectique.verveine.core.Dictionary;
+import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
@@ -111,35 +113,66 @@ import eu.synectique.verveine.extractor.java.VerveineJParser;
  * AST Visitor that defines all the (Famix) entities of interest
  * Famix entities are stored in a Map along with the IBindings to which they correspond
  */
-public class VerveineVisitor extends AbstractVisitor {
+public class VerveineVisitor extends ASTVisitor {
 
-	/**
-	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
-	 * we are in its parent node: a ClassInstanceCreation.
-	 * So we must keep this type from the visit(ClassInstanceCreation) to be used in visit(AnonymousClassDeclaration).<br>
-	 * Note that in some special cases one can also have an anonymous class definition without specifying its superclass.
-	 */
-	private Type anonymousSuperType;
+	/** 
+     * A dictionary allowing to recover created FAMIX Entities
+     */
+    protected JavaDictionary dico;
 
-	/**
-	 * Useful to keep the FamixType created in the specific case of "new SomeClass().someMethod()"
-	 */
-	private eu.synectique.verveine.core.gen.famix.Type classInstanceCreated = null;
+    /**
+     * The super type of an anonymous declaration is only available (without resorting to bindings) when 
+     * we are in its parent node: a ClassInstanceCreation.
+     * So we must keep this type from the visit(ClassInstanceCreation) to be used in visit(AnonymousClassDeclaration).<br>
+     * Note that in some special cases one can also have an anonymous class definition without specifying its superclass.
+     */
+    private Type anonymousSuperType;
 
-	/**
-	 * The source code of the visited AST.
-	 * Used to find back the contents of non-javadoc comments
-	 */
-	protected RandomAccessFile source;
+    /**
+     * Whether to summarize collected information at the level of classes or produce everything
+     * (see {@link VerveineJParser#classSummary}).
+     */
+    private boolean classSummary = false;
 
-	/**
-	 * Whether a variable access is lhs (write) or not
-	 */
-	protected boolean inAssignmentLHS = false;
+    /**
+     * Whether to output all local variables (even those with primitive type or not (default is not).<br>
+     * Note: allLocals = ! classSummary
+     */
+    private boolean allLocals = false;
+	
+    /**
+     * A stack that keeps the current definition context (package/class/method)
+     */
+    protected EntityStack context;
 
-	public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
-		super( dico, classSummary, allLocals, anchors);
-	}
+    /**
+     * Useful to keep the FamixType created in the specific case of "new SomeClass().someMethod()"
+     */
+    private eu.synectique.verveine.core.gen.famix.Type classInstanceCreated = null;
+
+    /**
+     * The source code of the visited AST.
+     * Used to find back the contents of non-javadoc comments
+     */
+    protected RandomAccessFile source;
+
+    /**
+     * Whether a variable access is lhs (write) or not
+     */
+    protected boolean inAssignmentLHS = false;
+
+    /**
+     * what sourceAnchors to create
+     */
+    private String anchors;
+
+    public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
+    	this.dico = dico;
+    	this.context = new EntityStack();
+    	this.classSummary = classSummary;
+    	this.allLocals = allLocals;
+    	this.anchors = anchors;
+    }
 
 	// VISITOR METHODS
 
@@ -179,6 +212,14 @@ public class VerveineVisitor extends AbstractVisitor {
 			}
 		}
 		super.endVisit(node);
+	}
+
+	public boolean visit(PackageDeclaration node) {
+		return false; // no need to visit children of the declaration
+	}
+
+	public boolean visit(ImportDeclaration node) {
+		return false; // no need to visit children of the declaration	
 	}
 
 	/*
@@ -223,6 +264,16 @@ public class VerveineVisitor extends AbstractVisitor {
 						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx, source);
 					}
 				}
+//			} else {
+//				for (Inheritance inh : fmx.getSuperInheritances()) {
+//					Reference lastRef = (classSummary ? null : context.getLastReference());
+//					Reference ref = dico.addFamixReference(findHighestType(context.top()),
+//							findHighestType(inh.getSuperclass()), lastRef);
+//					context.setLastReference(ref);
+//					if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+//						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+//					}
+//				}
 			}
 
 			for (TypeParameter tp : tparams) {
@@ -349,7 +400,14 @@ public class VerveineVisitor extends AbstractVisitor {
 		if (fmx != null) {
 			recursivelySetIsStub(fmx, false);
 
-			if (! classSummary) {
+			if (classSummary) {
+//				for (Inheritance inh : fmx.getSuperInheritances()) {
+//					Reference ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(inh.getSuperclass()), /*lastReference*/null);
+//					if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+//						dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+//					}
+//				}
+			} else {
 				dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
 				if ((!anchors.equals(VerveineJParser.ANCHOR_NONE)) && (fmx != null)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
@@ -475,7 +533,7 @@ public class VerveineVisitor extends AbstractVisitor {
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			// Insert for BodyHash computing
-			fmx.setBodyHash(this.computeHashForMethodBody(node));
+			//fmx.setBodyHash(this.computeHashForMethodBody(node));
 			this.context.pushMethod(fmx);
 
 			// now will recompute the actual returnType
@@ -1224,7 +1282,7 @@ public class VerveineVisitor extends AbstractVisitor {
 				}
 				if (classSummary) {
 					//dico.addFamixReference(findHighestType(sender), findHighestType(methOwner), /*lastReference*/null);
-					//  //TODO add FileAnchor to Reference
+					//  TODO add FileAnchor to Reference
 				} else {
 					String signature = calledName + "(";
 					boolean first = true;
@@ -1690,7 +1748,7 @@ public class VerveineVisitor extends AbstractVisitor {
 				if (!(accessed.getDeclaredType() instanceof PrimitiveType)) {
 					//dico.addFamixReference(findHighestType(accessed.getBelongsTo()),
 					//		findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
-					//   //TODO add FileAnchor to Reference
+					// TODO add FileAnchor to Reference
 				}
 			}
 
@@ -1725,7 +1783,7 @@ public class VerveineVisitor extends AbstractVisitor {
 		if ((accessed != null) && (accessor != null)) {
 			if (classSummary) {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
-				//  //TODO set FileAnchor to Reference
+				// TODO set FileAnchor to Reference
 			} else if (accessed.getBelongsTo() != accessor) {
 				context.setLastAccess(
 						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
@@ -1758,11 +1816,37 @@ public class VerveineVisitor extends AbstractVisitor {
 		}
 	}
 
-	/* *
+	/**
+	 * if {@link VerveineVisitor#classSummary} is true, we persist only classes that are not defined in methods.
+	 * @param bnd -- ITypeBinding for the class that we are checking, might be null and in this case, we check whether there is no method at the top of the context
+	 * @return whether to persist the class or its members
+	 */
+	private boolean persistClass(ITypeBinding bnd) {
+		if (bnd != null) {
+			if (bnd.isParameterizedType()) {
+				// parameterized types seem to never belong to a method even when they are created within one
+				// so we kind of "force" persistClass to consider only context by passing a null binding to it
+				return persistClass(null);
+			} else {
+				// let see if it is a type parameter
+				NamedEntity t = dico.getEntityByKey(bnd);
+				if ((t != null) && (t instanceof ParameterType)) {
+					return false;
+				}
+				// finally, the "normal" case
+				return (!classSummary) || (bnd.getDeclaringMethod() == null);
+			}
+		} else {
+			return (!classSummary) || (context.topMethod() == null);
+		}
+
+	}
+
+	/**
 	 *  find highest level type containing entity
 	 * @param e
 	 * @return
-	 * /
+	 */
 	private eu.synectique.verveine.core.gen.famix.Type findHighestType(NamedEntity e) {
 		eu.synectique.verveine.core.gen.famix.Type ret = null;
 
@@ -1775,7 +1859,7 @@ public class VerveineVisitor extends AbstractVisitor {
 			e = e.getBelongsTo();
 		}
 		return ret;
-	}*/
+	}
 
 	private void recursivelySetIsStub(ContainerEntity fmx, boolean b) {
 		ContainerEntity owner;

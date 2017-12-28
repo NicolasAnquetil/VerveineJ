@@ -72,19 +72,7 @@ public class SimpleBean implements SessionBean {
   @WebMethod(operationName="processOrderApp")
 
   public String orderResponse(OrderStruct orderRequest) throws RemoteException {
-    //System.out.println("======= Credit Rating Service Processor");
-    //System.out.println("======= Credit Rating Request received for " + loanRequest.getName() );
-    //System.out.println("======= ID             : "   + loanRequest.getSSN());
-    //System.out.println("======= Amount         : "   + loanRequest.getAmount());
-    //System.out.println("======= Rate           : "   + loanRequest.getRate());
-    //System.out.println("======= # Years        : "   + loanRequest.getNumOfYear());
-    //System.out.println("======= Notes          : "   + loanRequest.getNotes());
-    //System.out.println("=====================================================");
-
    String orderRating = "AA";
-    //loanRequest.setNotes("APPROVED BY THE <i><b>credit</b></i> LOAN APPLICATION PROCESSING SERVICE");
-    //System.out.println("======= " + "Credit Rating : " + creditRating);
-    //System.out.println("=====================================================");
     return orderRating;
 
   }

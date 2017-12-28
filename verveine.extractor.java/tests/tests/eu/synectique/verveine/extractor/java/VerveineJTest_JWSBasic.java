@@ -50,7 +50,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); // @Session, @WebService, @SOAPBinding, @WLHttpTransport, @WebMethod
+		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); // @Session, @WebService, @SOAPBinding, @WLHttpTransport, @WebMethod no longer found because of a method binding not resolved
 	}
 
 	@Test

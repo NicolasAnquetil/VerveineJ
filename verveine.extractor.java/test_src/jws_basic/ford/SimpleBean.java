@@ -71,19 +71,8 @@ public class SimpleBean implements SessionBean {
   @WebMethod(operationName="processOrderApp")
 
   public OrderStruct orderResponse(OrderStruct orderRequest) throws RemoteException {
-    //System.out.println("======= Management Approval Loan Application Processor");
-    //System.out.println("======= Loan Application received for " + loanRequest.getName() );
-    //System.out.println("======= Social Sec     : "   + loanRequest.getSSN());
-    //System.out.println("======= Amount         : "   + loanRequest.getAmount());
-    //System.out.println("======= Rate           : "   + loanRequest.getRate());
-    //System.out.println("======= # Years        : "   + loanRequest.getNumOfYear());
-    //System.out.println("======= Notes          : "   + loanRequest.getNotes());
-    //System.out.println("=====================================================");
-
     //Loan approved
 	  orderRequest.setNotes("ORDER EXECUTED by Ford");
-    //System.out.println("======= " + "Loan Request Status: " + loanRequest.getNotes());
-    //System.out.println("=====================================================");
     return orderRequest;
 
   }
