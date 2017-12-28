@@ -32,7 +32,7 @@ public class SingleDestinationAddress extends AbstractDestinationAddress {
 	 * @param singleDestinationAddress
 	 * @return
 	 */
-	public boolean equalsSingle(/*this parameter is commented*/String id) {
+	public boolean equalsSingle(String id) {
 		return id().equals(id);
 	}
 	

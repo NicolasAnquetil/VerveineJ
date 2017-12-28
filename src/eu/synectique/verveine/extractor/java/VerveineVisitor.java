@@ -44,7 +44,6 @@ import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.InstanceofExpression;
@@ -82,7 +81,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 
 import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
@@ -106,17 +104,14 @@ import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
+import eu.synectique.verveine.extractor.java.JavaDictionary;
+import eu.synectique.verveine.extractor.java.VerveineJParser;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
  * Famix entities are stored in a Map along with the IBindings to which they correspond
  */
-public class VerveineVisitor extends ASTVisitor {
-
-	/** 
-	 * A dictionary allowing to recover created FAMIX Entities
-	 */
-	protected JavaDictionary dico;
+public class VerveineVisitor extends AbstractVisitor {
 
 	/**
 	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
@@ -125,23 +120,6 @@ public class VerveineVisitor extends ASTVisitor {
 	 * Note that in some special cases one can also have an anonymous class definition without specifying its superclass.
 	 */
 	private Type anonymousSuperType;
-
-	/**
-	 * Whether to summarize collected information at the level of classes or produce everything
-	 * (see {@link VerveineJParser#classSummary}).
-	 */
-	private boolean classSummary = false;
-
-	/**
-	 * Whether to output all local variables (even those with primitive type or not (default is not).<br>
-	 * Note: allLocals = ! classSummary
-	 */
-	private boolean allLocals = false;
-
-	/**
-	 * A stack that keeps the current definition context (package/class/method)
-	 */
-	protected EntityStack context;
 
 	/**
 	 * Useful to keep the FamixType created in the specific case of "new SomeClass().someMethod()"
@@ -159,17 +137,8 @@ public class VerveineVisitor extends ASTVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 
-	/**
-	 * what sourceAnchors to create
-	 */
-	private String anchors;
-
 	public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
-		this.dico = dico;
-		this.context = new EntityStack();
-		this.classSummary = classSummary;
-		this.allLocals = allLocals;
-		this.anchors = anchors;
+		super( dico, classSummary, allLocals, anchors);
 	}
 
 	// VISITOR METHODS
@@ -212,20 +181,12 @@ public class VerveineVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
-	public boolean visit(PackageDeclaration node) {
-		return false; // no need to visit children of the declaration
-	}
-
-	public boolean visit(ImportDeclaration node) {
-		return false; // no need to visit children of the declaration	
-	}
-
 	/*
 	 * Can only be a class or interface declaration
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
 	public boolean visit(TypeDeclaration node) {
-		//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
+//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = node.resolveBinding();
 		@SuppressWarnings("unchecked")
 		List<TypeParameter> tparams = (List<TypeParameter>) node.typeParameters();
@@ -235,8 +196,6 @@ public class VerveineVisitor extends ASTVisitor {
 		eu.synectique.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
 		if (fmx != null) {
 			recursivelySetIsStub(fmx, false);
-			
-			// in some cases, binding does not provide
 
 			// if it is a generic and some parameterizedTypes were created for it
 			// they are marked as stub which is not right
@@ -257,11 +216,11 @@ public class VerveineVisitor extends ASTVisitor {
 				addUnboundAnnotationInstances(node, fmx, persistIt);
 
 				//comments
-				if (dico.createFamixComment(node.getJavadoc(), fmx/*, source*/) == null) {
+				if (dico.createFamixComment(node.getJavadoc(), fmx, source) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
 					if ((source != null) && (iCmt > -1)) {
-						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx/*, source*/);
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx, source);
 					}
 				}
 			}
@@ -331,7 +290,8 @@ public class VerveineVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * See {@link VerveineVisitor#anonymousSuperType}<br>
+	 * Creation of an anonymous class.<br>
+	 * See {@link VerveineVisitor#anonymousSuperType}.<br>
 	 * We could test if it is a local type (inner/anonymous) and not define it in case it does not make any reference
 	 * to anything outside its owner class. But it would be a lot of work for probably little gain.
 	 */
@@ -380,7 +340,7 @@ public class VerveineVisitor extends ASTVisitor {
 	 * See {@link VerveineVisitor#anonymousSuperType}
 	 */
 	public boolean visit(AnonymousClassDeclaration node) {
-		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
+//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
 		ITypeBinding bnd = node.resolveBinding();
 		String anonSuperTypeName = (anonymousSuperType != null) ? findTypeName(anonymousSuperType) : context.topType().getName();
@@ -421,7 +381,7 @@ public class VerveineVisitor extends ASTVisitor {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 
-			// possibly not persisting the enum's memebrs, i.e. enum-values
+			// possibly not persisting the enum's members, i.e. enum-values
 			for (EnumConstantDeclaration ecst : (List<EnumConstantDeclaration>)node.enumConstants()) {
 				EnumValue ev = dico.ensureFamixEnumValue(ecst.resolveVariable(), ecst.getName().getIdentifier(), fmx, persistClass(node.resolveBinding()));
 				ev.setIsStub(false);
@@ -515,7 +475,7 @@ public class VerveineVisitor extends ASTVisitor {
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			// Insert for BodyHash computing
-			//fmx.setBodyHash(this.computeHashForMethodBody(node));
+			fmx.setBodyHash(this.computeHashForMethodBody(node));
 			this.context.pushMethod(fmx);
 
 			// now will recompute the actual returnType
@@ -541,11 +501,11 @@ public class VerveineVisitor extends ASTVisitor {
 				dico.addFamixAnnotationInstances(bnd, fmx, /*persistIt=true*/!classSummary);
 
 				//comments
-				if (dico.createFamixComment(node.getJavadoc(), fmx/*, source*/) == null) {
+				if (dico.createFamixComment(node.getJavadoc(), fmx, source) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
 					if ((source != null) && (iCmt > -1)) {
-						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx/*, source*/);
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), fmx, source);
 					}
 				}
 			}
@@ -623,7 +583,7 @@ public class VerveineVisitor extends ASTVisitor {
 				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
-				dico.createFamixComment(node.getJavadoc(), fmx/*, source*/);
+				dico.createFamixComment(node.getJavadoc(), fmx, source);
 			}
 
 			if (node.getBody() != null) {
@@ -673,11 +633,11 @@ public class VerveineVisitor extends ASTVisitor {
 				}
 
 				//comments
-				if (dico.createFamixComment(node.getJavadoc(), att/*, source*/) == null) {
+				if (dico.createFamixComment(node.getJavadoc(), att, source) == null) {
 					CompilationUnit astRoot = (CompilationUnit) node.getRoot();
 					int iCmt = astRoot.firstLeadingCommentIndex(node);
 					if ((source != null) && (iCmt > -1)) {
-						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), att/*, source*/);
+						dico.createFamixComment((Comment) astRoot.getCommentList().get(iCmt), att, source);
 					}
 				}
 			}
@@ -1796,32 +1756,6 @@ public class VerveineVisitor extends ASTVisitor {
 				return JavaDictionary.OBJECT_NAME;
 			}
 		}
-	}
-
-	/**
-	 * if {@link VerveineVisitor#classSummary} is true, we persist only classes that are not defined in methods.
-	 * @param bnd -- ITypeBinding for the class that we are checking, might be null and in this case, we check whether there is no method at the top of the context
-	 * @return whether to persist the class or its members
-	 */
-	private boolean persistClass(ITypeBinding bnd) {
-		if (bnd != null) {
-			if (bnd.isParameterizedType()) {
-				// parameterized types seem to never belong to a method even when they are created within one
-				// so we kind of "force" persistClass to consider only context by passing a null binding to it
-				return persistClass(null);
-			} else {
-				// let see if it is a type parameter
-				NamedEntity t = dico.getEntityByKey(bnd);
-				if ((t != null) && (t instanceof ParameterType)) {
-					return false;
-				}
-				// finally, the "normal" case
-				return (!classSummary) || (bnd.getDeclaringMethod() == null);
-			}
-		} else {
-			return (!classSummary) || (context.topMethod() == null);
-		}
-
 	}
 
 	/* *
