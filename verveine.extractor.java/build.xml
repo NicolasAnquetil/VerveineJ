@@ -11,6 +11,20 @@
 	<property name="tests.jar"    location="${dist.dir}/verveine.extractor.java.tests.jar" />
 	<property name="test.report.dir" location="testrep" />
 
+	<!-- CHECKING PROPER JVM VERSION -->
+	<target name="print-version"> 
+	  <echo>Java/JVM version: ${ant.java.version}</echo> 
+	  <echo>Java/JVM detail version: ${java.version}</echo> 
+	</target>
+	
+	<fail message="Unsupported Java version: ${ant.java.version}. Make sure that the JDK version is exactly 1.8">
+	  <condition>
+	    <not>
+	      <equals arg1="${ant.java.version}" arg2="1.8"/>
+	    </not>
+	  </condition>
+	</fail>
+
 	<!-- Deletes the existing build, docs and dist directory-->
 	<target name="clean">
 		<delete dir="${build.dir}" />
