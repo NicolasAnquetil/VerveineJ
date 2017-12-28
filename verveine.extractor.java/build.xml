@@ -100,7 +100,7 @@
 				</fileset>
 			</classpath>
 			<!-- Output is XML, could also be plain-->
-			<formatter type="plain" />
+			<formatter type="xml" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
