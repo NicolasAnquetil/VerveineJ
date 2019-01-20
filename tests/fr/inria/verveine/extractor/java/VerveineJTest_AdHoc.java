@@ -19,8 +19,6 @@ import org.junit.Test;
 
 import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
@@ -44,6 +42,8 @@ import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.ThrownException;
 import eu.synectique.verveine.core.gen.famix.Type;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
  * @author Nicolas Anquetil

@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.defvisitors;
+package fr.inria.verveine.extractor.java.defvisitors;
 
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -9,10 +9,10 @@ import org.eclipse.jdt.core.dom.ITypeBinding;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.SummarizingClassesAbstractVisitor;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
-import eu.synectique.verveine.extractor.java.utils.Util;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
+import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.utils.Util;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest

@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.refvisitors;
 
 import java.util.List;
 
@@ -43,9 +43,9 @@ import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
-import eu.synectique.verveine.extractor.java.utils.ImplicitVarBinding;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 public class VisitorAccessRef extends AbstractRefVisitor {
 

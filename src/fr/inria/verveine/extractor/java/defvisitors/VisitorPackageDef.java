@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.defvisitors;
+package fr.inria.verveine.extractor.java.defvisitors;
 
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -9,7 +9,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.JavaDictionary;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest

@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java;
+package fr.inria.verveine.extractor.java;
 
 import java.io.File;
 import java.util.Collection;
@@ -9,16 +9,16 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
 import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.extractor.java.defvisitors.VisitorAnnotationDef;
-import eu.synectique.verveine.extractor.java.defvisitors.VisitorClassMethodDef;
-import eu.synectique.verveine.extractor.java.defvisitors.VisitorComments;
-import eu.synectique.verveine.extractor.java.defvisitors.VisitorPackageDef;
-import eu.synectique.verveine.extractor.java.defvisitors.VisitorVarsDef;
-import eu.synectique.verveine.extractor.java.refvisitors.VisitorAccessRef;
-import eu.synectique.verveine.extractor.java.refvisitors.VisitorAnnotationRef;
-import eu.synectique.verveine.extractor.java.refvisitors.VisitorInheritanceRef;
-import eu.synectique.verveine.extractor.java.refvisitors.VisitorInvocRef;
-import eu.synectique.verveine.extractor.java.refvisitors.VisitorTypeRefRef;
+import fr.inria.verveine.extractor.java.defvisitors.VisitorAnnotationDef;
+import fr.inria.verveine.extractor.java.defvisitors.VisitorClassMethodDef;
+import fr.inria.verveine.extractor.java.defvisitors.VisitorComments;
+import fr.inria.verveine.extractor.java.defvisitors.VisitorPackageDef;
+import fr.inria.verveine.extractor.java.defvisitors.VisitorVarsDef;
+import fr.inria.verveine.extractor.java.refvisitors.VisitorAccessRef;
+import fr.inria.verveine.extractor.java.refvisitors.VisitorAnnotationRef;
+import fr.inria.verveine.extractor.java.refvisitors.VisitorInheritanceRef;
+import fr.inria.verveine.extractor.java.refvisitors.VisitorInvocRef;
+import fr.inria.verveine.extractor.java.refvisitors.VisitorTypeRefRef;
 
 public class FamixRequestor extends FileASTRequestor {
 

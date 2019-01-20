@@ -34,9 +34,9 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.Parameter;
 import eu.synectique.verveine.core.gen.famix.SourceAnchor;
-import eu.synectique.verveine.extractor.java.FamixRequestor;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.FamixRequestor;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
  * @author Nicolas Anquetil

@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.defvisitors;
+package fr.inria.verveine.extractor.java.defvisitors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,10 +41,10 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.ParameterType;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.SummarizingClassesAbstractVisitor;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
-import eu.synectique.verveine.extractor.java.utils.Util;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
+import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.utils.Util;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest

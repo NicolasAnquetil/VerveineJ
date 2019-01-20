@@ -15,14 +15,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Namespace;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
  * @author Nicolas Anquetil

@@ -25,8 +25,8 @@ import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.SourceLanguage;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.core.gen.famix.Type;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 public abstract class VerveineJTest_Basic {
 

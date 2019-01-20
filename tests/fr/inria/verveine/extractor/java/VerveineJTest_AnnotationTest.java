@@ -18,10 +18,10 @@ import org.junit.Test;
 import ch.akuhn.fame.Repository;
 
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
  * @author Nicolas Anquetil

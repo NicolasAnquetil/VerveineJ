@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java;
+package fr.inria.verveine.extractor.java;
 
 import java.io.BufferedReader;
 import java.io.File;

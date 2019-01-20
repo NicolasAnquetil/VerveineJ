@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.utils;
+package fr.inria.verveine.extractor.java.utils;
 
 /**
  * Used when creating a structural entity

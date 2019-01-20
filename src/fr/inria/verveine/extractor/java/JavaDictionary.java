@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java;
+package fr.inria.verveine.extractor.java;
 
 import java.util.Collection;
 
@@ -44,7 +44,7 @@ import eu.synectique.verveine.core.gen.famix.SourcedEntity;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.core.gen.famix.Type;
 import eu.synectique.verveine.core.gen.famix.UnknownVariable;
-import eu.synectique.verveine.extractor.java.utils.ImplicitVarBinding;
+import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 /**
  * A {@link eu.synectique.verveine.Dictionary} specialized for Java

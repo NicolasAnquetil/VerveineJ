@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java;
+package fr.inria.verveine.extractor.java;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.extractor.java.utils.Util;
+import fr.inria.verveine.extractor.java.utils.Util;
 
 /**
  * This visitor offers methods to recover FamixEntities from the main JDT Entities and may put them in the context Stack<br>

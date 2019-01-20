@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.refvisitors;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -18,9 +18,9 @@ import eu.synectique.verveine.core.gen.famix.Inheritance;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.Type;
-import eu.synectique.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.utils.Util;
+import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.utils.Util;
 
 /** A visitor to record inheritance relationships.<br>
  * It is simpler than the other ref visitors

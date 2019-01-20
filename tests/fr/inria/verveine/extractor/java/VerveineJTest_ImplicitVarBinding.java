@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.extractor.java.utils.ImplicitVarBinding;
+import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 public class VerveineJTest_ImplicitVarBinding {
 

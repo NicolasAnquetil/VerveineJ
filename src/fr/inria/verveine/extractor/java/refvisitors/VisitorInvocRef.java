@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.refvisitors;
 
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -47,8 +47,8 @@ import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 public class VisitorInvocRef extends AbstractRefVisitor {
 

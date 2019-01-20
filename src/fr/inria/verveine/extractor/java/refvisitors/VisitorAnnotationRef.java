@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.refvisitors;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,9 +38,9 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
-import eu.synectique.verveine.extractor.java.SummarizingClassesAbstractVisitor;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
  * <p>Recovers annotations from the IBinding of various kind of entities:

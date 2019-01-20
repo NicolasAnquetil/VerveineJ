@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.utils;
+package fr.inria.verveine.extractor.java.utils;
 
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.QualifiedType;
@@ -6,7 +6,7 @@ import org.eclipse.jdt.core.dom.SimpleType;
 
 import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.JavaDictionary;
 
 public class Util {
 

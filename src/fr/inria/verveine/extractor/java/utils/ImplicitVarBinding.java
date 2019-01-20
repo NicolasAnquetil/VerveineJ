@@ -1,4 +1,4 @@
-package eu.synectique.verveine.extractor.java.utils;
+package fr.inria.verveine.extractor.java.utils;
 
 import java.util.Hashtable;
 import java.util.Map;

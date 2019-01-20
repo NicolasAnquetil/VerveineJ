@@ -12,7 +12,6 @@ import org.junit.Test;
 import ch.akuhn.fame.Repository;
 
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.extractor.java.VerveineJParser;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
@@ -20,6 +19,7 @@ import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.SourceAnchor;
+import fr.inria.verveine.extractor.java.VerveineJParser;
 
 public class VerveineJTest_Configuration {
 
