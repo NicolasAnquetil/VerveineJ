@@ -231,7 +231,6 @@ public class VerveineJParser extends VerveineParser {
 		jdtParser.setResolveBindings(true);
 		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
 
-		@SuppressWarnings("unchecked")
 		Map<String, String> options = JavaCore.getOptions();
 
 		if (codeVers == null) {

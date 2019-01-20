@@ -1,7 +1,7 @@
 
 import javax.interceptor.Interceptors;
 
-@Interceptors(InterceptorClass.class)
+@Interceptors(FirstInterceptorClass.class)
 public class AnnotatedClass {
 
 }

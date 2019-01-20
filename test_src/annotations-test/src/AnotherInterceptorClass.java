@@ -1,8 +1,5 @@
 
-import javax.interceptor.Interceptors;
-
-
-@Interceptors(value = {})
+@InterceptorsOnInterceptor(value = {})
 public class AnotherInterceptorClass {
 
 }

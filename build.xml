@@ -11,20 +11,6 @@
 	<property name="tests.jar"    location="${dist.dir}/verveine.extractor.java.tests.jar" />
 	<property name="test.report.dir" location="testrep" />
 
-	<!-- CHECKING PROPER JVM VERSION -->
-	<target name="print-version"> 
-	  <echo>Java/JVM version: ${ant.java.version}</echo> 
-	  <echo>Java/JVM detail version: ${java.version}</echo> 
-	</target>
-	
-	<fail message="Unsupported Java version: ${ant.java.version}. Make sure that the JDK version is exactly 1.8">
-	  <condition>
-	    <not>
-	      <equals arg1="${ant.java.version}" arg2="1.8"/>
-	    </not>
-	  </condition>
-	</fail>
-
 	<!-- Deletes the existing build, docs and dist directory-->
 	<target name="clean">
 		<delete dir="${build.dir}" />
@@ -41,14 +27,14 @@
 
 	<!-- Update source for licence checking -->
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
 				</fileset>
 			</classpath>
 		</javac>
-		<javac srcdir="${testsrc.dir}" destdir="${build.dir}" includeantruntime="false">
+		<javac srcdir="${testsrc.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
@@ -100,7 +86,7 @@
 				</fileset>
 			</classpath>
 			<!-- Output is XML, could also be plain-->
-			<formatter type="xml" />
+			<formatter type="plain" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
 			<test name="tests.eu.synectique.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
