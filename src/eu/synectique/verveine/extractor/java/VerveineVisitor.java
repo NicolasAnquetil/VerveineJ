@@ -799,6 +799,7 @@ public class VerveineVisitor extends ASTVisitor {
 		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(),
 				context.topMethod(), /*persistIt*/!classSummary);
 		IMethodBinding bnd = node.resolveMethodBinding();
+		String calledName = node.getName().getFullyQualifiedName();
 		if (bnd == null) {
 			Iterator<Inheritance> iter = this.context.topType().getSuperInheritances().iterator();
 			eu.synectique.verveine.core.gen.famix.Type superClass = iter.next().getSuperclass();
@@ -807,10 +808,18 @@ public class VerveineVisitor extends ASTVisitor {
 					&& iter.hasNext()) {
 				iter.next().getSuperclass();
 			}
-			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, superClass, node.arguments());
+			methodInvocation(bnd, calledName, receiver, superClass, node.arguments());
 		} else {
-			methodInvocation(bnd, node.getName().getFullyQualifiedName(), receiver, /*methOwner*/null,
+			methodInvocation(bnd, calledName, receiver, /*methOwner*/null,
 					node.arguments());
+		}
+
+		Invocation lastInvok = context.getLastInvocation();
+		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+				// check that lastInvocation correspond to current one
+				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
+				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
+			dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
 		}
 
 		return super.visit(node);
