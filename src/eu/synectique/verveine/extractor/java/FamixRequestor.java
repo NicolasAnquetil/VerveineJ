@@ -29,10 +29,17 @@ public class FamixRequestor extends FileASTRequestor {
 	 */
 	private boolean allLocals;
 
+
+	/**
+	 * Whether to output the accesses of a local variable inside its own parent
+	 */
+	private boolean localAccess;
+
 	/**
 	 * what sourceAnchors to create
 	 */
 	private String anchors;
+
 
 	/**
 	 * Maps the arguments (file names or dir names) to their absolute path (well actually it is the other way around)
@@ -41,7 +48,7 @@ public class FamixRequestor extends FileASTRequestor {
 	protected Map<String, String> fileMap;
 
 	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary,
-			boolean allLocals, String anchors) {
+						  boolean allLocals, String anchors, boolean localAccess) {
 		super();
 		this.famixRepo = r;
 
@@ -58,6 +65,7 @@ public class FamixRequestor extends FileASTRequestor {
 		this.classSummary = classSummary;
 		this.allLocals = allLocals;
 		this.anchors = anchors;
+		this.localAccess = localAccess;
 
 		this.famixDictionnary = new JavaDictionary(famixRepo);
 	}
@@ -68,7 +76,7 @@ public class FamixRequestor extends FileASTRequestor {
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
-			ast.accept(new VerveineVisitor(this.famixDictionnary, classSummary, allLocals, anchors));
+			ast.accept(new VerveineVisitor(this.famixDictionnary, classSummary, allLocals, anchors, localAccess));
 		} catch (Exception e) {
 			System.err.println("*** Visitor got exception: '" + e + "' while processing file: " + path);
 			e.printStackTrace(); // for debugging

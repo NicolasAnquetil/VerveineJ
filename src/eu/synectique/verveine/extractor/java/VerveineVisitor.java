@@ -139,7 +139,12 @@ public class VerveineVisitor extends ASTVisitor {
      * Note: allLocals = ! classSummary
      */
     private boolean allLocals = false;
-	
+
+	/**
+	 * Whether to output the accesses of a local variable inside its own parent
+	 */
+	private boolean localAccess = false;
+
     /**
      * A stack that keeps the current definition context (package/class/method)
      */
@@ -173,6 +178,15 @@ public class VerveineVisitor extends ASTVisitor {
     	this.allLocals = allLocals;
     	this.anchors = anchors;
     }
+
+	public VerveineVisitor(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors, boolean localAccess) {
+		this.dico = dico;
+		this.context = new EntityStack();
+		this.classSummary = classSummary;
+		this.allLocals = allLocals;
+		this.anchors = anchors;
+		this.localAccess = localAccess;
+	}
 
 	// VISITOR METHODS
 
@@ -1784,7 +1798,7 @@ public class VerveineVisitor extends ASTVisitor {
 			if (classSummary) {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
 				// TODO set FileAnchor to Reference
-			} else if (accessed.getBelongsTo() != accessor) {
+			} else if (localAccess || accessed.getBelongsTo() != accessor) {
 				context.setLastAccess(
 						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
 				//TODO set FileAnchor to Access

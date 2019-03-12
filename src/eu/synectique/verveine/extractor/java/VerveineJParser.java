@@ -63,6 +63,12 @@ public class VerveineJParser extends VerveineParser {
 	 */
 	private boolean allLocals = false;
 
+
+	/**
+	 * Whether to output the accesses of a local variable inside its own parent
+	 */
+	private boolean localAccess = false;
+
 	/**
 	 * Option: The version of Java expected by the parser
 	 */
@@ -167,6 +173,9 @@ public class VerveineJParser extends VerveineParser {
 			else if (arg.equals("-alllocals")) {
 				this.classSummary = false;
 				this.allLocals = true;
+			}
+			else if (arg.equals("-localaccesses")) {
+				this.localAccess = true;
 			}
 			else if (arg.equals("-autocp")) {
 				if (i < args.length) {
@@ -274,7 +283,7 @@ public class VerveineJParser extends VerveineParser {
 		 *   some new relation: classdep
 		 */
 		
-		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-localaccesses] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
 		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
 		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: output.mse)");
@@ -282,6 +291,7 @@ public class VerveineJParser extends VerveineParser {
 		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
 		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
 		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\"");
+		System.err.println("      [-localaccesses] Provides the accesses of local variables inside their own parents");
 		System.err.println("      [-anchor (none|default|assoc)] options for source anchor information:\n" +
 				   "                                     - no entity\n" +
 				   "                                     - only named entities\n" +
@@ -342,7 +352,7 @@ public class VerveineJParser extends VerveineParser {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals, anchors);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals, anchors, localAccess);
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
