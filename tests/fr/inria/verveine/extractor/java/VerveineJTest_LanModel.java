@@ -102,30 +102,33 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = 11+14;
-		int nbInherit =9+21;
-		
+		int nbClasses = 11+5; // 11+ Object,String,StringBuffer,PrintStream,System
+		// previous version was going up the inheritance hierarchy for stubs. No longer the case
+        // these class are no longer created: AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
+
+		/* previous version was going up the inheritance hierarchy for stubs. No longer the case
 		if ( System.getProperty("java.version").startsWith("1.") &&
 				System.getProperty("java.version").charAt(2) >= '7' ) {
 			 // class Autocloseable starting in Java 7
 			nbClasses++;
 			nbInherit++;
 		}
-
-		assertEquals(nbClasses,VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
+		*/
+		assertEquals( nbClasses,VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size());
 		assertEquals(3,    VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+8, VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10+1, VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,  VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,   VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(54,   VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(nbInherit, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//9 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
+		assertEquals(12, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());
 		assertEquals(25,   VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
 		assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); //Override
 		assertEquals(2,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
-		assertEquals(1,    VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //Comparable
-		assertEquals(22,   VerveineUtilsForTests.selectElementsOfType(repo, Comment.class).size());  // FileServer=2, IPrinter=1, OutputServer=3, PrintServer=3, AbstractDestinationAddress=1, Node=3, Packet=1, SingleDestinationAddress=3, WorkStation=5
+		assertEquals(32,   VerveineUtilsForTests.selectElementsOfType(repo, Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);
+                                                                                                              // PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
+        assertEquals(1,    VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //Comparable
 	}
 
 	@Test
@@ -330,18 +333,22 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testStubs() {
-		int nbTypes = 9;
-		
-		if ( System.getProperty("java.version").startsWith("1.") &&
+		int nbTypes = 5; // Object,String,StringBuffer,PrintStream,System
+        // previous version was going up the inheritance hierarchy for stubs. No longer the case
+        // these class are no longer created: AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
+
+        /* previous version was going up the inheritance hierarchy for stubs. No longer the case
+        if ( System.getProperty("java.version").startsWith("1.") &&
 				System.getProperty("java.version").charAt(2) >= '7' ) {
 			 // class Autocloseable starting in Java 7
 			nbTypes++;
 		}
+        */
 
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.')+1);
 		Namespace ns = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, javaLangName);
 		assertNotNull(ns);
-		assertEquals(nbTypes, ns.getTypes().size());  // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence, +(java7)AutoCloseable
+		assertEquals(nbTypes, ns.getTypes().size());
 		assertTrue(ns.getIsStub());
 
 		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
