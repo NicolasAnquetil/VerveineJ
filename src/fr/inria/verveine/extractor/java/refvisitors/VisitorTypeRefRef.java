@@ -2,26 +2,13 @@ package fr.inria.verveine.extractor.java.refvisitors;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
+import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.Method;
+import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
@@ -66,6 +53,13 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		endVisitTypeDeclaration(node);
 	}
 
+	/**
+	 * ClassInstanceCreation ::=
+        [ Expression . ]
+            new [ < Type { , Type } > ]
+            Type ( [ Expression { , Expression } ] )
+            [ AnonymousClassDeclaration ]
+	 */
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
 		if (node.getAnonymousClassDeclaration() == null) {
@@ -144,13 +138,15 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		super.endVisit(node);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean visit(FieldDeclaration node) {
-		setVariablesDeclaredType((List<VariableDeclaration>)node.fragments(), referedType(node.getType(), context.topType(), false));
-		return false;
-	}
-
+	/**
+	 * MethodDeclaration ::=
+    [ Javadoc ] { ExtendedModifier } [ < TypeParameter { , TypeParameter } > ] ( Type | void )
+        Identifier (
+            [ ReceiverParameter , ] [ FormalParameter { , FormalParameter } ]
+        ) { Dimension }
+        [ throws Type { , Type } ]
+        ( Block | ; )
+	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 		Method fmx = visitMethodDeclaration( node);
@@ -171,7 +167,6 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 
 		return false;
 	}
-
 
 	@Override
 	public void endVisit(MethodDeclaration node) {
@@ -214,16 +209,46 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Override
+	public boolean visit(FieldDeclaration node) {
+		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
+	}
+
+	/**
+	 * VariableDeclarationExpression ::=
+    { ExtendedModifier } Type VariableDeclarationFragment
+         { , VariableDeclarationFragment }
+	 */
+	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationExpression node) {
-		setVariablesDeclaredType((List<VariableDeclaration>)node.fragments(), referedType(node.getType(), context.topMethod(), false));
+		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
+	}
+
+	/**
+	 *  VariableDeclarationStatement ::=
+    { ExtendedModifier } Type VariableDeclarationFragment
+        { , VariableDeclarationFragment } ;
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean visit(VariableDeclarationStatement node) {
+		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
+	}
+	
+	/**
+	 * same behaviour for VariableDeclarationStatement and VariableDeclarationExpression
+	 */
+	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
+		setVariablesDeclaredType((List<VariableDeclaration>)fragments, referedType(declType, context.topMethod(), false));
+		for (VariableDeclaration varDecl : fragments) {
+			varDecl.accept(this);
+		}
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	public boolean visit(VariableDeclarationStatement node) {
-		setVariablesDeclaredType((List<VariableDeclaration>)node.fragments(), referedType(node.getType(), context.topMethod(), false));
-		return false;
-	}
+//	public boolean visit(SimpleName node) {
+//		IBinding bnd = node.resolveBinding();
+//		if ( (bnd != null) && (bnd instanceof ITypeBinding) ) {
+//			referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
 
 	private void setVariablesDeclaredType(List<VariableDeclaration> vars, eu.synectique.verveine.core.gen.famix.Type varTyp) {
 		for (VariableDeclaration var : vars) {
@@ -234,6 +259,17 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		}
 	}
 
-	// UTILITY METHODS
+	public boolean visit(MethodInvocation node) {
+		Expression callingExpr = node.getExpression();
+		if (callingExpr instanceof Name) {
+			IBinding bnd = ((Name)callingExpr).resolveBinding();
+			if ( (bnd != null) && (bnd instanceof ITypeBinding) ) {
+				referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+			}
+		}
+
+		return super.visit(node);
+	}
+
 
 }

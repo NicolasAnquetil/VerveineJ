@@ -41,8 +41,7 @@ public class VerveineJTest_ArrayListMatthias extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(8+7, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, <StubMethodContainer>, Object, String,
-		//CharSequence, Serializable, Cloneable, RandomAccess + all ParameterizableClasses
-		assertEquals(7,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); // List, Collection, AbstractList, ArrayList, Comparable, Iterable, AbstractCollection
+		assertEquals(6, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays
+		assertEquals(2,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //
 	}
 }
