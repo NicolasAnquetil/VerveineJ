@@ -47,7 +47,7 @@ import eu.synectique.verveine.core.gen.famix.UnknownVariable;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 /**
- * A {@link eu.synectique.verveine.Dictionary} specialized for Java
+ * A {@link eu.synectique.verveine.core.Dictionary} specialized for Java
  * @author anquetil
  */
 public class JavaDictionary extends Dictionary<IBinding> {
@@ -112,7 +112,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Returns the namespace with {@link Dictionary.DEFAULT_PCKG_NAME} or <code>null</code> if not found
+	 * Returns the namespace with {@link Dictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
 	 */
 	public Namespace getFamixNamespaceDefault() {
 		Collection<Namespace> l = getEntityByName( Namespace.class, DEFAULT_PCKG_NAME);
@@ -1141,10 +1141,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	/**
 	 * Check whether the owner of candidates is a method macthinf either methBnd or owner
-	 * @param bnd
+	 * @param methBnd
 	 * @param owner
-	 * @param candidate
-	 * @return a {@link JavaDictionary#CheckResult}
+	 * @param candidateOwner
+	 * @return a {@link CheckResult}
 	 */
 	private CheckResult matchAndMapOwnerAsMethod(IMethodBinding methBnd, NamedEntity owner, ContainerEntity candidateOwner) {
 		if ( (methBnd != null) || ((owner != null) && (owner instanceof Method)) ) {
@@ -1167,12 +1167,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * @param bnd
+	 * @param typBnd
 	 * @param owner
-	 * @param candidate
 	 * @param candidateOwner
-	 * @param ownerOwner
-	 * @return
+	 * @return a {@link CheckResult}
 	 */
 	private CheckResult matchAndMapOwnerAsType(ITypeBinding typBnd, NamedEntity owner, ContainerEntity candidateOwner) {
 		if ( (typBnd != null) || ((owner != null) && (owner instanceof Type)) ) {
@@ -1545,7 +1543,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Parameter associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixParameter(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}.
 	 * @param persistIt -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
@@ -1793,6 +1790,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	/**
 	 * Creates or recovers the Famix Class for "Object".
+	 * Because "Object" is the root of the inheritance tree, it needs to be treated differently.
 	 * @param bnd -- a potential binding for the java "Object" class
 	 * @return a Famix class for "Object"
 	 */

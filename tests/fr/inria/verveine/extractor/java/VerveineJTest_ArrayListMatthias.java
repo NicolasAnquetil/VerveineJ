@@ -34,7 +34,7 @@ public class VerveineJTest_ArrayListMatthias extends VerveineJTest_Basic {
 		new File(VerveineJParser.OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"test_src/ArrayList-Matthias"});
+		parser.setOptions(new String[] {"test_src/ArrayListMatthias"});
 		parser.parse();
 		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}

@@ -111,9 +111,11 @@ public abstract class VerveineJTest_Basic {
 		assertEquals(java, javaLang.getBelongsTo());
 		 // Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence
 
+		/* java.io no longer created by default
 		Namespace javaIO = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "io");
 		assertNotNull(javaIO);
 		assertEquals(java, javaIO.getBelongsTo());
+		*/
 
 		// Object
 		eu.synectique.verveine.core.gen.famix.Class obj = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
@@ -122,21 +124,26 @@ public abstract class VerveineJTest_Basic {
 		assertEquals(0, obj.getSuperInheritances().size());
 
 		// String
+		/* CharSequence no longer created as superclass of String
 		eu.synectique.verveine.core.gen.famix.Class charSeq = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "CharSequence");
 		assertNotNull(charSeq);
 		assertSame(javaLang, charSeq.getContainer());
 		assertTrue(charSeq.getIsInterface());
 		assertEquals(0, charSeq.getSuperInheritances().size());
+		*/
 
+		/* Serializable no longer created
 		eu.synectique.verveine.core.gen.famix.Class serial = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Serializable");
 		assertNotNull(serial);
 		assertSame(javaIO, serial.getContainer());
 		assertTrue(serial.getIsInterface());
 		assertEquals(0, serial.getSuperInheritances().size());
+		*/
 
 		eu.synectique.verveine.core.gen.famix.Class str = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "String");
 		assertNotNull(str);
 		assertSame(javaLang, str.getContainer());
+		/*stubs no longer have inheritance
 		assertEquals(4, str.getSuperInheritances().size());
 		for (Inheritance inh : str.getSuperInheritances()) {
 			assertTrue( "Unexpected super-class for String: "+inh.getSuperclass(),
@@ -145,14 +152,17 @@ public abstract class VerveineJTest_Basic {
 					(inh.getSuperclass() == serial) ||
 					(inh.getSuperclass().getName().equals("Comparable")) );  // there are 2 'comparable' in one case, so it's best to only test the name
 		}
+		*/
 
 		// System
 		if (this.testSystem) {
 			eu.synectique.verveine.core.gen.famix.Class syst = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "System");
 			assertNotNull(syst);
 			assertSame(javaLang, syst.getContainer());
+			/*stubs no longer have inheritance
 			assertEquals(1, syst.getSuperInheritances().size());
 			assertEquals(obj, syst.getSuperInheritances().iterator().next().getSuperclass());
+			*/
 			boolean foundOut = false;
 			for (Attribute att : syst.getAttributes()) {
 				if (att.getName().equals("out")) {
