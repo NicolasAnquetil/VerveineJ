@@ -334,7 +334,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testStubs() {
-		int nbTypes = 5; // Object,String,StringBuffer,PrintStream,System
+		//int nbTypes = 5; // Object,String,StringBuffer,PrintStream,System
         // previous version was going up the inheritance hierarchy for stubs. No longer the case
         // these class are no longer created: AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
 
@@ -368,12 +368,6 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Method mth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "<Initializer>");
 		assertNotNull(mth);
 		assertFalse(mth.getIsStub());
-		/* [].length not used in the default test case 
-		Attribute att = TestVerveineUtils.detectElement(repo, Attribute.class, "length");
-		assertNotNull(att);
-		clazz = (Class) att.getParentType();
-		assertNotNull(clazz);
-		assertEquals(JavaDictionary.ARRAYS_NAME, clazz.getName());*/
 	}
 
 	@Test
