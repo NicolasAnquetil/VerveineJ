@@ -41,7 +41,7 @@ public class VerveineJTest_AnnotationTest {
 		new File(VerveineJParser.OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"-cp" , "test_src/annotations-test/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar" , "test_src/annotations-test/src"});
+		parser.setOptions(new String[] {"-cp" , "test_src/annotationsTest/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar" , "test_src/annotationsTest/src"});
 		parser.parse();
 		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
