@@ -15,7 +15,6 @@ import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.Association;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
 import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
 import eu.synectique.verveine.core.gen.famix.Method;
@@ -25,18 +24,19 @@ import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.SourceLanguage;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.core.gen.famix.Type;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
 
 public abstract class VerveineJTest_Basic {
 
 	protected Repository repo;
 	protected VerveineJParser parser;
-	
-	private boolean testSystem = true;
 
-	public VerveineJTest_Basic(boolean system) {
-		testSystem = system;
+    private boolean testSystemEntities = true;
+
+    private boolean testLanguageMarker = true;
+
+    public VerveineJTest_Basic(boolean testSystemEntities, boolean testLanguageMarker) {
+        this.testSystemEntities = testSystemEntities;
+        this.testLanguageMarker = testLanguageMarker;
 	}
 
 	@Test
@@ -155,7 +155,7 @@ public abstract class VerveineJTest_Basic {
 		*/
 
 		// System
-		if (this.testSystem) {
+		if (this.testSystemEntities) {
 			eu.synectique.verveine.core.gen.famix.Class syst = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "System");
 			assertNotNull(syst);
 			assertSame(javaLang, syst.getContainer());
@@ -178,11 +178,18 @@ public abstract class VerveineJTest_Basic {
 	
 	@Test
 	public void testSourceLanguage() {
-		Collection<SourceLanguage> sl = VerveineUtilsForTests.selectElementsOfType(repo, SourceLanguage.class);
-		assertNotNull(sl);
-		assertEquals(1, sl.size());
-		SourceLanguage jsl = sl.iterator().next();
-		assertEquals(JavaSourceLanguage.class, jsl.getClass());
+	    if (testLanguageMarker) {
+            Collection<SourceLanguage> sl = VerveineUtilsForTests.selectElementsOfType(repo, SourceLanguage.class);
+            assertNotNull(sl);
+            assertEquals(1, sl.size());
+            SourceLanguage jsl = sl.iterator().next();
+            assertEquals(JavaSourceLanguage.class, jsl.getClass());
+        }
+        else {
+            Collection<SourceLanguage> sl = VerveineUtilsForTests.selectElementsOfType(repo, SourceLanguage.class);
+            assertNotNull(sl);
+            assertEquals(0, sl.size());
+        }
 	}
 
 	/**

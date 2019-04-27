@@ -23,7 +23,7 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
 public class VerveineJTest_ArrayListMatthias extends VerveineJTest_Basic {
 
 	public VerveineJTest_ArrayListMatthias() {
-		super(/*system*/false);  // there is no System.out.print in the tested code
+		super(/*testSystemEntities*/false, /*testLanguageMarker*/true);
 	}
 
 	/**

@@ -53,7 +53,7 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
 public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	public VerveineJTest_AdHoc() {
-		super(/*system*/true);  // yes please, test that System and members are created correctly
+		super(/*testSystemEntities*/true, /*testLanguageMarker*/true);
 	}
 
 	/**

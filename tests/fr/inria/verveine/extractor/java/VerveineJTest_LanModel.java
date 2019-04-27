@@ -49,7 +49,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	private static final String A_CLASS_NAME = "--aClassName--";
 
 	public VerveineJTest_LanModel() {
-		super(/*system*/true);  // yes please, test that System and members are created correctly
+		super(/*testSystemEntities*/true, /*testLanguageMarker*/true);
 	}
 
 	/**

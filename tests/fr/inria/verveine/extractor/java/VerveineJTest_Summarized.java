@@ -97,7 +97,7 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
 public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	public VerveineJTest_Summarized() {
-		super(/*system*/false);  // don't test that System and members are created correctly
+		super(/*testSystemEntities*/false, /*testLanguageMarker*/true);
 	}
 
 	/**

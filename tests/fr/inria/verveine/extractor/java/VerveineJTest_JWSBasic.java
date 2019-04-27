@@ -21,8 +21,7 @@ import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
+
 
 /**
  * @author Nicolas Anquetil
@@ -32,7 +31,8 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
 public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 	public VerveineJTest_JWSBasic() {
-		super(/*system*/false);  // yes please, test that System and members are created correctly
+		super(/*testSystemEntities*/false, /*testLanguageMarker*/false);
+		// we don't run parser.emitMSE in setup, so SourceLanguage is not created
 	}
 
 	/**
@@ -50,34 +50,33 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); // @Session, @WebService, @SOAPBinding, @WLHttpTransport, @WebMethod
+		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
+		// JDT no longer returns not resolved anotations: @Session, @WLHttpTransport,
 	}
 
 	@Test
 	public void testAnnotation() {
-		AnnotationType sessionAnn = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "Session");
-		assertNotNull(sessionAnn);
-		assertTrue(sessionAnn.getIsStub());
-		assertEquals(3, sessionAnn.getInstances().size());
+		AnnotationType ann = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "WebService");
+		assertNotNull(ann);
+		assertTrue(ann.getIsStub());
+		assertEquals(3, ann.getInstances().size());
 
-		assertEquals(2, sessionAnn.getAttributes().size());
-		for (Attribute a : sessionAnn.getAttributes()) {
+		assertEquals(3, ann.getAttributes().size());
+		for (Attribute a : ann.getAttributes()) {
 			assertEquals(AnnotationTypeAttribute.class, a.getClass());
-			assertTrue(a.getName().equals("ejbName") || a.getName().equals("serviceEndpoint"));
+			assertTrue(a.getName().equals("name") || a.getName().equals("serviceName") || a.getName().equals("targetNamespace"));
 		}
 
 		// Class annotation
-		Namespace defPckg = VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, JavaDictionary.DEFAULT_PCKG_NAME);
-		assertNotNull(defPckg);
 		eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SimpleBean");
 		assertNotNull(cl);
-		assertEquals(4, cl.getAnnotationInstances().size());
+		assertEquals(2, cl.getAnnotationInstances().size());
 		for (AnnotationInstance ai :cl.getAnnotationInstances() ) {
-			if (ai.getAnnotationType().getName().equals("Session") || ai.getAnnotationType().getName().equals("WLHttpTransport")) {
-				assertEquals(defPckg, ai.getAnnotationType().getBelongsTo());
+			if (ai.getAnnotationType().getName().equals("WebService")) {
+				assertEquals(VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "jws"), ai.getAnnotationType().getBelongsTo());
 			}
-			else if (ai.getAnnotationType().getName().equals("WebService") || ai.getAnnotationType().getName().equals("SOAPBinding")) {
-				assertTrue(defPckg != ai.getAnnotationType().getBelongsTo());
+			else if (ai.getAnnotationType().getName().equals("SOAPBinding")) {
+				assertEquals(VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "soap"), ai.getAnnotationType().getBelongsTo());
 			}
 			else {
 				assertTrue("Unexpected AnnotationInstance for SimpleBean: "+ ai.getAnnotationType().getName(), false);
