@@ -17,12 +17,6 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
  */
 public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 
-	/**
-	 * Whether to summarize collected information at the level of classes or produce everything
-	 * (see {@link VerveineJParser#classSummary}).
-	 */
-	protected boolean classSummary = false;
-
 	public AbstractRefVisitor(JavaDictionary dico, boolean classSummary) {
 		super(dico, classSummary);
 	}

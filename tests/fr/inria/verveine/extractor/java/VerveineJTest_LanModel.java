@@ -126,10 +126,9 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); //Override
 		assertEquals(2,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
-		assertEquals(32,   VerveineUtilsForTests.selectElementsOfType(repo, Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);
-                                                                                                              // PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
+		assertEquals(32,   VerveineUtilsForTests.selectElementsOfType(repo, Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);// PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
 		// class Comparable is no longer created
-        assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //Comparable
+        assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
 	}
 
 	@Test

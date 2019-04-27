@@ -152,29 +152,22 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test(timeout=100)
 	public void testEntitiesNumber() {
-		int nbClasses = 10+14;
-		int nbInherit = 7+21;
-		
-		if ( System.getProperty("java.version").startsWith("1.") &&
-				System.getProperty("java.version").charAt(2) >= '7' ) {
-			 // class Autocloseable starting in Java 7
-			nbClasses++;
-			nbInherit++;
-		}
+		int nbClasses = 10+5; // one less than in VerveineJTest_LanModel because anonymous class is not created
 
-		assertEquals(nbClasses, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // 11 + {Object,String,StringBuffer,AbstractStringBuilder,PrintStream,FilterOutputStream,OutputStream,System,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)Autocloseable}
+		assertEquals(nbClasses, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size());
 		assertEquals(3,     VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());
 		assertEquals(0, 	VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());
 		assertEquals(0, 	VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
 		assertEquals(2+4,   VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(nbInherit, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());//7 internal + {Object=9,String=0,StringBuffer=0,AbstractStringBuilder=0,PrintStream=0,FilterOutputStream=0,OutputStream=1,System=0,Comparable=1,Serializable=2,Flushable=1,Appendable=2,CharSequence=3,Closeable=2, +(java7)AutoCloseable=1}
+		assertEquals(12, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
 		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
-		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());  // TODO should be 1 ?
-		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());  // TODO should be 2 ?
-		assertEquals(1,     VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
+		assertEquals(1,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());
+		assertEquals(2,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());
+ 		// class Comparable no longer created
+		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
 
 		// following redefinition of meta-model, Reference from class to class are no longer possible (must from method to class)
 		// so all reference creation was removed
