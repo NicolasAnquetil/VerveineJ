@@ -348,14 +348,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// we just created it or it was not bound, so we make sure it has the right information in it
 			if (bnd != null) {
 				fmx.setIsInterface( bnd.isInterface());
-				setNamedEntityModifiers(fmx, bnd.getDeclaredModifiers());
-				if (fmx.getIsAbstract()) {
-					// don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
-					fmx.addModifiers(MODIFIER_ABSTRACT);
-				}
-				if (Modifier.isStatic(modifiers)) {
-					fmx.addModifiers(MODIFIER_STATIC);
-				}
+				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 		}
 
@@ -1392,9 +1385,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		if (fmx!=null) {
-			setNamedEntityModifiers(fmx, modifiers);
-			fmx.setHasClassScope(Modifier.isStatic(modifiers));
-
+			setMethodModifiers(fmx, modifiers);
 			// if it's a constructor
 			if(fmx.getName().equals(fmx.getBelongsTo().getName()))
 				fmx.setKind(CONSTRUCTOR_KIND_MARKER);
@@ -1412,7 +1403,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param fmx -- the FamixNamedEntity
 	 * @param mod -- a description of the modifiers as understood by org.eclipse.jdt.core.dom.Modifier
 	 */
-	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
+	public void setNamedEntityModifiers(NamedEntity fmx, int mod) {
 		if (Modifier.isAbstract(mod)) {
 			fmx.addModifiers(MODIFIER_ABSTRACT);
 			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
@@ -1433,7 +1424,32 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx.addModifiers(MODIFIER_FINAL);
 			// fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
 		}
-	}
+    }
+
+    public void setAttributeModifiers(Attribute fmx, int mod) {
+        setNamedEntityModifiers(fmx, mod);
+        fmx.setHasClassScope(Modifier.isStatic(mod));
+    }
+
+    public void setMethodModifiers(Method fmx, int mod) {
+        setNamedEntityModifiers(fmx, mod);
+        if (fmx.getIsAbstract()) {
+            // don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
+            fmx.addModifiers(MODIFIER_ABSTRACT);
+        }
+        fmx.setHasClassScope(Modifier.isStatic(mod));
+    }
+
+    public void setClassModifiers(Class fmx, int mod) {
+        setNamedEntityModifiers(fmx, mod);
+        if (fmx.getIsAbstract()) {
+            // don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
+            fmx.addModifiers(MODIFIER_ABSTRACT);
+        }
+		if (Modifier.isStatic(mod)) {
+			fmx.addModifiers(MODIFIER_STATIC);
+		}
+    }
 
 	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, Type owner, boolean persistIt) {
 		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, persistIt);
@@ -1521,8 +1537,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx.setDeclaredType(type);
 			if (bnd != null) {
 				int mod = bnd.getModifiers();
-				setNamedEntityModifiers(fmx, mod);
-				fmx.setHasClassScope(Modifier.isStatic(mod));
+                setAttributeModifiers(fmx, mod);
 			}
 		}
 
