@@ -88,17 +88,30 @@ public class FamixRequestor extends FileASTRequestor {
 			ast.accept(new VisitorInvocRef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorAnnotationRef(this.famixDictionnary, classSummary));
 
-		} catch (Exception e) {
-			StackTraceElement[] stack = e.getStackTrace();
-			if (stack.length == 0) {
-				e.printStackTrace();
+		} catch (Exception err) {
+			System.err.println("*** " + getVisitorName(err, path) + " got exception: '" + err + "' while processing file: " + path);
+		}
+	}
+
+	private String getVisitorName(Exception err, String path) {
+		String visitorName = "";
+		StackTraceElement[] stack = err.getStackTrace();
+		if (stack.length == 0) {
+			return "unknown class";
+		}
+
+		for (int i = 0; (! visitorName.startsWith("Visitor")) && (i < stack.length); i++) {
+			visitorName = stack[i].getClassName();
+			int j = visitorName.lastIndexOf('.');
+			if (j > 0) {
+				visitorName = visitorName.substring(j + 1);
 			}
-			String visitorName = stack[0].getClassName();
-			int i = visitorName.lastIndexOf('.');
-			if (i>0) {
-				visitorName = visitorName.substring(i + 1);
-			}
-			System.err.println("*** "+ visitorName + " got exception: '" + e + "' while processing file: " + path);
+		}
+		if (visitorName.startsWith("Visitor")) {
+			return visitorName;
+		}
+		else {
+			return "unknown class";
 		}
 	}
 
