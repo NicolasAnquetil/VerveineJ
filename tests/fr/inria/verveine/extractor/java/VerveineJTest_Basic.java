@@ -66,15 +66,19 @@ public abstract class VerveineJTest_Basic {
 	@Test
 	public void testBelongsTo() {
 		for ( Type e : repo.all(Type.class) ) {
-			if (! (e instanceof PrimitiveType) ) {
+			if (! e.getIsStub() ) {
 				assertNotNull("a Type '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
 			}
 		}
 		for ( BehaviouralEntity e : repo.all(BehaviouralEntity.class) ) {
-			assertNotNull("a BehaviouralEntity '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
+            if (! e.getIsStub() ) {
+                assertNotNull("a BehaviouralEntity '" + e.getName() + "' does not belong to anything", e.getBelongsTo());
+            }
 		}
 		for ( StructuralEntity e : repo.all(StructuralEntity.class) ) {
-			assertNotNull("a StructuralEntity '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
+            if (! e.getIsStub() ) {
+                assertNotNull("a StructuralEntity '" + e.getName() + "' does not belong to anything", e.getBelongsTo());
+            }
 		}
 	}
 

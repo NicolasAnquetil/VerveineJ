@@ -53,7 +53,7 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
 public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	public VerveineJTest_AdHoc() {
-		super(/*testSystemEntities*/true, /*testLanguageMarker*/true);
+		super(/*testSystemEntities*/true, /*testLanguageMarker*/false);
 	}
 
 	/**
@@ -64,9 +64,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		new File(VerveineJParser.OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"test_src/ad_hoc"});
+		parser.setOptions(new String[] {"test_src/ad_hoc/"});
 		parser.parse();
-		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+		//parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
 
 	@ Test
