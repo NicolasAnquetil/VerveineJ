@@ -173,6 +173,13 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		endVisitMethodDeclaration(node);
 	}
 
+	/**
+	 * Initializer ::=
+     *      [ static ] Block
+     * Note:
+     * VariableDeclarationFragment ::=
+     *     Identifier { Dimension } [ = Expression ]
+	 */
 	@Override
 	public boolean visit(Initializer node) {
 		if (visitInitializer(node) != null) {
@@ -208,16 +215,28 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		return super.visit(node);
 	}
 
+    /**
+     *  FieldDeclaration ::=
+     *     [Javadoc] { ExtendedModifier } Type VariableDeclarationFragment
+     *          { , VariableDeclarationFragment } ;
+     */
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
+		visitFieldDeclaration(node);  // to recover optional JavaDictionary.INIT_BLOCK_NAME method
+		visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());   // to create the TypeRefs
+		return true;
+	}
+
+	@Override
+	public void endVisit(FieldDeclaration node) {
+		endVisitFieldDeclaration(node);
 	}
 
 	/**
 	 * VariableDeclarationExpression ::=
-    { ExtendedModifier } Type VariableDeclarationFragment
-         { , VariableDeclarationFragment }
+     *     { ExtendedModifier } Type VariableDeclarationFragment
+     *          { , VariableDeclarationFragment }
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationExpression node) {
@@ -226,8 +245,8 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 
 	/**
 	 *  VariableDeclarationStatement ::=
-    { ExtendedModifier } Type VariableDeclarationFragment
-        { , VariableDeclarationFragment } ;
+     *     { ExtendedModifier } Type VariableDeclarationFragment
+     *         { , VariableDeclarationFragment } ;
 	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(VariableDeclarationStatement node) {
@@ -236,6 +255,8 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	
 	/**
 	 * same behaviour for VariableDeclarationStatement and VariableDeclarationExpression
+     * VariableDeclaration ::=
+     *     SingleVariableDeclaration VariableDeclarationFragment
 	 */
 	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
 		setVariablesDeclaredType((List<VariableDeclaration>)fragments, referedType(declType, context.topMethod(), false));

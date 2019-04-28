@@ -257,19 +257,25 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		super.endVisit(node);
 	}
 
-	@Override
+    /**
+     * BodyDeclaration ::=
+     *                [ ... ]
+     *                 FieldDeclaration
+     *                 Initializer
+     *                 MethodDeclaration (for methods and constructors)
+     * Initializer ::=
+     *      [ static ] Block
+     */
+    @Override
 	public boolean visit(Initializer node) {
 		//		System.err.println("TRACE, Visiting Initializer: ");
 
-		Method fmx = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(),
-											context.topType(), node.getModifiers(),	/*persistIt*/!classSummary);
+		Method fmx = createInitBlock();
 		// init-block don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create either
 
 		if (fmx != null) {
-			fmx.setIsStub(false);
-
-			pushInitBlockMethod(fmx);
+            dico.setMethodModifiers(fmx, node.getModifiers());
 			if (!classSummary) {
 				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
@@ -299,24 +305,34 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		for (Expression expr : (List<Expression>)node.arguments()) {
 			if (expr != null) {
 				createInitBlock();
-				break;  // we created the INIT_BLOCK, no need to look for other arguments that would only ensure the same creation
+				break;  // we created the INIT_BLOCK, no need to look for other declaration that would only ensure the same creation
 			}
 		}
 		return super.visit(node);
 	
 	}
 
+    public void endVisit(EnumConstantDeclaration node) {
+        closeOptionalInitBlock();
+    }
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
+		boolean hasInitBlock = false;
 		for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
 			if (vardecl.getInitializer() != null) {
 				createInitBlock();
-				break;  // we created the INIT_BLOCK, no need to look for other arguments that would only ensure the same creation
+				hasInitBlock = true;
+				break;  // we created the INIT_BLOCK, no need to look for other declaration that would only ensure the same creation
 			}
 		}
-		return false;
+		return hasInitBlock;
 	}
+
+    public void endVisit(FieldDeclaration node) {
+        closeOptionalInitBlock();
+    }
 
 	@Override
 	public boolean visit(ConstructorInvocation node) {
@@ -436,11 +452,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 	// UTILITY METHODS
 
-	/**
-	 * when we have an initialization in a variable declaration, we may need to create a faked
-	 * INIT_Block method if this variable is a field (for example) 
+    /**
+     * REnsures the creation of the fake method: {@link JavaDictionary#INIT_BLOCK_NAME}
+     *
+     * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
-	protected void createInitBlock() {
+	protected Method createInitBlock() {
 		// putting field's initialization code in an INIT_BLOCK_NAME method
 		Method ctxtMeth = this.context.topMethod();
 		if (ctxtMeth != null && !ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
@@ -463,6 +480,8 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
 			pushInitBlockMethod(ctxtMeth);
 		}
+
+		return ctxtMeth;
 	}
 
 	/**
@@ -481,7 +500,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		}
 	}
 
-	protected void optionalCloseInitBlock() {
+	protected void closeOptionalInitBlock() {
 		Method ctxtMeth = this.context.topMethod();
 		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME))) {
 			closeMethodDeclaration();
