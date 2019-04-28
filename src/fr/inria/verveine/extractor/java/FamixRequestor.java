@@ -71,37 +71,34 @@ public class FamixRequestor extends FileASTRequestor {
 	}
 
 	public void acceptAST(String sourceFilePath, CompilationUnit ast) {
-		String visitorName = "";
 		String path = relativePath(sourceFilePath);
 		System.out.println("Processing file: " + path);
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
-			visitorName = "PackageDef"; // for debugging (see catch clause)
 			ast.accept(new VisitorPackageDef(this.famixDictionnary, allLocals, anchors));
-			visitorName = "Class&MethodDef"; // for debugging (see catch clause)
 			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, allLocals, anchors));
-			visitorName = "AnnotationDef"; // for debugging (see catch clause)
 			ast.accept(new VisitorAnnotationDef(this.famixDictionnary, classSummary, allLocals, anchors));
-			visitorName = "VarDef"; // for debugging (see catch clause)
 			ast.accept(new VisitorVarsDef(this.famixDictionnary, classSummary, allLocals, anchors));
-			visitorName = "Comments"; // for debugging (see catch clause)
 			ast.accept(new VisitorComments(this.famixDictionnary));
 
-			visitorName = "Inheritances"; // for debugging (see catch clause)
 			ast.accept(new VisitorInheritanceRef(this.famixDictionnary));
-			visitorName = "TypeReferences"; // for debugging (see catch clause)
 			ast.accept(new VisitorTypeRefRef(this.famixDictionnary, classSummary, anchors));
-			visitorName = "Accesses"; // for debugging (see catch clause)
 			ast.accept(new VisitorAccessRef(this.famixDictionnary, classSummary, anchors));
-			visitorName = "Invocations"; // for debugging (see catch clause)
 			ast.accept(new VisitorInvocRef(this.famixDictionnary, classSummary, anchors));
-			visitorName = "AnnotationRef"; // for debugging (see catch clause)
 			ast.accept(new VisitorAnnotationRef(this.famixDictionnary, classSummary));
 
 		} catch (Exception e) {
-			System.err.println("*** Visitor "+ visitorName + " got exception: '" + e + "' while processing file: " + path);
-			e.printStackTrace();
+			StackTraceElement[] stack = e.getStackTrace();
+			if (stack.length == 0) {
+				e.printStackTrace();
+			}
+			String visitorName = stack[0].getClassName();
+			int i = visitorName.lastIndexOf('.');
+			if (i>0) {
+				visitorName = visitorName.substring(i + 1);
+			}
+			System.err.println("*** "+ visitorName + " got exception: '" + e + "' while processing file: " + path);
 		}
 	}
 
