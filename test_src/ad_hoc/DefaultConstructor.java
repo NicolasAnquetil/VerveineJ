@@ -1,5 +1,8 @@
 package ad_hoc;
 
+
+import javax.swing.JFrame;
+
 public class DefaultConstructor {
 
 	public static final int FIELD_WITH_CLASS_SCOPE = 0;

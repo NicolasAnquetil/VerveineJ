@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import eu.synectique.verveine.core.gen.famix.*;
+import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
@@ -39,14 +41,6 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 
 import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
@@ -106,17 +100,38 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	}
 
 	/**
-	 * See {@link VerveineVisitor#anonymousSuperType}<br>
-	 * We could test if it is a local type (inner/anonymous) and not define it in case it does not make any reference
-	 * to anything outside its owner class. But it would be a lot of work for probably little gain.
+	 * Creates an invocation to the constructor of the class
+	 *
+	 * ClassInstanceCreation ::=
+	 *         [ Expression . ]
+	 *             new [ < Type { , Type } > ]
+	 *             Type ( [ Expression { , Expression } ] )
+	 *             [ AnonymousClassDeclaration ]
 	 */
 	public boolean visit(ClassInstanceCreation node) {
 		visitClassInstanceCreation( node);
+
+		if (! classSummary) {
+			Type clazz = node.getType();
+			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+
+			// create an invocation to the constructor
+			String typName = findTypeName(clazz);
+			methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
+			Invocation lastInvok = context.getLastInvocation();
+			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+					&& (lastInvok != null)
+					&& (lastInvok.getSender() == context.topMethod())
+					&& (lastInvok.getReceiver() == null)
+					&& (lastInvok.getSignature().startsWith(typName)) ) {
+				dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
+			}
+		}
 		return super.visit(node);
 	}
 
 	/**
-	 * See {@link VerveineVisitor#anonymousSuperType}
+	 * See {@link GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
 	 */
 	public boolean visit(AnonymousClassDeclaration node) {
 		if (visitAnonymousClassDeclaration( node) != null) {

@@ -66,9 +66,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			Type clazz = node.getType();
 			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
-			if (classSummary) {
-				//ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
-			} else {
+			if (!classSummary) {
 				ref = dico.addFamixReference( (BehaviouralEntity) context.top(), fmx, context.getLastReference());
 				context.setLastReference(ref);
 			}
