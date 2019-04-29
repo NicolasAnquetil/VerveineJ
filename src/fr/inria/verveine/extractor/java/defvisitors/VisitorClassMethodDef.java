@@ -1,40 +1,10 @@
 package fr.inria.verveine.extractor.java.defvisitors;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.AssertStatement;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.ContinueStatement;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SwitchCase;
-import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.SynchronizedStatement;
-import org.eclipse.jdt.core.dom.ThrowStatement;
-import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeLiteral;
-import org.eclipse.jdt.core.dom.TypeParameter;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.WhileStatement;
+import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.Method;
@@ -205,6 +175,15 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	}
 
 	/**
+     * MethodDeclaration ::=
+     *     [ Javadoc ] { ExtendedModifier } [ < TypeParameter { , TypeParameter } > ] ( Type | void )
+     *         Identifier (
+     *             [ ReceiverParameter , ] [ FormalParameter { , FormalParameter } ]
+     *         ) { Dimension }
+     *         [ throws Type { , Type } ]
+     *         ( Block | ; )
+     *  Also includes ConstructorDeclaration (same thing without return type)
+     *
 	 * Local type: same as {@link VisitorClassMethodDef#visit(ClassInstanceCreation)}, 
 	 * we create it even if it is a local method because their are too many ways it can access external things
 	 */
@@ -212,7 +191,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		IMethodBinding bnd = node.resolveBinding();
 
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), /*paramTypes*/null, /*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
+        Collection<String> paramTypes = new ArrayList<String>();
+        for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
+            paramTypes.add( Util.jdtTypeName(param.getType()));
+        }
+
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
