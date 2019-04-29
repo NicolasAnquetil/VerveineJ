@@ -417,7 +417,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testMethodLocalVariableArgumentTypes() {
 		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "getEntityByName");
 		assertNotNull(meth);
-		assertEquals(2, meth.getLocalVariables().size());
+		assertEquals(3, meth.getLocalVariables().size());
 		for (LocalVariable var : meth.getLocalVariables()) {
 			Type collec;
 			if (var.getName().equals("ret")) {
