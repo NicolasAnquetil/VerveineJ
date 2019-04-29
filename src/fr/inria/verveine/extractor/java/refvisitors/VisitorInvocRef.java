@@ -5,44 +5,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import eu.synectique.verveine.core.gen.famix.*;
-import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.ArrayAccess;
-import org.eclipse.jdt.core.dom.ArrayCreation;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SuperFieldAccess;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeLiteral;
-
 import eu.synectique.verveine.core.Dictionary;
+
+import eu.synectique.verveine.core.gen.famix.*;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
+
+import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Type;
 
 public class VisitorInvocRef extends AbstractRefVisitor {
 
@@ -216,6 +188,31 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	@Override
 	public void endVisit(Initializer node) {
 		endVisitInitializer(node);
+	}
+
+    /**
+     *  FieldDeclaration ::=
+     *     [Javadoc] { ExtendedModifier } Type VariableDeclarationFragment
+     *          { , VariableDeclarationFragment } ;
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean visit(FieldDeclaration node) {
+        visitFieldDeclaration(node);  // to recover optional JavaDictionary.INIT_BLOCK_NAME method
+        return true;
+    }
+
+    @Override
+    public void endVisit(FieldDeclaration node) {
+        endVisitFieldDeclaration(node);
+    }
+
+	public boolean visit(EnumConstantDeclaration node) {
+		return visitEnumConstantDeclaration(node);
+	}
+
+	public void endVisit(EnumConstantDeclaration node) {
+		endVisitEnumConstantDeclaration(node);
 	}
 
 	@SuppressWarnings("unchecked")

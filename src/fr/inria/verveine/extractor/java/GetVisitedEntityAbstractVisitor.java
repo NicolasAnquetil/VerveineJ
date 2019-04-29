@@ -196,7 +196,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 *      [ static ] Block
 	 */
 	public Method visitInitializer(Initializer node) {
-		return visitInitializer();
+		return ctxtPushInitializerMethod();
 	}
 
 	public void endVisitInitializer(Initializer node) {
@@ -258,7 +258,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 *     Identifier { Dimension } [ = Expression ]
 	 */
 	private Method visitClassMemberInitializer(Expression initializingExpr) {
-		return visitInitializer();
+		return ctxtPushInitializerMethod();
 	}
 
 	/**
@@ -266,7 +266,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 *
 	 * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
-	private Method visitInitializer() {
+	private Method ctxtPushInitializerMethod() {
 		Method fmx = dico.getFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), context.topType());
 		if (fmx != null) {
 			context.pushMethod(fmx);

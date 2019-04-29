@@ -231,6 +231,14 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		endVisitFieldDeclaration(node);
 	}
 
+	public boolean visit(EnumConstantDeclaration node) {
+		return visitEnumConstantDeclaration(node);
+	}
+
+	public void endVisit(EnumConstantDeclaration node) {
+		endVisitEnumConstantDeclaration(node);
+	}
+
 	/**
 	 * VariableDeclarationExpression ::=
      *     { ExtendedModifier } Type VariableDeclarationFragment
