@@ -158,6 +158,14 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		endVisitInitializer(node);
 	}
 
+	@Override
+	public boolean visit(MethodInvocation node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
+		return super.visit(node);
+	}
+
 	/**
 	 *  FieldDeclaration ::=
 	 *     [Javadoc] { ExtendedModifier } Type VariableDeclarationFragment
@@ -353,6 +361,14 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	}
 
 	public boolean visit(WhileStatement node) {
+		if (node.getExpression() instanceof SimpleName) {
+			visitSimpleName((SimpleName) node.getExpression());
+		}
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(ThrowStatement node) {
 		if (node.getExpression() instanceof SimpleName) {
 			visitSimpleName((SimpleName) node.getExpression());
 		}
