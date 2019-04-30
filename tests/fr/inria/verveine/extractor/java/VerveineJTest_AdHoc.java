@@ -343,7 +343,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method newDeck = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "newDeck");
 		assertNotNull(newDeck);
 
-		// newDeck() makes a Reference to a Parameterized type
+		// recover reference to ArrayList<Card> in newDeck()
 		ParameterizedType refedArrList = null;
 		for (Reference r : newDeck.getOutgoingReferences()) {
 			if (r.getTarget() instanceof ParameterizedType) {
@@ -359,10 +359,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(1, refedArrList.getArguments().size());
 		assertEquals("Card", refedArrList.getArguments().iterator().next().getName());
 		
-		assertEquals(2, refedArrList.getIncomingReferences().size());
+		assertEquals(3, refedArrList.getIncomingReferences().size()); // Card.newDeck(), Card.INIT_BLOCK_NAME, WrongInvocation.getX()
 		for (Reference r : refedArrList.getIncomingReferences()) {
 			String refererName = r.getFrom().getName(); 
-			assertTrue(refererName.equals(newDeck.getName()) || refererName.equals(JavaDictionary.INIT_BLOCK_NAME));
+			assertTrue(refererName.equals("newDeck") || refererName.equals("getX") || refererName.equals(JavaDictionary.INIT_BLOCK_NAME));
 		}
 	}
 
