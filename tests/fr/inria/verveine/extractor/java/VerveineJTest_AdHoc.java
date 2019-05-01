@@ -269,7 +269,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testClassVar() {
 		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "ensureFamixEntity");
 		assertNotNull(meth);
-		
+
+		// might as well do some tests on the method itself
+		// not very unit-testing, but it's some more tests
 		assertEquals(3, meth.getParameters().size());
 		for (Parameter p : meth.getParameters()) {
 			if (p.getName().equals("fmxClass")) {
@@ -282,8 +284,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 				break;
 			}
 		}
-		
-		assertEquals(2, meth.getAccesses().size());  // ImplicitVariable.class, mapBind
+
+		// here start the really intended tests
+		assertEquals(2, meth.getAccesses().size());  // only 2 non-local variable accessed:  ImplicitVariable.class, Dictionary.mapBind
 		boolean classFieldFound = false;
 		for (Access acc : meth.getAccesses()) {
 			if (acc.getTo().getName().equals("class")) {

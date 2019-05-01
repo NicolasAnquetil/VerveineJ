@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.inria.verveine.extractor.java.refvisitors.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
@@ -14,11 +15,6 @@ import fr.inria.verveine.extractor.java.defvisitors.VisitorClassMethodDef;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorComments;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorPackageDef;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorVarsDef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorAccessRef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorAnnotationRef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorInheritanceRef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorInvocRef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorTypeRefRef;
 
 public class FamixRequestor extends FileASTRequestor {
 
@@ -87,6 +83,7 @@ public class FamixRequestor extends FileASTRequestor {
 			ast.accept(new VisitorAccessRef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorInvocRef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorAnnotationRef(this.famixDictionnary, classSummary));
+			ast.accept(new VisitorExceptionRef(this.famixDictionnary, classSummary));
 
 		} catch (Exception err) {
 			System.err.println("*** " + getVisitorName(err, path) + " got exception: '" + err + "' while processing file: " + path);
