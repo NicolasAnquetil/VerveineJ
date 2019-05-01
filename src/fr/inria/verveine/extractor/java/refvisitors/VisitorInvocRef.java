@@ -81,22 +81,24 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 *             [ AnonymousClassDeclaration ]
 	 */
 	public boolean visit(ClassInstanceCreation node) {
-		visitClassInstanceCreation( node);
+		if (node.getAnonymousClassDeclaration() == null) {
+			visitClassInstanceCreation(node);
 
-		if (! classSummary) {
-			Type clazz = node.getType();
-			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+			if (!classSummary) {
+				Type clazz = node.getType();
+				eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
-			// create an invocation to the constructor
-			String typName = findTypeName(clazz);
-			methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
-			Invocation lastInvok = context.getLastInvocation();
-			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC)
-					&& (lastInvok != null)
-					&& (lastInvok.getSender() == context.topMethod())
-					&& (lastInvok.getReceiver() == null)
-					&& (lastInvok.getSignature().startsWith(typName)) ) {
-				dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
+				// create an invocation to the constructor
+				String typName = findTypeName(clazz);
+				methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
+				Invocation lastInvok = context.getLastInvocation();
+				if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+						&& (lastInvok != null)
+						&& (lastInvok.getSender() == context.topMethod())
+						&& (lastInvok.getReceiver() == null)
+						&& (lastInvok.getSignature().startsWith(typName))) {
+					dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
+				}
 			}
 		}
 		return super.visit(node);
