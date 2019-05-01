@@ -344,6 +344,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	}
 
 	@Override
+	public boolean visit(CatchClause node) {
+		this.context.addTopMethodCyclo(1);
+		return super.visit(node);
+	}
+
+	@Override
 	public boolean visit(AssertStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
