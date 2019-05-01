@@ -33,14 +33,11 @@ public class VisitorInheritanceRef extends GetVisitedEntityAbstractVisitor {
 	}
 
 	public boolean visit(TypeDeclaration node) {
-		//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
+		eu.synectique.verveine.core.gen.famix.Class fmx = visitTypeDeclaration(node);
 		ITypeBinding bnd = node.resolveBinding();
-
-		eu.synectique.verveine.core.gen.famix.Class fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
-		if ( (fmx != null) && (bnd != null) ){
+		if ((fmx != null) && (bnd != null)) {
 			ensureInheritances(bnd, fmx);
 
-			this.context.pushType(fmx);
 			return super.visit(node);
 		} else {
 			return false;
