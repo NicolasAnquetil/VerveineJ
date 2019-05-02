@@ -32,11 +32,6 @@ public class FamixRequestor extends FileASTRequestor {
 	private boolean allLocals;
 
 	/**
-	 * Whether to output accesses to local variable inside methods
-	 */
-	private boolean localAccess;
-
-	/**
 	 * what sourceAnchors to create
 	 */
 	private VerveineJParser.anchorOptions anchors;
@@ -48,7 +43,7 @@ public class FamixRequestor extends FileASTRequestor {
 	protected Map<String, String> fileMap;
 
 	public FamixRequestor(Repository repo, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary,
-						  boolean allLocals, boolean localAccesses, VerveineJParser.anchorOptions anchors) {
+						  boolean allLocals, VerveineJParser.anchorOptions anchors) {
 		super();
 
 		this.fileMap = new HashMap<String, String>();
@@ -63,7 +58,6 @@ public class FamixRequestor extends FileASTRequestor {
 
 		this.classSummary = classSummary;
 		this.allLocals = allLocals;
-		this.localAccess = localAccess;
 		this.anchors = anchors;
 
 		this.famixDictionnary = new JavaDictionary(repo);
@@ -83,7 +77,7 @@ public class FamixRequestor extends FileASTRequestor {
 
 			ast.accept(new VisitorInheritanceRef(this.famixDictionnary));
 			ast.accept(new VisitorTypeRefRef(this.famixDictionnary, classSummary, anchors));
-			ast.accept(new VisitorAccessRef(this.famixDictionnary, classSummary, anchors));
+			ast.accept(new VisitorAccessRef(this.famixDictionnary, classSummary, allLocals, anchors));
 			ast.accept(new VisitorInvocRef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorAnnotationRef(this.famixDictionnary, classSummary));
 			ast.accept(new VisitorExceptionRef(this.famixDictionnary, classSummary));

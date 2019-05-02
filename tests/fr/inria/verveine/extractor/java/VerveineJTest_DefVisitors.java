@@ -87,7 +87,7 @@ public class VerveineJTest_DefVisitors {
 	}
 
 	protected FileASTRequestor createTestRequestor(JavaDictionary dico) {
-		return new FamixRequestor(repo, new ArrayList<String>(), Arrays.asList( ALL_SRC_FILES), /*classSummary*/false, /*allLocals*/false, /*anchors*/false, VerveineJParser.anchorOptions.entity);
+		return new FamixRequestor(repo, new ArrayList<String>(), Arrays.asList( ALL_SRC_FILES), /*classSummary*/false, /*allLocals*/false, /*anchors*/ VerveineJParser.anchorOptions.entity);
 	}
 
 	@Test

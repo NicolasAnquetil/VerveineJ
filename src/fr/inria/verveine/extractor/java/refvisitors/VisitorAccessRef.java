@@ -14,10 +14,15 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
+/**
+ * A visitor that extracts accesses to variables.
+ * One difficulty is that variable are often SimpleName nodes
+ * But many other things are also SimpleName nodes (ex: name of an invoked method)
+ * So we need to differentiate them. The choice has been made to do this in the parent nodes of the SimpleName nodes
+ */
 public class VisitorAccessRef extends AbstractRefVisitor {
 
 	/**
@@ -25,13 +30,19 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 
+    /**
+     * Whether to output all local variables (even those with primitive type or not (default is not).
+     */
+    private boolean allLocals;
+
 	/**
 	 * what sourceAnchors to create
 	 */
 	private anchorOptions anchors;
 
-	public VisitorAccessRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
+	public VisitorAccessRef(JavaDictionary dico, boolean classSummary, boolean allLocals, anchorOptions anchors) {
 		super(dico, classSummary);
+		this.allLocals = allLocals;
 		this.anchors = anchors;
 	}
 
@@ -65,7 +76,14 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
 		visitClassInstanceCreation( node);
-		return super.visit(node);
+        visitAsSimpleName(node.getExpression());
+        for (Object arg : node.arguments()) {
+            visitAsSimpleName((ASTNode) arg);
+        }
+        if (node.getAnonymousClassDeclaration() != null) {
+            node.getAnonymousClassDeclaration().accept(this);
+        }
+		return false;
 	}
 
 	@Override
@@ -159,12 +177,22 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		endVisitInitializer(node);
 	}
 
+    /**
+     * MethodInvocation ::=
+     *      [ Expression . ]
+     *          [ < Type { , Type } > ]
+     *          Identifier ( [ Expression { , Expression } ] )
+     */
 	@Override
 	public boolean visit(MethodInvocation node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
-		return super.visit(node);
+        visitAsSimpleName( node.getExpression());
+
+
+        for (Object arg : node.arguments()) {
+            visitAsSimpleName((ASTNode) arg);
+
+        }
+		return false;  // already visited the interesting children
 	}
 
 	/**
@@ -229,24 +257,30 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		return super.visit(node);
 	}
 
-	@SuppressWarnings("unchecked")
-	public boolean visit(InfixExpression node) {
-		if (node.getLeftOperand() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getLeftOperand());
-		}
-		if (node.getRightOperand() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getRightOperand());
-		}
-		if (node.hasExtendedOperands()) {
-			for (Expression op : (List<Expression>) node.extendedOperands()) {
-				if (op instanceof SimpleName) {
-					visitSimpleName((SimpleName) op);
-				}
-			}
-		}
+    @SuppressWarnings("unchecked")
+    public boolean visit(InfixExpression node) {
+        visitIfSimpleName( node.getLeftOperand());
+        visitIfSimpleName( node.getRightOperand());
+        if (node.hasExtendedOperands()) {
+            for (Expression op : (List<Expression>) node.extendedOperands()) {
+                visitIfSimpleName( op);
+            }
+        }
 
-		return super.visit(node);
-	}
+        return super.visit(node);
+    }
+
+    @Override
+    public boolean visit(PrefixExpression node) {
+        visitIfSimpleName( node.getOperand());
+        return super.visit(node);
+    }
+
+    @Override
+    public boolean visit(PostfixExpression node) {
+        visitIfSimpleName( node.getOperand());
+        return super.visit(node);
+    }
 
 	// "SomeClass.class"
 	public boolean visit(TypeLiteral node) {
@@ -259,29 +293,17 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	}
 
 	public boolean visit(AssertStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
-		if (node.getMessage() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getMessage());
-		}
+        visitIfSimpleName( node.getExpression());
+        visitIfSimpleName( node.getMessage());
 		return super.visit(node);
 	}
 
 	public boolean visit(Assignment node) {
 		inAssignmentLHS = true;
-		if (node.getLeftHandSide() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getLeftHandSide());
-		} else {
-			node.getLeftHandSide().accept(this);
-		}
+        visitAsSimpleName( node.getLeftHandSide());
 		inAssignmentLHS = false;
 
-		if (node.getRightHandSide() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getRightHandSide());
-		} else {
-			node.getRightHandSide().accept(this);
-		}
+        visitAsSimpleName( node.getRightHandSide());
 
 		return false;
 	}
@@ -294,85 +316,61 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		node.getArray().accept(this);
 
 		inAssignmentLHS = false;
-		if (node.getIndex() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getIndex());
-		} else {
-			node.getIndex().accept(this);
-		}
+        visitAsSimpleName( node.getIndex());
 		inAssignmentLHS = tmp;
 
 		return false;
 	}
 
 	public boolean visit(DoStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+        visitIfSimpleName( node.getExpression());
 		return super.visit(node);
 	}
 
 	public boolean visit(EnhancedForStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+        visitIfSimpleName( node.getExpression());
 		return super.visit(node);
 	}
 
 	public boolean visit(ForStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+        visitIfSimpleName( node.getExpression());
 		return super.visit(node);
 	}
 
 	public boolean visit(IfStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+        visitIfSimpleName( node.getExpression());
 		return super.visit(node);
 	}
 
 	public boolean visit(ReturnStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+        visitIfSimpleName( node.getExpression());
 		return super.visit(node);
 	}
 
 	public boolean visit(SwitchCase node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+        visitIfSimpleName( node.getExpression());
 		return super.visit(node);
 	}
 
 	public boolean visit(SwitchStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+        visitIfSimpleName( node.getExpression());
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}
 
 	public boolean visit(SynchronizedStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+		visitIfSimpleName(node.getExpression());
 		return super.visit(node);
 	}
 
 	public boolean visit(WhileStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+		visitIfSimpleName(node.getExpression());
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(ThrowStatement node) {
-		if (node.getExpression() instanceof SimpleName) {
-			visitSimpleName((SimpleName) node.getExpression());
-		}
+		visitIfSimpleName( node.getExpression());
 		return super.visit(node);
 	}
 
@@ -395,6 +393,26 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	}
 
 	// UTILITY METHODS
+
+    /**
+     * Visit the parameter as a SimpleName node if it is one, otherwise does nothing
+     */
+   	private void visitIfSimpleName(ASTNode node) {
+        if (node instanceof SimpleName) {
+            visitSimpleName((SimpleName) node);
+        }
+    }
+
+    /**
+     * Visit the parameter as a SimpleName node if it is one, otherwise do a "normal" visit
+     */
+  	private void visitAsSimpleName(ASTNode node) {
+        if (node instanceof SimpleName) {
+            visitSimpleName((SimpleName) node);
+        } else if (node != null) {
+            node.accept(this);
+        }
+    }
 
 	/**
 	 * Deals with expressions that are simple name, e.g. "if (aBool) ..." or "return aVar;"<br>
@@ -479,7 +497,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			if (classSummary) {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
 				//  //TODO set FileAnchor to Reference
-			} else if (accessed.getBelongsTo() != accessor) {
+			} else if (allLocals || (accessed.getBelongsTo() != accessor) ) {
 				context.setLastAccess(
 						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
 				//TODO set FileAnchor to Access

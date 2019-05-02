@@ -47,25 +47,28 @@ public class VerveineJTest_Configuration {
 	}
 
 	@Test
-	public void testAlllocals()
-	{
+	public void testAlllocals() {
 		VerveineJParser parser;
 		Repository repo;
 
 		// without option
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"test_src/ad_hoc/Planet.java"});
+		parser.setOptions(new String[]{"test_src/ad_hoc/ReadException.java", "test_src/ad_hoc/ReadClient.java"});
 		parser.parse();
-		assertEquals(2, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // ret, p
-		
+		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // lire().nom ; lire().num ; lire().e
+		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());  // setNum()->num ; getNum()->num ; setNom()->nom ; getNom()->nom
+
 		// with option
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"-alllocals", "test_src/ad_hoc/Planet.java"});
+		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/ReadException.java", "test_src/ad_hoc/ReadClient.java"});
 		parser.parse();
-		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());	  // ret, p, check, earthWeight, mass, 	
+		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // + lire().c + lire().i
+		assertEquals(28, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		// ReadClient()->this*2+2 ; lire()->c*6+i*2+in*4+nom*2+num*2 ; setNum()->this*1+2 ; getNum()->1 ; setNom()->this*1+2 ; getNom()->1
 	}
+
 
 	@Test
 	public void testAnchorsAssoc()

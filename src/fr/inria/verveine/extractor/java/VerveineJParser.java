@@ -62,16 +62,10 @@ public class VerveineJParser extends VerveineParser {
 	private boolean classSummary = false;
 
 	/**
-	 * Whether to output all local variables (even those with primitive type or not (default is not).<br>
+	 * Whether to output all local variables (even those with primitive type) or not (default is not).<br>
 	 * Note: allLocals => not classSummary
 	 */
 	private boolean allLocals = false;
-
-	/**
-	 * Whether to output accesses to local variable inside methods
-	 * Note: localAccess => allLocals
-	 */
-	private boolean localAccess = false;
 
 	/**
 	 * Option: The version of Java expected by the parser
@@ -175,10 +169,6 @@ public class VerveineJParser extends VerveineParser {
 				this.allLocals = false;
 			}
 			else if (arg.equals("-alllocals")) {
-				this.classSummary = false;
-				this.allLocals = true;
-			}
-			else if (arg.equals("-localaccesses")) {
 				this.classSummary = false;
 				this.allLocals = true;
 			}
@@ -294,7 +284,6 @@ public class VerveineJParser extends VerveineParser {
 		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
 		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
 		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\")");
-		System.err.println("      [-localaccesses] Forces outputing accesses to local variables (implies \"-alllocal\")");
 		System.err.println("      [-anchor (none|entity|default|assoc)] options for source anchor information:\n" +
 				   "                                     - no entity\n" +
 				   "                                     - only named entities [default]\n" +
@@ -355,7 +344,7 @@ public class VerveineJParser extends VerveineParser {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals, localAccess, anchors);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals, anchors);
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
