@@ -14,6 +14,7 @@ import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
 
 /**
@@ -25,9 +26,9 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	protected String anchors;
+	protected anchorOptions anchors;
 
-	public VisitorClassMethodDef(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
+	public VisitorClassMethodDef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super( dico, classSummary);
 		this.anchors = anchors;
 	}
@@ -74,7 +75,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			this.context.pushType(fmx);
 
 			if (persistIt) {
-				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				if (anchors != anchorOptions.none) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -131,7 +132,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			Util.recursivelySetIsStub(fmx, false);
 
 			if (! classSummary) {
-				if ((!anchors.equals(VerveineJParser.ANCHOR_NONE)) && (fmx != null)) {
+				if ((anchors != anchorOptions.none) && (fmx != null)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -158,7 +159,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			Util.recursivelySetIsStub(fmx, false);
 
 			this.context.pushType(fmx);
-			if ( ! anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+			if (anchors != anchorOptions.none) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 			return super.visit(node);
@@ -210,7 +211,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			}
 
 			if (!classSummary) {
-				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				if (anchors != anchorOptions.none) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -261,7 +262,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		if (fmx != null) {
             dico.setMethodModifiers(fmx, node.getModifiers());
 			if (!classSummary) {
-				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				if (anchors != anchorOptions.none) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}

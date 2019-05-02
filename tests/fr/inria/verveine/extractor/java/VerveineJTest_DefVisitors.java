@@ -34,9 +34,6 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.Parameter;
 import eu.synectique.verveine.core.gen.famix.SourceAnchor;
-import fr.inria.verveine.extractor.java.FamixRequestor;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
 
 /**
  * @author Nicolas Anquetil
@@ -90,7 +87,7 @@ public class VerveineJTest_DefVisitors {
 	}
 
 	protected FileASTRequestor createTestRequestor(JavaDictionary dico) {
-		return new FamixRequestor(repo, new ArrayList<String>(), Arrays.asList( ALL_SRC_FILES), /*classSummary*/false, /*allLocals*/false, /*anchors*/VerveineJParser.ANCHOR_DEFAULT);
+		return new FamixRequestor(repo, new ArrayList<String>(), Arrays.asList( ALL_SRC_FILES), /*classSummary*/false, /*allLocals*/false, /*anchors*/false, VerveineJParser.anchorOptions.entity);
 	}
 
 	@Test

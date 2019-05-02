@@ -15,6 +15,7 @@ import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 public class VisitorAccessRef extends AbstractRefVisitor {
@@ -27,9 +28,9 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private anchorOptions anchors;
 
-	public VisitorAccessRef(JavaDictionary dico, boolean classSummary, String anchors) {
+	public VisitorAccessRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.anchors = anchors;
 	}
@@ -197,7 +198,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		// FIXME if bnd == null we have a problem
 		ensureAccessedStructEntity(bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
 		Access lastAccess = context.getLastAccess();
-		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+		if ( (anchors == anchorOptions.assoc)
 				// check that lastAccess corresponds to current one
 				&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
 				&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
@@ -217,7 +218,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			ensureAccessedStructEntity((IVariableBinding) bnd, node.getName().getIdentifier(), /*typ*/null,
 					/*owner*/null, accessor);
 			Access lastAccess = context.getLastAccess();
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+			if ( (anchors == anchorOptions.assoc)
 					// check that lastAccess corresponds to current one
 					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
 					&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
@@ -385,7 +386,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			createAccess(accessor, fmx, inAssignmentLHS);
 
 			Access lastAccess = context.getLastAccess();
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (lastAccess != null) ) {
+			if ( (anchors == anchorOptions.assoc) && (lastAccess != null) ) {
 				dico.addSourceAnchor(lastAccess, node.getParent(), /*oneLineAnchor*/true);
 			}
 		}
@@ -411,7 +412,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			ensureAccessedStructEntity((IVariableBinding) bnd, expr.getIdentifier(), /*typ*/null, /*owner*/null,
 					accessor);
 			Access lastAccess = context.getLastAccess();
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+			if ( (anchors == anchorOptions.assoc)
 					// check that lastAccess corresponds to current one
 					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
 					&& (lastAccess.getVariable().getName().equals(expr.getIdentifier()))) {

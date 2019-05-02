@@ -13,15 +13,16 @@ import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 
 public class VisitorTypeRefRef extends AbstractRefVisitor {
 
 	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private anchorOptions anchors;
 
-	public VisitorTypeRefRef(JavaDictionary dico, boolean classSummary, String anchors) {
+	public VisitorTypeRefRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.anchors = anchors;
 	}
@@ -71,7 +72,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 				context.setLastReference(ref);
 			}
 
-			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+			if ((anchors != anchorOptions.assoc) && (ref != null) ) {
 				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -206,7 +207,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			ref = dico.addFamixReference((BehaviouralEntity) context.top(), fmx, context.getLastReference());
 			context.setLastReference(ref);
 		}
-		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+		if (anchors == anchorOptions.assoc) {
 			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 		}
 

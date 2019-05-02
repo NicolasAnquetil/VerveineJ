@@ -36,6 +36,7 @@ import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 
 /**
@@ -53,14 +54,14 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private anchorOptions anchors;
 
 	/**
 	 * set in parent of structuralEntity declaration to indicate what kind of structuralentity it is
 	 */
 	private StructuralEntityKinds structuralType;
 
-	public VisitorVarsDef(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
+	public VisitorVarsDef(JavaDictionary dico, boolean classSummary, boolean allLocals, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.allLocals = allLocals;
 		this.anchors = anchors;
@@ -157,7 +158,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+			if (anchors != anchorOptions.none) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 
@@ -297,7 +298,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			if ((!classSummary) && (!anchors.equals(VerveineJParser.ANCHOR_NONE))) {
+			if ((!classSummary) && (anchors != anchorOptions.none)) {
 				dico.addSourceAnchor(fmx, varDecl.getParent(), /*oneLineAnchor*/true);
 			}
 		}

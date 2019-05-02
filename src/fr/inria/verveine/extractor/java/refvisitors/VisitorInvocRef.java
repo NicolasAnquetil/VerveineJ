@@ -10,6 +10,7 @@ import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.*;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
 
 import org.eclipse.jdt.core.dom.*;
@@ -37,9 +38,9 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private anchorOptions anchors;
 
-	public VisitorInvocRef(JavaDictionary dico, boolean classSummary, String anchors) {
+	public VisitorInvocRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.anchors = anchors;
 	}
@@ -92,7 +93,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				String typName = findTypeName(clazz);
 				methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
 				Invocation lastInvok = context.getLastInvocation();
-				if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+				if ( (anchors == anchorOptions.assoc)
 						&& (lastInvok != null)
 						&& (lastInvok.getSender() == context.topMethod())
 						&& (lastInvok.getReceiver() == null)
@@ -232,7 +233,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}//context
 
 		Invocation lastInvok = context.getLastInvocation();
-		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+		if ( (anchors == anchorOptions.assoc)
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
@@ -269,7 +270,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		Invocation lastInvok = context.getLastInvocation();
-		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+		if ( (anchors == anchorOptions.assoc)
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
@@ -305,7 +306,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
 			
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (invok != null)) {
+			if ( (anchors == anchorOptions.assoc) && (invok != null)) {
 				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -331,7 +332,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+			if (anchors == anchorOptions.assoc) {
 				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 			}
 		}

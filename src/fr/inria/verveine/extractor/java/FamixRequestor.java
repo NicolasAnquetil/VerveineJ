@@ -18,8 +18,6 @@ import fr.inria.verveine.extractor.java.defvisitors.VisitorVarsDef;
 
 public class FamixRequestor extends FileASTRequestor {
 
-	protected Repository famixRepo;
-
 	protected JavaDictionary famixDictionnary;
 
 	/**
@@ -34,9 +32,14 @@ public class FamixRequestor extends FileASTRequestor {
 	private boolean allLocals;
 
 	/**
+	 * Whether to output accesses to local variable inside methods
+	 */
+	private boolean localAccess;
+
+	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private VerveineJParser.anchorOptions anchors;
 
 	/**
 	 * Maps the arguments (file names or dir names) to their absolute path (well actually it is the other way around)
@@ -44,10 +47,9 @@ public class FamixRequestor extends FileASTRequestor {
 	protected Map<String, String> dirMap;
 	protected Map<String, String> fileMap;
 
-	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary,
-			boolean allLocals, String anchors) {
+	public FamixRequestor(Repository repo, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary,
+						  boolean allLocals, boolean localAccesses, VerveineJParser.anchorOptions anchors) {
 		super();
-		this.famixRepo = r; 
 
 		this.fileMap = new HashMap<String, String>();
 		// initialization of the Map with the absolute paths
@@ -61,9 +63,10 @@ public class FamixRequestor extends FileASTRequestor {
 
 		this.classSummary = classSummary;
 		this.allLocals = allLocals;
+		this.localAccess = localAccess;
 		this.anchors = anchors;
 
-		this.famixDictionnary = new JavaDictionary(famixRepo);
+		this.famixDictionnary = new JavaDictionary(repo);
 	}
 
 	public void acceptAST(String sourceFilePath, CompilationUnit ast) {
@@ -72,9 +75,9 @@ public class FamixRequestor extends FileASTRequestor {
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
-			ast.accept(new VisitorPackageDef(this.famixDictionnary, allLocals, anchors));
-			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, allLocals, anchors));
-			ast.accept(new VisitorAnnotationDef(this.famixDictionnary, classSummary, allLocals, anchors));
+			ast.accept(new VisitorPackageDef(this.famixDictionnary));
+			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, anchors));
+			ast.accept(new VisitorAnnotationDef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorVarsDef(this.famixDictionnary, classSummary, allLocals, anchors));
 			ast.accept(new VisitorComments(this.famixDictionnary));
 
