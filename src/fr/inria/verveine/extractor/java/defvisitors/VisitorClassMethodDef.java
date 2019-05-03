@@ -1,9 +1,11 @@
 package fr.inria.verveine.extractor.java.defvisitors;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import java.security.MessageDigest;
 import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
@@ -13,9 +15,10 @@ import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
-import fr.inria.verveine.extractor.java.VerveineJParser;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
+
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -28,10 +31,18 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	 */
 	protected anchorOptions anchors;
 
-	public VisitorClassMethodDef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
+    protected MessageDigest md5;
+
+    public VisitorClassMethodDef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super( dico, classSummary);
 		this.anchors = anchors;
-	}
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            md5 = null;
+        }
+    }
 
 	// VISITOR METHODS
 
@@ -201,8 +212,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			// TODO change FamixMethod to add setBodyHash
-			//fmx.setBodyHash(this.computeHashForMethodBody(node));
+			fmx.setBodyHash(this.computeHashForMethodBody(node));
 
 			this.context.pushMethod(fmx);
 
@@ -225,16 +235,17 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			return false;
 		}
 	}
-	
-/* TODO change FamixMethod to add setBodyHash
+
 	private String computeHashForMethodBody(MethodDeclaration node) {
-		// not optimized but will work in a first version
 		Block body = node.getBody();
-		if (body == null)
-			return "0";
-		return DigestUtils.md5Hex(node.getBody().toString().replaceAll("\\r|\\n|\\t", ""));
+		if ( (body == null) || (md5 == null) ) {
+            return "0";
+        }
+        byte[] bytes = node.getBody().toString().replaceAll("\\r|\\n|\\t", "").getBytes();
+
+       return DatatypeConverter.printHexBinary(md5.digest(bytes)).toUpperCase();
 	}
-*/
+
 
 	@Override
 	public void endVisit(MethodDeclaration node) {

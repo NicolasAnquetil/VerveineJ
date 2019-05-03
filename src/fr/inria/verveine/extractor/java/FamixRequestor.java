@@ -53,8 +53,9 @@ public class FamixRequestor extends FileASTRequestor {
 
 		this.dirMap = new HashMap<String, String>();
 		// initialization of the Map with the absolute paths
-		for (String tempArgDir : argsDir)
+		for (String tempArgDir : argsDir) {
 			this.dirMap.put(new File(tempArgDir).getAbsolutePath(), tempArgDir);
+		}
 
 		this.classSummary = classSummary;
 		this.allLocals = allLocals;
