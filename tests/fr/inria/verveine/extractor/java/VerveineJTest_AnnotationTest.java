@@ -12,6 +12,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 
+import eu.synectique.verveine.core.gen.famix.Parameter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,6 +45,19 @@ public class VerveineJTest_AnnotationTest {
 		parser.setOptions(new String[] {"-cp" , "test_src/annotationsTest/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar" , "test_src/annotationsTest/src"});
 		parser.parse();
 		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+	}
+
+	@Test
+	public void testAnnotationOnVar() {
+		Parameter param = VerveineUtilsForTests.detectFamixElement(repo, Parameter.class, "annotatedParam");
+		assertNotNull(param);
+
+		assertEquals(1, param.getAnnotationInstances().size());
+		AnnotationInstance inst = param.getAnnotationInstances().iterator().next();
+		assertNotNull(inst);
+		assertEquals("SuppressWarnings", inst.getAnnotationType().getName());
+		assertSame(inst.getAnnotatedEntity(), param);
+
 	}
 
 	@Test

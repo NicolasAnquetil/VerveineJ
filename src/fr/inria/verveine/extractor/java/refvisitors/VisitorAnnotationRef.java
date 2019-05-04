@@ -104,16 +104,55 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		createAnnotationInstances(node.resolveBinding());
+
 		return true;
+	}
+
+	@Override
+	public boolean visit(SingleVariableDeclaration node) {
+		createAnnotationInstances(node.resolveBinding());
+		return true;
+	}
+
+	/**
+	 * VariableDeclarationExpression ::=
+     *     { ExtendedModifier } Type VariableDeclarationFragment
+     *          { , VariableDeclarationFragment }
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean visit(VariableDeclarationExpression node) {
+		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
+	}
+
+	/**
+	 *  VariableDeclarationStatement ::=
+     *     { ExtendedModifier } Type VariableDeclarationFragment
+     *         { , VariableDeclarationFragment } ;
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean visit(VariableDeclarationStatement node) {
+		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
 	}
 
 	// UTILITY METHODS
 
 	/**
+	 * same behaviour for VariableDeclarationStatement and VariableDeclarationExpression
+     * VariableDeclaration ::=
+     *     SingleVariableDeclaration VariableDeclarationFragment
+	 */
+	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
+		for (VariableDeclaration varDecl : fragments) {
+			createAnnotationInstances(varDecl.resolveBinding());
+		}
+		return false;
+	}
+
+	/**
 	 * Adds possible annotation instances to a Famix NamedEntity with the given binding
 	 * @param bnd -- IBinding of an entity (possibly null)
-	 * @param fmx -- corresponding famix entity (possibly null)
-	 * @param persistIt  -- whether to persist or not the type
 	 */
 	private void createAnnotationInstances(IBinding bnd) {
 		NamedEntity fmx;
@@ -143,7 +182,6 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 	 * creates an annotationInstance attribute
 	 * @param annPV -- Value pair: name of the attribute and its value (may be null)
 	 * @param annType -- the annotation type instantiated
-	 * @param persistIt -- whether to persist the data
 	 * @return the AnnotationInstanceAttribute created or null
 	 */
 	private AnnotationInstanceAttribute annInstAtt(IMemberValuePairBinding annPV, AnnotationType annType) {

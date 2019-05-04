@@ -246,6 +246,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      *          { , VariableDeclarationFragment }
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public boolean visit(VariableDeclarationExpression node) {
 		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
 	}
@@ -256,6 +257,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      *         { , VariableDeclarationFragment } ;
 	 */
 	@SuppressWarnings("unchecked")
+	@Override
 	public boolean visit(VariableDeclarationStatement node) {
 		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
 	}
@@ -266,7 +268,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      *     SingleVariableDeclaration VariableDeclarationFragment
 	 */
 	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
-		setVariablesDeclaredType((List<VariableDeclaration>)fragments, referedType(declType, context.topMethod(), false));
+		setVariablesDeclaredType((List<VariableDeclaration>)fragments, referedType(declType, context.topType(), false));
 		for (VariableDeclaration varDecl : fragments) {
 			varDecl.accept(this);
 		}
