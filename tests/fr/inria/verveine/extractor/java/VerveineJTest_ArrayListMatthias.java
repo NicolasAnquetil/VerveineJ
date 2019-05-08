@@ -22,8 +22,8 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
  */
 public class VerveineJTest_ArrayListMatthias extends VerveineJTest_Basic {
 
-	public VerveineJTest_ArrayListMatthias() {
-		super(/*testSystemEntities*/false, /*testLanguageMarker*/true);
+	public VerveineJTest_ArrayListMatthias() throws IllegalAccessException {
+		super(new boolean[] {false, true, true, true, false, true, true});
 	}
 
 	/**

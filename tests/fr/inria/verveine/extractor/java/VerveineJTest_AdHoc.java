@@ -50,8 +50,8 @@ import eu.synectique.verveine.core.gen.famix.Type;
  */
 public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
-	public VerveineJTest_AdHoc() {
-		super(/*testSystemEntities*/true, /*testLanguageMarker*/false);
+	public VerveineJTest_AdHoc() throws IllegalAccessException {
+		super(new boolean[] {true, true, true, true, true, false, true});
 	}
 
 	/**
@@ -73,29 +73,29 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertNotNull(meth);
 
 		// test outgoing invocation to constructor
-		assertEquals(3, meth.getOutgoingInvocations().size());
+		Collection<Invocation> methOutgoingInvocations = meth.getOutgoingInvocations();
+		assertEquals(3, methOutgoingInvocations.size());
+
+		// test invocations' signatures
+		for (Invocation invok : methOutgoingInvocations) {
+			BehaviouralEntity invoked = invok.getCandidates().iterator().next();
+			assertTrue( "Unexpected invoked signature: "+invoked.getSignature(),
+					invok.getSignature().equals("DefaultConstructor()")
+							|| invok.getSignature().equals("JFrame(\"My title\")")
+							|| invok.getSignature().equals("methodWithInstanceScope()"));
+		}
 
 		// test constructors
-		assertEquals(2, VerveineUtilsForTests.listFamixElements(repo, Method.class, "DefaultConstructor").size());
-		for (Method m : VerveineUtilsForTests.listFamixElements(repo, Method.class, "DefaultConstructor")) {
+		Collection<Method> defaultContructors = VerveineUtilsForTests.listFamixElements(repo, Method.class, "DefaultConstructor");
+		assertEquals(2, defaultContructors.size());
+		for (Method m : defaultContructors) {
 			int nbParam = m.getParameters().size();
 			assertTrue( (nbParam == 0) || (nbParam == 1) );
 			assertEquals(1, m.getIncomingInvocations().size());
 			assertEquals(1, m.getOutgoingInvocations().size());
 		}
-		
-		// test invocations' signatures
-		for (Invocation invok : meth.getOutgoingInvocations()) {
-			BehaviouralEntity invoked = invok.getCandidates().iterator().next();
-			if (invoked.getName().equals("DefaultConstructor")) {
-				assertEquals("DefaultConstructor()", invok.getSignature());
-			}
-			else if (invoked.getName().equals("JFrame")) {
-				assertEquals("JFrame(\"My title\")", invok.getSignature());
-			}
-		}
 
-		for (Method m : VerveineUtilsForTests.listFamixElements(repo, Method.class, "DefaultConstructor")) {
+		for (Method m : defaultContructors) {
 			Invocation invok = m.getOutgoingInvocations().iterator().next();
 			if (m.getParameters().size() == 0) {
 				assertEquals("this(\"For testing\")", invok.getSignature());
@@ -230,8 +230,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 		// Method annotations
 		eu.synectique.verveine.core.gen.famix.Class book = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Book");
-		assertEquals(12, book.getMethods().size());
-		for (Method meth : book.getMethods()) {
+		Collection<Method> bookMethods = book.getMethods();
+		assertEquals(12, bookMethods.size());
+		for (Method meth : bookMethods) {
 			Collection<AnnotationInstance> annInstances = meth.getAnnotationInstances();
 			if (meth.getName().startsWith("get")) {
 				assertEquals(1, annInstances.size());
@@ -253,8 +254,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 
 		// one Attribute with annotation
-		assertEquals(6, book.getAttributes().size());
-		for (Attribute att : book.getAttributes()) {
+		Collection<Attribute> bookAttributes = book.getAttributes();
+		assertEquals(6, bookAttributes.size());
+		for (Attribute att : bookAttributes) {
 			if (att.getName().equals("time")) {
 				assertEquals(1, att.getAnnotationInstances().size());
 			}

@@ -30,8 +30,8 @@ import eu.synectique.verveine.core.gen.famix.Namespace;
  */
 public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
-	public VerveineJTest_JWSBasic() {
-		super(/*testSystemEntities*/false, /*testLanguageMarker*/false);
+	public VerveineJTest_JWSBasic() throws IllegalAccessException {
+		super(new boolean[] {true, true, true, true, true, false, true});
 		// we don't run parser.emitMSE in setup, so SourceLanguage is not created
 	}
 

@@ -4,12 +4,6 @@
 package fr.inria.verveine.extractor.java;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,6 +28,8 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.Parameter;
 import eu.synectique.verveine.core.gen.famix.SourceAnchor;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Nicolas Anquetil
@@ -206,7 +202,9 @@ public class VerveineJTest_DefVisitors {
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "FileServer"), n.getParentType());
 		
 		//constructors
-		for (Method m : VerveineUtilsForTests.selectElementsOfType(repo, Method.class)) {
+		Collection<Method> methods = VerveineUtilsForTests.selectElementsOfType(repo, Method.class);
+		assertFalse("Found no methods !", methods.isEmpty());
+		for (Method m : methods) {
 			if (m.getName().equals(m.getParentType().getName())) {
 				assertEquals("constructor", m.getKind());
 			}
@@ -230,6 +228,9 @@ public class VerveineJTest_DefVisitors {
 			else if (a.getName().equals("name")) {
 				assertSame(clazz, a.getParentType());
 			}
+			else {
+				fail("Unknown attribute: "+ a.getName());
+			}
 		}
 	}
 
@@ -237,7 +238,9 @@ public class VerveineJTest_DefVisitors {
 	public void testParameter() {
 		eu.synectique.verveine.core.gen.famix.Class nodeClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(nodeClass);
-		for (Method mNode : nodeClass.getMethods()) {
+		Collection<Method> methods = nodeClass.getMethods();
+		assertFalse("Found no methods !", methods.isEmpty());
+		for (Method mNode : methods) {
 			if ( (mNode.getName().equals("Node")) ||
 				 (mNode.getName().equals("methodWithEmptyBody")) ||
 				 (mNode.getName().equals("canOriginate")) ||
@@ -252,6 +255,9 @@ public class VerveineJTest_DefVisitors {
 					 (mNode.getName().equals("send")) ||
 					 (mNode.getName().equals("printOn")) ) {
 				assertEquals("Wrong number of parameter for method Node."+mNode.getName()+"()", 1, mNode.getParameters().size());
+			}
+			else {
+				fail("Unknown method: "+ mNode.getName());
 			}
 		}
 		eu.synectique.verveine.core.gen.famix.Class iprintClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
@@ -408,6 +414,9 @@ public class VerveineJTest_DefVisitors {
 			else if (owner.getName().equals("WorkStation")) {
 				assertEquals(2, m.getCyclomaticComplexity());
 				assertEquals(4, m.getNumberOfStatements());
+			}
+			else {
+				fail("Unknown method: "+ m.getName());
 			}
 		}		
 	}

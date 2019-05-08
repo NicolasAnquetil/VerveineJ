@@ -96,8 +96,8 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
  */
 public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
-	public VerveineJTest_Summarized() {
-		super(/*testSystemEntities*/false, /*testLanguageMarker*/true);
+	public VerveineJTest_Summarized() throws IllegalAccessException {
+		super(new boolean[] {false, false, false, true, true, true, true});
 	}
 
 	/**
