@@ -74,7 +74,7 @@ public class FamixRequestor extends FileASTRequestor {
 			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorAnnotationDef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorVarsDef(this.famixDictionnary, classSummary, allLocals, anchors));
-			ast.accept(new VisitorComments(this.famixDictionnary));
+			ast.accept(new VisitorComments(this.famixDictionnary, classSummary));
 
 			ast.accept(new VisitorInheritanceRef(this.famixDictionnary));
 			ast.accept(new VisitorTypeRefRef(this.famixDictionnary, classSummary, anchors));

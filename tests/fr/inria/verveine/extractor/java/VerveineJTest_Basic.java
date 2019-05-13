@@ -52,7 +52,7 @@ public abstract class VerveineJTest_Basic {
 		this.testsToRun = testsToRun;
 	}
 
-	@Test // numvber 0
+	@Test // number 0
 	public void testAssociation() {
     	Assume.assumeTrue(testsToRun[0]);
 
@@ -88,7 +88,7 @@ public abstract class VerveineJTest_Basic {
 		assertTrue("No `previous' found in any Associations", found);
 	}
 
-	@Test // numvber 1
+	@Test // number 1
 	public void testBelongsTo() {
     	Assume.assumeTrue(testsToRun[1]);
 
@@ -120,7 +120,7 @@ public abstract class VerveineJTest_Basic {
 		assertTrue("All `StructuralEntities' are stubs", found);
 	}
 
-	@Test // numvber 2
+	@Test // number 2
 	public void testMethodAndClassSourceAnchor() {
 		// related to issue #728 VerveineJ places methods in the wrong classes
 		// some methods were created without sourceAnchor whereas their parent did have one. This should not happen (or only in special cases)
@@ -144,7 +144,7 @@ public abstract class VerveineJTest_Basic {
 	 * Test of some "basic" Java entities that we know should be here such as: java.lang, java.io, Object, String, System
 	 * (and respective superclasses and implemented interfaces)
 	 */
-	@Test // numvber 3
+	@Test // number 3
 	public void testJavaCore() {
 		Assume.assumeTrue(testsToRun[3]);
 
@@ -202,7 +202,7 @@ public abstract class VerveineJTest_Basic {
 		*/
 	}
 
-	@Test // numvber 4
+	@Test // number 4
 	public void testSystemClass() {
 		Assume.assumeTrue(testsToRun[4]);
 
@@ -226,7 +226,7 @@ public abstract class VerveineJTest_Basic {
 		assertTrue("No `out' attribute in class `System'", found);
 	}
 	
-	@Test // numvber 5
+	@Test // number 5
 	public void testSourceLanguage() {
     	Assume.assumeTrue(testsToRun[5]);
 
@@ -243,7 +243,7 @@ public abstract class VerveineJTest_Basic {
 	 * Note that any of these `listFamixElements' might be empty depending on the test set used
 	 * Therefore these tests are "Rotten Green Tests" on purpose
 	 */
-	@Test // numvber 6
+	@Test // number 6
 	public void testPrimitiveTypes() {
     	Assume.assumeTrue(testsToRun[6]);
 		for (NamedEntity t : VerveineUtilsForTests.listFamixElements(repo, "byte")) {

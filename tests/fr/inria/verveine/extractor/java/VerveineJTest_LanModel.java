@@ -709,11 +709,11 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			IndexedFileAnchor tmpAnc = (IndexedFileAnchor) c.getSourceAnchor();
 			if ( tmpAnc.getStartPos().intValue() > 5) { // i.e. not the one at the beginning of the file
 				anc = tmpAnc;
+				assertEquals(64, tmpAnc.getStartPos());
+				assertEquals(120, tmpAnc.getEndPos());
 			}
 		}
 		assertNotNull(anc);
-		assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(120, ((IndexedFileAnchor)anc).getEndPos());
 
 		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "equalsSingle");
 		assertNotNull(meth);

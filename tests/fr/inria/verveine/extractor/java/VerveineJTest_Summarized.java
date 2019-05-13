@@ -61,33 +61,19 @@ FileServer
 - String
 */
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
-
 import java.io.File;
+import java.lang.Exception;
 import java.util.Collection;
 
+import eu.synectique.verveine.core.gen.famix.*;
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
-import eu.synectique.verveine.core.gen.famix.Reference;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Nicolas Anquetil
@@ -155,19 +141,19 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		int nbClasses = 10+5; // one less than in VerveineJTest_LanModel because anonymous class is not created
 
 		assertEquals(nbClasses, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size());
-		assertEquals(3,     VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());
-		assertEquals(0, 	VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());
-		assertEquals(0, 	VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
-		assertEquals(2+4,   VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
-		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
-		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
+		assertEquals(3,  VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
+		assertEquals(2+4,VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
 		assertEquals(12, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());
-		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
-		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
-		assertEquals(1,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());
-		assertEquals(2,     VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
+		assertEquals(1,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());
+		assertEquals(2,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());
  		// class Comparable no longer created
-		assertEquals(0,     VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
 
 		// following redefinition of meta-model, Reference from class to class are no longer possible (must from method to class)
 		// so all reference creation was removed
@@ -251,4 +237,23 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertSame(inh2.getPrevious(), inh);
 	}
 
+	@Test(timeout=100)
+	public void testComments() {
+		Collection<Comment> cmts = VerveineUtilsForTests.selectElementsOfType(repo, Comment.class);
+		assertEquals(18, cmts.size());
+		for (Comment c : cmts) {
+			int length = 0;
+			assertNotNull(c);
+			assertNotNull("Empty container for Comment", c.getContainer());
+			IndexedFileAnchor anc = (IndexedFileAnchor) c.getSourceAnchor();
+			length = (int)anc.getEndPos() - (int)anc.getStartPos();
+			// length of comments may vary slightly from one file to the other
+			if ( anc.getStartPos().intValue() > 5) { // i.e. not the one at the beginning of the file
+				assertTrue("Wrong comment length ("+length+") in:"+anc.getFileName(), (55 <= length) && (length <= 57) );
+			}
+			else {
+				assertTrue("Wrong comment length ("+length+") in:"+anc.getFileName(), (40 <= length) && (length <= 42));
+			}
+		}
+	}
 }
