@@ -207,30 +207,30 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
         // --FileServer extends OutputServer
 
 		eu.synectique.verveine.core.gen.famix.Class clazz;
-		Collection<Inheritance> superInheritances;
+		Collection<Inheritance> inherits;
 		Inheritance inh, inh2 = null;
 		
 		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
-		superInheritances = clazz.getSuperInheritances();
-		assertEquals(1, superInheritances.size());
-		inh = superInheritances.iterator().next();
+        inherits = clazz.getSuperInheritances();
+		assertEquals(1, inherits.size());
+		inh = inherits.iterator().next();
 		assertSame(clazz, inh.getSubclass());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
 
 		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
-		superInheritances = clazz.getSuperInheritances();
-		assertEquals(1, superInheritances.size());
-		inh = superInheritances.iterator().next();
+        inherits = clazz.getSuperInheritances();
+		assertEquals(1, inherits.size());
+		inh = inherits.iterator().next();
 		assertSame(clazz, inh.getSubclass());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 		
 		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
-		superInheritances = clazz.getSuperInheritances();
-		assertEquals(2, superInheritances.size()); // superInheritances: Object and IPrinter (in this order)
-		for (Inheritance inheritance : superInheritances) {
+        inherits = clazz.getSuperInheritances();
+		assertEquals(2, inherits.size()); // superInheritances: Object and IPrinter (in this order)
+		for (Inheritance inheritance : inherits) {
 			assertSame(clazz, inheritance.getSubclass());
 			if (inheritance.getSuperclass().getName().equals("IPrinter")) {
 				inh2 = inheritance;
@@ -246,7 +246,13 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		}
 		assertSame(inh.getNext(), inh2);
 		assertSame(inh2.getPrevious(), inh);
-	}
+
+        clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+        assertNotNull(clazz);
+        inherits = clazz.getSubInheritances();
+        assertEquals(1, inherits.size());
+
+    }
 
 	@Test
 	public void testComments() {
