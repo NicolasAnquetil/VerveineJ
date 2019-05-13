@@ -788,7 +788,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
         methods = clazz.getMethods();
-		assertFalse("No method found in SingleDestinationAddress",methods.isEmpty());		for (Method method : methods) {
+		assertFalse("No method found in SingleDestinationAddress",methods.isEmpty());
+		for (Method method : methods) {
 			annInstances = method.getAnnotationInstances();
 			if (method.getName().equals("isDestinationFor")) {
 				assertEquals(1, annInstances.size());

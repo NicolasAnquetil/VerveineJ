@@ -171,7 +171,7 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 
 				// add the annotation instance to the Famix entity, may be if fmx==null we should not even create the AnnotationInstanceType ?
 				fmx = dico.getEntityByKey(bnd);
-				if (fmx != null) {
+				if ( (fmx != null) && (! classSummary) ) {
 					dico.addFamixAnnotationInstance(fmx, annType, annAtts);
 				}
 			}
@@ -211,7 +211,6 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 	/**
 	 * represents the value of an AnnotationInstanceAttribute as a String
 	 * @param attVal
-	 * @return
 	 */
 	private String annInstAttValAsString(Object attVal) {
 		String attFamixVal;

@@ -151,9 +151,8 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());
-		assertEquals(2,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());
- 		// class Comparable no longer created
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());    // Override annotations on methods
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());  // class Comparable no longer created
 
 		// following redefinition of meta-model, Reference from class to class are no longer possible (must from method to class)
 		// so all reference creation was removed
@@ -237,7 +236,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertSame(inh2.getPrevious(), inh);
 	}
 
-	@Test(timeout=100)
+	@Test
 	public void testComments() {
 		Collection<Comment> cmts = VerveineUtilsForTests.selectElementsOfType(repo, Comment.class);
 		assertEquals(18, cmts.size());
@@ -256,4 +255,5 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 			}
 		}
 	}
+
 }
