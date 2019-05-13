@@ -147,7 +147,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(2+4,VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(12, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());
+		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());
@@ -194,6 +194,18 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testInheritance() {
+	    // --WorkStation extends Node
+        // --SingleDestinationAddress extends AbstractDestinationAddress
+        // --Packet
+        // --Node
+        // --AbstractDestinationAddress
+        // --PrintServer extends OutputServer
+        // --XPrinter implements IPrinter
+        // --XPrinter
+        // ** **new IPrinter() {
+        // --OutputServer extends Node
+        // --FileServer extends OutputServer
+
 		eu.synectique.verveine.core.gen.famix.Class clazz;
 		Collection<Inheritance> superInheritances;
 		Inheritance inh, inh2 = null;
