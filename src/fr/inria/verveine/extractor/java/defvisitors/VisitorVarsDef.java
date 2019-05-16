@@ -241,7 +241,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(VariableDeclarationFragment node) {
 		createStructuralEntity( structuralType, node, context.top());
 
-		return false;  // no need to go in the children
+		return true;  // no need to go in the children
 	}
 
 	@Override

@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Collection;
 
 import org.junit.Test;
 
@@ -66,6 +67,36 @@ public class VerveineJTest_Configuration {
 		parser.parse();
 		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // + lire().c + lire().i
 		assertEquals(28, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		// ReadClient()->this*2+2 ; lire()->c*6+i*2+in*4+nom*2+num*2 ; setNum()->this*1+2 ; getNum()->1 ; setNom()->this*1+2 ; getNom()->1
+	}
+
+	@Test
+	public void testLocalVarInInvokInDeclaration() {
+		VerveineJParser parser;
+		Repository repo;
+
+		// with option
+		parser = new VerveineJParser();
+		repo = parser.getFamixRepo();
+		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/LocalVarInInvokInDeclaration.java"});
+		parser.parse();
+
+		Collection<LocalVariable> vars = VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class);
+        LocalVariable var1 = null;
+        LocalVariable var2 = null;
+		assertEquals(2, vars.size());
+		for (LocalVariable v : vars) {
+            if (v.getName().equals("firstVar")) {
+                var1 = v;
+            }
+            else if (v.getName().equals("secondVar")) {
+                var2 = v;
+            }
+		}
+        assertNotNull(var1);
+        assertNotNull(var2);
+        assertEquals(1, var1.getIncomingAccesses().size());
+        assertEquals(3, var2.getIncomingAccesses().size());
 		// ReadClient()->this*2+2 ; lire()->c*6+i*2+in*4+nom*2+num*2 ; setNum()->this*1+2 ; getNum()->1 ; setNom()->this*1+2 ; getNom()->1
 	}
 
