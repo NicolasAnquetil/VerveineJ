@@ -71,33 +71,38 @@ public class VerveineJTest_Configuration {
 	}
 
 	@Test
-	public void testLocalVarInInvokInDeclaration() {
+	public void testSpecialLocalVarDecls() {
 		VerveineJParser parser;
 		Repository repo;
 
 		// with option
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/LocalVarInInvokInDeclaration.java"});
+		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
 		parser.parse();
 
 		Collection<LocalVariable> vars = VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class);
         LocalVariable var1 = null;
-        LocalVariable var2 = null;
-		assertEquals(2, vars.size());
+		LocalVariable var2 = null;
+		LocalVariable var3 = null;
+		assertEquals(3, vars.size());
 		for (LocalVariable v : vars) {
             if (v.getName().equals("firstVar")) {
                 var1 = v;
             }
-            else if (v.getName().equals("secondVar")) {
-                var2 = v;
-            }
+			else if (v.getName().equals("secondVar")) {
+				var2 = v;
+			}
+			else if (v.getName().equals("thirdVar")) {
+				var3 = v;
+			}
 		}
         assertNotNull(var1);
-        assertNotNull(var2);
+		assertNotNull(var2);
+		assertNotNull(var3);
         assertEquals(1, var1.getIncomingAccesses().size());
-        assertEquals(3, var2.getIncomingAccesses().size());
-		// ReadClient()->this*2+2 ; lire()->c*6+i*2+in*4+nom*2+num*2 ; setNum()->this*1+2 ; getNum()->1 ; setNom()->this*1+2 ; getNom()->1
+		assertEquals(0, var2.getIncomingAccesses().size());
+		assertEquals(3, var3.getIncomingAccesses().size());
 	}
 
 

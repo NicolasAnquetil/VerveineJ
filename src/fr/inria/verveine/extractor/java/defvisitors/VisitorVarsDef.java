@@ -191,7 +191,8 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(Initializer node) {
-		return false;
+        visitInitializer(node);
+		return super.visit(node);
 	}
 
 	@Override
@@ -205,7 +206,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(EnumConstantDeclaration node) {
 		EnumValue ev = dico.ensureFamixEnumValue(node.resolveVariable(), node.getName().getIdentifier(), /*owner*/(Enum)context.topType(), persistClass(((EnumDeclaration)node.getParent()).resolveBinding()));
 		ev.setIsStub(false);
-		return false;
+		return super.visit(node);
 	}
 
 	@Override
@@ -218,9 +219,10 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(VariableDeclarationExpression node) {
 		// we usually don't declare local variables that have a primitive type
-		// because we are assuming that the user is not interested in them (non primitive types are important because of the dependence they create)
+		// because we are assuming that the user is not interested in them
+		// note that non primitive types are important because of the dependencies they create
 		if ( ! allLocals && node.getType().isPrimitiveType() && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
-			return false;
+			return false;  // FIXME could be a mistake, but not too sure: what about var declaration with complex initialization (eg including an anonymous class)?
 		}
 
 		return super.visit(node);
@@ -231,7 +233,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		// about the same node as VariableDeclarationExpression (but is a statement instead of an expression)
 
 		if ( ! allLocals && node.getType().isPrimitiveType() && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
-			return false;
+			return false;  // FIXME could be a mistake, but not too sure: what about var declaration with complex initialization (eg including an anonymous class)?
 		}
 
 		return super.visit(node);
@@ -241,7 +243,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(VariableDeclarationFragment node) {
 		createStructuralEntity( structuralType, node, context.top());
 
-		return true;  // no need to go in the children
+		return true;  // e.g. with an initialization containing an anonymous class definition
 	}
 
 	@Override
@@ -249,7 +251,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		if ( allLocals || (! node.getType().isPrimitiveType()) || (structuralType != StructuralEntityKinds.LOCALVAR) ) {
 			createStructuralEntity( structuralType, node, context.top());
 		}
-		return false;  // no need to go in the children
+		return true;  // e.g. with an initialization containing an anonymous class definition
 	}
 
 	public boolean visit(SuperMethodInvocation node) {
