@@ -284,7 +284,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 			return super.visit(node);
 		} else {
-			this.context.pushMethod(null);
+			this.context.pushMethod(null);   // because endVisit(Initializer) will pop it out
 			return false;
 		}
 	}
@@ -441,6 +441,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(TryStatement node) {
 		this.context.addTopMethodCyclo(1);
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(VariableDeclarationStatement node) {
 		this.context.addTopMethodNOS(1);
 		return super.visit(node);
 	}

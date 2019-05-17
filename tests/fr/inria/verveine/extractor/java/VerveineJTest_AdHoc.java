@@ -636,7 +636,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	@Test
 	public void testStaticInitializationBlock() {
 		Collection<Method> l_meth = VerveineUtilsForTests.listFamixElements(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
-		assertEquals(6, l_meth.size());
+		assertEquals(7, l_meth.size());
 		for (Method meth : l_meth) {
 			assertEquals(JavaDictionary.INIT_BLOCK_NAME+"()", meth.getSignature());
 			if (meth.getParentType().getName().equals("Card")) {
@@ -660,6 +660,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			else if (meth.getParentType().getName().equals("EnumConstWithInitNewString")) {
 				assertEquals(1, meth.getOutgoingInvocations().size());
 				assertEquals(1, meth.getOutgoingReferences().size());
+			}
+			else if (meth.getParentType().getName().equals("anonymous(List)")) {
+				assertEquals(1, meth.getOutgoingInvocations().size());
 			}
 			else {
 				fail("Unknown class with an <Initializer> method: " + meth.getParentType().getName());

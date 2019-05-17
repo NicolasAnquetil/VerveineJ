@@ -101,7 +101,7 @@ public class VerveineJTest_Configuration {
 		assertNotNull(var2);
 		assertNotNull(var3);
         assertEquals(1, var1.getIncomingAccesses().size());
-		assertEquals(0, var2.getIncomingAccesses().size());
+		assertEquals(2, var2.getIncomingAccesses().size());
 		assertEquals(3, var3.getIncomingAccesses().size());
 	}
 

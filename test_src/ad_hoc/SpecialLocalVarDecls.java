@@ -4,7 +4,10 @@ public class SpecialLocalVarDecls {
     Object aField;
     public void aMethod() {
         boolean firstVar = aField.invocation(
-                new List() {{int secondVar = 0; }
+                new List() {{
+                    Integer secondVar = 0;
+                    secondVar.whatever(secondVar);
+                    }
                     public void anotherMethod() {
                         while (true) {
                             int thirdVar = 0;

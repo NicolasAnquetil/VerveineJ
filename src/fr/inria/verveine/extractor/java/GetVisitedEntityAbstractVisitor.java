@@ -267,13 +267,30 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
 	private Method ctxtPushInitializerMethod() {
-		Method fmx = dico.getFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), context.topType());
+        eu.synectique.verveine.core.gen.famix.Type owner = context.topType();
+        Method fmx = recoverInitializerMethod(owner);
+        if (fmx == null) {
+            fmx = dico.getFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), owner);
+        }
 		if (fmx != null) {
 			context.pushMethod(fmx);
 		}
 
 		return fmx;
 	}
+
+    private Method recoverInitializerMethod(eu.synectique.verveine.core.gen.famix.Type owner) {
+	    Method ret = null;
+        if (owner != null) {
+            for (Method meth : owner.getMethods()) {
+                if (meth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+                    ret = meth;
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
 
     public AnnotationTypeAttribute visitAnnotationTypeMemberDeclaration(AnnotationTypeMemberDeclaration node) {
 		IMethodBinding bnd = node.resolveBinding();
