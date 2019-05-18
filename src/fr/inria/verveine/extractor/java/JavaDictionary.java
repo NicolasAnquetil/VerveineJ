@@ -1269,10 +1269,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return ensureFamixMethod(bnd, name, paramTypes, /*returnType*/null, owner,modifiers, persistIt);
 	}
 
-	public Method getFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type owner) {
-		return ensureFamixMethod(bnd, name, paramTypes, /*returnType*/null, owner, UNKNOWN_MODIFIERS, /*persistIt*/false);
-	}
-
 	
 	/**
 	 * Returns a Famix Method associated with the IMethodBinding. The Entity is created if it does not exist.

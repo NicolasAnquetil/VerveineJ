@@ -175,7 +175,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 			paramTypes.add( Util.jdtTypeName(param.getType()));
 		}
 
-		Method fmx = dico.getFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*owner*/context.topType());
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*returnType*/null, /*owner*/context.topType(), JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
 
 		context.pushMethod(fmx);  // whether fmx==null or not
 		return fmx;
@@ -270,7 +270,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
         eu.synectique.verveine.core.gen.famix.Type owner = context.topType();
         Method fmx = recoverInitializerMethod(owner);
         if (fmx == null) {
-            fmx = dico.getFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), owner);
+            fmx = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), /*returnType*/null, owner, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
         }
 		if (fmx != null) {
 			context.pushMethod(fmx);
@@ -279,6 +279,11 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		return fmx;
 	}
 
+    /**
+     * Special method to recover the <Initializer> method of a class.
+     * Cannot do it with ensureFamixMethod because we have no binding, no parameter, no return type
+     * on which ensureFamixMethod relies
+     */
     private Method recoverInitializerMethod(eu.synectique.verveine.core.gen.famix.Type owner) {
 	    Method ret = null;
         if (owner != null) {

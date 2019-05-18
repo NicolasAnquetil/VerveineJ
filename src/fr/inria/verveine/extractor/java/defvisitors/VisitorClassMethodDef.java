@@ -334,13 +334,13 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(ConstructorInvocation node) {
 		//		System.err.println("TRACE, Visiting ConstructorInvocation: ");
 		this.context.addTopMethodNOS(1);
-		return false;
+		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(SuperConstructorInvocation node) {
 		this.context.addTopMethodNOS(1);
-		return false;
+		return super.visit(node);
 	}
 
 	// "SomeClass.class"

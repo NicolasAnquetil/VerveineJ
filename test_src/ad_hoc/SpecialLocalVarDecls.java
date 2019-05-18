@@ -2,7 +2,12 @@ package ad_hoc;
 
 public class SpecialLocalVarDecls {
     Object aField;
-    public void aMethod() {
+    public SpecialLocalVarDecls(Object o) {
+        super.SpecialLocalVarDecls(new Object() {
+            public void otherMethod(int param1, char param2) { }
+        });
+    }
+    public void otherMethod() {
         boolean firstVar = aField.invocation(
                 new List() {{
                     Integer secondVar = 0;

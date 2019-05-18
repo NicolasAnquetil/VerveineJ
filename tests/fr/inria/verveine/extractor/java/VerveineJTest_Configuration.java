@@ -8,18 +8,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.util.Collection;
 
+import eu.synectique.verveine.core.gen.famix.*;
 import org.junit.Test;
 
 import ch.akuhn.fame.Repository;
 
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.SourceAnchor;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
 public class VerveineJTest_Configuration {
@@ -71,7 +65,7 @@ public class VerveineJTest_Configuration {
 	}
 
 	@Test
-	public void testSpecialLocalVarDecls() {
+	public void testClassDeclsInExpr() {
 		VerveineJParser parser;
 		Repository repo;
 
@@ -103,7 +97,26 @@ public class VerveineJTest_Configuration {
         assertEquals(1, var1.getIncomingAccesses().size());
 		assertEquals(2, var2.getIncomingAccesses().size());
 		assertEquals(3, var3.getIncomingAccesses().size());
-	}
+
+
+        Collection<Parameter> params = VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class);
+        Parameter par1 = null;
+        Parameter par2 = null;
+		assertEquals(3, params.size());
+		for (Parameter p : params) {
+            if (p.getName().equals("param1")) {
+				par1 = p;
+			}
+			else if (p.getName().equals("param2")) {
+				par2 = p;
+			}
+		}
+        assertNotNull(par1);
+		assertNotNull(par2);
+        assertNotNull(par1.getParentBehaviouralEntity());
+        assertNotNull(par2.getParentBehaviouralEntity());
+
+    }
 
 
 	@Test
