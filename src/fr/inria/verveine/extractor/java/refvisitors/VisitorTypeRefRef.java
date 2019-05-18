@@ -268,11 +268,15 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      *     SingleVariableDeclaration VariableDeclarationFragment
 	 */
 	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
+		boolean hasInitializer = false;
 		setVariablesDeclaredType((List<VariableDeclaration>)fragments, referedType(declType, context.topType(), false));
 		for (VariableDeclaration varDecl : fragments) {
 			varDecl.accept(this);
+			if (varDecl.getInitializer() != null) {
+				hasInitializer = true;
+			}
 		}
-		return false;
+		return hasInitializer;
 	}
 
 //	public boolean visit(SimpleName node) {

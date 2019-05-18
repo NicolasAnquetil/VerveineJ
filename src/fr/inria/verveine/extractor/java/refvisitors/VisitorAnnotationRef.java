@@ -95,10 +95,14 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
+		boolean hasInitializer =  false;
 		for (VariableDeclaration vd : (List<VariableDeclaration>) node.fragments()) {
 			createAnnotationInstances(vd.resolveBinding());
+			if (vd.getInitializer() != null) {
+				hasInitializer = true;
+			}
 		}
-		return false;
+		return hasInitializer;
 	}
 
 	@Override
@@ -144,10 +148,14 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
      *     SingleVariableDeclaration VariableDeclarationFragment
 	 */
 	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
+		boolean hasInitializer =  false;
 		for (VariableDeclaration varDecl : fragments) {
 			createAnnotationInstances(varDecl.resolveBinding());
+			if (varDecl.getInitializer() != null) {
+				hasInitializer = true;
+			}
 		}
-		return false;
+		return hasInitializer;
 	}
 
 	/**
