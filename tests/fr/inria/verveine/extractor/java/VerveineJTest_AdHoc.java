@@ -13,6 +13,7 @@ import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -787,17 +788,20 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method m = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "sillyArrayAssignement");
 		assertNotNull(m);
 
-		assertEquals(2, m.getOutgoingReferences().size());
+		Collection<Reference> refs = m.getOutgoingReferences();
+		assertEquals(2, refs.size());
 
 		Type referred;
-		referred = ((Reference)m.getOutgoingReferences().iterator().next()).getTarget();
+		Iterator<Reference> iter = refs.iterator();
+
+		referred = iter.next().getTarget();
 		if (referred.getName().equals("IOException")) {
-		    referred = ((Reference)m.getOutgoingReferences().iterator().next()).getTarget();
+		    referred = iter.next().getTarget();
 		    assertEquals("Planet", referred.getName());
         }
         else {
 		    assertEquals("Planet", referred.getName());
-		    referred = ((Reference)m.getOutgoingReferences().iterator().next()).getTarget();
+		    referred = iter.next().getTarget();
 		    assertEquals("IOException", referred.getName());
 
         }

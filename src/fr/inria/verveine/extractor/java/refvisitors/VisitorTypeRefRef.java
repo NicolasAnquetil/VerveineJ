@@ -268,15 +268,11 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      *     SingleVariableDeclaration VariableDeclarationFragment
 	 */
 	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
-		boolean hasInitializer = false;
 		setVariablesDeclaredType((List<VariableDeclaration>)fragments, referedType(declType, context.topType(), false));
 		for (VariableDeclaration varDecl : fragments) {
 			varDecl.accept(this);
-			if (varDecl.getInitializer() != null) {
-				hasInitializer = true;
-			}
 		}
-		return hasInitializer;
+		return false;
 	}
 
 //	public boolean visit(SimpleName node) {
@@ -298,7 +294,9 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		if (callingExpr instanceof Name) {
 			IBinding bnd = ((Name)callingExpr).resolveBinding();
 			if ( (bnd != null) && (bnd instanceof ITypeBinding) ) {
-				referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+				eu.synectique.verveine.core.gen.famix.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+				Reference ref = dico.addFamixReference((BehaviouralEntity) context.top(), referred, context.getLastReference());
+				context.setLastReference(ref);
 			}
 		}
 
