@@ -104,6 +104,16 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 				assertEquals("super(why)", invok.getSignature());
 			}
 		}
+
+		// get calling method in InvokWithFullPath
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "InvokWithFullPath");
+		meth = clazz.getMethods().iterator().next();
+
+		// get called method in InvokWithFullPath
+		methOutgoingInvocations = meth.getOutgoingInvocations();
+		assertEquals(1, methOutgoingInvocations.size());
+        Invocation invok = methOutgoingInvocations.iterator().next();
+		assertEquals("Book(\"The Monster Book of Monsters\",\"Hagrid\")", invok.getSignature());
 	}
 
 	@ Test
@@ -775,12 +785,22 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	@Test
 	public void testInstanceOf() {
 		Method m = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "sillyArrayAssignement");
-		eu.synectique.verveine.core.gen.famix.Class ioex = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IOException");
 		assertNotNull(m);
-		assertNotNull(ioex);
-		
-		assertEquals(1, m.getOutgoingReferences().size());
-		assertEquals(ioex, ((Reference)m.getOutgoingReferences().iterator().next()).getTarget());
+
+		assertEquals(2, m.getOutgoingReferences().size());
+
+		Type referred;
+		referred = ((Reference)m.getOutgoingReferences().iterator().next()).getTarget();
+		if (referred.getName().equals("IOException")) {
+		    referred = ((Reference)m.getOutgoingReferences().iterator().next()).getTarget();
+		    assertEquals("Planet", referred.getName());
+        }
+        else {
+		    assertEquals("Planet", referred.getName());
+		    referred = ((Reference)m.getOutgoingReferences().iterator().next()).getTarget();
+		    assertEquals("IOException", referred.getName());
+
+        }
 	}
 
 	@Test

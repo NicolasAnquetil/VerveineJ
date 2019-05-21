@@ -90,7 +90,13 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 				// create an invocation to the constructor
-				String typName = findTypeName(clazz);
+				String typName;
+				if (fmx == null) {
+					typName = findTypeName(clazz);
+				}
+				else {
+					typName = fmx.getName();
+				}
 				methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
 				Invocation lastInvok = context.getLastInvocation();
 				if ( (anchors == anchorOptions.assoc)
