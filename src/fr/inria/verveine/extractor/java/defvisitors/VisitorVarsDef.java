@@ -191,8 +191,13 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(Initializer node) {
-        visitInitializer(node);
+		visitInitializer(node);
 		return super.visit(node);
+	}
+
+	@Override
+	public void endVisit(Initializer node) {
+		endVisitInitializer(node);
 	}
 
 	@Override

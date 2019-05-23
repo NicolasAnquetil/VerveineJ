@@ -10,8 +10,8 @@ public class SpecialLocalVarDecls {
     public void otherMethod() {
         boolean firstVar = aField.invocation(
                 new List() {{
-                    Integer secondVar = 0;
-                    secondVar.whatever(secondVar);
+                        Integer secondVar = 0;
+                        secondVar.whatever(secondVar);
                     }
                     public void anotherMethod() {
                         while (true) {
@@ -24,6 +24,7 @@ public class SpecialLocalVarDecls {
                             }
                         }
                     }
+                    private Object anonymousListField;
                 }
         );
         if (firstVar) {

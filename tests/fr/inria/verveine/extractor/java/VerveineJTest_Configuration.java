@@ -120,6 +120,22 @@ public class VerveineJTest_Configuration {
 
 
 	@Test
+	public void testAlllocalsAndInitializerAndField() {
+		VerveineJParser parser;
+		Repository repo;
+
+		// with option
+		parser = new VerveineJParser();
+		repo = parser.getFamixRepo();
+		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
+		parser.parse();
+
+		Collection<Attribute> vars = VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class);
+		assertEquals(3, vars.size());  // aField, anonymousListField, System.out
+	}
+
+
+	@Test
 	public void testAnchorsAssoc()
 	{
 		VerveineJParser parser;
