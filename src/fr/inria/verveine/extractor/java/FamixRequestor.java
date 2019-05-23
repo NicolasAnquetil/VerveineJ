@@ -92,21 +92,22 @@ public class FamixRequestor extends FileASTRequestor {
 		String visitorName = "";
 		StackTraceElement[] stack = err.getStackTrace();
 		if (stack.length == 0) {
-			return "unknown class";
+			return "Unknown Class";
 		}
 
 		for (int i = 0; (! visitorName.startsWith("Visitor")) && (i < stack.length); i++) {
-			visitorName = stack[i].getClassName();
-			int j = visitorName.lastIndexOf('.');
-			if (j > 0) {
-				visitorName = visitorName.substring(j + 1);
+			visitorName = stack[i].getClassName() + ":" + stack[i].getLineNumber();
+			int dot = visitorName.lastIndexOf('.');
+			if (dot > 0) {
+				visitorName = visitorName.substring(dot + 1);
 			}
+
 		}
 		if (visitorName.startsWith("Visitor")) {
 			return visitorName;
 		}
 		else {
-			return "unknown class";
+			return stack[0].getClassName();  // did not find the Visitor in the stack, return the top frame
 		}
 	}
 
