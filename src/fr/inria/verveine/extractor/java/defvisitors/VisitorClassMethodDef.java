@@ -1,40 +1,12 @@
 package fr.inria.verveine.extractor.java.defvisitors;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.AssertStatement;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.ContinueStatement;
-import org.eclipse.jdt.core.dom.DoStatement;
-import org.eclipse.jdt.core.dom.EnhancedForStatement;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.ExpressionStatement;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.ForStatement;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IfStatement;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.ReturnStatement;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SwitchCase;
-import org.eclipse.jdt.core.dom.SwitchStatement;
-import org.eclipse.jdt.core.dom.SynchronizedStatement;
-import org.eclipse.jdt.core.dom.ThrowStatement;
-import org.eclipse.jdt.core.dom.TryStatement;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeLiteral;
-import org.eclipse.jdt.core.dom.TypeParameter;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.WhileStatement;
+import java.security.MessageDigest;
+import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.Method;
@@ -43,8 +15,10 @@ import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
-import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
+
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -55,12 +29,20 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	protected String anchors;
+	protected anchorOptions anchors;
 
-	public VisitorClassMethodDef(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
+    protected MessageDigest md5;
+
+    public VisitorClassMethodDef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super( dico, classSummary);
 		this.anchors = anchors;
-	}
+        try {
+            md5 = MessageDigest.getInstance("MD5");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+            md5 = null;
+        }
+    }
 
 	// VISITOR METHODS
 
@@ -104,7 +86,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			this.context.pushType(fmx);
 
 			if (persistIt) {
-				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				if (anchors != anchorOptions.none) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -161,7 +143,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			Util.recursivelySetIsStub(fmx, false);
 
 			if (! classSummary) {
-				if ((!anchors.equals(VerveineJParser.ANCHOR_NONE)) && (fmx != null)) {
+				if ((anchors != anchorOptions.none) && (fmx != null)) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -188,7 +170,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			Util.recursivelySetIsStub(fmx, false);
 
 			this.context.pushType(fmx);
-			if ( ! anchors.equals(VerveineJParser.ANCHOR_NONE) ) {
+			if (anchors != anchorOptions.none) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 			return super.visit(node);
@@ -205,6 +187,15 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	}
 
 	/**
+     * MethodDeclaration ::=
+     *     [ Javadoc ] { ExtendedModifier } [ < TypeParameter { , TypeParameter } > ] ( Type | void )
+     *         Identifier (
+     *             [ ReceiverParameter , ] [ FormalParameter { , FormalParameter } ]
+     *         ) { Dimension }
+     *         [ throws Type { , Type } ]
+     *         ( Block | ; )
+     *  Also includes ConstructorDeclaration (same thing without return type)
+     *
 	 * Local type: same as {@link VisitorClassMethodDef#visit(ClassInstanceCreation)}, 
 	 * we create it even if it is a local method because their are too many ways it can access external things
 	 */
@@ -212,12 +203,16 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		IMethodBinding bnd = node.resolveBinding();
 
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), /*paramTypes*/null, /*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
+        Collection<String> paramTypes = new ArrayList<String>();
+        for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
+            paramTypes.add( Util.jdtTypeName(param.getType()));
+        }
+
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			// TODO change FamixMethod to add setBodyHash
-			//fmx.setBodyHash(this.computeHashForMethodBody(node));
+			fmx.setBodyHash(this.computeHashForMethodBody(node));
 
 			this.context.pushMethod(fmx);
 
@@ -226,7 +221,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			}
 
 			if (!classSummary) {
-				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				if (anchors != anchorOptions.none) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -240,16 +235,17 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			return false;
 		}
 	}
-	
-/* TODO change FamixMethod to add setBodyHash
+
 	private String computeHashForMethodBody(MethodDeclaration node) {
-		// not optimized but will work in a first version
 		Block body = node.getBody();
-		if (body == null)
-			return "0";
-		return DigestUtils.md5Hex(node.getBody().toString().replaceAll("\\r|\\n|\\t", ""));
+		if ( (body == null) || (md5 == null) ) {
+            return "0";
+        }
+        byte[] bytes = node.getBody().toString().replaceAll("\\r|\\n|\\t", "").getBytes();
+
+       return DatatypeConverter.printHexBinary(md5.digest(bytes)).toUpperCase();
 	}
-*/
+
 
 	@Override
 	public void endVisit(MethodDeclaration node) {
@@ -257,21 +253,27 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		super.endVisit(node);
 	}
 
-	@Override
+    /**
+     * BodyDeclaration ::=
+     *                [ ... ]
+     *                 FieldDeclaration
+     *                 Initializer
+     *                 MethodDeclaration (for methods and constructors)
+     * Initializer ::=
+     *      [ static ] Block
+     */
+    @Override
 	public boolean visit(Initializer node) {
 		//		System.err.println("TRACE, Visiting Initializer: ");
 
-		Method fmx = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(),
-											context.topType(), node.getModifiers(),	/*persistIt*/!classSummary);
+		Method fmx = createInitBlock();
 		// init-block don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create either
 
 		if (fmx != null) {
-			fmx.setIsStub(false);
-
-			pushInitBlockMethod(fmx);
+            dico.setMethodModifiers(fmx, node.getModifiers());
 			if (!classSummary) {
-				if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+				if (anchors != anchorOptions.none) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -282,7 +284,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 			return super.visit(node);
 		} else {
-			this.context.pushMethod(null);
+			this.context.pushMethod(null);   // because endVisit(Initializer) will pop it out
 			return false;
 		}
 	}
@@ -299,36 +301,46 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		for (Expression expr : (List<Expression>)node.arguments()) {
 			if (expr != null) {
 				createInitBlock();
-				break;  // we created the INIT_BLOCK, no need to look for other arguments that would only ensure the same creation
+				break;  // we created the INIT_BLOCK, no need to look for other declaration that would only ensure the same creation
 			}
 		}
 		return super.visit(node);
 	
 	}
 
+    public void endVisit(EnumConstantDeclaration node) {
+        closeOptionalInitBlock();
+    }
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
+		boolean hasInitBlock = false;
 		for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
 			if (vardecl.getInitializer() != null) {
 				createInitBlock();
-				break;  // we created the INIT_BLOCK, no need to look for other arguments that would only ensure the same creation
+				hasInitBlock = true;
+				break;  // we created the INIT_BLOCK, no need to look for other declaration that would only ensure the same creation
 			}
 		}
-		return false;
+		return hasInitBlock;
 	}
+
+    public void endVisit(FieldDeclaration node) {
+        closeOptionalInitBlock();
+    }
 
 	@Override
 	public boolean visit(ConstructorInvocation node) {
 		//		System.err.println("TRACE, Visiting ConstructorInvocation: ");
 		this.context.addTopMethodNOS(1);
-		return false;
+		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(SuperConstructorInvocation node) {
 		this.context.addTopMethodNOS(1);
-		return false;
+		return super.visit(node);
 	}
 
 	// "SomeClass.class"
@@ -340,6 +352,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(ThrowStatement node) {
 		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(CatchClause node) {
+		this.context.addTopMethodCyclo(1);
 		return super.visit(node);
 	}
 
@@ -428,6 +446,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	}
 
 	@Override
+	public boolean visit(VariableDeclarationStatement node) {
+		this.context.addTopMethodNOS(1);
+		return super.visit(node);
+	}
+
+	@Override
 	public boolean visit(WhileStatement node) {
 		this.context.addTopMethodCyclo(1);
 		this.context.addTopMethodNOS(1);
@@ -436,11 +460,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 	// UTILITY METHODS
 
-	/**
-	 * when we have an initialization in a variable declaration, we may need to create a faked
-	 * INIT_Block method if this variable is a field (for example) 
+    /**
+     * REnsures the creation of the fake method: {@link JavaDictionary#INIT_BLOCK_NAME}
+     *
+     * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
-	protected void createInitBlock() {
+	protected Method createInitBlock() {
 		// putting field's initialization code in an INIT_BLOCK_NAME method
 		Method ctxtMeth = this.context.topMethod();
 		if (ctxtMeth != null && !ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
@@ -463,6 +488,8 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
 			pushInitBlockMethod(ctxtMeth);
 		}
+
+		return ctxtMeth;
 	}
 
 	/**
@@ -481,7 +508,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		}
 	}
 
-	protected void optionalCloseInitBlock() {
+	protected void closeOptionalInitBlock() {
 		Method ctxtMeth = this.context.topMethod();
 		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME))) {
 			closeMethodDeclaration();

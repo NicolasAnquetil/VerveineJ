@@ -47,7 +47,7 @@ import eu.synectique.verveine.core.gen.famix.UnknownVariable;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 /**
- * A {@link eu.synectique.verveine.Dictionary} specialized for Java
+ * A {@link eu.synectique.verveine.core.Dictionary} specialized for Java
  * @author anquetil
  */
 public class JavaDictionary extends Dictionary<IBinding> {
@@ -112,7 +112,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Returns the namespace with {@link Dictionary.DEFAULT_PCKG_NAME} or <code>null</code> if not found
+	 * Returns the namespace with {@link Dictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
 	 */
 	public Namespace getFamixNamespaceDefault() {
 		Collection<Namespace> l = getEntityByName( Namespace.class, DEFAULT_PCKG_NAME);
@@ -348,14 +348,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			// we just created it or it was not bound, so we make sure it has the right information in it
 			if (bnd != null) {
 				fmx.setIsInterface( bnd.isInterface());
-				setNamedEntityModifiers(fmx, bnd.getDeclaredModifiers());
-				if (fmx.getIsAbstract()) {
-					// don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
-					fmx.addModifiers(MODIFIER_ABSTRACT);
-				}
-				if (Modifier.isStatic(modifiers)) {
-					fmx.addModifiers(MODIFIER_STATIC);
-				}
+				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 		}
 
@@ -1141,10 +1134,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	/**
 	 * Check whether the owner of candidates is a method macthinf either methBnd or owner
-	 * @param bnd
+	 * @param methBnd
 	 * @param owner
-	 * @param candidate
-	 * @return a {@link JavaDictionary#CheckResult}
+	 * @param candidateOwner
+	 * @return a {@link CheckResult}
 	 */
 	private CheckResult matchAndMapOwnerAsMethod(IMethodBinding methBnd, NamedEntity owner, ContainerEntity candidateOwner) {
 		if ( (methBnd != null) || ((owner != null) && (owner instanceof Method)) ) {
@@ -1167,12 +1160,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * @param bnd
+	 * @param typBnd
 	 * @param owner
-	 * @param candidate
 	 * @param candidateOwner
-	 * @param ownerOwner
-	 * @return
+	 * @return a {@link CheckResult}
 	 */
 	private CheckResult matchAndMapOwnerAsType(ITypeBinding typBnd, NamedEntity owner, ContainerEntity candidateOwner) {
 		if ( (typBnd != null) || ((owner != null) && (owner instanceof Type)) ) {
@@ -1276,10 +1267,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type owner, int modifiers, boolean persistIt) {
 		return ensureFamixMethod(bnd, name, paramTypes, /*returnType*/null, owner,modifiers, persistIt);
-	}
-
-	public Method getFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type owner) {
-		return ensureFamixMethod(bnd, name, paramTypes, /*returnType*/null, owner, UNKNOWN_MODIFIERS, /*persistIt*/false);
 	}
 
 	
@@ -1394,9 +1381,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		if (fmx!=null) {
-			setNamedEntityModifiers(fmx, modifiers);
-			fmx.setHasClassScope(Modifier.isStatic(modifiers));
-
+			setMethodModifiers(fmx, modifiers);
 			// if it's a constructor
 			if(fmx.getName().equals(fmx.getBelongsTo().getName()))
 				fmx.setKind(CONSTRUCTOR_KIND_MARKER);
@@ -1414,7 +1399,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param fmx -- the FamixNamedEntity
 	 * @param mod -- a description of the modifiers as understood by org.eclipse.jdt.core.dom.Modifier
 	 */
-	private void setNamedEntityModifiers(NamedEntity fmx, int mod) {
+	public void setNamedEntityModifiers(NamedEntity fmx, int mod) {
 		if (Modifier.isAbstract(mod)) {
 			fmx.addModifiers(MODIFIER_ABSTRACT);
 			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
@@ -1435,7 +1420,32 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx.addModifiers(MODIFIER_FINAL);
 			// fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
 		}
-	}
+    }
+
+    public void setAttributeModifiers(Attribute fmx, int mod) {
+        setNamedEntityModifiers(fmx, mod);
+        fmx.setHasClassScope(Modifier.isStatic(mod));
+    }
+
+    public void setMethodModifiers(Method fmx, int mod) {
+        setNamedEntityModifiers(fmx, mod);
+        if (fmx.getIsAbstract()) {
+            // don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
+            fmx.addModifiers(MODIFIER_ABSTRACT);
+        }
+        fmx.setHasClassScope(Modifier.isStatic(mod));
+    }
+
+    public void setClassModifiers(Class fmx, int mod) {
+        setNamedEntityModifiers(fmx, mod);
+        if (fmx.getIsAbstract()) {
+            // don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
+            fmx.addModifiers(MODIFIER_ABSTRACT);
+        }
+		if (Modifier.isStatic(mod)) {
+			fmx.addModifiers(MODIFIER_STATIC);
+		}
+    }
 
 	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, Type owner, boolean persistIt) {
 		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, persistIt);
@@ -1523,8 +1533,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			fmx.setDeclaredType(type);
 			if (bnd != null) {
 				int mod = bnd.getModifiers();
-				setNamedEntityModifiers(fmx, mod);
-				fmx.setHasClassScope(Modifier.isStatic(mod));
+                setAttributeModifiers(fmx, mod);
 			}
 		}
 
@@ -1545,7 +1554,6 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Parameter associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixParameter(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}.
 	 * @param persistIt -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
@@ -1793,6 +1801,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	/**
 	 * Creates or recovers the Famix Class for "Object".
+	 * Because "Object" is the root of the inheritance tree, it needs to be treated differently.
 	 * @param bnd -- a potential binding for the java "Object" class
 	 * @return a Famix class for "Object"
 	 */

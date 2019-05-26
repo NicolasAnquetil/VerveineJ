@@ -6,19 +6,14 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.Collection;
 
+import eu.synectique.verveine.core.gen.famix.*;
 import org.junit.Test;
 
 import ch.akuhn.fame.Repository;
 
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.SourceAnchor;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
 public class VerveineJTest_Configuration {
@@ -47,25 +42,98 @@ public class VerveineJTest_Configuration {
 	}
 
 	@Test
-	public void testAlllocals()
-	{
+	public void testAlllocals() {
 		VerveineJParser parser;
 		Repository repo;
 
 		// without option
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"test_src/ad_hoc/Planet.java"});
+		parser.setOptions(new String[]{"test_src/ad_hoc/ReadException.java", "test_src/ad_hoc/ReadClient.java"});
 		parser.parse();
-		assertEquals(2, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // ret, p
-		
+		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // lire().nom ; lire().num ; lire().e
+		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());  // setNum()->num ; getNum()->num ; setNom()->nom ; getNom()->nom
+
 		// with option
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"-alllocals", "test_src/ad_hoc/Planet.java"});
+		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/ReadException.java", "test_src/ad_hoc/ReadClient.java"});
 		parser.parse();
-		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());	  // ret, p, check, earthWeight, mass, 	
+		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // + lire().c + lire().i
+		assertEquals(28, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		// ReadClient()->this*2+2 ; lire()->c*6+i*2+in*4+nom*2+num*2 ; setNum()->this*1+2 ; getNum()->1 ; setNom()->this*1+2 ; getNom()->1
 	}
+
+	@Test
+	public void testClassDeclsInExpr() {
+		VerveineJParser parser;
+		Repository repo;
+
+		// with option
+		parser = new VerveineJParser();
+		repo = parser.getFamixRepo();
+		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
+		parser.parse();
+
+		Collection<LocalVariable> vars = VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class);
+        LocalVariable var1 = null;
+		LocalVariable var2 = null;
+		LocalVariable var3 = null;
+		assertEquals(3, vars.size());
+		for (LocalVariable v : vars) {
+            if (v.getName().equals("firstVar")) {
+                var1 = v;
+            }
+			else if (v.getName().equals("secondVar")) {
+				var2 = v;
+			}
+			else if (v.getName().equals("thirdVar")) {
+				var3 = v;
+			}
+		}
+        assertNotNull(var1);
+		assertNotNull(var2);
+		assertNotNull(var3);
+        assertEquals(1, var1.getIncomingAccesses().size());
+		assertEquals(2, var2.getIncomingAccesses().size());
+		assertEquals(3, var3.getIncomingAccesses().size());
+
+
+        Collection<Parameter> params = VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class);
+        Parameter par1 = null;
+        Parameter par2 = null;
+		assertEquals(3, params.size());
+		for (Parameter p : params) {
+            if (p.getName().equals("param1")) {
+				par1 = p;
+			}
+			else if (p.getName().equals("param2")) {
+				par2 = p;
+			}
+		}
+        assertNotNull(par1);
+		assertNotNull(par2);
+        assertNotNull(par1.getParentBehaviouralEntity());
+        assertNotNull(par2.getParentBehaviouralEntity());
+
+    }
+
+
+	@Test
+	public void testAlllocalsAndInitializerAndField() {
+		VerveineJParser parser;
+		Repository repo;
+
+		// with option
+		parser = new VerveineJParser();
+		repo = parser.getFamixRepo();
+		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
+		parser.parse();
+
+		Collection<Attribute> vars = VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class);
+		assertEquals(3, vars.size());  // aField, anonymousListField, System.out
+	}
+
 
 	@Test
 	public void testAnchorsAssoc()

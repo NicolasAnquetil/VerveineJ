@@ -2,39 +2,27 @@ package fr.inria.verveine.extractor.java.refvisitors;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
+import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.Method;
+import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 
 public class VisitorTypeRefRef extends AbstractRefVisitor {
 
 	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private anchorOptions anchors;
 
-	public VisitorTypeRefRef(JavaDictionary dico, boolean classSummary, String anchors) {
+	public VisitorTypeRefRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.anchors = anchors;
 	}
@@ -66,20 +54,25 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		endVisitTypeDeclaration(node);
 	}
 
+	/**
+	 * ClassInstanceCreation ::=
+        [ Expression . ]
+            new [ < Type { , Type } > ]
+            Type ( [ Expression { , Expression } ] )
+            [ AnonymousClassDeclaration ]
+	 */
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
 		if (node.getAnonymousClassDeclaration() == null) {
 			Type clazz = node.getType();
 			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
-			if (classSummary) {
-				//ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
-			} else {
+			if (!classSummary) {
 				ref = dico.addFamixReference( (BehaviouralEntity) context.top(), fmx, context.getLastReference());
 				context.setLastReference(ref);
 			}
 
-			if ( anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (ref != null) ) {
+			if ((anchors != anchorOptions.assoc) && (ref != null) ) {
 				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -144,13 +137,15 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		super.endVisit(node);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public boolean visit(FieldDeclaration node) {
-		setVariablesDeclaredType((List<VariableDeclaration>)node.fragments(), referedType(node.getType(), context.topType(), false));
-		return false;
-	}
-
+	/**
+	 * MethodDeclaration ::=
+    [ Javadoc ] { ExtendedModifier } [ < TypeParameter { , TypeParameter } > ] ( Type | void )
+        Identifier (
+            [ ReceiverParameter , ] [ FormalParameter { , FormalParameter } ]
+        ) { Dimension }
+        [ throws Type { , Type } ]
+        ( Block | ; )
+	 */
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodDeclaration node) {
 		Method fmx = visitMethodDeclaration( node);
@@ -172,12 +167,18 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		return false;
 	}
 
-
 	@Override
 	public void endVisit(MethodDeclaration node) {
 		endVisitMethodDeclaration(node);
 	}
 
+	/**
+	 * Initializer ::=
+     *      [ static ] Block
+     * Note:
+     * VariableDeclarationFragment ::=
+     *     Identifier { Dimension } [ = Expression ]
+	 */
 	@Override
 	public boolean visit(Initializer node) {
 		if (visitInitializer(node) != null) {
@@ -206,24 +207,78 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			ref = dico.addFamixReference((BehaviouralEntity) context.top(), fmx, context.getLastReference());
 			context.setLastReference(ref);
 		}
-		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+		if (anchors == anchorOptions.assoc) {
 			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 		}
 
 		return super.visit(node);
 	}
 
+    /**
+     *  FieldDeclaration ::=
+     *     [Javadoc] { ExtendedModifier } Type VariableDeclarationFragment
+     *          { , VariableDeclarationFragment } ;
+     */
 	@SuppressWarnings("unchecked")
+	@Override
+	public boolean visit(FieldDeclaration node) {
+		visitFieldDeclaration(node);  // to recover optional JavaDictionary.INIT_BLOCK_NAME method
+		visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());   // to create the TypeRefs
+		return true;
+	}
+
+	@Override
+	public void endVisit(FieldDeclaration node) {
+		endVisitFieldDeclaration(node);
+	}
+
+	public boolean visit(EnumConstantDeclaration node) {
+		return visitEnumConstantDeclaration(node);
+	}
+
+	public void endVisit(EnumConstantDeclaration node) {
+		endVisitEnumConstantDeclaration(node);
+	}
+
+	/**
+	 * VariableDeclarationExpression ::=
+     *     { ExtendedModifier } Type VariableDeclarationFragment
+     *          { , VariableDeclarationFragment }
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public boolean visit(VariableDeclarationExpression node) {
-		setVariablesDeclaredType((List<VariableDeclaration>)node.fragments(), referedType(node.getType(), context.topMethod(), false));
+		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
+	}
+
+	/**
+	 *  VariableDeclarationStatement ::=
+     *     { ExtendedModifier } Type VariableDeclarationFragment
+     *         { , VariableDeclarationFragment } ;
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public boolean visit(VariableDeclarationStatement node) {
+		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
+	}
+	
+	/**
+	 * same behaviour for VariableDeclarationStatement and VariableDeclarationExpression
+     * VariableDeclaration ::=
+     *     SingleVariableDeclaration VariableDeclarationFragment
+	 */
+	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
+		setVariablesDeclaredType((List<VariableDeclaration>)fragments, referedType(declType, context.topType(), false));
+		for (VariableDeclaration varDecl : fragments) {
+			varDecl.accept(this);
+		}
 		return false;
 	}
 
-	@SuppressWarnings("unchecked")
-	public boolean visit(VariableDeclarationStatement node) {
-		setVariablesDeclaredType((List<VariableDeclaration>)node.fragments(), referedType(node.getType(), context.topMethod(), false));
-		return false;
-	}
+//	public boolean visit(SimpleName node) {
+//		IBinding bnd = node.resolveBinding();
+//		if ( (bnd != null) && (bnd instanceof ITypeBinding) ) {
+//			referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
 
 	private void setVariablesDeclaredType(List<VariableDeclaration> vars, eu.synectique.verveine.core.gen.famix.Type varTyp) {
 		for (VariableDeclaration var : vars) {
@@ -234,6 +289,19 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		}
 	}
 
-	// UTILITY METHODS
+	public boolean visit(MethodInvocation node) {
+		Expression callingExpr = node.getExpression();
+		if (callingExpr instanceof Name) {
+			IBinding bnd = ((Name)callingExpr).resolveBinding();
+			if ( (bnd != null) && (bnd instanceof ITypeBinding) ) {
+				eu.synectique.verveine.core.gen.famix.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+				Reference ref = dico.addFamixReference((BehaviouralEntity) context.top(), referred, context.getLastReference());
+				context.setLastReference(ref);
+			}
+		}
+
+		return super.visit(node);
+	}
+
 
 }

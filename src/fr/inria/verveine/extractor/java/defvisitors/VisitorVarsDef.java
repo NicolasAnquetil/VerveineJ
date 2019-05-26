@@ -36,6 +36,7 @@ import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 
 /**
@@ -53,14 +54,14 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private anchorOptions anchors;
 
 	/**
 	 * set in parent of structuralEntity declaration to indicate what kind of structuralentity it is
 	 */
 	private StructuralEntityKinds structuralType;
 
-	public VisitorVarsDef(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
+	public VisitorVarsDef(JavaDictionary dico, boolean classSummary, boolean allLocals, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.allLocals = allLocals;
 		this.anchors = anchors;
@@ -157,7 +158,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+			if (anchors != anchorOptions.none) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 
@@ -190,7 +191,13 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(Initializer node) {
-		return false;
+		visitInitializer(node);
+		return super.visit(node);
+	}
+
+	@Override
+	public void endVisit(Initializer node) {
+		endVisitInitializer(node);
 	}
 
 	@Override
@@ -204,7 +211,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(EnumConstantDeclaration node) {
 		EnumValue ev = dico.ensureFamixEnumValue(node.resolveVariable(), node.getName().getIdentifier(), /*owner*/(Enum)context.topType(), persistClass(((EnumDeclaration)node.getParent()).resolveBinding()));
 		ev.setIsStub(false);
-		return false;
+		return super.visit(node);
 	}
 
 	@Override
@@ -217,9 +224,10 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(VariableDeclarationExpression node) {
 		// we usually don't declare local variables that have a primitive type
-		// because we are assuming that the user is not interested in them (non primitive types are important because of the dependence they create)
+		// because we are assuming that the user is not interested in them
+		// note that non primitive types are important because of the dependencies they create
 		if ( ! allLocals && node.getType().isPrimitiveType() && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
-			return false;
+			return false;  // FIXME could be a mistake, but not too sure: what about var declaration with complex initialization (eg including an anonymous class)?
 		}
 
 		return super.visit(node);
@@ -230,7 +238,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		// about the same node as VariableDeclarationExpression (but is a statement instead of an expression)
 
 		if ( ! allLocals && node.getType().isPrimitiveType() && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
-			return false;
+			return false;  // FIXME could be a mistake, but not too sure: what about var declaration with complex initialization (eg including an anonymous class)?
 		}
 
 		return super.visit(node);
@@ -240,7 +248,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(VariableDeclarationFragment node) {
 		createStructuralEntity( structuralType, node, context.top());
 
-		return false;  // no need to go in the children
+		return true;  // e.g. with an initialization containing an anonymous class definition
 	}
 
 	@Override
@@ -248,7 +256,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		if ( allLocals || (! node.getType().isPrimitiveType()) || (structuralType != StructuralEntityKinds.LOCALVAR) ) {
 			createStructuralEntity( structuralType, node, context.top());
 		}
-		return false;  // no need to go in the children
+		return true;  // e.g. with an initialization containing an anonymous class definition
 	}
 
 	public boolean visit(SuperMethodInvocation node) {
@@ -297,7 +305,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			if ((!classSummary) && (!anchors.equals(VerveineJParser.ANCHOR_NONE))) {
+			if ((!classSummary) && (anchors != anchorOptions.none)) {
 				dico.addSourceAnchor(fmx, varDecl.getParent(), /*oneLineAnchor*/true);
 			}
 		}

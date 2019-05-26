@@ -12,6 +12,7 @@ import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
 
 /**
@@ -23,9 +24,9 @@ public class VisitorAnnotationDef extends SummarizingClassesAbstractVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	protected String anchors;
+	protected anchorOptions anchors;
 
-	public VisitorAnnotationDef(JavaDictionary dico, boolean classSummary, boolean allLocals, String anchors) {
+	public VisitorAnnotationDef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super( dico, classSummary);
 		this.anchors = anchors;
 	}
@@ -49,7 +50,7 @@ public class VisitorAnnotationDef extends SummarizingClassesAbstractVisitor {
 		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top(), persistClass(bnd));
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
-			if (! anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+			if (anchors != anchorOptions.none) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 
@@ -76,7 +77,7 @@ public class VisitorAnnotationDef extends SummarizingClassesAbstractVisitor {
 		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			if (!anchors.equals(VerveineJParser.ANCHOR_NONE)) {
+			if (anchors != anchorOptions.none) {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 

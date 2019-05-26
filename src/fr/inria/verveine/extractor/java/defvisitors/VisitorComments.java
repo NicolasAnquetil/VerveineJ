@@ -1,5 +1,6 @@
 package fr.inria.verveine.extractor.java.defvisitors;
 
+import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
@@ -38,7 +39,7 @@ import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
  * @author anquetil
  *
  */
-public class VisitorComments extends GetVisitedEntityAbstractVisitor {
+public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	/**
 	 * Needed to recover the regular comments
@@ -67,8 +68,8 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	 */
 	private boolean varDeclarationFragmentHasComment;
 
-	public VisitorComments(JavaDictionary dico) {
-		super(dico);
+	public VisitorComments(JavaDictionary dico, boolean classSummary) {
+		super(dico, classSummary);
 	}
 	// VISITOR METHODS
 
@@ -171,7 +172,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		Method fmx = visitMethodDeclaration( node);
 
-		if (fmx != null) {
+		if ( (fmx != null) && (! classSummary) ){
 			entityJavadoc = node.getJavadoc();
 			addRegularOrJavaDocComment(node, fmx);
 
@@ -199,7 +200,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
 		AnnotationTypeAttribute fmx = visitAnnotationTypeMemberDeclaration( node);
-		if (fmx != null) {
+		if ( (fmx != null) && (! classSummary) ) {
 			entityJavadoc = node.getJavadoc();
 			addRegularOrJavaDocComment(node, fmx);
 			return super.visit(node);
@@ -216,7 +217,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	@Override
 	public boolean visit(Initializer node) {
 		Method fmx = visitInitializer(node);
-		if (fmx != null) {
+		if ( (fmx != null) && (! classSummary) ) {
 			entityJavadoc = node.getJavadoc();
 			addRegularOrJavaDocComment(node, fmx);
 			return super.visit(node);
@@ -242,7 +243,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	public boolean visit(FieldDeclaration node) {
 		structuralType = StructuralEntityKinds.ATTRIBUTE;
 		entityJavadoc = node.getJavadoc();
-		varDeclarationFragmentHasComment = (nodeHasComment(node) != null);
+		varDeclarationFragmentHasComment = (nodeHasRegularComment(node) != null);
  
 		return super.visit(node);
 	}
@@ -282,6 +283,11 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 
 	protected void createCommentOnStructEntity(VariableDeclaration node, StructuralEntityKinds structuralKind, Javadoc structuralJavadoc) {
 		StructuralEntity fmx;
+
+		if (classSummary) {
+			return;
+		}
+
 		IVariableBinding bnd = node.resolveBinding();
 		String name = node.getName().getIdentifier();
 
@@ -328,22 +334,23 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	 * @param fmx An entity on which to create a comment
 	 */
 	protected void addRegularOrJavaDocComment(ASTNode node, NamedEntity fmx) {
+
 		if (fmx == null) {
 			return;
 		}
 
 		if (entityJavadoc != null) {
-			dico.createFamixComment(entityJavadoc, fmx);
+			eu.synectique.verveine.core.gen.famix.Comment cmt = dico.createFamixComment(entityJavadoc, fmx);
 			return;  // cannot have both javadoc and regular comment, can it ???
 		}
 
-		Comment cmt = nodeHasComment(node);
+		Comment cmt = nodeHasRegularComment(node);
 		if (cmt != null) {
 			dico.createFamixComment( cmt, fmx);
 		}
 	}
 
-	private Comment nodeHasComment(ASTNode node) {
+	private Comment nodeHasRegularComment(ASTNode node) {
 		int iCmt = astRoot.firstLeadingCommentIndex(node);
 		if (iCmt > -1) {
 			return (Comment) astRoot.getCommentList().get(iCmt);

@@ -31,17 +31,21 @@ public class VerveineJParser extends VerveineParser {
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
 
 	/**
-	 * Option for SourceAnchors: default=only entities
+	 * Possible options for SourceAnchors: no source anchor, only entities [default], entities and associations
 	 */
-	public static final String ANCHOR_DEFAULT = "default";
-	/**
-	 * Option for SourceAnchors: none=no source anchor
-	 */
-	public static final String ANCHOR_NONE = "none";
-	/**
-	 * Option for SourceAnchors: assoc=entities and associations have source anchors
-	 */
-	public static final String ANCHOR_ASSOC = "assoc";
+	public enum anchorOptions {
+		none, entity, assoc;
+
+		public static anchorOptions getValue(String option) {
+			switch (option) {
+				case "none": return none;
+				case "default":
+				case "entity": return entity;
+				case "assoc": return assoc;
+				default: return null;
+			}
+		}
+	}
 
 	/**
 	 * Whether to summarize collected information at the level of classes or produce everything.
@@ -58,7 +62,7 @@ public class VerveineJParser extends VerveineParser {
 	private boolean classSummary = false;
 
 	/**
-	 * Whether to output all local variables (even those with primitive type or not (default is not).<br>
+	 * Whether to output all local variables (even those with primitive type) or not (default is not).<br>
 	 * Note: allLocals => not classSummary
 	 */
 	private boolean allLocals = false;
@@ -71,7 +75,7 @@ public class VerveineJParser extends VerveineParser {
 	/**
 	 * Option: Whether to put Sourceanchor in the entities and/or associations
 	 */
-	protected String anchors = null;
+	protected anchorOptions anchors = null;
 
 	/**
 	 * The arguments that were passed to the parser
@@ -122,7 +126,7 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	/** Reads all jar in classpath from a file, one per line
-	 * @param the filename of the file containing the jars of tyhe classpath
+	 * @param filename of the file containing the jars of tyhe classpath
 	 * @return the collection of jar paths
 	 */
 	private List<String> readAllJars(String filename) {
@@ -193,11 +197,10 @@ public class VerveineJParser extends VerveineParser {
 			else if (arg.equals("-anchor")) {
 				if (i < args.length) {
 					String anchor = args[i++];
-					if (! (anchor.equals(ANCHOR_DEFAULT) || anchor.equals(ANCHOR_NONE) || anchor.equals(ANCHOR_ASSOC)) ) {
-						System.err.println("unknown option to -anchor: "+anchor);
-					}
-					else {
-						this.anchors = anchor;
+					this.anchors = anchorOptions.getValue(anchor);
+					if (this.anchors == null) {
+						System.err.println("unknown option to -anchor: "+anchor+", assuming default");
+						this.anchors = anchorOptions.entity;
 					}
 				} else {
 					System.err.println("-anchor requires an option (none|default|assoc)");
@@ -237,7 +240,7 @@ public class VerveineJParser extends VerveineParser {
 			codeVers = DEFAULT_CODE_VERSION;
 		}
 		if (anchors == null) {
-			anchors = ANCHOR_DEFAULT;
+			anchors = anchorOptions.getValue("default");
 		}
 		options.put(JavaCore.COMPILER_COMPLIANCE, codeVers);
 		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, codeVers);
@@ -276,14 +279,14 @@ public class VerveineJParser extends VerveineParser {
 		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
 		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
-		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: output.mse)");
+		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: "+VerveineParser.OUTPUT_FILE+")");
 		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
 		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
 		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
-		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\"");
-		System.err.println("      [-anchor (none|default|assoc)] options for source anchor information:\n" +
+		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\")");
+		System.err.println("      [-anchor (none|entity|default|assoc)] options for source anchor information:\n" +
 				   "                                     - no entity\n" +
-				   "                                     - only named entities\n" +
+				   "                                     - only named entities [default]\n" +
 				   "                                     - named entities+associations (i.e. accesses, invocations, references)");
 		System.err.println("      [-cp CLASSPATH] classpath where to look for stubs");
 		System.err.println("      [-autocp DIR] gather all jars in DIR and put them in the classpath");
@@ -371,7 +374,7 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	/**
-	 * @see VerveineJParser.compressNamespacesNames()
+	 * @see VerveineJParser#compressNamespacesNames()
 	 */
 	private void expandNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
@@ -410,22 +413,4 @@ public class VerveineJParser extends VerveineParser {
 		parser.emitMSE();
 	}
 
-	/* *
-	 * developer method to know what went wrong
-	 * 
-	 * @param checker
-	 * @param licenceCheck
-	 * /
-	private static void cannotContinue(LicenceChecker checker, int licenceCheck) {
-		System.err.println("Authentication failure VerveineJ cannot continue");
-		if (licenceCheck == LicenceChecker.WRONG_LICENCE) {
-			System.err.println("    " + checker.getLineRead());
-		}
-		else {
-			System.err.println("    error " + licenceCheck);			
-		}
-		
-		System.exit(0);
-	}
-	*/
 }

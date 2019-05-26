@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.inria.verveine.extractor.java.refvisitors.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
@@ -14,15 +15,8 @@ import fr.inria.verveine.extractor.java.defvisitors.VisitorClassMethodDef;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorComments;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorPackageDef;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorVarsDef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorAccessRef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorAnnotationRef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorInheritanceRef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorInvocRef;
-import fr.inria.verveine.extractor.java.refvisitors.VisitorTypeRefRef;
 
 public class FamixRequestor extends FileASTRequestor {
-
-	protected Repository famixRepo;
 
 	protected JavaDictionary famixDictionnary;
 
@@ -40,7 +34,7 @@ public class FamixRequestor extends FileASTRequestor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private VerveineJParser.anchorOptions anchors;
 
 	/**
 	 * Maps the arguments (file names or dir names) to their absolute path (well actually it is the other way around)
@@ -48,10 +42,9 @@ public class FamixRequestor extends FileASTRequestor {
 	protected Map<String, String> dirMap;
 	protected Map<String, String> fileMap;
 
-	public FamixRequestor(Repository r, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary,
-			boolean allLocals, String anchors) {
+	public FamixRequestor(Repository repo, Collection<String> argsDir, Collection<String> argsFile, boolean classSummary,
+						  boolean allLocals, VerveineJParser.anchorOptions anchors) {
 		super();
-		this.famixRepo = r; 
 
 		this.fileMap = new HashMap<String, String>();
 		// initialization of the Map with the absolute paths
@@ -60,48 +53,61 @@ public class FamixRequestor extends FileASTRequestor {
 
 		this.dirMap = new HashMap<String, String>();
 		// initialization of the Map with the absolute paths
-		for (String tempArgDir : argsDir)
+		for (String tempArgDir : argsDir) {
 			this.dirMap.put(new File(tempArgDir).getAbsolutePath(), tempArgDir);
+		}
 
 		this.classSummary = classSummary;
 		this.allLocals = allLocals;
 		this.anchors = anchors;
 
-		this.famixDictionnary = new JavaDictionary(famixRepo);
+		this.famixDictionnary = new JavaDictionary(repo);
 	}
 
 	public void acceptAST(String sourceFilePath, CompilationUnit ast) {
-		String visitorName = "";
 		String path = relativePath(sourceFilePath);
 		System.out.println("Processing file: " + path);
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
-			visitorName = "PackageDef"; // for debugging (see catch clause)
-			ast.accept(new VisitorPackageDef(this.famixDictionnary, allLocals, anchors));
-			visitorName = "Class&MethodDef"; // for debugging (see catch clause)
-			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, allLocals, anchors));
-			visitorName = "AnnotationDef"; // for debugging (see catch clause)
-			ast.accept(new VisitorAnnotationDef(this.famixDictionnary, classSummary, allLocals, anchors));
-			visitorName = "VarDef"; // for debugging (see catch clause)
+			ast.accept(new VisitorPackageDef(this.famixDictionnary));
+			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, anchors));
+			ast.accept(new VisitorAnnotationDef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorVarsDef(this.famixDictionnary, classSummary, allLocals, anchors));
-			visitorName = "Comments"; // for debugging (see catch clause)
-			ast.accept(new VisitorComments(this.famixDictionnary));
+			ast.accept(new VisitorComments(this.famixDictionnary, classSummary));
 
-			visitorName = "Inheritances"; // for debugging (see catch clause)
-			ast.accept(new VisitorInheritanceRef(this.famixDictionnary));
-			visitorName = "TypeReferences"; // for debugging (see catch clause)
+			ast.accept(new VisitorInheritanceRef(this.famixDictionnary, classSummary));
 			ast.accept(new VisitorTypeRefRef(this.famixDictionnary, classSummary, anchors));
-			visitorName = "Accesses"; // for debugging (see catch clause)
-			ast.accept(new VisitorAccessRef(this.famixDictionnary, classSummary, anchors));
-			visitorName = "Invocations"; // for debugging (see catch clause)
+			ast.accept(new VisitorAccessRef(this.famixDictionnary, classSummary, allLocals, anchors));
 			ast.accept(new VisitorInvocRef(this.famixDictionnary, classSummary, anchors));
-			visitorName = "AnnotationRef"; // for debugging (see catch clause)
 			ast.accept(new VisitorAnnotationRef(this.famixDictionnary, classSummary));
+			ast.accept(new VisitorExceptionRef(this.famixDictionnary, classSummary));
 
-		} catch (Exception e) {
-			System.err.println("*** Visitor "+ visitorName + " got exception: '" + e + "' while processing file: " + path);
-			e.printStackTrace();
+		} catch (Exception err) {
+			System.err.println("*** " + getVisitorName(err, path) + " got exception: '" + err + "' while processing file: " + path);
+		}
+	}
+
+	private String getVisitorName(Exception err, String path) {
+		String visitorName = "";
+		StackTraceElement[] stack = err.getStackTrace();
+		if (stack.length == 0) {
+			return "Unknown Class";
+		}
+
+		for (int i = 0; (! visitorName.startsWith("Visitor")) && (i < stack.length); i++) {
+			visitorName = stack[i].getClassName() + ":" + stack[i].getLineNumber();
+			int dot = visitorName.lastIndexOf('.');
+			if (dot > 0) {
+				visitorName = visitorName.substring(dot + 1);
+			}
+
+		}
+		if (visitorName.startsWith("Visitor")) {
+			return visitorName;
+		}
+		else {
+			return stack[0].getClassName();  // did not find the Visitor in the stack, return the top frame
 		}
 	}
 

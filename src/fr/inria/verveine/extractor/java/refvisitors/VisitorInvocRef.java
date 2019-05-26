@@ -5,50 +5,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.ArrayAccess;
-import org.eclipse.jdt.core.dom.ArrayCreation;
-import org.eclipse.jdt.core.dom.Assignment;
-import org.eclipse.jdt.core.dom.CastExpression;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConditionalExpression;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.FieldAccess;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.InfixExpression;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.MethodInvocation;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.ParenthesizedExpression;
-import org.eclipse.jdt.core.dom.StringLiteral;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SuperFieldAccess;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.ThisExpression;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeLiteral;
-
 import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
+
+import eu.synectique.verveine.core.gen.famix.*;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
+import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
+
+import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.Type;
 
 public class VisitorInvocRef extends AbstractRefVisitor {
 
@@ -71,9 +38,9 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	private String anchors;
+	private anchorOptions anchors;
 
-	public VisitorInvocRef(JavaDictionary dico, boolean classSummary, String anchors) {
+	public VisitorInvocRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.anchors = anchors;
 	}
@@ -106,17 +73,46 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	}
 
 	/**
-	 * See {@link VerveineVisitor#anonymousSuperType}<br>
-	 * We could test if it is a local type (inner/anonymous) and not define it in case it does not make any reference
-	 * to anything outside its owner class. But it would be a lot of work for probably little gain.
+	 * Creates an invocation to the constructor of the class
+	 *
+	 * ClassInstanceCreation ::=
+	 *         [ Expression . ]
+	 *             new [ < Type { , Type } > ]
+	 *             Type ( [ Expression { , Expression } ] )
+	 *             [ AnonymousClassDeclaration ]
 	 */
 	public boolean visit(ClassInstanceCreation node) {
-		visitClassInstanceCreation( node);
+		if (node.getAnonymousClassDeclaration() == null) {
+			visitClassInstanceCreation(node);
+
+			if (!classSummary) {
+				Type clazz = node.getType();
+				eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+
+				// create an invocation to the constructor
+				String typName;
+				if (fmx == null) {
+					typName = findTypeName(clazz);
+				}
+				else {
+					typName = fmx.getName();
+				}
+				methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
+				Invocation lastInvok = context.getLastInvocation();
+				if ( (anchors == anchorOptions.assoc)
+						&& (lastInvok != null)
+						&& (lastInvok.getSender() == context.topMethod())
+						&& (lastInvok.getReceiver() == null)
+						&& (lastInvok.getSignature().startsWith(typName))) {
+					dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
+				}
+			}
+		}
 		return super.visit(node);
 	}
 
 	/**
-	 * See {@link VerveineVisitor#anonymousSuperType}
+	 * See {@link GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
 	 */
 	public boolean visit(AnonymousClassDeclaration node) {
 		if (visitAnonymousClassDeclaration( node) != null) {
@@ -203,6 +199,31 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		endVisitInitializer(node);
 	}
 
+    /**
+     *  FieldDeclaration ::=
+     *     [Javadoc] { ExtendedModifier } Type VariableDeclarationFragment
+     *          { , VariableDeclarationFragment } ;
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public boolean visit(FieldDeclaration node) {
+        visitFieldDeclaration(node);  // to recover optional JavaDictionary.INIT_BLOCK_NAME method
+        return true;
+    }
+
+    @Override
+    public void endVisit(FieldDeclaration node) {
+        endVisitFieldDeclaration(node);
+    }
+
+	public boolean visit(EnumConstantDeclaration node) {
+		return visitEnumConstantDeclaration(node);
+	}
+
+	public void endVisit(EnumConstantDeclaration node) {
+		endVisitEnumConstantDeclaration(node);
+	}
+
 	@SuppressWarnings("unchecked")
 	public boolean visit(MethodInvocation node) {
 		Expression callingExpr = node.getExpression();
@@ -218,7 +239,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}//context
 
 		Invocation lastInvok = context.getLastInvocation();
-		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+		if ( (anchors == anchorOptions.assoc)
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
@@ -255,7 +276,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		Invocation lastInvok = context.getLastInvocation();
-		if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)
+		if ( (anchors == anchorOptions.assoc)
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
@@ -291,7 +312,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
 			
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC) && (invok != null)) {
+			if ( (anchors == anchorOptions.assoc) && (invok != null)) {
 				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -317,7 +338,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
-			if (anchors.equals(VerveineJParser.ANCHOR_ASSOC)) {
+			if (anchors == anchorOptions.assoc) {
 				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 			}
 		}

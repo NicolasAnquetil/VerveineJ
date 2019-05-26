@@ -15,14 +15,14 @@ public class ReadClient {
 	private String nom;
 
 	@Deprecated
-	public Client(String num, String nom) {
+	public ReadClient(String num, String nom) {
 		this.setNum(num);
 		this.setNom(nom);
 	}
 	
 	@Override
 	@Deprecated
-	public static Client lire(BufferedReader in) throws ReadException {
+	public static ReadClient lire(BufferedReader in) throws ReadException {
 		String nom = "";
 		String num = "";
 		char c = ' ';

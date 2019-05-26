@@ -3,6 +3,7 @@ package fr.inria.verveine.extractor.java.refvisitors;
 import java.util.Collection;
 import java.util.LinkedList;
 
+import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -26,21 +27,18 @@ import fr.inria.verveine.extractor.java.utils.Util;
  * It is simpler than the other ref visitors
  * @author anquetil
  */
-public class VisitorInheritanceRef extends GetVisitedEntityAbstractVisitor {
+public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
-	public VisitorInheritanceRef(JavaDictionary dico) {
-		super(dico);
+	public VisitorInheritanceRef(JavaDictionary dico, boolean classSummary) {
+		super(dico, classSummary);
 	}
 
 	public boolean visit(TypeDeclaration node) {
-		//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
+		eu.synectique.verveine.core.gen.famix.Class fmx = visitTypeDeclaration(node);
 		ITypeBinding bnd = node.resolveBinding();
-
-		eu.synectique.verveine.core.gen.famix.Class fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
-		if ( (fmx != null) && (bnd != null) ){
+		if ((fmx != null) && (bnd != null)) {
 			ensureInheritances(bnd, fmx);
 
-			this.context.pushType(fmx);
 			return super.visit(node);
 		} else {
 			return false;
@@ -63,7 +61,7 @@ public class VisitorInheritanceRef extends GetVisitedEntityAbstractVisitor {
 		ITypeBinding bnd = node.resolveBinding();
 		eu.synectique.verveine.core.gen.famix.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(anonymousSuperTypeName, context), /*owner*/(ContainerEntity)context.top());
 
-		if ( (fmx != null) && (bnd != null) ){
+		if ( (fmx != null) && (bnd != null) && (! classSummary) ){
 			ensureInheritances(bnd, fmx);
 
 			this.context.pushType(fmx);

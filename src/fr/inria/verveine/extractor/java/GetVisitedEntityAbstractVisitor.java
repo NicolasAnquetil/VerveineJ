@@ -4,21 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.ASTVisitor;
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
@@ -176,8 +162,6 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
-	// MethodDeclaration --> FamixMethod
-
 	/**
 	 * Local type: same as {@link GetVisitedEntityAbstractVisitor#visitClassInstanceCreation(ClassInstanceCreation)}, 
 	 * we create it even if it is a local method because their are too many ways it can access external things
@@ -191,7 +175,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 			paramTypes.add( Util.jdtTypeName(param.getType()));
 		}
 
-		Method fmx = dico.getFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*owner*/context.topType());
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*returnType*/null, /*owner*/context.topType(), JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
 
 		context.pushMethod(fmx);  // whether fmx==null or not
 		return fmx;
@@ -202,13 +186,17 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	/**
+	 * BodyDeclaration ::=
+	 *                [ ... ]
+	 *                 FieldDeclaration
+	 *                 Initializer
+	 *                 MethodDeclaration (for methods and constructors)
+	 * Initializer ::=
+	 *      [ static ] Block
+	 */
 	public Method visitInitializer(Initializer node) {
-		Method fmx = dico.getFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), context.topType());
-
-		if (fmx != null) {
-			context.pushMethod(fmx);
-		}
-		return fmx;
+		return ctxtPushInitializerMethod();
 	}
 
 	public void endVisitInitializer(Initializer node) {
@@ -218,7 +206,98 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
-	public AnnotationTypeAttribute visitAnnotationTypeMemberDeclaration(AnnotationTypeMemberDeclaration node) {
+	@SuppressWarnings("unchecked")
+	public boolean visitEnumConstantDeclaration(EnumConstantDeclaration node) {
+		boolean hasInitBlock = false;
+		for (Expression expr : (List<Expression>)node.arguments()) {
+			if (expr != null) {
+				visitClassMemberInitializer(expr);
+				hasInitBlock = true;
+				break;  // we recovered the INIT_BLOCK, no need to look for other declaration
+			}
+		}
+		return hasInitBlock;
+
+	}
+
+	public void endVisitEnumConstantDeclaration(EnumConstantDeclaration node) {
+		for (Expression expr : (List<Expression>)node.arguments()) {
+			if (expr != null) {
+				context.pop();  // pops the JavaDictionary.INIT_BLOCK_NAME method
+				break;
+			}
+		}
+	}
+
+    @SuppressWarnings("unchecked")
+    public boolean visitFieldDeclaration(FieldDeclaration node) {
+        boolean hasInitBlock = false;
+        for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
+            if (vardecl.getInitializer() != null) {
+                visitClassMemberInitializer(vardecl.getInitializer());
+                hasInitBlock = true;
+                break;  // we recovered the INIT_BLOCK, no need to look for other declarations
+            }
+        }
+        return hasInitBlock;
+    }
+
+	public void endVisitFieldDeclaration(FieldDeclaration node) {
+		for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
+			if (vardecl.getInitializer() != null) {
+				context.pop();  // pops the JavaDictionary.INIT_BLOCK_NAME method
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Handles initialization part for FieldDeclaration and EnumConstantDeclaration
+	 *
+	 * VariableDeclarationFragment ::=
+	 *     Identifier { Dimension } [ = Expression ]
+	 */
+	private Method visitClassMemberInitializer(Expression initializingExpr) {
+		return ctxtPushInitializerMethod();
+	}
+
+	/**
+	 * Recovers the fake method: {@link JavaDictionary#INIT_BLOCK_NAME}
+	 *
+	 * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
+	 */
+	private Method ctxtPushInitializerMethod() {
+        eu.synectique.verveine.core.gen.famix.Type owner = context.topType();
+        Method fmx = recoverInitializerMethod(owner);
+        if (fmx == null) {
+            fmx = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), /*returnType*/null, owner, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
+        }
+		if (fmx != null) {
+			context.pushMethod(fmx);
+		}
+
+		return fmx;
+	}
+
+    /**
+     * Special method to recover the <Initializer> method of a class.
+     * Cannot do it with ensureFamixMethod because we have no binding, no parameter, no return type
+     * on which ensureFamixMethod relies
+     */
+    private Method recoverInitializerMethod(eu.synectique.verveine.core.gen.famix.Type owner) {
+	    Method ret = null;
+        if (owner != null) {
+            for (Method meth : owner.getMethods()) {
+                if (meth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+                    ret = meth;
+                    break;
+                }
+            }
+        }
+        return ret;
+    }
+
+    public AnnotationTypeAttribute visitAnnotationTypeMemberDeclaration(AnnotationTypeMemberDeclaration node) {
 		IMethodBinding bnd = node.resolveBinding();
 
 		AnnotationTypeAttribute fmx = dico.getFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType());

@@ -32,7 +32,7 @@ public class VisitorPackageDef extends ASTVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 
-	public VisitorPackageDef(JavaDictionary dico, boolean allLocals, String anchors) {
+	public VisitorPackageDef(JavaDictionary dico) {
 		this.dico = dico;
 		this.context = new EntityStack();
 	}

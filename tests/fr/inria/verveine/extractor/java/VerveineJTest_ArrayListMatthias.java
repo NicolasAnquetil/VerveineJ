@@ -22,8 +22,8 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
  */
 public class VerveineJTest_ArrayListMatthias extends VerveineJTest_Basic {
 
-	public VerveineJTest_ArrayListMatthias() {
-		super(/*system*/false);  // there is no System.out.print in the tested code
+	public VerveineJTest_ArrayListMatthias() throws IllegalAccessException {
+		super(new boolean[] {false, true, true, true, false, true, true});
 	}
 
 	/**
@@ -34,15 +34,14 @@ public class VerveineJTest_ArrayListMatthias extends VerveineJTest_Basic {
 		new File(VerveineJParser.OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"test_src/ArrayList-Matthias"});
+		parser.setOptions(new String[] {"test_src/ArrayListMatthias"});
 		parser.parse();
 		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(8+7, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, <StubMethodContainer>, Object, String,
-		//CharSequence, Serializable, Cloneable, RandomAccess + all ParameterizableClasses
-		assertEquals(7,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); // List, Collection, AbstractList, ArrayList, Comparable, Iterable, AbstractCollection
+		assertEquals(6, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays
+		assertEquals(2,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //
 	}
 }
