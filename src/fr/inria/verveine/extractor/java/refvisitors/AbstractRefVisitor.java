@@ -21,6 +21,8 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 		super(dico, classSummary);
 	}
 
+
+
 	protected String findTypeName(org.eclipse.jdt.core.dom.Type t) {
 		if (t == null) {
 			return null;

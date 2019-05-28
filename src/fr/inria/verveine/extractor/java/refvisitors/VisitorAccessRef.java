@@ -2,6 +2,7 @@ package fr.inria.verveine.extractor.java.refvisitors;
 
 import java.util.List;
 
+import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.gen.famix.Access;
@@ -40,10 +41,13 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	 */
 	private anchorOptions anchors;
 
+	private boolean inLambda;
+
 	public VisitorAccessRef(JavaDictionary dico, boolean classSummary, boolean allLocals, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.allLocals = allLocals;
 		this.anchors = anchors;
+		this.inLambda = false;
 	}
 
 	// VISITOR METHODS
@@ -193,6 +197,24 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 
         }
 		return false;  // already visited the interesting children
+	}
+
+
+	/**
+	 * Currently not defining lambdas. Only parse their body and consider their parameters as local variables
+	 * of the parent method
+	 *
+	 *  LambdaExpression:
+	 *     Identifier -> Body
+	 *     ( [ Identifier { , Identifier } ] ) -> Body
+	 *     ( [ FormalParameter { , FormalParameter } ] ) -> Body
+	 */
+	@Override
+	public boolean visit(LambdaExpression node) {
+		inLambda = true;
+		node.getBody().accept(this);
+		inLambda = false;
+		return false;  // only visit body of lambda
 	}
 
 	/**
@@ -470,7 +492,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 				// special case: length attribute of arrays in Java
 				((Attribute) accessed).setParentType(dico.ensureFamixClassArray());
 			}
-		} else if (bnd.isParameter()) {
+		} else if (bnd.isParameter() && (! inLambda)) {
 			if (!classSummary) {
 				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, /*persistIt*/!classSummary);
 			}

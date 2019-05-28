@@ -1745,32 +1745,32 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Location informations are: <b>name</b> of the source file and <b>line</b> position in this file. They are found in the JDT ASTNode: ast.
 	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
 	 * @param fmx -- Famix Entity to add the anchor to
-	 * @param jdtCmt -- JDT ASTNode, where the information are extracted
+	 * @param node -- JDT ASTNode, where the information is extracted
 	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some association happening within <b>ast</b>
 	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null)
 	 */
-	public SourceAnchor addSourceAnchor(SourcedEntity fmx, ASTNode jdtCmt, boolean oneLineAnchor) {
+	public SourceAnchor addSourceAnchor(SourcedEntity fmx, ASTNode node, boolean oneLineAnchor) {
 		AbstractFileAnchor fa = null;
 
-		if ( (fmx != null) && (jdtCmt != null) ) {
+		if ( (fmx != null) && (node != null) ) {
 			// position in source file
-			int beg = jdtCmt.getStartPosition()+1; // Java starts at 0, Moose at 1
-			int end = beg + jdtCmt.getLength()-1;
+			int beg = node.getStartPosition()+1; // Java starts at 0, Moose at 1
+			int end = beg + node.getLength()-1;
 
 			// find source Compilation Unit
 			// there is a special case for the JDT Comment Nodes
-			if (jdtCmt instanceof org.eclipse.jdt.core.dom.Comment) {
-				jdtCmt = ((org.eclipse.jdt.core.dom.Comment) jdtCmt).getAlternateRoot();
+			if (node instanceof org.eclipse.jdt.core.dom.Comment) {
+				node = ((org.eclipse.jdt.core.dom.Comment) node).getAlternateRoot();
 			}
 			else {
-				jdtCmt = jdtCmt.getRoot();
+				node = node.getRoot();
 			}
 
 			fa = new IndexedFileAnchor();
 			((IndexedFileAnchor)fa).setStartPos(beg);
 			((IndexedFileAnchor)fa).setEndPos(end);
 
-			fa.setFileName((String) ((CompilationUnit)jdtCmt).getProperty(SOURCE_FILENAME_PROPERTY));
+			fa.setFileName((String) ((CompilationUnit)node).getProperty(SOURCE_FILENAME_PROPERTY));
 			fmx.setSourceAnchor(fa);
 			famixRepo.add(fa);
 		}

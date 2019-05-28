@@ -169,9 +169,9 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer"), clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 
-		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "anonymous(IPrinter)");
+		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "_anonymous(IPrinter)");
 		assertNotNull(clazz);
-		assertEquals("anonymous(IPrinter)", clazz.getName());
+		assertEquals("_anonymous(IPrinter)", clazz.getName());
 		assertEquals(1, clazz.numberOfMethods());
 		assertEquals(0, clazz.numberOfAttributes());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,Method.class, "PrintServer"), clazz.getContainer());
