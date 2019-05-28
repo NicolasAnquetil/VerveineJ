@@ -246,14 +246,13 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
        return DatatypeConverter.printHexBinary(md5.digest(bytes)).toUpperCase();
 	}
 
-
 	@Override
 	public void endVisit(MethodDeclaration node) {
 		closeMethodDeclaration();
 		super.endVisit(node);
 	}
 
-    /**
+	/**
      * BodyDeclaration ::=
      *                [ ... ]
      *                 FieldDeclaration

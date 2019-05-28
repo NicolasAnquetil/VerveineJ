@@ -1,28 +1,6 @@
 package fr.inria.verveine.extractor.java.defvisitors;
 
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.ConstructorInvocation;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
-import org.eclipse.jdt.core.dom.SuperMethodInvocation;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.TypeLiteral;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
+import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
@@ -198,6 +176,28 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public void endVisit(Initializer node) {
 		endVisitInitializer(node);
+	}
+
+	/**
+	 * Currently not defining lambdas. Only parse their body and consider their parameters as local variables
+	 * of the parent method
+	 *
+	 *  LambdaExpression:
+	 *     Identifier -> Body
+	 *     ( [ Identifier { , Identifier } ] ) -> Body
+	 *     ( [ FormalParameter { , FormalParameter } ] ) -> Body
+	 */
+	@Override
+	public boolean visit(LambdaExpression node) {
+		// actually, should already be the case since we must be in a method
+		structuralType = StructuralEntityKinds.LOCALVAR;
+		node.getBody().accept(this);
+		return false;  // only visit body of lambda
+	}
+
+	@Override
+	public void endVisit(LambdaExpression node) {
+
 	}
 
 	@Override

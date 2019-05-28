@@ -163,9 +163,9 @@ public class VerveineJTest_DefVisitors {
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer"), innerClass.getContainer());
 		assertFalse(innerClass.getIsInterface());
 
-		eu.synectique.verveine.core.gen.famix.Class anonClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "anonymous(IPrinter)");
+		eu.synectique.verveine.core.gen.famix.Class anonClass = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "_anonymous(IPrinter)");
 		assertNotNull(anonClass);
-		assertEquals("anonymous(IPrinter)", anonClass.getName());
+		assertEquals("_anonymous(IPrinter)", anonClass.getName());
 		assertEquals(1, anonClass.getMethods().size());
 		assertEquals(0, anonClass.getAttributes().size());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,Method.class, "PrintServer"), anonClass.getContainer());

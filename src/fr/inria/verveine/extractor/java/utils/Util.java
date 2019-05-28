@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java.utils;
 
 import org.eclipse.jdt.core.dom.ArrayType;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleType;
 
@@ -12,11 +13,19 @@ public class Util {
 
 
 	/**
-	 * Little helper to "normalize" an anonymous type name
+	 * helper to "normalize" lambda names
+	 */
+	public static String lambdaName(LambdaExpression node, EntityStack context) {
+		return "_lambda" + context.top().getName() + node.getStartPosition();
+
+	}
+
+	/**
+	 * helper to "normalize" an anonymous type name
 	 */
 	public static String stringForAnonymousName(String anonymousSuperTypeName, EntityStack context) {
 		String anonSuperTypeName = (anonymousSuperTypeName != null) ? anonymousSuperTypeName : context.topType().getName();
-		return "anonymous("+anonSuperTypeName+")";
+		return "_anonymous("+anonSuperTypeName+")";
 	}
 
 	/**
@@ -55,5 +64,4 @@ public class Util {
 		}
 		
 	}
-
 }
