@@ -483,7 +483,6 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 				if (!(accessed.getDeclaredType() instanceof PrimitiveType)) {
 					//dico.addFamixReference(findHighestType(accessed.getBelongsTo()),
 					//		findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
-					//   //TODO add FileAnchor to Reference
 				}
 			}
 
@@ -518,11 +517,9 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if ((accessed != null) && (accessor != null)) {
 			if (classSummary) {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
-				//  //TODO set FileAnchor to Reference
 			} else if (allLocals || (accessed.getBelongsTo() != accessor) ) {
 				context.setLastAccess(
 						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
-				//TODO set FileAnchor to Access
 			}
 		}
 	}

@@ -6,9 +6,11 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.lang.Exception;
 import java.util.Collection;
 
 import eu.synectique.verveine.core.gen.famix.*;
+import org.junit.Before;
 import org.junit.Test;
 
 import ch.akuhn.fame.Repository;
@@ -20,6 +22,25 @@ public class VerveineJTest_Configuration {
 
 	private static final String OTHER_OUTPUT_FILE= "other_output.mse";
 
+	protected Repository repo;
+	protected VerveineJParser parser;
+
+	/**
+	 * @throws java.lang.Exception
+	 */
+	@Before
+	public void setUp() throws Exception {
+		new File(VerveineJParser.OUTPUT_FILE).delete();
+		parser = new VerveineJParser();
+		repo = parser.getFamixRepo();
+	}
+
+	private void parse(String[] sources) {
+		parser.setOptions(sources);
+		parser.parse();
+		//parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+	}
+
 	@Test
 	public void testChangeOutputFilePath()
 	{
@@ -28,13 +49,7 @@ public class VerveineJTest_Configuration {
 		new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).delete();
 		assertFalse(new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).exists());
 	
-		String[] args = new String[] {"-o",VerveineJTest_Configuration.OTHER_OUTPUT_FILE, "test_src/LANModel/"};
-		
-		//VerveineJParser.main(args);
-		// Executing the instructions of the main() without calling the licence verification stuff
-		VerveineJParser parser = new VerveineJParser();
-		parser.setOptions(args);
-		parser.parse();
+		parse( new String[] {"-o",VerveineJTest_Configuration.OTHER_OUTPUT_FILE, "test_src/LANModel/"});
 		parser.emitMSE();
 
 		assertTrue(new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).exists());
@@ -42,38 +57,28 @@ public class VerveineJTest_Configuration {
 	}
 
 	@Test
-	public void testAlllocals() {
-		VerveineJParser parser;
-		Repository repo;
-
-		// without option
-		parser = new VerveineJParser();
-		repo = parser.getFamixRepo();
-		parser.setOptions(new String[]{"test_src/ad_hoc/ReadException.java", "test_src/ad_hoc/ReadClient.java"});
-		parser.parse();
+	public void testNotAlllocals() {
+		// works in team with testAlllocals
+		parse(new String[]{"test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
 		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // lire().nom ; lire().num ; lire().e
-		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());  // setNum()->num ; getNum()->num ; setNom()->nom ; getNom()->nom
 
-		// with option
-		parser = new VerveineJParser();
-		repo = parser.getFamixRepo();
-		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/ReadException.java", "test_src/ad_hoc/ReadClient.java"});
-		parser.parse();
-		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // + lire().c + lire().i
+		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		// setNum()->num ; getNum()->num ; setNom()->nom ; getNom()->nom
+		// ReadClient()->self *2 ???
+	}
+
+	@Test
+	public void testAlllocals() {
+		// works in team with testNotAlllocals
+		parse(new String[]{"-alllocals", "test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
+
+		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
 		assertEquals(28, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
-		// ReadClient()->this*2+2 ; lire()->c*6+i*2+in*4+nom*2+num*2 ; setNum()->this*1+2 ; getNum()->1 ; setNom()->this*1+2 ; getNom()->1
 	}
 
 	@Test
 	public void testClassDeclsInExpr() {
-		VerveineJParser parser;
-		Repository repo;
-
-		// with option
-		parser = new VerveineJParser();
-		repo = parser.getFamixRepo();
-		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
-		parser.parse();
+		parse(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
 
 		Collection<LocalVariable> vars = VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class);
         LocalVariable var1 = null;
@@ -121,14 +126,7 @@ public class VerveineJTest_Configuration {
 
 	@Test
 	public void testAlllocalsAndInitializerAndField() {
-		VerveineJParser parser;
-		Repository repo;
-
-		// with option
-		parser = new VerveineJParser();
-		repo = parser.getFamixRepo();
-		parser.setOptions(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
-		parser.parse();
+		parse(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
 
 		Collection<Attribute> vars = VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class);
 		assertEquals(3, vars.size());  // aField, anonymousListField, System.out
@@ -138,8 +136,6 @@ public class VerveineJTest_Configuration {
 	@Test
 	public void testAnchorsAssoc()
 	{
-		VerveineJParser parser;
-		Repository repo;
 		String[] args = new String[] {
 							"-anchor", "assoc",
 							"-cp", "test_src/LANModel/",
@@ -147,10 +143,7 @@ public class VerveineJTest_Configuration {
 						};
 
 		// parsing
-		parser = new VerveineJParser();
-		repo = parser.getFamixRepo();
-		parser.setOptions(args);
-		parser.parse();
+		parse(args);
 
 		SourceAnchor anc;
 		// testing accesses

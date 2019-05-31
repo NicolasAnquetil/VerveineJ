@@ -72,6 +72,24 @@ public class VerveineJTest_AdHoc {
 	}
 
 	@Test
+	public void testUnresolvedDeclaration() {
+		 // note: lire() method unresolved because it throws ReadException which is not parsed here
+		parse(new String[]{"test_src/ad_hoc/ReadClient.java"});
+
+		int nbLire = 0;
+		Method lire = null;
+		for (Method m : VerveineUtilsForTests.selectElementsOfType(repo, Method.class)) {
+			if (m.getName().equals("lire")) {
+				nbLire++;
+				lire = m;
+			}
+		}
+		assertEquals(1, nbLire);
+		// actually the extra methods are not in the repository, but they own the invocations
+		assertEquals(6, lire.getOutgoingInvocations().size());
+	}
+
+	@Test
 	public void testLambdaParameter() {
 		parse(new String[] {"test_src/ad_hoc/WithLambda.java"});
 

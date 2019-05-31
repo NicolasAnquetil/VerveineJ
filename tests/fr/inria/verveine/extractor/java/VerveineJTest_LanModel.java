@@ -7,9 +7,6 @@ package fr.inria.verveine.extractor.java;
 import java.io.File;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import eu.synectique.verveine.core.VerveineUtilsForTests;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
@@ -28,9 +25,9 @@ import eu.synectique.verveine.core.gen.famix.Parameter;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.SourceAnchor;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
 
+import org.junit.Before;
+import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
@@ -108,6 +105,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			nbInherit++;
 		}
 		*/
+
 		assertEquals( nbClasses,VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size());
 		assertEquals(3,    VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+8, VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}

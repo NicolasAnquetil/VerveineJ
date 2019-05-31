@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import fr.inria.verveine.extractor.java.utils.StubBinding;
 import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.EntityStack;
@@ -81,7 +82,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
 	protected eu.synectique.verveine.core.gen.famix.Class visitTypeDeclaration(TypeDeclaration node) {
-		ITypeBinding bnd = node.resolveBinding();
+		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
 		eu.synectique.verveine.core.gen.famix.Class fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		if (fmx != null) {
@@ -116,8 +117,9 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	protected eu.synectique.verveine.core.gen.famix.Class visitAnonymousClassDeclaration(AnonymousClassDeclaration node) {
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
 
-		ITypeBinding bnd = node.resolveBinding();
-		fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(anonymousSuperTypeName,context), /*owner*/(ContainerEntity)context.top());
+        ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
+
+        fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(anonymousSuperTypeName,context), /*owner*/(ContainerEntity)context.top());
 		if (fmx != null) {
 			this.context.pushType(fmx);
 		}
@@ -132,7 +134,9 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected eu.synectique.verveine.core.gen.famix.Enum visitEnumDeclaration(EnumDeclaration node) {
-		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.getFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), (ContainerEntity) context.top());
+        ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
+
+        eu.synectique.verveine.core.gen.famix.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
 			this.context.pushType(fmx);
 		}
@@ -147,7 +151,8 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected AnnotationType visitAnnotationTypeDeclaration(AnnotationTypeDeclaration node) {
-		ITypeBinding bnd = node.resolveBinding();
+        ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
+
 		AnnotationType fmx = dico.getFamixAnnotationType(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
 			context.pushType(fmx);
@@ -168,7 +173,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 */
 	@SuppressWarnings("unchecked")
 	protected Method visitMethodDeclaration(MethodDeclaration node) {
-		IMethodBinding bnd = node.resolveBinding();
+        IMethodBinding bnd = (IMethodBinding) StubBinding.getDeclarationBinding(node);
 
 		Collection<String> paramTypes = new ArrayList<String>();
 		for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
