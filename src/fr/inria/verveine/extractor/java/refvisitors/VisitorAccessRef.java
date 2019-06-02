@@ -199,7 +199,6 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		return false;  // already visited the interesting children
 	}
 
-
 	/**
 	 * Currently not defining lambdas. Only parse their body and consider their parameters as local variables
 	 * of the parent method
@@ -225,8 +224,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		visitFieldDeclaration(node);  // to recover optional JavaDictionary.INIT_BLOCK_NAME method
-		return true;
+		return visitFieldDeclaration(node);  // recovers optional JavaDictionary.INIT_BLOCK_NAME method
 	}
 
 	@Override
@@ -483,7 +481,6 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 				if (!(accessed.getDeclaredType() instanceof PrimitiveType)) {
 					//dico.addFamixReference(findHighestType(accessed.getBelongsTo()),
 					//		findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
-					//   //TODO add FileAnchor to Reference
 				}
 			}
 
@@ -518,11 +515,9 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if ((accessed != null) && (accessor != null)) {
 			if (classSummary) {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
-				//  //TODO set FileAnchor to Reference
 			} else if (allLocals || (accessed.getBelongsTo() != accessor) ) {
 				context.setLastAccess(
 						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
-				//TODO set FileAnchor to Access
 			}
 		}
 	}

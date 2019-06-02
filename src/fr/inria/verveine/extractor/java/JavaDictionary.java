@@ -1303,10 +1303,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- signature
 		sig = name + "(";
-		if (bnd != null) {
-			sig += signatureParamsFromBinding(bnd);
-		}
-		else if (paramTypes != null) {
+		 if (bnd != null) {
+	            sig += signatureParamsFromBinding(bnd);
+	        }
+        else if (paramTypes != null) {
 			sig += signatureParamsFromStringCollection(paramTypes);
 		}
 		else {
@@ -1332,9 +1332,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					// we need T to create the method and the method to create T ...
 					// so we need to test the situation and deal with it
 					retTypBnd = bnd.getReturnType();
-					if (retTypBnd.isArray()) {
+					if (retTypBnd == null) {
+						ret = null;
+					}
+					else if (retTypBnd.isArray()) {
 						retTypBnd = retTypBnd.getElementType();
 					}
+
 					if ( (retTypBnd != null) && retTypBnd.isTypeVariable() && (retTypBnd.getDeclaringMethod() == bnd) ) {
 						ret = null;
 						delayedRetTyp = true;

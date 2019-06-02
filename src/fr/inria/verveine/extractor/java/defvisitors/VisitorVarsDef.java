@@ -17,6 +17,8 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 
+import java.util.List;
+
 /**
  * AST Visitor that defines all the (Famix) entities of interest
  * Famix entities are stored in a Map along with the IBindings to which they correspond
@@ -189,10 +191,8 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	 */
 	@Override
 	public boolean visit(LambdaExpression node) {
-		// actually, should already be the case since we must be in a method
-		structuralType = StructuralEntityKinds.LOCALVAR;
-		node.getBody().accept(this);
-		return false;  // only visit body of lambda
+		structuralType = StructuralEntityKinds.LOCALVAR;  // actually, should already be the case since we must be in a method
+		return super.visit(node);
 	}
 
 	@Override
@@ -218,14 +218,32 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(FieldDeclaration node) {
 		structuralType = StructuralEntityKinds.ATTRIBUTE;
 
-		return super.visit(node);
+		// creating the attribute(s)
+		for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
+			createStructuralEntity( structuralType, vardecl, context.top());
+		}
+
+		// Possible local variables in optional initializer
+		if (visitFieldDeclaration(node)) {  // recovers optional JavaDictionary.INIT_BLOCK_NAME method
+			structuralType = StructuralEntityKinds.LOCALVAR;
+			for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
+				vardecl.getInitializer().accept(this);
+			}
+		}
+
+		return false;  // already visited all children
+	}
+
+	@Override
+	public void endVisit(FieldDeclaration node) {
+		endVisitFieldDeclaration(node);
 	}
 
 	@Override
 	public boolean visit(VariableDeclarationExpression node) {
 		// we usually don't declare local variables that have a primitive type
 		// because we are assuming that the user is not interested in them
-		// note that non primitive types are important because of the dependencies they create
+		// note that non primitive types are important because of the dependencies they create (eg invocation receiver)
 		if ( ! allLocals && node.getType().isPrimitiveType() && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
 			return false;  // FIXME could be a mistake, but not too sure: what about var declaration with complex initialization (eg including an anonymous class)?
 		}

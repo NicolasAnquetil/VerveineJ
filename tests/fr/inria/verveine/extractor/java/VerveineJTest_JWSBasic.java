@@ -32,7 +32,6 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 	public VerveineJTest_JWSBasic() throws IllegalAccessException {
 		super(new boolean[] {true, true, true, true, true, false, true});
-		// we don't run parser.emitMSE in setup, so SourceLanguage is not created
 	}
 
 	/**

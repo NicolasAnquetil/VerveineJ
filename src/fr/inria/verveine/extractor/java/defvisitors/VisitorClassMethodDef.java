@@ -6,6 +6,10 @@ import java.util.Collection;
 import java.util.List;
 
 import java.security.MessageDigest;
+
+import fr.inria.verveine.extractor.java.utils.StubBinding;
+
+import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
@@ -17,8 +21,6 @@ import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
-
-import javax.xml.bind.DatatypeConverter;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -64,8 +66,8 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(TypeDeclaration node) {
 		//		System.err.println("TRACE, Visiting TypeDeclaration: "+node.getName().getIdentifier());
-		ITypeBinding bnd = node.resolveBinding();
-		@SuppressWarnings("unchecked")
+		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
+
 		List<TypeParameter> tparams = (List<TypeParameter>) node.typeParameters();
 
 		boolean persistIt = persistClass(bnd);
@@ -136,14 +138,15 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(AnonymousClassDeclaration node) {
 		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
 		eu.synectique.verveine.core.gen.famix.Class fmx = null;
-		ITypeBinding bnd = node.resolveBinding();
+		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
+
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 		fmx = this.dico.ensureFamixClass(bnd, Util.stringForAnonymousName(anonymousSuperTypeName, context), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
 			if (! classSummary) {
-				if ((anchors != anchorOptions.none) && (fmx != null)) {
+				if (anchors != anchorOptions.none) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
 			}
@@ -164,8 +167,9 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(EnumDeclaration node) {
 //		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
+		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(node.resolveBinding(), node.getName().getIdentifier(), (ContainerEntity) context.top());
+		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
@@ -201,7 +205,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	 */
 	@Override
 	public boolean visit(MethodDeclaration node) {
-		IMethodBinding bnd = node.resolveBinding();
+		IMethodBinding bnd = (IMethodBinding) StubBinding.getDeclarationBinding(node);
 
         Collection<String> paramTypes = new ArrayList<String>();
         for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
@@ -243,7 +247,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
         }
         byte[] bytes = node.getBody().toString().replaceAll("\\r|\\n|\\t", "").getBytes();
 
-       return DatatypeConverter.printHexBinary(md5.digest(bytes)).toUpperCase();
+       return DigestUtils.md5Hex(bytes).toUpperCase();
 	}
 
 	@Override

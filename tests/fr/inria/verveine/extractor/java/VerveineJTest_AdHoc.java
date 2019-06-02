@@ -22,10 +22,6 @@ import org.junit.Test;
 import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.VerveineUtilsForTests;
 import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
 import eu.synectique.verveine.core.gen.famix.CaughtException;
@@ -68,12 +64,55 @@ public class VerveineJTest_AdHoc {
 	private void parse(String[] sources) {
 		parser.setOptions(sources);
 		parser.parse();
-		//parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
 
 	@Test
-	public void testLambdaParameter() {
-		parse(new String[] {"test_src/ad_hoc/WithLambda.java"});
+	public void testUnresolvedDeclaration() {
+		 // note: lire() method unresolved because it throws ReadException which is not parsed here
+		parse(new String[]{"test_src/ad_hoc/ReadClient.java"});
+
+		int nbLire = 0;
+		Method lire = null;
+		for (Method m : VerveineUtilsForTests.selectElementsOfType(repo, Method.class)) {
+			if (m.getName().equals("lire")) {
+				nbLire++;
+				lire = m;
+			}
+		}
+		assertEquals(1, nbLire);
+		// actually the extra methods are not in the repository, but they own the invocations
+		assertEquals(6, lire.getOutgoingInvocations().size());
+	}
+
+	@Test
+	public void testLambdaTypedParameter() {
+		parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
+
+		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
+		assertNotNull(meth);
+
+		LocalVariable seg1 = null;
+		LocalVariable seg2 = null;
+		assertEquals(2, meth.getLocalVariables().size());
+		for (LocalVariable lvar : meth.getLocalVariables()) {
+			if (lvar.getName().equals("seg1")) {
+				seg1 = lvar;
+			}
+			else if (lvar.getName().equals("seg2")) {
+				seg2 = lvar;
+			}
+			else {
+				fail("Unknown local variable:" + lvar.getName());
+			}
+		}
+		assertNotNull(seg1);
+		assertNotNull(seg2);
+	}
+
+	@Test
+	public void testLambdaUnTypedParameter() {
+		parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
 
 		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
 		assertNotNull(meth);
@@ -256,71 +295,6 @@ public class VerveineJTest_AdHoc {
 		assertNotNull(clazz);
 		assertEquals(eu.synectique.verveine.core.gen.famix.Class.class, clazz.getClass());
 	}
-	
-	@Test
-	public void testAnnotation() {
-		parse(new String[] {"test_src/ad_hoc/annotations"});
-
-		AnnotationType getProp = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "GetProperty");
-		assertNotNull(getProp);
-		assertFalse(getProp.getIsStub());
-
-		assertEquals(1, getProp.getAttributes().size());
-		AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) getProp.getAttributes().iterator().next();
-		assertEquals("value", getAtt.getName());
-		assertEquals(4, getProp.getInstances().size());
-
-		// Class annotation
-		eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Serializer");
-		assertEquals(1, cl.getAnnotationInstances().size());
-		AnnotationInstance sw = cl.getAnnotationInstances().iterator().next();
-		assertNotNull(sw);
-		assertEquals("SuppressWarnings", sw.getAnnotationType().getName());
-		assertSame(sw.getAnnotatedEntity(), cl);
-		assertEquals(1, sw.getAttributes().size());
-		AnnotationInstanceAttribute swVal = sw.getAttributes().iterator().next();
-		assertNotNull(swVal);
-		assertEquals("value", swVal.getAnnotationTypeAttribute().getName());
-		assertEquals("serial", swVal.getValue());
-
-		// Method annotations
-		eu.synectique.verveine.core.gen.famix.Class book = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Book");
-		Collection<Method> bookMethods = book.getMethods();
-		assertEquals(12, bookMethods.size());
-		for (Method meth : bookMethods) {
-			Collection<AnnotationInstance> annInstances = meth.getAnnotationInstances();
-			if (meth.getName().startsWith("get")) {
-				assertEquals(1, annInstances.size());
-				AnnotationInstance annInst = annInstances.iterator().next();
-				assertSame(getProp, annInst.getAnnotationType());
-				assertEquals(1, annInst.getAttributes().size());
-				AnnotationInstanceAttribute getValInst = annInst.getAttributes().iterator().next();
-				assertSame(getAtt, getValInst.getAnnotationTypeAttribute());
-				
-			}
-			else if (meth.getName().startsWith("set")) {
-				assertEquals(1, annInstances.size());
-				AnnotationInstance annInst = annInstances.iterator().next();
-				assertEquals("SetProperty", annInst.getAnnotationType().getName());
-			}
-			else {
-				assertEquals(0, annInstances.size());
-			}
-		}
-
-		// one Attribute with annotation
-		Collection<Attribute> bookAttributes = book.getAttributes();
-		assertEquals(6, bookAttributes.size());
-		for (Attribute att : bookAttributes) {
-			if (att.getName().equals("time")) {
-				assertEquals(1, att.getAnnotationInstances().size());
-			}
-			else {
-				assertEquals(0, att.getAnnotationInstances().size());
-			}
-		}
-
-	}
 
 	@Test
 	public void testClassVar() {
@@ -357,7 +331,7 @@ public class VerveineJTest_AdHoc {
 
 	@Test
 	public void testParameterizableClass() {
-		parse(new String[] {"test_src/ad_hoc/annotations", "test_src/ad_hoc/Card.java", "test_src/ad_hoc/WrongInvocation.java", "test_src/ad_hoc/Dictionary.java"});
+		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/WrongInvocation.java", "test_src/ad_hoc/Dictionary.java"});
 
 		assertEquals(9, VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
 		// WrongInvocation -> List<X>, ArrayList<X>
@@ -466,7 +440,15 @@ public class VerveineJTest_AdHoc {
 		assertEquals("Dictionary", cont.getName());
 		assertSame(ParameterizableClass.class, cont.getClass());
 	}
-	
+
+	@Test
+	public void testArrayListMatthias() {
+		parse(new String[] {"test_src/ad_hoc/Bla.java"});
+
+		assertEquals(6, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays
+		assertEquals(2,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //
+	}
+
 	@Test
 	public void testMethodParameterArgumentTypes() {
 		parse(new String[] {"test_src/ad_hoc/Dictionary.java"});
@@ -715,20 +697,14 @@ public class VerveineJTest_AdHoc {
 
 	@Test
 	public void testStaticInitializationBlock() {
-		parse(new String[] {"test_src/ad_hoc/annotations", "test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java", "test_src/ad_hoc/InvokWithFullPath.java", "test_src/ad_hoc/DefaultConstructor.java"});
+		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java", "test_src/ad_hoc/InvokWithFullPath.java", "test_src/ad_hoc/DefaultConstructor.java"});
 
 		Collection<Method> l_meth = VerveineUtilsForTests.listFamixElements(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
-		assertEquals(5, l_meth.size());
+		assertEquals(3, l_meth.size());
 		for (Method meth : l_meth) {
 			assertEquals(JavaDictionary.INIT_BLOCK_NAME+"()", meth.getSignature());
 			if (meth.getParentType().getName().equals("Card")) {
 				assertEquals(5, meth.getOutgoingInvocations().size());
-			}
-			else if (meth.getParentType().getName().equals("Serializer")) {
-				assertEquals(1, meth.getOutgoingInvocations().size());
-			}
-			else if (meth.getParentType().getName().equals("Book")) {
-				assertEquals(1, meth.getOutgoingInvocations().size());
 			}
 			else if (meth.getParentType().getName().equals("Planet")) {
 				assertEquals(0, meth.getOutgoingInvocations().size());
@@ -793,35 +769,11 @@ public class VerveineJTest_AdHoc {
 		assertNotNull(withParam);
 		assertEquals(3, withParam.getOutgoingInvocations().size());  // printStackTrace(new PrintWriter(new StringWriter()))
 	}
-	
-	@Test  // issue 714
-	public void testAnnotParamIsClass(){
-		parse(new String[] {"test_src/ad_hoc/annotations"});
-
-		Attribute att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "time");
-		assertNotNull(att);
-
-		assertEquals(1, att.getAnnotationInstances().size());
-		AnnotationInstance ann = att.getAnnotationInstances().iterator().next();
-		assertNotNull(ann);
-		assertEquals("XmlElement", ann.getAnnotationType().getName());
-		assertSame(ann.getAnnotatedEntity(), att);
-		assertEquals(3, ann.getAttributes().size());
-
-		for (AnnotationInstanceAttribute annAtt : ann.getAttributes()) {
-			if (annAtt.getAnnotationTypeAttribute().getName().equals("type")) {
-				assertEquals("String.class", annAtt.getValue());
-			}
-			else {
-				assertTrue( annAtt.getAnnotationTypeAttribute().getName().equals("name") ||
-						    annAtt.getAnnotationTypeAttribute().getName().equals("required"));
-			}
-		}
-	}
 
 	@Test
 	public void testInvokSelfNoBinding(){
-		parse(new String[] {"test_src/ad_hoc/annotations"});
+		// TODO sould use source within ad_hoc
+		parse(new String[] {"test_src/annotations/Serializer.java"});
 
 		Method seri = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "serialize");
 		assertNotNull(seri);
@@ -834,28 +786,6 @@ public class VerveineJTest_AdHoc {
 				assertEquals(owner, invoked.getBelongsTo());
 			}
 		}
-	}
-
-	@Test
-	public void testAnnotationTypeFileAnchor(){
-		parse(new String[] {"test_src/ad_hoc/annotations"});
-
-		AnnotationType xmle = VerveineUtilsForTests.detectFamixElement(repo, AnnotationType.class, "XmlElement");
-		assertNotNull(xmle);
-		assertNotNull(xmle.getSourceAnchor());
-		assertEquals(IndexedFileAnchor.class, xmle.getSourceAnchor().getClass());
-		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((IndexedFileAnchor)xmle.getSourceAnchor()).getFileName());
-		assertEquals(62, ((IndexedFileAnchor)xmle.getSourceAnchor()).getStartPos());
-		assertEquals(176, ((IndexedFileAnchor)xmle.getSourceAnchor()).getEndPos());
-		
-		AnnotationTypeAttribute req = VerveineUtilsForTests.detectFamixElement(repo, AnnotationTypeAttribute.class, "required");
-		assertNotNull(req);
-		assertNotNull(req.getSourceAnchor());
-		assertEquals(IndexedFileAnchor.class, req.getSourceAnchor().getClass());
-		assertEquals("test_src/ad_hoc/annotations/XmlElement.java", ((IndexedFileAnchor)req.getSourceAnchor()).getFileName());
-		assertEquals(120, ((IndexedFileAnchor)req.getSourceAnchor()).getStartPos());
-		assertEquals(145, ((IndexedFileAnchor)req.getSourceAnchor()).getEndPos());
-
 	}
 
 	@Test
