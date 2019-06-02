@@ -199,7 +199,6 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		return false;  // already visited the interesting children
 	}
 
-
 	/**
 	 * Currently not defining lambdas. Only parse their body and consider their parameters as local variables
 	 * of the parent method
@@ -225,8 +224,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		visitFieldDeclaration(node);  // to recover optional JavaDictionary.INIT_BLOCK_NAME method
-		return true;
+		return visitFieldDeclaration(node);  // recovers optional JavaDictionary.INIT_BLOCK_NAME method
 	}
 
 	@Override

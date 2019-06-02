@@ -60,11 +60,8 @@ public class VerveineJTest_Configuration {
 	public void testNotAlllocals() {
 		// works in team with testAlllocals
 		parse(new String[]{"test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
-		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // lire().nom ; lire().num ; lire().e
-
-		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
-		// setNum()->num ; getNum()->num ; setNom()->nom ; getNom()->nom
-		// ReadClient()->self *2 ???
+		assertEquals(0, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
+		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom
 	}
 
 	@Test

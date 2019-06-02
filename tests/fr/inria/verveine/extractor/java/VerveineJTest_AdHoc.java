@@ -68,7 +68,7 @@ public class VerveineJTest_AdHoc {
 	private void parse(String[] sources) {
 		parser.setOptions(sources);
 		parser.parse();
-		//parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
 
 	@Test
@@ -90,8 +90,33 @@ public class VerveineJTest_AdHoc {
 	}
 
 	@Test
-	public void testLambdaParameter() {
-		parse(new String[] {"test_src/ad_hoc/WithLambda.java"});
+	public void testLambdaTypedParameter() {
+		parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
+
+		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
+		assertNotNull(meth);
+
+		LocalVariable seg1 = null;
+		LocalVariable seg2 = null;
+		assertEquals(2, meth.getLocalVariables().size());
+		for (LocalVariable lvar : meth.getLocalVariables()) {
+			if (lvar.getName().equals("seg1")) {
+				seg1 = lvar;
+			}
+			else if (lvar.getName().equals("seg2")) {
+				seg2 = lvar;
+			}
+			else {
+				fail("Unknown local variable:" + lvar.getName());
+			}
+		}
+		assertNotNull(seg1);
+		assertNotNull(seg2);
+	}
+
+	@Test
+	public void testLambdaUnTypedParameter() {
+		parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
 
 		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
 		assertNotNull(meth);
