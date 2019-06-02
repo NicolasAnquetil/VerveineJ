@@ -63,6 +63,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String OBJECT_PACKAGE_NAME = "java.lang";
 	public static final String ARRAYS_NAME = "default[]";
 	public static final String INIT_BLOCK_NAME = "<Initializer>";
+	public static final String ANONYMOUS_NAME_PREFIX = "_Anonymous";
 
 	public static final int UNKNOWN_MODIFIERS = 0;
 	public static final String MODIFIER_ABSTRACT = "abstract";
@@ -72,7 +73,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_FINAL    = "final";
 	public static final String MODIFIER_STATIC    = "static";
 
-	/**
+    /**
 	 * Result of utility methods for checking matching between two entities
 	 */
 	private enum CheckResult {

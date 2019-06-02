@@ -25,7 +25,7 @@ public class Util {
 	 */
 	public static String stringForAnonymousName(String anonymousSuperTypeName, EntityStack context) {
 		String anonSuperTypeName = (anonymousSuperTypeName != null) ? anonymousSuperTypeName : context.topType().getName();
-		return "_anonymous("+anonSuperTypeName+")";
+		return JavaDictionary.ANONYMOUS_NAME_PREFIX + "(" +anonSuperTypeName+")";
 	}
 
 	/**

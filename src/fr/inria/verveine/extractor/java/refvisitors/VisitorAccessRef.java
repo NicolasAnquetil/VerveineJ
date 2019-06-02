@@ -241,7 +241,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	}
 
 	public boolean visit(FieldAccess node) {
-		BehaviouralEntity accessor = this.context.topMethod();
+		Method accessor = this.context.topMethod();
 		IVariableBinding bnd = node.resolveFieldBinding();
 		// FIXME if bnd == null we have a problem
 		ensureAccessedStructEntity(bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
@@ -262,7 +262,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		IBinding bnd = node.resolveBinding();
 		if (bnd instanceof IVariableBinding) {
 			// could be a field or an enumValue
-			BehaviouralEntity accessor = this.context.topMethod();
+			Method accessor = this.context.topMethod();
 			ensureAccessedStructEntity((IVariableBinding) bnd, node.getName().getIdentifier(), /*typ*/null,
 					/*owner*/null, accessor);
 			Access lastAccess = context.getLastAccess();
@@ -399,7 +399,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		IBinding bnd = ImplicitVarBinding.getInstance(context.topMethod(), JavaDictionary.SELF_NAME);
 		ImplicitVariable fmx = dico.ensureFamixImplicitVariable(bnd, JavaDictionary.SELF_NAME, this.context.topType(), context.topMethod(), /*persistIt*/!classSummary);
 		if (fmx != null) {
-			BehaviouralEntity accessor = this.context.topMethod();
+			Method accessor = this.context.topMethod();
 
 			createAccess(accessor, fmx, inAssignmentLHS);
 
@@ -446,7 +446,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		IBinding bnd = expr.resolveBinding();
 		if ((bnd instanceof IVariableBinding) && (context.topMethod() != null)) {
 			// could be a variable, a field, an enumValue, ...
-			BehaviouralEntity accessor = this.context.topMethod();
+			Method accessor = this.context.topMethod();
 			ensureAccessedStructEntity((IVariableBinding) bnd, expr.getIdentifier(), /*typ*/null, /*owner*/null,
 					accessor);
 			Access lastAccess = context.getLastAccess();
@@ -461,7 +461,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	}
 
 	private StructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name,
-			eu.synectique.verveine.core.gen.famix.Type typ, ContainerEntity owner, BehaviouralEntity accessor) {
+			eu.synectique.verveine.core.gen.famix.Type typ, ContainerEntity owner, Method accessor) {
 		StructuralEntity accessed = null;
 
 		if (bnd == null) {
@@ -510,16 +510,26 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	 * @param accessed -- the variable accessed
 	 * @param isLHS -- whether the access occurs on the LeftHandSide of an assignement (and therefore is a write access)
 	 */
-	private void createAccess(BehaviouralEntity accessor, StructuralEntity accessed, boolean isLHS) {
+	private void createAccess(Method accessor, StructuralEntity accessed, boolean isLHS) {
 		// create local accesses?
 		if ((accessed != null) && (accessor != null)) {
 			if (classSummary) {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
-			} else if (allLocals || (accessed.getBelongsTo() != accessor) ) {
+			} else if (allLocals || (! localVariable(accessed, accessor)) ) {
 				context.setLastAccess(
 						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
 			}
 		}
+	}
+
+	private boolean localVariable(StructuralEntity accessed, Method accessor) {
+		if (accessed.getBelongsTo() == accessor) {
+			return true;
+		}
+		if (accessor.getParentType().getName().startsWith(JavaDictionary.ANONYMOUS_NAME_PREFIX)) {
+			return localVariable(accessed, (Method)accessor.getParentType().getContainer());
+		}
+		return false;
 	}
 
 }

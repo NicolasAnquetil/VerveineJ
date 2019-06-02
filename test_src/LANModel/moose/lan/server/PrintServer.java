@@ -31,9 +31,10 @@ public class PrintServer extends OutputServer {
 	}
 	
 	public PrintServer() {
+		final int forInner = 0;
 		this.printer = new IPrinter() {
 			public void print(String contents, boolean rv) {
-				System.out.println(contents);		
+				System.out.println(contents + forInner);
 			}
 		};
 	}
