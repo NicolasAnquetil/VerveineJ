@@ -243,8 +243,8 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(VariableDeclarationExpression node) {
 		// we usually don't declare local variables that have a primitive type
 		// because we are assuming that the user is not interested in them
-		// note that non primitive types are important because of the dependencies they create
-		if ( ! allLocals && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
+		// note that non primitive types are important because of the dependencies they create (eg invocation receiver)
+		if ( ! allLocals && node.getType().isPrimitiveType() && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
 			return false;  // FIXME could be a mistake, but not too sure: what about var declaration with complex initialization (eg including an anonymous class)?
 		}
 
@@ -255,7 +255,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(VariableDeclarationStatement node) {
 		// about the same node as VariableDeclarationExpression (but is a statement instead of an expression)
 
-		if ( ! allLocals && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
+		if ( ! allLocals && node.getType().isPrimitiveType() && (structuralType == StructuralEntityKinds.LOCALVAR) ) {
 			return false;  // FIXME could be a mistake, but not too sure: what about var declaration with complex initialization (eg including an anonymous class)?
 		}
 
@@ -271,7 +271,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
-		if ( allLocals || (structuralType != StructuralEntityKinds.LOCALVAR) ) {
+		if ( allLocals || (! node.getType().isPrimitiveType()) || (structuralType != StructuralEntityKinds.LOCALVAR) ) {
 			createStructuralEntity( structuralType, node, context.top());
 		}
 		return true;  // e.g. with an initialization containing an anonymous class definition
