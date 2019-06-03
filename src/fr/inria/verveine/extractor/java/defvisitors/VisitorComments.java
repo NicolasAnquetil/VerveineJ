@@ -1,5 +1,6 @@
 package fr.inria.verveine.extractor.java.defvisitors;
 
+import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -25,7 +26,6 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
@@ -95,7 +95,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 		eu.synectique.verveine.core.gen.famix.Class fmx = visitTypeDeclaration( node);
 		if (fmx != null) {
 			entityJavadoc = node.getJavadoc();
-			addRegularOrJavaDocComment(node, fmx);
+			commentOnEntity(node, fmx);
 			if (compilUnitComment != null) {
 				dico.createFamixComment(compilUnitComment, fmx);
 				compilUnitComment = null;  // in case there are several types defined in the compilation unit
@@ -174,7 +174,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 		if ( (fmx != null) && (! classSummary) ){
 			entityJavadoc = node.getJavadoc();
-			addRegularOrJavaDocComment(node, fmx);
+			commentOnEntity(node, fmx);
 
 			structuralType = StructuralEntityKinds.PARAMETER;
 			entityJavadoc = null;  // no javadoc on parameters
@@ -202,7 +202,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 		AnnotationTypeAttribute fmx = visitAnnotationTypeMemberDeclaration( node);
 		if ( (fmx != null) && (! classSummary) ) {
 			entityJavadoc = node.getJavadoc();
-			addRegularOrJavaDocComment(node, fmx);
+			commentOnEntity(node, fmx);
 			return super.visit(node);
 		} else {
 			return false;
@@ -219,7 +219,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 		Method fmx = visitInitializer(node);
 		if ( (fmx != null) && (! classSummary) ) {
 			entityJavadoc = node.getJavadoc();
-			addRegularOrJavaDocComment(node, fmx);
+			commentOnEntity(node, fmx);
 			return super.visit(node);
 		}
 		else {
@@ -243,16 +243,14 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	public boolean visit(FieldDeclaration node) {
 		structuralType = StructuralEntityKinds.ATTRIBUTE;
 		entityJavadoc = node.getJavadoc();
-		varDeclarationFragmentHasComment = (nodeHasRegularComment(node) != null);
- 
+		varDeclarationFragmentHasComment = (nodeOptionalComment(node) != null);
+
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(VariableDeclarationExpression node) {
 		structuralType = StructuralEntityKinds.LOCALVAR;
-		entityJavadoc = null;  // no javadoc on local variables
-		varDeclarationFragmentHasComment = false;
 
 		return super.visit(node);
 	}
@@ -260,104 +258,107 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(VariableDeclarationStatement node) {
 		structuralType = StructuralEntityKinds.LOCALVAR;
-		entityJavadoc = null;  // no javadoc on local variables
-		varDeclarationFragmentHasComment = false;
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(VariableDeclarationFragment node) {
-		createCommentOnStructEntity(node, structuralType, entityJavadoc);
+		commentOnStructuralEntity(node, structuralType);
 
 		return super.visit(node);
 	}
 
 	@Override
 	public boolean visit(SingleVariableDeclaration node) {
-		createCommentOnStructEntity(node, structuralType, entityJavadoc);
+		commentOnStructuralEntity(node, structuralType);
 
 		return super.visit(node);
 	}
 
 	// UTILITY METHODS
 
-	protected void createCommentOnStructEntity(VariableDeclaration node, StructuralEntityKinds structuralKind, Javadoc structuralJavadoc) {
-		StructuralEntity fmx;
+    protected void commentOnEntity(ASTNode node, NamedEntity fmx) {
+		Comment cmt = null;
+
+		if (fmx == null) {
+			return;
+        }
+
+		if (entityJavadoc != null) {
+			cmt = entityJavadoc;
+		} else {
+			cmt = nodeOptionalComment(node);
+		}
+
+		if (cmt != null) {
+		    dico.createFamixComment(cmt, fmx);
+        }
+    }
+
+	protected void commentOnStructuralEntity(VariableDeclaration node, StructuralEntityKinds structuralKind) {
+		StructuralEntity fmx = null;
+		Comment cmt = null;
 
 		if (classSummary) {
 			return;
 		}
 
-		IVariableBinding bnd = node.resolveBinding();
-		String name = node.getName().getIdentifier();
-
-		// recover the famix entity
-		switch (structuralKind) {
-		case ATTRIBUTE:
-			fmx = dico.getFamixAttribute(bnd, name, context.topType());
-			if (varDeclarationFragmentHasComment) {
-				// if there is a comment on a FieldDeclaration (which possibly have several fields), we keep the comment for the first field
-				addRegularOrJavaDocComment(node.getParent(), fmx);
-				varDeclarationFragmentHasComment = false;
-			}
-			else {
-				addRegularOrJavaDocComment(node, fmx);
-			}
-			break;
-
-		case PARAMETER:
-			fmx = dico.getFamixParameter(bnd, name, context.topMethod());
-			addRegularOrJavaDocComment(node, fmx);
-			break;
-
-		case LOCALVAR:
-			fmx = dico.getFamixLocalVariable(bnd, name, context.topMethod());
-			if (varDeclarationFragmentHasComment) {
-				// if there is a comment on a VariableDeclaration (which possibly have several variables), we keep the comment for the first variable
-				addRegularOrJavaDocComment(node.getParent(), fmx);
-				varDeclarationFragmentHasComment = false;
-			}
-			else {
-				addRegularOrJavaDocComment(node, fmx);
-			}
-			break;
-
-		default:
-			/*nothing*/
-		}
-
-	}
-
-	/**
-	 * depends on {@link #entityJavadoc} variable to contain a javaDoc associated to the <code>fmx</code> entity (or nil)
-	 * @param node An AST node close to the declaration of the famix entity to comment
-	 * @param fmx An entity on which to create a comment
-	 */
-	protected void addRegularOrJavaDocComment(ASTNode node, NamedEntity fmx) {
-
-		if (fmx == null) {
-			return;
-		}
-
 		if (entityJavadoc != null) {
-			eu.synectique.verveine.core.gen.famix.Comment cmt = dico.createFamixComment(entityJavadoc, fmx);
-			return;  // cannot have both javadoc and regular comment, can it ???
+			cmt = entityJavadoc;
+		} else {
+			cmt = variableOptionalComment(node, structuralKind);
 		}
 
-		Comment cmt = nodeHasRegularComment(node);
 		if (cmt != null) {
-			dico.createFamixComment( cmt, fmx);
+			IVariableBinding bnd = node.resolveBinding();
+			String name = node.getName().getIdentifier();
+
+			// recover the famix entity
+			switch (structuralKind) {
+				case ATTRIBUTE:
+					fmx = dico.getFamixAttribute(bnd, name, context.topType());
+					break;
+
+				case PARAMETER:
+					fmx = dico.getFamixParameter(bnd, name, context.topMethod());
+					break;
+
+				case LOCALVAR:
+					fmx = dico.getFamixLocalVariable(bnd, name, context.topMethod());
+					break;
+			}
+
+			if (! fmx.getIsStub()) {
+			    // if it is a stub, it might have been created by the getFamixXXX just above
+                // or something very strange happened
+                // Anyway we cannot have a comment on a stub
+			    dico.createFamixComment(cmt, fmx);
+            }
 		}
 	}
 
-	private Comment nodeHasRegularComment(ASTNode node) {
-		int iCmt = astRoot.firstLeadingCommentIndex(node);
-		if (iCmt > -1) {
-			return (Comment) astRoot.getCommentList().get(iCmt);
-		}
-		else {
-			return null;
+	private Comment variableOptionalComment(ASTNode node, StructuralEntityKinds structuralKind) {
+		switch (structuralKind) {
+			case ATTRIBUTE:
+			case LOCALVAR:
+				return nodeOptionalComment(node.getParent());
+
+			case PARAMETER:
+				return nodeOptionalComment(node);
+
+            default:
+                return null;
 		}
 	}
+
+	private Comment nodeOptionalComment(ASTNode node) {
+        int iCmt = astRoot.firstLeadingCommentIndex(node);
+        if (iCmt > -1) {
+            return (Comment) astRoot.getCommentList().get(iCmt);
+        }
+        else {
+            return null;
+        }
+    }
 
 }

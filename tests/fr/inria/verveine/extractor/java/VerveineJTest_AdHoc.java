@@ -110,30 +110,51 @@ public class VerveineJTest_AdHoc {
 		assertNotNull(seg2);
 	}
 
-	@Test
-	public void testLambdaUnTypedParameter() {
-		parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
+    @Test
+    public void testLambdaUnTypedParameter() {
+        parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
 
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
-		assertNotNull(meth);
+        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
+        assertNotNull(meth);
 
-		LocalVariable col = null;
-		LocalVariable o = null;
-		assertEquals(2, meth.getLocalVariables().size());
-		for (LocalVariable lvar : meth.getLocalVariables()) {
-			if (lvar.getName().equals("col")) {
-				col = lvar;
-			}
-			else if (lvar.getName().equals("o")) {
-				o = lvar;
-			}
-			else {
-				fail("Unknown local variable:" + lvar.getName());
-			}
-		}
-		assertNotNull(col);
-		assertNotNull(o);
-	}
+        LocalVariable col = null;
+        LocalVariable found = null;
+        LocalVariable t = null;
+        assertEquals(3, meth.getLocalVariables().size());
+        for (LocalVariable lvar : meth.getLocalVariables()) {
+            if (lvar.getName().equals("col")) {
+                col = lvar;
+            }
+            else if (lvar.getName().equals("found")) {
+                found = lvar;
+            }
+            else if (lvar.getName().equals("t")) {
+                t = lvar;
+            }
+            else {
+                fail("Unknown local variable:" + lvar.getName());
+            }
+        }
+        assertNotNull(col);
+        assertNotNull(found);
+        assertNotNull(t);
+    }
+
+    @Test
+    public void testLambdaNotAllLocals() {
+        parse(new String[] {"test_src/ad_hoc/WithLambda.java"});
+
+        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
+        assertNotNull(meth);
+
+        LocalVariable col = null;
+        assertEquals(1, meth.getLocalVariables().size());
+        col = meth.getLocalVariables().iterator().next();
+        assertNotNull(col);
+        assertEquals("col", col.getName());
+
+        assertEquals(0, meth.getAccesses().size());
+    }
 
 	@ Test
 	public void testConstructorInvocations() {
