@@ -147,6 +147,17 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(pckg, clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 
+		eu.synectique.verveine.core.gen.famix.Class outputServ = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer");
+		assertNotNull(outputServ);
+		assertEquals("OutputServer", outputServ.getName());
+		assertEquals(4, outputServ.getMethods().size());
+		for (Method mth : outputServ.getMethods()) {
+			String nm = mth.getName();
+			assertTrue("Unknown method name: "+nm, nm.equals(JavaDictionary.INIT_BLOCK_NAME) || nm.equals("accept") || nm.equals("canOutput") || nm.equals("output") );
+		}
+		assertEquals(1, outputServ.getAttributes().size());
+		assertFalse(outputServ.getIsInterface());
+		
 		pckg = VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "server");
 		assertNotNull(pckg);
 		assertEquals("server", pckg.getName());
@@ -166,14 +177,23 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(1, clazz.numberOfAttributes());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer"), clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
+	}
 
-		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "_Anonymous(IPrinter)");
+	@Test
+	public void testAnonymous() {
+		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "_Anonymous(IPrinter)");
 		assertNotNull(clazz);
 		assertEquals("_Anonymous(IPrinter)", clazz.getName());
 		assertEquals(1, clazz.numberOfMethods());
 		assertEquals(0, clazz.numberOfAttributes());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,Method.class, "PrintServer"), clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
+
+		Method mth = clazz.getMethods().iterator().next();
+		assertEquals("print", mth.getName());
+        assertEquals(1, mth.getReferences().size());  // System
+        assertEquals(1, mth.getAccesses().size());   // out
+        assertEquals(1, mth.getOutgoingInvocations().size());  // println
 	}
 
 	@Test
@@ -277,6 +297,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals("equalsMultiple(AbstractDestinationAddress)", em.getSignature());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress"), em.getParentType());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,PrimitiveType.class, "boolean"), em.getDeclaredType());
+		assertEquals("29F586AA07B1D80186CC5981C16F6442", em.getBodyHash());
 
 		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "FileServer");
 		assertNotNull(clazz);
