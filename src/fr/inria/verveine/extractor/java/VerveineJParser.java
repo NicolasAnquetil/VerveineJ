@@ -48,6 +48,7 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	/**
+	 * TODO remove ?
 	 * Whether to summarize collected information at the level of classes or produce everything.
 	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation.<br>
 	 * Note: classSummary => not allLocals
