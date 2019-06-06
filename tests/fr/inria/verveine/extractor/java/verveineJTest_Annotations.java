@@ -33,6 +33,15 @@ public class verveineJTest_Annotations {
     }
 
     @Test
+    public void testAnnotationSubClass() {
+        eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SubAnnotation");
+        assertNotNull(cl);
+
+        AnnotationType getProp = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "GetProperty");
+        assertEquals(getProp, cl.getContainer());
+    }
+
+    @Test
     public void testClassAnnotation() {
         eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Serializer");
         assertEquals(1, cl.getAnnotationInstances().size());

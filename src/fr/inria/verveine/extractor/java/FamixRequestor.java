@@ -10,7 +10,6 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
 import ch.akuhn.fame.Repository;
-import fr.inria.verveine.extractor.java.defvisitors.VisitorAnnotationDef;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorClassMethodDef;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorComments;
 import fr.inria.verveine.extractor.java.defvisitors.VisitorPackageDef;
@@ -72,7 +71,6 @@ public class FamixRequestor extends FileASTRequestor {
 		try {
 			ast.accept(new VisitorPackageDef(this.famixDictionnary));
 			ast.accept(new VisitorClassMethodDef(this.famixDictionnary, classSummary, anchors));
-			ast.accept(new VisitorAnnotationDef(this.famixDictionnary, classSummary, anchors));
 			ast.accept(new VisitorVarsDef(this.famixDictionnary, classSummary, allLocals, anchors));
 			ast.accept(new VisitorComments(this.famixDictionnary, classSummary));
 

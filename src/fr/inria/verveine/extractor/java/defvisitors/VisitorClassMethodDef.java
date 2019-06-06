@@ -7,20 +7,18 @@ import java.util.List;
 
 import java.security.MessageDigest;
 
+import eu.synectique.verveine.core.gen.famix.*;
+import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jdt.core.dom.*;
 
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.ParameterType;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -190,6 +188,31 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		super.endVisit(node);
 	}
 
+	@Override
+	public boolean visit(AnnotationTypeDeclaration node) {
+		ITypeBinding bnd = node.resolveBinding();
+		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top(), persistClass(bnd));
+		if (fmx != null) {
+			Util.recursivelySetIsStub(fmx, false);
+			if (anchors != anchorOptions.none) {
+				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+			}
+
+			context.pushType(fmx);
+			return super.visit(node);
+		}
+		else {
+			context.pushType(null);
+			return false;
+		}
+	}
+
+	@Override
+	public void endVisit(AnnotationTypeDeclaration node) {
+		this.context.popType();
+		super.endVisit(node);
+	}
+
 	/**
      * MethodDeclaration ::=
      *     [ Javadoc ] { ExtendedModifier } [ < TypeParameter { , TypeParameter } > ] ( Type | void )
@@ -332,6 +355,32 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
     public void endVisit(FieldDeclaration node) {
         closeOptionalInitBlock();
     }
+
+	@Override
+	public boolean visit(AnnotationTypeMemberDeclaration node) {
+//		System.err.println("TRACE, Visiting AnnotationTypeMemberDeclaration: "+node.getName().getIdentifier());
+		IMethodBinding bnd = node.resolveBinding();
+
+		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
+		if (fmx != null) {
+			fmx.setIsStub(false);
+			if (anchors != anchorOptions.none) {
+				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+			}
+
+			context.pushAnnotationMember(fmx);
+			return super.visit(node);
+		} else {
+			context.pushAnnotationMember(null);
+			return false;
+		}
+	}
+
+	@Override
+	public void endVisit(AnnotationTypeMemberDeclaration node) {
+		this.context.popAnnotationMember();
+		super.endVisit(node);
+	}
 
 	@Override
 	public boolean visit(ConstructorInvocation node) {

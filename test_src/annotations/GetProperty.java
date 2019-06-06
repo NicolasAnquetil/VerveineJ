@@ -15,5 +15,7 @@ import java.lang.annotation.*;
 public @interface GetProperty {
 
 	public String value();
+
+	class SubAnnotation implements GetProperty {}
 	
 }
