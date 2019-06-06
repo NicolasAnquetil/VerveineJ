@@ -146,50 +146,40 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
 		assertEquals(2+4,VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
-		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());    // Override annotations on methods
 		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());  // class Comparable no longer created
+	}
 
-		// following redefinition of meta-model, Reference from class to class are no longer possible (must from method to class)
-		// so all reference creation was removed
-		//assertEquals(30,    VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());
-		/* list of known references
-			(access to self attribute generate a ref from the class to itself, invocation of self method does not generate a ref):
-			AbstractDestinationAddress -> String
-			FileServer -> OutputServer
-			FileServer -> Packet 
-			FileServer -> String 
-			FileServer -> System 
-			IPrinter -> String 
-			Node -> Node 
-			Node -> Packet 
-			Node -> String 
-			Node -> StringBuffer 
-			Node -> System 
-			OutputServer -> Packet 
-			OutputServer -> String 
-			Packet -> Node 
-			Packet -> Packet 
-			Packet -> SingleDestinationAddress 
-			Packet -> String 
-			Packet -> StringBuffer 
-			PrintServer -> IPrinter 
-			PrintServer -> Packet 
-			PrintServer -> PrintServer 
-			PrintServer -> String 
-			PrintServer -> System 
-			SingleDestinationAddress -> AbstractDestinationAddress 
-			SingleDestinationAddress -> SingleDestinationAddress 
-			SingleDestinationAddress -> String 
-			System -> PrintStream 
-			WorkStation -> Packet 
-			WorkStation -> String 
-			WorkStation -> System
-		 */
+	@Test
+	public void testAccesses() {
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+
+		for (Access acc : VerveineUtilsForTests.selectElementsOfType(repo, Access.class)) {
+			assertNotNull(acc.getVariable());
+			assertNotNull(acc.getAccessor());
+		}
+	}
+
+	@Test
+	public void testInvocations() {
+		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
+
+		for (Invocation invok : VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class)) {
+			assertNotNull(invok.getCandidates());
+			assertNotNull(invok.getSender());
+		}
+	}
+
+	@Test
+	public void testReferences() {
+		// TODO assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());
+
+		for (Reference ref : VerveineUtilsForTests.selectElementsOfType(repo, Reference.class)) {
+			assertNotNull(ref.getTarget());
+			assertNotNull(ref.getSource());
+		}
 	}
 
 	@Test
@@ -209,7 +199,9 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		eu.synectique.verveine.core.gen.famix.Class clazz;
 		Collection<Inheritance> inherits;
 		Inheritance inh, inh2 = null;
-		
+
+		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
+
 		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
