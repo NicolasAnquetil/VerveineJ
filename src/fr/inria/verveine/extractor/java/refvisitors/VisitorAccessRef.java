@@ -260,7 +260,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	 */
 	public boolean visit(QualifiedName node) {
 		IBinding bnd = node.resolveBinding();
-		if (bnd instanceof IVariableBinding) {
+		if ( (bnd != null) && (bnd.getKind() == IBinding.VARIABLE) ) {
 			// could be a field or an enumValue
 			Method accessor = this.context.topMethod();
 			ensureAccessedStructEntity((IVariableBinding) bnd, node.getName().getIdentifier(), /*typ*/null,
@@ -444,7 +444,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	private void visitSimpleName(SimpleName expr) {
 		//		System.err.println("visitSimpleName(): "+expr.getIdentifier() + " inAssignmentLHS=" + inAssignmentLHS);
 		IBinding bnd = expr.resolveBinding();
-		if ((bnd instanceof IVariableBinding) && (context.topMethod() != null)) {
+		if ( (bnd != null) && (bnd.getKind() == IBinding.VARIABLE) && (context.topMethod() != null) ) {
 			// could be a variable, a field, an enumValue, ...
 			Method accessor = this.context.topMethod();
 			ensureAccessedStructEntity((IVariableBinding) bnd, expr.getIdentifier(), /*typ*/null, /*owner*/null,
