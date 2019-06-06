@@ -191,7 +191,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		Method mth = clazz.getMethods().iterator().next();
 		assertEquals("print", mth.getName());
-        assertEquals(1, mth.getReferences().size());  // System
+        assertEquals(1, mth.getOutgoingReferences().size());  // System
         assertEquals(1, mth.getAccesses().size());   // out
         assertEquals(1, mth.getOutgoingInvocations().size());  // println
 	}

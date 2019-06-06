@@ -22,9 +22,16 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	 */
 	private anchorOptions anchors;
 
+    /**
+     * Global variable indicating whether a name could be a typeReference
+     * Checked in visit(SimpleName), set in expressions that could contain typeReference
+     */
+	private boolean searchTypeRef;
+
 	public VisitorTypeRefRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super(dico, classSummary);
 		this.anchors = anchors;
+		this.searchTypeRef = false;
 	}
 
 	// VISITOR METHODS
@@ -63,6 +70,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	 */
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
+		visitClassInstanceCreation(node);
 		if (node.getAnonymousClassDeclaration() == null) {
 			Type clazz = node.getType();
 			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
@@ -206,10 +214,10 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		else {
 			ref = dico.addFamixReference((BehaviouralEntity) context.top(), fmx, context.getLastReference());
 			context.setLastReference(ref);
-		}
-		if (anchors == anchorOptions.assoc) {
-			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
-		}
+    		if (anchors == anchorOptions.assoc) {
+	    		dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+		    }
+        }
 
 		return super.visit(node);
 	}
@@ -261,8 +269,42 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	public boolean visit(VariableDeclarationStatement node) {
 		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
 	}
-	
-	/**
+
+    @Override
+    public boolean visit(MethodInvocation node) {
+        Expression receivr = node.getExpression();
+        if (receivr != null) {
+            searchTypeRef = true;
+            receivr.accept(this);
+            searchTypeRef = false;
+        }
+        for (Expression arg : (List<Expression>)node.arguments()) {
+            arg.accept(this);
+        }
+        for (Type targ : (List<Type>)node.typeArguments()) {
+            searchTypeRef = true;
+            targ.accept(this);
+            searchTypeRef = false;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean visit(SimpleName node) {
+	    if (this.searchTypeRef) {
+            IBinding bnd = node.resolveBinding();
+            if ( (bnd != null) && (bnd.getKind() == IBinding.TYPE) ) {
+                eu.synectique.verveine.core.gen.famix.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+                Reference ref = dico.addFamixReference((BehaviouralEntity) context.top(), referred, context.getLastReference());
+                context.setLastReference(ref);
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
 	 * same behaviour for VariableDeclarationStatement and VariableDeclarationExpression
      * VariableDeclaration ::=
      *     SingleVariableDeclaration VariableDeclarationFragment
@@ -288,20 +330,5 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			}
 		}
 	}
-
-	public boolean visit(MethodInvocation node) {
-		Expression callingExpr = node.getExpression();
-		if (callingExpr instanceof Name) {
-			IBinding bnd = ((Name)callingExpr).resolveBinding();
-			if ( (bnd != null) && (bnd instanceof ITypeBinding) ) {
-				eu.synectique.verveine.core.gen.famix.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
-				Reference ref = dico.addFamixReference((BehaviouralEntity) context.top(), referred, context.getLastReference());
-				context.setLastReference(ref);
-			}
-		}
-
-		return super.visit(node);
-	}
-
 
 }
