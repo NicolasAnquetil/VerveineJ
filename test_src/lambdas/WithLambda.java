@@ -1,4 +1,4 @@
-package adhoc;
+package lambdas;
 
 public class WithLambda {
 

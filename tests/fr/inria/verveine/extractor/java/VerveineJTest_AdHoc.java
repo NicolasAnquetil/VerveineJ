@@ -70,7 +70,7 @@ public class VerveineJTest_AdHoc {
 	@Test
 	public void testUnresolvedDeclaration() {
 		 // note: lire() method unresolved because it throws ReadException which is not parsed here
-		parse(new String[]{"test_src/ad_hoc/ReadClient.java"});
+		parse(new String[]{"test_src/exceptions/ReadClient.java"});
 
 		int nbLire = 0;
 		Method lire = null;
@@ -84,77 +84,6 @@ public class VerveineJTest_AdHoc {
 		// actually the extra methods are not in the repository, but they own the invocations
 		assertEquals(6, lire.getOutgoingInvocations().size());
 	}
-
-	@Test
-	public void testLambdaTypedParameter() {
-		parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
-
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
-		assertNotNull(meth);
-
-		LocalVariable seg1 = null;
-		LocalVariable seg2 = null;
-		assertEquals(2, meth.getLocalVariables().size());
-		for (LocalVariable lvar : meth.getLocalVariables()) {
-			if (lvar.getName().equals("seg1")) {
-				seg1 = lvar;
-			}
-			else if (lvar.getName().equals("seg2")) {
-				seg2 = lvar;
-			}
-			else {
-				fail("Unknown local variable:" + lvar.getName());
-			}
-		}
-		assertNotNull(seg1);
-		assertNotNull(seg2);
-	}
-
-    @Test
-    public void testLambdaUnTypedParameter() {
-        parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
-
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
-        assertNotNull(meth);
-
-        LocalVariable col = null;
-        LocalVariable found = null;
-        LocalVariable t = null;
-        assertEquals(3, meth.getLocalVariables().size());
-        for (LocalVariable lvar : meth.getLocalVariables()) {
-            if (lvar.getName().equals("col")) {
-                col = lvar;
-            }
-            else if (lvar.getName().equals("found")) {
-                found = lvar;
-            }
-            else if (lvar.getName().equals("t")) {
-                t = lvar;
-            }
-            else {
-                fail("Unknown local variable:" + lvar.getName());
-            }
-        }
-        assertNotNull(col);
-        assertNotNull(found);
-        assertNotNull(t);
-    }
-
-    @Test
-    public void testLambdaNotAllLocals() {
-        parse(new String[] {"test_src/ad_hoc/WithLambda.java"});
-
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
-        assertNotNull(meth);
-
-        LocalVariable col = null;
-        assertEquals(1, meth.getLocalVariables().size());
-        col = meth.getLocalVariables().iterator().next();
-        assertNotNull(col);
-        assertEquals("col", col.getName());
-
-        assertEquals(0, meth.getAccesses().size());
-    }
 
 	@ Test
 	public void testConstructorInvocations() {
@@ -277,35 +206,6 @@ public class VerveineJTest_AdHoc {
 		assertNotNull(meth);
 		
 		assertEquals("uniplementedMethod(?,?)", meth.getSignature());
-	}
-
-	@Test
-	public void testExceptions() {
-		parse(new String[] {"test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"});
-
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "lire");
-		assertNotNull(meth);
-
-		eu.synectique.verveine.core.gen.famix.Class excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
-		assertNotNull(excepClass);
-
-		assertEquals(1, meth.getDeclaredExceptions().size());
-		DeclaredException exD = meth.getDeclaredExceptions().iterator().next();
-		assertSame(meth, exD.getDefiningMethod());
-		assertSame(excepClass, exD.getExceptionClass());
-
-		assertEquals(1, meth.getThrownExceptions().size());
-		ThrownException exT = meth.getThrownExceptions().iterator().next();
-		assertSame(meth, exT.getDefiningMethod());
-		assertSame(excepClass, exT.getExceptionClass());
-
-		excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IOException");
-		assertNotNull(excepClass);
-
-		assertEquals(1,meth.getCaughtExceptions().size());
-		CaughtException exC = meth.getCaughtExceptions().iterator().next();
-		assertSame(meth, exC.getDefiningMethod());
-		assertSame(excepClass, exC.getExceptionClass());
 	}
 
 	@Test

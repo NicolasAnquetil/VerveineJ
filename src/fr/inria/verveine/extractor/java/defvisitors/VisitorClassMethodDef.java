@@ -361,6 +361,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 //		System.err.println("TRACE, Visiting AnnotationTypeMemberDeclaration: "+node.getName().getIdentifier());
 		IMethodBinding bnd = node.resolveBinding();
 
+		// note"Annotatin members looks like methods but they are closer to attributes
 		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
 		if (fmx != null) {
 			fmx.setIsStub(false);

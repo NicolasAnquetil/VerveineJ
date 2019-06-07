@@ -1,4 +1,4 @@
-package ad_hoc;
+package exceptions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
