@@ -1,25 +1,17 @@
-package fr.inria.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.eclipse.jdt.core.dom.IMemberValuePairBinding;
-import org.eclipse.jdt.core.dom.IPackageBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.InstanceofExpression;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
@@ -32,15 +24,9 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.Reference;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
-import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 
 /**
  * <p>Recovers annotations from the IBinding of various kind of entities:
@@ -199,13 +185,13 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 			return null;
 		}
 
-		if (attVal.getClass() == Object[].class) {
+		if (isArray(attVal)) {
 			int nbVal = 0;
 			for (Object val : ((Object[])attVal)) {
-				attFamixVal += (nbVal>0?", " : "") + annInstAttValAsString( val );
+				attFamixVal += (nbVal>0 ? ", " : "") + annInstAttValAsString( val );
 				nbVal++;
 			}
-			if (nbVal != 1) {  // '0' => {} ; '>=1' => {val, val, ...}
+			if (nbVal != 1) {  // '0' => {} ; '1' => val ; '>1' => {val, val, ...}
 				attFamixVal = "{" + attFamixVal + "}";
 			}
 		}
@@ -216,7 +202,11 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 		return( dico.createFamixAnnotationInstanceAttribute(annoAtt, attFamixVal) );
 	}
 
-	/**
+    private boolean isArray(Object attVal) {
+        return attVal.getClass() == Object[].class;
+    }
+
+    /**
 	 * represents the value of an AnnotationInstanceAttribute as a String
 	 * @param attVal
 	 */

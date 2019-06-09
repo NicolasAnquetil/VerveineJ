@@ -1,9 +1,9 @@
-package fr.inria.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import eu.synectique.verveine.core.gen.famix.*;
 import eu.synectique.verveine.core.gen.famix.Class;
-import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
@@ -81,7 +81,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
         Type excepClass = node.getException().getType();
         if (meth != null) {
             eu.synectique.verveine.core.gen.famix.Class excepFmx = null;
-            if ((excepClass instanceof SimpleType) || (excepClass instanceof QualifiedType)) {
+            if ( NodeTypeChecker.isSimpleType(excepClass) || NodeTypeChecker.isQualifiedType(excepClass) ) {
                 excepFmx = (Class) referedType(excepClass, meth, true);
             }
             if (excepFmx != null) {

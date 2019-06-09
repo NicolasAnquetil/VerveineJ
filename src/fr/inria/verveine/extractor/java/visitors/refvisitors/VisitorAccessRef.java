@@ -1,13 +1,12 @@
-package fr.inria.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import java.util.List;
 
-import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
+import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.Enum;
 import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
@@ -418,7 +417,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
      * Visit the parameter as a SimpleName node if it is one, otherwise does nothing
      */
    	private void visitIfSimpleName(ASTNode node) {
-        if (node instanceof SimpleName) {
+        if (NodeTypeChecker.isSimpleName(node)) {
             visitSimpleName((SimpleName) node);
         }
     }
@@ -427,7 +426,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
      * Visit the parameter as a SimpleName node if it is one, otherwise do a "normal" visit
      */
   	private void visitAsSimpleName(ASTNode node) {
-        if (node instanceof SimpleName) {
+        if (NodeTypeChecker.isSimpleName(node)) {
             visitSimpleName((SimpleName) node);
         } else if (node != null) {
             node.accept(this);

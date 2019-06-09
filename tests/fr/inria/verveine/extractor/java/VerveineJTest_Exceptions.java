@@ -77,6 +77,7 @@ public class VerveineJTest_Exceptions {
         Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "doThrow");
         assertNotNull(meth);
 
+//        assertEquals(0, meth.getParentType().getTypes().size());
         assertEquals(1, meth.getDeclaredExceptions().size());
         DeclaredException exD = meth.getDeclaredExceptions().iterator().next();
         assertSame(meth, exD.getDefiningMethod());

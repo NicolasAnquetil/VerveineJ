@@ -1,5 +1,8 @@
-package fr.inria.verveine.extractor.java;
+package fr.inria.verveine.extractor.java.visitors;
 
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
 import eu.synectique.verveine.core.gen.famix.NamedEntity;

@@ -1,9 +1,10 @@
-package fr.inria.verveine.extractor.java;
+package fr.inria.verveine.extractor.java.visitors;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import org.eclipse.jdt.core.dom.*;
 

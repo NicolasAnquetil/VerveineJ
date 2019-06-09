@@ -59,7 +59,7 @@ public class VerveineJTest_Configuration {
 	@Test
 	public void testNotAlllocals() {
 		// works in team with testAlllocals
-		parse(new String[]{"test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
+		parse(new String[]{"test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
 		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // nom, num, e
 		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom
 	}
@@ -67,7 +67,7 @@ public class VerveineJTest_Configuration {
 	@Test
 	public void testAlllocals() {
 		// works in team with testNotAlllocals
-		parse(new String[]{"-alllocals", "test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
+		parse(new String[]{"-alllocals", "test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
 
 		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
 		assertEquals(28, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
