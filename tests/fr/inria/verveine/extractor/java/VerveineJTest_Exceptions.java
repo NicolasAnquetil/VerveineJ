@@ -29,7 +29,7 @@ public class VerveineJTest_Exceptions {
         repo = parser.getFamixRepo();
         parser.setOptions(new String[] {"test_src/exceptions"});
         parser.parse();
-        //	parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+        parser.emitMSE(VerveineJParser.OUTPUT_FILE);
     }
 
     @Test
@@ -81,7 +81,7 @@ public class VerveineJTest_Exceptions {
         assertEquals(1, meth.getDeclaredExceptions().size());
         DeclaredException exD = meth.getDeclaredExceptions().iterator().next();
         assertSame(meth, exD.getDefiningMethod());
-        assertSame("T", exD.getExceptionClass().getName());
+        assertEquals("T", exD.getExceptionClass().getName());
     }
 
 }

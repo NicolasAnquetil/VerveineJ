@@ -73,7 +73,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_FINAL    = "final";
 	public static final String MODIFIER_STATIC    = "static";
 
-    /**
+	/**
 	 * Result of utility methods for checking matching between two entities
 	 */
 	private enum CheckResult {
@@ -354,6 +354,28 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		return fmx;
+	}
+
+	public Type asClass(ParameterType excepFmx) {
+		ContainerEntity owner = excepFmx.getBelongsTo();
+		owner.getTypes().remove(excepFmx);
+		super.removeEntity(excepFmx);
+
+		Class tmp = super.ensureFamixClass(entityToKey.get(excepFmx), excepFmx.getName(), owner, /*alwaysPersist?*/true);
+
+		tmp.addMethods(excepFmx.getMethods());
+		tmp.addAttributes(excepFmx.getAttributes());
+		tmp.addModifiers(excepFmx.getModifiers());
+		tmp.addSuperInheritances(excepFmx.getSuperInheritances());
+		tmp.addSubInheritances(excepFmx.getSubInheritances());
+		tmp.setSourceAnchor(excepFmx.getSourceAnchor());
+		tmp.addAnnotationInstances(excepFmx.getAnnotationInstances());
+		tmp.addComments(excepFmx.getComments());
+		tmp.addIncomingReferences(excepFmx.getIncomingReferences());
+		tmp.setIsStub(excepFmx.getIsStub());
+		tmp.addTypes(excepFmx.getTypes());
+
+		return tmp;
 	}
 
 	/**

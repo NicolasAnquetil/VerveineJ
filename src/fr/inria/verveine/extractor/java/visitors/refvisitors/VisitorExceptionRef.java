@@ -57,10 +57,13 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 		Method fmx = visitMethodDeclaration( node);
 		if (fmx != null) {
 		    for (Type excep : (List<Type>)node.thrownExceptionTypes()) {
-				Class excepFmx = (Class) this.referedType(excep.resolveBinding(), context.topType(), true);
+				eu.synectique.verveine.core.gen.famix.Type excepFmx = this.referedType(excep.resolveBinding(), context.topType(), true);
 				if (excepFmx != null) {
 					if (! classSummary) {
-						dico.createFamixDeclaredException(fmx, excepFmx);
+					    if (excepFmx instanceof ParameterType) {
+					        excepFmx = dico.asClass((ParameterType)excepFmx);
+                        }
+						dico.createFamixDeclaredException(fmx, (Class) excepFmx);
 					}
 				}
 			}
