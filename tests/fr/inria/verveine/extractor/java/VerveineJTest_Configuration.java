@@ -70,7 +70,7 @@ public class VerveineJTest_Configuration {
 		parse(new String[]{"-alllocals", "test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
 
 		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
-		assertEquals(28, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		assertEquals(32, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());  // ReadClient*4 ; lire*20 ; setNum*3 ; getNum*1 ; setNom*3 ; getNom*1
 	}
 
 	@Test
@@ -96,9 +96,9 @@ public class VerveineJTest_Configuration {
         assertNotNull(var1);
 		assertNotNull(var2);
 		assertNotNull(var3);
-        assertEquals(1, var1.getIncomingAccesses().size());
-		assertEquals(2, var2.getIncomingAccesses().size());
-		assertEquals(3, var3.getIncomingAccesses().size());
+        assertEquals(2, var1.getIncomingAccesses().size());
+		assertEquals(3, var2.getIncomingAccesses().size());
+		assertEquals(4, var3.getIncomingAccesses().size());
 
 
         Collection<Parameter> params = VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class);

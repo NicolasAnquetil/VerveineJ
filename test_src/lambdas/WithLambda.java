@@ -12,6 +12,6 @@ public class WithLambda {
 
     public WithLambda() {
         Collection<Object> col;
-        boolean found = col.stream().anyMatch(t -> t.getName().contains("target/data/foo"));
+        boolean found = col.stream().anyMatch(t -> System.out.print("lambda!"));
     }
 }

@@ -114,7 +114,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(26,   VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
 		assertEquals(54,   VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
 		assertEquals(12, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size());
-		assertEquals(25,   VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());// 16 "internal" attributes + 9 System.out
+		assertEquals(26,   VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());// 17 "internal" attributes + 9 System.out
 		assertEquals(0,    VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
 		assertEquals(1,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); //Override
 		assertEquals(2,    VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
@@ -597,7 +597,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "serverType");
 		assertNotNull(att);
-		assertEquals(1, att.getIncomingAccesses().size());
+		assertEquals(2, att.getIncomingAccesses().size());   // OutputServer: "protected String serverType = ..." ; FileServer: "this.serverType = ..."
 		acces = att.getIncomingAccesses().iterator().next();
 		accessor = acces.getAccessor();
 

@@ -542,10 +542,7 @@ public class VerveineJTest_AdHoc {
 
 		assertEquals(4, pl.getAttributes().size());
 		for (Attribute a : pl.getAttributes()) {
-			if ( a.getName().equals("G") || a.getName().equals("i") ) {
-				assertEquals(1, a.getIncomingAccesses().size());
-			}
-			else if (a.getName().equals("radius")) {
+			if ( a.getName().equals("G") || a.getName().equals("radius") || a.getName().equals("i") ) {
 				assertEquals(2, a.getIncomingAccesses().size());
 			}
 			else if (a.getName().equals("mass")) {
@@ -599,9 +596,14 @@ public class VerveineJTest_AdHoc {
 		}
 		
 		assertNotNull("Attribute i in Planet not found", i_att);
-		assertEquals(1, i_att.getIncomingAccesses().size());
+		assertEquals(2, i_att.getIncomingAccesses().size());
 		access = i_att.getIncomingAccesses().iterator().next();
-		assertFalse(access.getIsWrite());
+		if (access.getAccessor().getName().equals("sillyArrayAssignement")) {
+            assertFalse(access.getIsWrite());
+        }
+        else {
+		    assertTrue(access.getIsWrite());
+        }
 		
 		assertNotNull("Attribute mass in Planet not found", mass_att);
 		assertEquals(4, mass_att.getIncomingAccesses().size());

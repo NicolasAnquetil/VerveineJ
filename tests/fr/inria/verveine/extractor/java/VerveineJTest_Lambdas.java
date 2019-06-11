@@ -4,14 +4,14 @@ import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.core.VerveineUtilsForTests;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
+import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
+import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class VerveineJTest_Lambdas {
 
