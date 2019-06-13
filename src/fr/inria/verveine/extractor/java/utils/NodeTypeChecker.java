@@ -193,11 +193,6 @@ public class NodeTypeChecker extends ASTVisitor {
         return false;
     }
     @Override
-    public boolean visit(LambdaExpression node) {
-        return true;
-    }
-
-    @Override
     public boolean visit(AnnotationTypeDeclaration node) {
         return false;
     }
@@ -364,6 +359,11 @@ public class NodeTypeChecker extends ASTVisitor {
 
     @Override
     public boolean visit(LabeledStatement node) {
+        return false;
+    }
+
+    @Override
+    public boolean visit(LambdaExpression node) {
         return false;
     }
 
