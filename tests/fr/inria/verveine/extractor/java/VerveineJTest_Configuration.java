@@ -18,12 +18,13 @@ import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.core.VerveineUtilsForTests;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 
-public class VerveineJTest_Configuration {
+public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
 	private static final String OTHER_OUTPUT_FILE= "other_output.mse";
 
-	protected Repository repo;
-	protected VerveineJParser parser;
+	public VerveineJTest_Configuration() {
+		super(false);
+	}
 
 	/**
 	 * @throws java.lang.Exception
@@ -160,11 +161,11 @@ public class VerveineJTest_Configuration {
 		// testing invocation
 		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(clazz);
-		Method mth = clazz.getMethods().iterator().next();  // first (and sole) method
+		Method mth = firstElt(clazz.getMethods());  // first (and sole) method
 		assertNotNull(mth);
 		assertEquals("print", mth.getName());
 		assertEquals(1, mth.getIncomingInvocations().size());
-		Invocation invok = mth.getIncomingInvocations().iterator().next();
+		Invocation invok = firstElt(mth.getIncomingInvocations());
 		anc = invok.getSourceAnchor(); 
 		assertNotNull(anc);
 		assertEquals(IndexedFileAnchor.class, anc.getClass());

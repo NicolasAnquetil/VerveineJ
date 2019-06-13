@@ -13,10 +13,11 @@ import java.io.File;
 
 import static org.junit.Assert.*;
 
-public class VerveineJTest_Lambdas {
+public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
 
-    protected Repository repo;
-    protected VerveineJParser parser;
+    public VerveineJTest_Lambdas() {
+        super(false);
+    }
 
     /**
      * @throws java.lang.Exception
@@ -98,7 +99,7 @@ public class VerveineJTest_Lambdas {
 
         LocalVariable col = null;
         assertEquals(1, meth.getLocalVariables().size());
-        col = meth.getLocalVariables().iterator().next();
+        col = firstElt(meth.getLocalVariables());
         assertNotNull(col);
         assertEquals("col", col.getName());
 

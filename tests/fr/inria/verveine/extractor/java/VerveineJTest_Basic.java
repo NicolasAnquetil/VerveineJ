@@ -52,6 +52,12 @@ public abstract class VerveineJTest_Basic {
 		this.testsToRun = testsToRun;
 	}
 
+
+	// helper method
+	protected <T> T firstElt(Collection<T> coll) {
+		return coll.iterator().next();
+	}
+
 	@Test // number 0
 	public void testAssociation() {
     	Assume.assumeTrue(testsToRun[0]);
@@ -211,9 +217,6 @@ public abstract class VerveineJTest_Basic {
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
 		Namespace javaLang = VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, javaLangName);
 		assertSame(javaLang, syst.getContainer());
-		/*stubs no longer have inheritance
-		assertEquals(1, syst.getSuperInheritances().size());
-		assertEquals(obj, syst.getSuperInheritances().iterator().next().getSuperclass());			*/
 		boolean found = false;
 		for (Attribute att : syst.getAttributes()) {
 			if (att.getName().equals("out")) {
@@ -233,7 +236,7 @@ public abstract class VerveineJTest_Basic {
     	Collection<SourceLanguage> sl = VerveineUtilsForTests.selectElementsOfType(repo, SourceLanguage.class);
     	assertNotNull(sl);
     	assertEquals(1, sl.size());
-    	SourceLanguage jsl = sl.iterator().next();
+    	SourceLanguage jsl = firstElt(sl);
     	assertEquals(JavaSourceLanguage.class, jsl.getClass());
 	}
 

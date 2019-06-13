@@ -14,11 +14,11 @@ import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
 
-public class verveineJTest_Annotations {
+public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
-	protected Repository repo;
-	protected VerveineJParser parser;
-
+	public verveineJTest_Annotations() {
+	    super(false);
+    }
     /**
      * @throws java.lang.Exception
      */
@@ -45,12 +45,12 @@ public class verveineJTest_Annotations {
     public void testClassAnnotation() {
         eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Serializer");
         assertEquals(1, cl.getAnnotationInstances().size());
-        AnnotationInstance sw = cl.getAnnotationInstances().iterator().next();
+        AnnotationInstance sw = firstElt(cl.getAnnotationInstances());
         assertNotNull(sw);
         assertEquals("SuppressWarnings", sw.getAnnotationType().getName());
         assertSame(sw.getAnnotatedEntity(), cl);
         assertEquals(1, sw.getAttributes().size());
-        AnnotationInstanceAttribute swVal = sw.getAttributes().iterator().next();
+        AnnotationInstanceAttribute swVal = firstElt(sw.getAttributes());
         assertNotNull(swVal);
         assertEquals("value", swVal.getAnnotationTypeAttribute().getName());
         assertEquals("serial", swVal.getValue());
@@ -64,23 +64,23 @@ public class verveineJTest_Annotations {
 
        AnnotationType getProp = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "GetProperty");
        assertNotNull(getProp);
-       AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) getProp.getAttributes().iterator().next();
+       AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) firstElt(getProp.getAttributes());
 
         assertEquals(12, bookMethods.size());
         for (Method meth : bookMethods) {
             Collection<AnnotationInstance> annInstances = meth.getAnnotationInstances();
             if (meth.getName().startsWith("get")) {
                 assertEquals(1, annInstances.size());
-                AnnotationInstance annInst = annInstances.iterator().next();
+                AnnotationInstance annInst = firstElt(annInstances);
                 assertSame(getProp, annInst.getAnnotationType());
                 assertEquals(1, annInst.getAttributes().size());
-                AnnotationInstanceAttribute getValInst = annInst.getAttributes().iterator().next();
+                AnnotationInstanceAttribute getValInst = firstElt(annInst.getAttributes());
                 assertSame(getAtt, getValInst.getAnnotationTypeAttribute());
 
             }
             else if (meth.getName().startsWith("set")) {
                 assertEquals(1, annInstances.size());
-                AnnotationInstance annInst = annInstances.iterator().next();
+                AnnotationInstance annInst = firstElt(annInstances);
                 assertEquals("SetProperty", annInst.getAnnotationType().getName());
             }
             else {
@@ -111,7 +111,7 @@ public class verveineJTest_Annotations {
         assertNotNull(att);
 
         assertEquals(1, att.getAnnotationInstances().size());
-        AnnotationInstance ann = att.getAnnotationInstances().iterator().next();
+        AnnotationInstance ann = firstElt(att.getAnnotationInstances());
         assertNotNull(ann);
         assertEquals("XmlElement", ann.getAnnotationType().getName());
         assertSame(ann.getAnnotatedEntity(), att);
@@ -154,7 +154,7 @@ public class verveineJTest_Annotations {
         assertNotNull(param);
 
         assertEquals(1, param.getAnnotationInstances().size());
-        AnnotationInstance inst = param.getAnnotationInstances().iterator().next();
+        AnnotationInstance inst = firstElt(param.getAnnotationInstances());
         assertNotNull(inst);
         assertEquals("SuppressWarnings", inst.getAnnotationType().getName());
         assertSame(inst.getAnnotatedEntity(), param);
@@ -167,7 +167,7 @@ public class verveineJTest_Annotations {
         assertFalse(getProp.getIsStub());
 
         assertEquals(1, getProp.getAttributes().size());
-        AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) getProp.getAttributes().iterator().next();
+        AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) firstElt(getProp.getAttributes());
         assertEquals("value", getAtt.getName());
         assertEquals(4, getProp.getInstances().size());
 
@@ -175,14 +175,14 @@ public class verveineJTest_Annotations {
         assertNotNull(annTyp);
         assertFalse(annTyp.getIsStub());
         assertEquals(1, annTyp.numberOfAttributes());
-        assertEquals("value", annTyp.getAttributes().iterator().next().getName());
+        assertEquals("value", firstElt(annTyp.getAttributes()).getName());
         assertEquals(2, annTyp.numberOfInstances());
 
         annTyp = VerveineUtilsForTests.detectFamixElement(repo, AnnotationType.class, "Interceptors");
         assertNotNull(annTyp);
         assertTrue(annTyp.getIsStub());
         assertEquals(1, annTyp.numberOfAttributes());
-        assertEquals("value", annTyp.getAttributes().iterator().next().getName());
+        assertEquals("value", firstElt(annTyp.getAttributes()).getName());
         assertEquals(3, annTyp.numberOfInstances());
     }
 
@@ -192,12 +192,12 @@ public class verveineJTest_Annotations {
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
-        AnnotationInstance inst = clss.getAnnotationInstances().iterator().next();
+        AnnotationInstance inst = firstElt(clss.getAnnotationInstances());
         assertEquals("Interceptors", inst.getAnnotationType().getName());
         assertSame(inst.getAnnotatedEntity(), clss);
 
         assertEquals(1, inst.numberOfAttributes());
-        AnnotationInstanceAttribute att = inst.getAttributes().iterator().next();
+        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
         assertNotNull(att);
         assertEquals("value", att.getAnnotationTypeAttribute().getName());
 
@@ -210,13 +210,13 @@ public class verveineJTest_Annotations {
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
-        AnnotationInstance inst = clss.getAnnotationInstances().iterator().next();
+        AnnotationInstance inst = firstElt(clss.getAnnotationInstances());
         assertNotNull(inst);
         assertEquals("Interceptors", inst.getAnnotationType().getName());
         assertSame(inst.getAnnotatedEntity(), clss);
 
         assertEquals(1, inst.numberOfAttributes());
-        AnnotationInstanceAttribute att = inst.getAttributes().iterator().next();
+        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
         assertNotNull(att);
         assertEquals("value", att.getAnnotationTypeAttribute().getName());
 
@@ -229,11 +229,11 @@ public class verveineJTest_Annotations {
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
-        AnnotationInstance inst = clss.getAnnotationInstances().iterator().next();
+        AnnotationInstance inst = firstElt(clss.getAnnotationInstances());
         assertNotNull(inst);
 
         assertEquals(1, inst.numberOfAttributes());
-        AnnotationInstanceAttribute att = inst.getAttributes().iterator().next();
+        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
         assertNotNull(att);
         assertEquals("{}", att.getValue());
     }
@@ -244,13 +244,13 @@ public class verveineJTest_Annotations {
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
-        AnnotationInstance inst = clss.getAnnotationInstances().iterator().next();
+        AnnotationInstance inst = firstElt(clss.getAnnotationInstances());
         assertNotNull(inst);
         assertEquals("Interceptors", inst.getAnnotationType().getName());
         assertSame(inst.getAnnotatedEntity(), clss);
 
         assertEquals(1, inst.numberOfAttributes());
-        AnnotationInstanceAttribute att = inst.getAttributes().iterator().next();
+        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
         assertNotNull(att);
         assertEquals("value", att.getAnnotationTypeAttribute().getName());
 

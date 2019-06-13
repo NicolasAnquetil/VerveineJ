@@ -15,9 +15,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
-public class VerveineJTest_Exceptions {
+public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 
-	protected Repository repo;
+    public VerveineJTest_Exceptions() {
+        super(false);
+    }
 
     /**
      * @throws java.lang.Exception
@@ -29,7 +31,7 @@ public class VerveineJTest_Exceptions {
         repo = parser.getFamixRepo();
         parser.setOptions(new String[] {"test_src/exceptions"});
         parser.parse();
-        parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+        //parser.emitMSE(VerveineJParser.OUTPUT_FILE);
     }
 
     @Test
@@ -41,7 +43,7 @@ public class VerveineJTest_Exceptions {
         assertNotNull(excepClass);
 
         assertEquals(1, meth.getDeclaredExceptions().size());
-        DeclaredException exD = meth.getDeclaredExceptions().iterator().next();
+        DeclaredException exD = firstElt(meth.getDeclaredExceptions());
         assertSame(meth, exD.getDefiningMethod());
         assertSame(excepClass, exD.getExceptionClass());
     }
@@ -52,7 +54,7 @@ public class VerveineJTest_Exceptions {
         assertNotNull(meth);
 
         assertEquals(1, meth.getThrownExceptions().size());
-        ThrownException exT = meth.getThrownExceptions().iterator().next();
+        ThrownException exT = firstElt(meth.getThrownExceptions());
         assertSame(meth, exT.getDefiningMethod());
 
         eu.synectique.verveine.core.gen.famix.Class excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
@@ -65,7 +67,7 @@ public class VerveineJTest_Exceptions {
         assertNotNull(meth);
 
         assertEquals(1,meth.getCaughtExceptions().size());
-        CaughtException exC = meth.getCaughtExceptions().iterator().next();
+        CaughtException exC = firstElt(meth.getCaughtExceptions());
         assertSame(meth, exC.getDefiningMethod());
 
         eu.synectique.verveine.core.gen.famix.Class excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IOException");
@@ -79,7 +81,7 @@ public class VerveineJTest_Exceptions {
 
 //        assertEquals(0, meth.getParentType().getTypes().size());
         assertEquals(1, meth.getDeclaredExceptions().size());
-        DeclaredException exD = meth.getDeclaredExceptions().iterator().next();
+        DeclaredException exD = firstElt(meth.getDeclaredExceptions());
         assertSame(meth, exD.getDefiningMethod());
         assertEquals("T", exD.getExceptionClass().getName());
     }

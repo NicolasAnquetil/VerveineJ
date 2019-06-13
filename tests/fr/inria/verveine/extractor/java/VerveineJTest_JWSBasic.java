@@ -87,7 +87,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		assertNotNull(rep);
 		Collection<AnnotationInstance> annInstances = rep.getAnnotationInstances();
 		assertEquals(1, annInstances.size());
-		AnnotationInstance annInst = annInstances.iterator().next();
+		AnnotationInstance annInst = firstElt(annInstances);
 		assertEquals("WebMethod", annInst.getAnnotationType().getName());
 
 		

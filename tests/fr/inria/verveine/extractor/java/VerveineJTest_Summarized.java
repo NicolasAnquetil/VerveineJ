@@ -209,7 +209,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size());
-		inh = inherits.iterator().next();
+		inh = firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
 
@@ -217,7 +217,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size());
-		inh = inherits.iterator().next();
+		inh = firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
 		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 		
