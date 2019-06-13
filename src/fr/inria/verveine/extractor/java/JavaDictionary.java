@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java;
 
 import java.util.Collection;
+import java.util.ConcurrentModificationException;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -356,24 +357,30 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	public Type asClass(ParameterType excepFmx) {
+	public Type asClass(Type excepFmx) {
+	    Class tmp = null;
+		try {
 		ContainerEntity owner = excepFmx.getBelongsTo();
 		owner.getTypes().remove(excepFmx);
 		super.removeEntity(excepFmx);
 
-		Class tmp = super.ensureFamixClass(entityToKey.get(excepFmx), excepFmx.getName(), owner, /*alwaysPersist?*/true);
+		tmp = super.ensureFamixClass(entityToKey.get(excepFmx), excepFmx.getName(), owner, /*alwaysPersist?*/true);
 
-		tmp.addMethods(excepFmx.getMethods());
-		tmp.addAttributes(excepFmx.getAttributes());
-		tmp.addModifiers(excepFmx.getModifiers());
-		tmp.addSuperInheritances(excepFmx.getSuperInheritances());
-		tmp.addSubInheritances(excepFmx.getSubInheritances());
-		tmp.setSourceAnchor(excepFmx.getSourceAnchor());
-		tmp.addAnnotationInstances(excepFmx.getAnnotationInstances());
-		tmp.addComments(excepFmx.getComments());
-		tmp.addIncomingReferences(excepFmx.getIncomingReferences());
-		tmp.setIsStub(excepFmx.getIsStub());
-		tmp.addTypes(excepFmx.getTypes());
+			tmp.addMethods(excepFmx.getMethods());
+			tmp.addAttributes(excepFmx.getAttributes());
+			tmp.addModifiers(excepFmx.getModifiers());
+			tmp.addSuperInheritances(excepFmx.getSuperInheritances());
+			tmp.addSubInheritances(excepFmx.getSubInheritances());
+			tmp.setSourceAnchor(excepFmx.getSourceAnchor());
+			tmp.addAnnotationInstances(excepFmx.getAnnotationInstances());
+			tmp.addComments(excepFmx.getComments());
+			tmp.addIncomingReferences(excepFmx.getIncomingReferences());
+			tmp.setIsStub(excepFmx.getIsStub());
+			tmp.addTypes(excepFmx.getTypes());
+		}
+		catch( ConcurrentModificationException e) {
+			e.printStackTrace();
+		}
 
 		return tmp;
 	}

@@ -1,12 +1,13 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import eu.synectique.verveine.core.gen.famix.*;
 import eu.synectique.verveine.core.gen.famix.Class;
+import eu.synectique.verveine.core.gen.famix.Method;
+import eu.synectique.verveine.core.gen.famix.Namespace;
+import eu.synectique.verveine.core.gen.famix.ParameterType;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.Type;
+
 
 import java.util.List;
 
@@ -60,8 +61,9 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 				eu.synectique.verveine.core.gen.famix.Type excepFmx = this.referedType(excep.resolveBinding(), context.topType(), true);
 				if (excepFmx != null) {
 					if (! classSummary) {
-					    if (excepFmx instanceof ParameterType) {
-					        excepFmx = dico.asClass((ParameterType)excepFmx);
+					    // not instanceof because we test the exact type and not subclasses
+					    if ( (excepFmx.getClass() == eu.synectique.verveine.core.gen.famix.Type.class) || (excepFmx.getClass() == ParameterType.class) ) {
+					        excepFmx = dico.asClass(excepFmx);
                         }
 						dico.createFamixDeclaredException(fmx, (Class) excepFmx);
 					}

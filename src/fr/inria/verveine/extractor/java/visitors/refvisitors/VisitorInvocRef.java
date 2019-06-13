@@ -320,8 +320,6 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	public boolean visit(SuperConstructorInvocation node) {
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
 		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!classSummary);
-		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
-		// also no parameters specified here, so no references to create either
 
 		if (! classSummary) {
 			String signature = node.toString();
