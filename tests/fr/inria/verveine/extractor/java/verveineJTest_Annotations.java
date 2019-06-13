@@ -34,16 +34,16 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationSubClass() {
-        eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SubAnnotation");
+        eu.synectique.verveine.core.gen.famix.Class cl = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "SubAnnotation");
         assertNotNull(cl);
 
-        AnnotationType getProp = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "GetProperty");
+        AnnotationType getProp = detectFamixElement(AnnotationType.class, "GetProperty");
         assertEquals(getProp, cl.getContainer());
     }
 
     @Test
     public void testClassAnnotation() {
-        eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Serializer");
+        eu.synectique.verveine.core.gen.famix.Class cl = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Serializer");
         assertEquals(1, cl.getAnnotationInstances().size());
         AnnotationInstance sw = firstElt(cl.getAnnotationInstances());
         assertNotNull(sw);
@@ -59,10 +59,10 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testMethodAnnotation() {
-        eu.synectique.verveine.core.gen.famix.Class book = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Book");
+        eu.synectique.verveine.core.gen.famix.Class book = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Book");
         Collection<Method> bookMethods = book.getMethods();
 
-       AnnotationType getProp = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "GetProperty");
+       AnnotationType getProp = detectFamixElement(AnnotationType.class, "GetProperty");
        assertNotNull(getProp);
        AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) firstElt(getProp.getAttributes());
 
@@ -91,7 +91,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAttributeAnnotation() {
-        eu.synectique.verveine.core.gen.famix.Class book = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Book");
+        eu.synectique.verveine.core.gen.famix.Class book = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Book");
         Collection<Attribute> bookAttributes = book.getAttributes();
         assertEquals(6, bookAttributes.size());
         for (Attribute att : bookAttributes) {
@@ -107,7 +107,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test  // issue 714
     public void testAnnotParamIsClass(){
-        Attribute att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "time");
+        Attribute att = detectFamixElement( Attribute.class, "time");
         assertNotNull(att);
 
         assertEquals(1, att.getAnnotationInstances().size());
@@ -130,7 +130,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationTypeFileAnchor(){
-        AnnotationType xmle = VerveineUtilsForTests.detectFamixElement(repo, AnnotationType.class, "XmlElement");
+        AnnotationType xmle = detectFamixElement( AnnotationType.class, "XmlElement");
         assertNotNull(xmle);
         assertNotNull(xmle.getSourceAnchor());
         assertEquals(IndexedFileAnchor.class, xmle.getSourceAnchor().getClass());
@@ -138,7 +138,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         assertEquals(62, ((IndexedFileAnchor)xmle.getSourceAnchor()).getStartPos());
         assertEquals(176, ((IndexedFileAnchor)xmle.getSourceAnchor()).getEndPos());
 
-        AnnotationTypeAttribute req = VerveineUtilsForTests.detectFamixElement(repo, AnnotationTypeAttribute.class, "required");
+        AnnotationTypeAttribute req = detectFamixElement( AnnotationTypeAttribute.class, "required");
         assertNotNull(req);
         assertNotNull(req.getSourceAnchor());
         assertEquals(IndexedFileAnchor.class, req.getSourceAnchor().getClass());
@@ -150,7 +150,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationOnVar() {
-        Parameter param = VerveineUtilsForTests.detectFamixElement(repo, Parameter.class, "annotatedParam");
+        Parameter param = detectFamixElement( Parameter.class, "annotatedParam");
         assertNotNull(param);
 
         assertEquals(1, param.getAnnotationInstances().size());
@@ -162,7 +162,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationType() {
-        AnnotationType getProp = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "GetProperty");
+        AnnotationType getProp = detectFamixElement(AnnotationType.class, "GetProperty");
         assertNotNull(getProp);
         assertFalse(getProp.getIsStub());
 
@@ -171,14 +171,14 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         assertEquals("value", getAtt.getName());
         assertEquals(4, getProp.getInstances().size());
 
-        AnnotationType annTyp = VerveineUtilsForTests.detectFamixElement(repo, AnnotationType.class, "InterceptorsOnInterceptor");
+        AnnotationType annTyp = detectFamixElement( AnnotationType.class, "InterceptorsOnInterceptor");
         assertNotNull(annTyp);
         assertFalse(annTyp.getIsStub());
         assertEquals(1, annTyp.numberOfAttributes());
         assertEquals("value", firstElt(annTyp.getAttributes()).getName());
         assertEquals(2, annTyp.numberOfInstances());
 
-        annTyp = VerveineUtilsForTests.detectFamixElement(repo, AnnotationType.class, "Interceptors");
+        annTyp = detectFamixElement( AnnotationType.class, "Interceptors");
         assertNotNull(annTyp);
         assertTrue(annTyp.getIsStub());
         assertEquals(1, annTyp.numberOfAttributes());
@@ -188,7 +188,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationInstanceAttribute() {
-        eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnnotatedClass");
+        eu.synectique.verveine.core.gen.famix.Class clss = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "AnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
@@ -206,7 +206,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationInstanceArrayOfOne() {
-        eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AThirdAnnotatedClass");
+        eu.synectique.verveine.core.gen.famix.Class clss = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "AThirdAnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
@@ -225,7 +225,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationInstanceEmptyArrayForValue() {
-        eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnotherInterceptorClass");
+        eu.synectique.verveine.core.gen.famix.Class clss = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "AnotherInterceptorClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
@@ -240,7 +240,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationInstanceArray() {
-        eu.synectique.verveine.core.gen.famix.Class clss = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "AnotherAnnotatedClass");
+        eu.synectique.verveine.core.gen.famix.Class clss = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "AnotherAnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());

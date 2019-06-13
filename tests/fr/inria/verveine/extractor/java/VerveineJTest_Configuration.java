@@ -13,11 +13,6 @@ import eu.synectique.verveine.core.gen.famix.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.akuhn.fame.Repository;
-
-import eu.synectique.verveine.core.VerveineUtilsForTests;
-import fr.inria.verveine.extractor.java.VerveineJParser;
-
 public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
 	private static final String OTHER_OUTPUT_FILE= "other_output.mse";
@@ -61,8 +56,8 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	public void testNotAlllocals() {
 		// works in team with testAlllocals
 		parse(new String[]{"test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
-		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // nom, num, e
-		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom
+		assertEquals(3, entitiesOfType( LocalVariable.class).size());  // nom, num, e
+		assertEquals(4, entitiesOfType( Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom
 	}
 
 	@Test
@@ -70,15 +65,15 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		// works in team with testNotAlllocals
 		parse(new String[]{"-alllocals", "test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
 
-		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
-		assertEquals(32, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());  // ReadClient*4 ; lire*20 ; setNum*3 ; getNum*1 ; setNom*3 ; getNom*1
+		assertEquals(5, entitiesOfType( LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
+		assertEquals(32, entitiesOfType( Access.class).size());  // ReadClient*4 ; lire*20 ; setNum*3 ; getNum*1 ; setNom*3 ; getNom*1
 	}
 
 	@Test
 	public void testClassDeclsInExpr() {
 		parse(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
 
-		Collection<LocalVariable> vars = VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class);
+		Collection<LocalVariable> vars = entitiesOfType( LocalVariable.class);
         LocalVariable var1 = null;
 		LocalVariable var2 = null;
 		LocalVariable var3 = null;
@@ -102,7 +97,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		assertEquals(4, var3.getIncomingAccesses().size());
 
 
-        Collection<Parameter> params = VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class);
+        Collection<Parameter> params = entitiesOfType( Parameter.class);
         Parameter par1 = null;
         Parameter par2 = null;
 		assertEquals(3, params.size());
@@ -126,7 +121,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	public void testAlllocalsAndInitializerAndField() {
 		parse(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
 
-		Collection<Attribute> vars = VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class);
+		Collection<Attribute> vars = entitiesOfType( Attribute.class);
 		assertEquals(3, vars.size());  // aField, anonymousListField, System.out
 	}
 
@@ -145,7 +140,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
 		SourceAnchor anc;
 		// testing accesses
-		Attribute prtr = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "printer");
+		Attribute prtr = detectFamixElement( Attribute.class, "printer");
 		assertNotNull(prtr);
 		assertEquals(2, prtr.getIncomingAccesses().size());
 		for (Access acc : prtr.getIncomingAccesses()) {
@@ -159,7 +154,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		}
 		
 		// testing invocation
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(clazz);
 		Method mth = firstElt(clazz.getMethods());  // first (and sole) method
 		assertNotNull(mth);

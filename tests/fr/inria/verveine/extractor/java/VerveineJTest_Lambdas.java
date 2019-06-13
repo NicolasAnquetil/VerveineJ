@@ -39,7 +39,7 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
     public void testLambdaTypedParameter() {
         parse(new String[] {"-alllocals", "test_src/lambdas"});
 
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
+        Method meth = detectFamixElement( Method.class, JavaDictionary.INIT_BLOCK_NAME);
         assertNotNull(meth);
 
         LocalVariable seg1 = null;
@@ -64,7 +64,7 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
     public void testLambdaUnTypedParameter() {
         parse(new String[] {"-alllocals", "test_src/lambdas"});
 
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
+        Method meth = detectFamixElement( Method.class, "WithLambda");
         assertNotNull(meth);
 
         LocalVariable col = null;
@@ -94,7 +94,7 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
     public void testLambdaNotAllLocals() {
         parse(new String[] {"test_src/lambdas"});
 
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
+        Method meth = detectFamixElement( Method.class, "WithLambda");
         assertNotNull(meth);
 
         LocalVariable col = null;

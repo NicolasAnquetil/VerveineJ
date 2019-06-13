@@ -14,7 +14,6 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.VerveineUtilsForTests;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
@@ -49,13 +48,13 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
+		assertEquals(3, entitiesOfType( AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
 		// JDT no longer returns not resolved anotations: @Session, @WLHttpTransport,
 	}
 
 	@Test
 	public void testAnnotation() {
-		AnnotationType ann = VerveineUtilsForTests.detectFamixElement(repo,AnnotationType.class, "WebService");
+		AnnotationType ann = detectFamixElement(AnnotationType.class, "WebService");
 		assertNotNull(ann);
 		assertTrue(ann.getIsStub());
 		assertEquals(3, ann.getInstances().size());
@@ -67,15 +66,15 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		}
 
 		// Class annotation
-		eu.synectique.verveine.core.gen.famix.Class cl = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "SimpleBean");
+		eu.synectique.verveine.core.gen.famix.Class cl = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "SimpleBean");
 		assertNotNull(cl);
 		assertEquals(2, cl.getAnnotationInstances().size());
 		for (AnnotationInstance ai :cl.getAnnotationInstances() ) {
 			if (ai.getAnnotationType().getName().equals("WebService")) {
-				assertEquals(VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "jws"), ai.getAnnotationType().getBelongsTo());
+				assertEquals(detectFamixElement(Namespace.class, "jws"), ai.getAnnotationType().getBelongsTo());
 			}
 			else if (ai.getAnnotationType().getName().equals("SOAPBinding")) {
-				assertEquals(VerveineUtilsForTests.detectFamixElement(repo,Namespace.class, "soap"), ai.getAnnotationType().getBelongsTo());
+				assertEquals(detectFamixElement(Namespace.class, "soap"), ai.getAnnotationType().getBelongsTo());
 			}
 			else {
 				assertTrue("Unexpected AnnotationInstance for SimpleBean: "+ ai.getAnnotationType().getName(), false);
@@ -83,7 +82,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		}
 
 		// Method annotations
-		Method rep = VerveineUtilsForTests.detectFamixElement(repo,Method.class, "orderResponse");
+		Method rep = detectFamixElement(Method.class, "orderResponse");
 		assertNotNull(rep);
 		Collection<AnnotationInstance> annInstances = rep.getAnnotationInstances();
 		assertEquals(1, annInstances.size());

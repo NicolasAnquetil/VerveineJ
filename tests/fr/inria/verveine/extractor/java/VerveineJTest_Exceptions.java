@@ -36,10 +36,10 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 
     @Test
     public void testDeclaredExceptions() {
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "lire");
+        Method meth = detectFamixElement( Method.class, "lire");
         assertNotNull(meth);
 
-        eu.synectique.verveine.core.gen.famix.Class excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
+        eu.synectique.verveine.core.gen.famix.Class excepClass = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
         assertNotNull(excepClass);
 
         assertEquals(1, meth.getDeclaredExceptions().size());
@@ -50,33 +50,33 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 
     @Test
     public void testThrownExceptions() {
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "lire");
+        Method meth = detectFamixElement( Method.class, "lire");
         assertNotNull(meth);
 
         assertEquals(1, meth.getThrownExceptions().size());
         ThrownException exT = firstElt(meth.getThrownExceptions());
         assertSame(meth, exT.getDefiningMethod());
 
-        eu.synectique.verveine.core.gen.famix.Class excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
+        eu.synectique.verveine.core.gen.famix.Class excepClass = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
         assertSame(excepClass, exT.getExceptionClass());
     }
 
     @Test
     public void testCaughtExceptions() {
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "lire");
+        Method meth = detectFamixElement( Method.class, "lire");
         assertNotNull(meth);
 
         assertEquals(1,meth.getCaughtExceptions().size());
         CaughtException exC = firstElt(meth.getCaughtExceptions());
         assertSame(meth, exC.getDefiningMethod());
 
-        eu.synectique.verveine.core.gen.famix.Class excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IOException");
+        eu.synectique.verveine.core.gen.famix.Class excepClass = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "IOException");
         assertSame(excepClass, exC.getExceptionClass());
     }
 
     @Test
     public void testGenericExceptions() {
-        Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "doThrow");
+        Method meth = detectFamixElement( Method.class, "doThrow");
         assertNotNull(meth);
 
 //        assertEquals(0, meth.getParentType().getTypes().size());

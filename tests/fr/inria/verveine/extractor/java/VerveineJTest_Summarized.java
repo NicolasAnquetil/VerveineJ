@@ -70,10 +70,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.VerveineUtilsForTests;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
-
 import static org.junit.Assert.*;
 
 /**
@@ -141,23 +137,23 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	public void testEntitiesNumber() {
 		int nbClasses = 10+5; // one less than in VerveineJTest_LanModel because anonymous class is not created
 
-		assertEquals(nbClasses, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size());
-		assertEquals(3,  VerveineUtilsForTests.selectElementsOfType(repo, PrimitiveType.class).size());
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Method.class).size());
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class).size());
-		assertEquals(2+4,VerveineUtilsForTests.selectElementsOfType(repo, Namespace.class).size());
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class).size());
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());
-		assertEquals(1,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationType.class).size());
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, AnnotationInstance.class).size());    // Override annotations on methods
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());  // class Comparable no longer created
+		assertEquals(nbClasses, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size());
+		assertEquals(3,  entitiesOfType( PrimitiveType.class).size());
+		assertEquals(0,  entitiesOfType( Method.class).size());
+		assertEquals(0,  entitiesOfType( Attribute.class).size());
+		assertEquals(2+4, entitiesOfType( Namespace.class).size());
+		assertEquals(0,  entitiesOfType( Parameter.class).size());
+		assertEquals(0,  entitiesOfType( LocalVariable.class).size());
+		assertEquals(1,  entitiesOfType( AnnotationType.class).size());
+		assertEquals(0,  entitiesOfType( AnnotationInstance.class).size());    // Override annotations on methods
+		assertEquals(0,  entitiesOfType( ParameterizableClass.class).size());  // class Comparable no longer created
 	}
 
 	@Test
 	public void testAccesses() {
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		assertEquals(0,  entitiesOfType( Access.class).size());
 
-		for (Access acc : VerveineUtilsForTests.selectElementsOfType(repo, Access.class)) {
+		for (Access acc : entitiesOfType( Access.class)) {
 			assertNotNull(acc.getVariable());
 			assertNotNull(acc.getAccessor());
 		}
@@ -166,9 +162,9 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	@Test
 	@Ignore
 	public void testInvocations() {
-		assertEquals(0,  VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class).size());
+		assertEquals(0,  entitiesOfType( Invocation.class).size());
 
-		for (Invocation invok : VerveineUtilsForTests.selectElementsOfType(repo, Invocation.class)) {
+		for (Invocation invok : entitiesOfType( Invocation.class)) {
 			assertNotNull(invok.getCandidates());
 			assertNotNull(invok.getSender());
 		}
@@ -177,9 +173,9 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	@Test
 	@Ignore
 	public void testReferences() {
-		assertEquals(9,  VerveineUtilsForTests.selectElementsOfType(repo, Reference.class).size());  // Node:1 , WorkStation:2 , FileServer:2 , PrintServer:4
+		assertEquals(9,  entitiesOfType( Reference.class).size());  // Node:1 , WorkStation:2 , FileServer:2 , PrintServer:4
 
-		for (Reference ref : VerveineUtilsForTests.selectElementsOfType(repo, Reference.class)) {
+		for (Reference ref : entitiesOfType( Reference.class)) {
 			assertNotNull(ref.getTarget());
 			assertNotNull(ref.getSource());
 		}
@@ -203,25 +199,25 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		Collection<Inheritance> inherits;
 		Inheritance inh, inh2 = null;
 
-		assertEquals(10, VerveineUtilsForTests.selectElementsOfType(repo, Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
+		assertEquals(10, entitiesOfType( Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
-		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
+		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size());
 		inh = firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
+		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
 
-		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size());
 		inh = firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 		
-		clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
+		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
 		assertEquals(2, inherits.size()); // superInheritances: Object and IPrinter (in this order)
@@ -231,18 +227,18 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 				inh2 = inheritance;
 				assertNull(inheritance.getNext());
 				assertSame(inheritance,inheritance.getPrevious().getNext());
-				assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
+				assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
 			} else {
 				inh = inheritance;
 				assertNull(inheritance.getPrevious());
 				assertSame(inheritance,inheritance.getNext().getPrevious());
-				assertSame(VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
+				assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
 			}
 		}
 		assertSame(inh.getNext(), inh2);
 		assertSame(inh2.getPrevious(), inh);
 
-        clazz = VerveineUtilsForTests.detectFamixElement(repo,eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+        clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
         assertNotNull(clazz);
         inherits = clazz.getSubInheritances();
         assertEquals(1, inherits.size());
@@ -251,7 +247,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testComments() {
-		Collection<Comment> cmts = VerveineUtilsForTests.selectElementsOfType(repo, Comment.class);
+		Collection<Comment> cmts = entitiesOfType( Comment.class);
 		assertEquals(18, cmts.size());
 		for (Comment c : cmts) {
 			int length = 0;
