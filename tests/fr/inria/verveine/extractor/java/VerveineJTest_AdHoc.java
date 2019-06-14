@@ -604,4 +604,19 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 	}
 
+    @Test
+    public void testSuperConstructorInvocation() {
+ 		parse(new String[] {"test_src/ad_hoc/StubSuperConstructor.java"});
+
+       Collection<Method> meths = entitiesNamed( Method.class, "StubSuperConstructor");
+
+        assertEquals(1, meths.size());
+        Method meth = firstElt(meths);
+        assertEquals(1, meth.getOutgoingInvocations().size());
+        Invocation invok = firstElt(meth.getOutgoingInvocations());
+        BehaviouralEntity invoked = firstElt(invok.getCandidates());
+        assertNotNull(invoked);
+        assertEquals("ArrayList", invoked.getBelongsTo() );
+    }
+
 }

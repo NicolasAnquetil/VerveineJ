@@ -155,9 +155,4 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         }
     }
 
-    @Test
-    public void testSuperConstructorInvocation() {
-        Method mth = detectFamixElement( Method.class, "Collection");
-
-    }
 }
