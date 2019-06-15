@@ -616,7 +616,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
         Invocation invok = firstElt(meth.getOutgoingInvocations());
         BehaviouralEntity invoked = firstElt(invok.getCandidates());
         assertNotNull(invoked);
-        assertEquals("ArrayList", invoked.getBelongsTo() );
+        assertEquals("ArrayList", invoked.getName() );
     }
 
 }

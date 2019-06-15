@@ -1,7 +1,14 @@
 package ad_hoc;
 
-public class StubSuperConstructor  extends ArrayList {
+import java.util.ArrayList;
+
+public class StubSuperConstructor  extends ArrayList<String> {
+
+    public StubSuperConstructor() {
+    }
 
     public StubSuperConstructor(int sz) {
         super(sz);
     }
+
+}

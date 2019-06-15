@@ -8,6 +8,7 @@ import java.util.Iterator;
 import eu.synectique.verveine.core.Dictionary;
 
 import eu.synectique.verveine.core.gen.famix.*;
+import eu.synectique.verveine.core.gen.famix.Class;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
@@ -319,9 +320,17 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 	public boolean visit(SuperConstructorInvocation node) {
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
-		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!classSummary);
+        Class superC = superClass();
+		Method invoked = null;
 
-		if (! classSummary) {
+//		if (superC != null) {
+//            invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), superC.getName(),  /*paramsType*/(Collection<String>) null, superC, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
+//        }
+//        else {
+		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!classSummary);
+//        }
+
+		if ( (invoked != null) && (! classSummary) ) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -341,7 +350,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		return super.visit(node);
 	}
 
-	// UTILITY METHODS
+    // UTILITY METHODS
 
 	/**
 	 * Handles an invocation of a method by creating the corresponding Famix Entity.
@@ -621,5 +630,21 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			}
 		}
 	}
+
+    /**
+     * Finds the super class of the current class
+     * @return
+     */
+    private Class superClass() {
+        eu.synectique.verveine.core.gen.famix.Type clazz = context.topType();
+        Class superC = null;
+        for (Inheritance inh : clazz.getSuperInheritances()) {
+            if ( (inh.getSuperclass() instanceof Class) && (! ((Class) inh.getSuperclass()).getIsInterface()) ) {
+                superC = (Class) inh.getSuperclass();
+                break;
+            }
+        }
+        return superC;
+    }
 
 }
