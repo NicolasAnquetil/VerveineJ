@@ -10,6 +10,7 @@ import java.lang.Exception;
 import java.util.Collection;
 
 import eu.synectique.verveine.core.gen.famix.*;
+import eu.synectique.verveine.core.gen.famix.Class;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -116,7 +117,6 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
     }
 
-
 	@Test
 	public void testAlllocalsAndInitializerAndField() {
 		parse(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
@@ -125,47 +125,67 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		assertEquals(3, vars.size());  // aField, anonymousListField, System.out
 	}
 
+    @Test
+    public void testAnchorsAssoc()
+    {
+        String[] args = new String[] {
+                "-anchor", "assoc",
+                "-cp", "test_src/LANModel/",
+                "test_src/LANModel/moose/lan/server/PrintServer.java",
+        };
 
-	@Test
-	public void testAnchorsAssoc()
-	{
-		String[] args = new String[] {
-							"-anchor", "assoc",
-							"-cp", "test_src/LANModel/",
-							"test_src/LANModel/moose/lan/server/PrintServer.java",
-						};
+        // parsing
+        parse(args);
 
-		// parsing
-		parse(args);
+        SourceAnchor anc;
+        // testing accesses
+        Attribute prtr = detectFamixElement( Attribute.class, "printer");
+        assertNotNull(prtr);
+        assertEquals(2, prtr.getIncomingAccesses().size());
+        for (Access acc : prtr.getIncomingAccesses()) {
+            anc = acc.getSourceAnchor();
+            assertNotNull(anc);
+            assertEquals(IndexedFileAnchor.class, anc.getClass());
+            int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
+            int ep = (Integer) ((IndexedFileAnchor)anc).getEndPos();
+            assertTrue("wrong startPos for Access: " + sp, (sp == 584) || (sp == 980) );
+            assertTrue("wrong endPos for Access: " + ep, (ep == 595) || (ep == 991) );
+        }
 
-		SourceAnchor anc;
-		// testing accesses
-		Attribute prtr = detectFamixElement( Attribute.class, "printer");
-		assertNotNull(prtr);
-		assertEquals(2, prtr.getIncomingAccesses().size());
-		for (Access acc : prtr.getIncomingAccesses()) {
-			anc = acc.getSourceAnchor(); 
-			assertNotNull(anc);
-			assertEquals(IndexedFileAnchor.class, anc.getClass());
-			int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
-			int ep = (Integer) ((IndexedFileAnchor)anc).getEndPos();
-			assertTrue("wrong startPos for Access: " + sp, (sp == 584) || (sp == 980) );
-			assertTrue("wrong endPos for Access: " + ep, (ep == 595) || (ep == 991) );
-		}
-		
-		// testing invocation
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
-		assertNotNull(clazz);
-		Method mth = firstElt(clazz.getMethods());  // first (and sole) method
-		assertNotNull(mth);
-		assertEquals("print", mth.getName());
-		assertEquals(1, mth.getIncomingInvocations().size());
-		Invocation invok = firstElt(mth.getIncomingInvocations());
-		anc = invok.getSourceAnchor(); 
-		assertNotNull(anc);
-		assertEquals(IndexedFileAnchor.class, anc.getClass());
-		assertEquals((Integer)980,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals((Integer)1061, (Integer) ((IndexedFileAnchor)anc).getEndPos());
-	}
+        // testing invocation
+        eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+        assertNotNull(clazz);
+        Method mth = firstElt(clazz.getMethods());  // first (and sole) method
+        assertNotNull(mth);
+        assertEquals("print", mth.getName());
+        assertEquals(1, mth.getIncomingInvocations().size());
+        Invocation invok = firstElt(mth.getIncomingInvocations());
+        anc = invok.getSourceAnchor();
+        assertNotNull(anc);
+        assertEquals(IndexedFileAnchor.class, anc.getClass());
+        assertEquals((Integer)980,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
+        assertEquals((Integer)1061, (Integer) ((IndexedFileAnchor)anc).getEndPos());
+    }
+
+    @Test
+    public void testExcludepath()
+    {
+        String[] args = new String[] {
+                "-excludepath", "*Address*",
+                "-excludepath", "*erver*",
+                "test_src/LANModel/",
+        };
+
+        // parsing
+        parse(args);
+
+        int count=0;
+        for (Class clazz : entitiesOfType(Class.class)) {
+            if (!clazz.getIsStub() ) {
+                count++;
+            }
+        }
+        assertEquals(3, count);
+    }
 
 }
