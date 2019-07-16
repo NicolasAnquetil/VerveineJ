@@ -10,20 +10,17 @@ import java.lang.Exception;
 import java.util.Collection;
 
 import eu.synectique.verveine.core.gen.famix.*;
+import eu.synectique.verveine.core.gen.famix.Class;
 import org.junit.Before;
 import org.junit.Test;
 
-import ch.akuhn.fame.Repository;
-
-import eu.synectique.verveine.core.VerveineUtilsForTests;
-import fr.inria.verveine.extractor.java.VerveineJParser;
-
-public class VerveineJTest_Configuration {
+public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
 	private static final String OTHER_OUTPUT_FILE= "other_output.mse";
 
-	protected Repository repo;
-	protected VerveineJParser parser;
+	public VerveineJTest_Configuration() {
+		super(false);
+	}
 
 	/**
 	 * @throws java.lang.Exception
@@ -59,25 +56,25 @@ public class VerveineJTest_Configuration {
 	@Test
 	public void testNotAlllocals() {
 		// works in team with testAlllocals
-		parse(new String[]{"test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
-		assertEquals(3, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());  // nom, num, e
-		assertEquals(4, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom
+		parse(new String[]{"test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
+		assertEquals(3, entitiesOfType( LocalVariable.class).size());  // nom, num, e
+		assertEquals(4, entitiesOfType( Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom
 	}
 
 	@Test
 	public void testAlllocals() {
 		// works in team with testNotAlllocals
-		parse(new String[]{"-alllocals", "test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
+		parse(new String[]{"-alllocals", "test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
 
-		assertEquals(5, VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
-		assertEquals(28, VerveineUtilsForTests.selectElementsOfType(repo, Access.class).size());
+		assertEquals(5, entitiesOfType( LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
+		assertEquals(32, entitiesOfType( Access.class).size());  // ReadClient*4 ; lire*20 ; setNum*3 ; getNum*1 ; setNom*3 ; getNom*1
 	}
 
 	@Test
 	public void testClassDeclsInExpr() {
 		parse(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
 
-		Collection<LocalVariable> vars = VerveineUtilsForTests.selectElementsOfType(repo, LocalVariable.class);
+		Collection<LocalVariable> vars = entitiesOfType( LocalVariable.class);
         LocalVariable var1 = null;
 		LocalVariable var2 = null;
 		LocalVariable var3 = null;
@@ -96,12 +93,12 @@ public class VerveineJTest_Configuration {
         assertNotNull(var1);
 		assertNotNull(var2);
 		assertNotNull(var3);
-        assertEquals(1, var1.getIncomingAccesses().size());
-		assertEquals(2, var2.getIncomingAccesses().size());
-		assertEquals(3, var3.getIncomingAccesses().size());
+        assertEquals(2, var1.getIncomingAccesses().size());
+		assertEquals(3, var2.getIncomingAccesses().size());
+		assertEquals(4, var3.getIncomingAccesses().size());
 
 
-        Collection<Parameter> params = VerveineUtilsForTests.selectElementsOfType(repo, Parameter.class);
+        Collection<Parameter> params = entitiesOfType( Parameter.class);
         Parameter par1 = null;
         Parameter par2 = null;
 		assertEquals(3, params.size());
@@ -120,56 +117,75 @@ public class VerveineJTest_Configuration {
 
     }
 
-
 	@Test
 	public void testAlllocalsAndInitializerAndField() {
 		parse(new String[]{"-alllocals", "test_src/ad_hoc/SpecialLocalVarDecls.java"});
 
-		Collection<Attribute> vars = VerveineUtilsForTests.selectElementsOfType(repo, Attribute.class);
+		Collection<Attribute> vars = entitiesOfType( Attribute.class);
 		assertEquals(3, vars.size());  // aField, anonymousListField, System.out
 	}
 
+    @Test
+    public void testAnchorsAssoc()
+    {
+        String[] args = new String[] {
+                "-anchor", "assoc",
+                "-cp", "test_src/LANModel/",
+                "test_src/LANModel/moose/lan/server/PrintServer.java",
+        };
 
-	@Test
-	public void testAnchorsAssoc()
-	{
-		String[] args = new String[] {
-							"-anchor", "assoc",
-							"-cp", "test_src/LANModel/",
-							"test_src/LANModel/moose/lan/server/PrintServer.java",
-						};
+        // parsing
+        parse(args);
 
-		// parsing
-		parse(args);
+        SourceAnchor anc;
+        // testing accesses
+        Attribute prtr = detectFamixElement( Attribute.class, "printer");
+        assertNotNull(prtr);
+        assertEquals(2, prtr.getIncomingAccesses().size());
+        for (Access acc : prtr.getIncomingAccesses()) {
+            anc = acc.getSourceAnchor();
+            assertNotNull(anc);
+            assertEquals(IndexedFileAnchor.class, anc.getClass());
+            int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
+            int ep = (Integer) ((IndexedFileAnchor)anc).getEndPos();
+            assertTrue("wrong startPos for Access: " + sp, (sp == 584) || (sp == 980) );
+            assertTrue("wrong endPos for Access: " + ep, (ep == 595) || (ep == 991) );
+        }
 
-		SourceAnchor anc;
-		// testing accesses
-		Attribute prtr = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "printer");
-		assertNotNull(prtr);
-		assertEquals(2, prtr.getIncomingAccesses().size());
-		for (Access acc : prtr.getIncomingAccesses()) {
-			anc = acc.getSourceAnchor(); 
-			assertNotNull(anc);
-			assertEquals(IndexedFileAnchor.class, anc.getClass());
-			int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
-			int ep = (Integer) ((IndexedFileAnchor)anc).getEndPos();
-			assertTrue("wrong statPos for Access: " + sp, (sp == 558) || (sp == 945) );
-			assertTrue("wrong endPos for Access: " + ep, (ep == 569) || (ep == 956) );
-		}
-		
-		// testing invocation
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
-		assertNotNull(clazz);
-		Method mth = clazz.getMethods().iterator().next();  // first (and sole) method
-		assertNotNull(mth);
-		assertEquals("print", mth.getName());
-		assertEquals(1, mth.getIncomingInvocations().size());
-		Invocation invok = mth.getIncomingInvocations().iterator().next();
-		anc = invok.getSourceAnchor(); 
-		assertNotNull(anc);
-		assertEquals(IndexedFileAnchor.class, anc.getClass());
-		assertEquals((Integer)945,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals((Integer)1026, (Integer) ((IndexedFileAnchor)anc).getEndPos());	
-	}
+        // testing invocation
+        eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+        assertNotNull(clazz);
+        Method mth = firstElt(clazz.getMethods());  // first (and sole) method
+        assertNotNull(mth);
+        assertEquals("print", mth.getName());
+        assertEquals(1, mth.getIncomingInvocations().size());
+        Invocation invok = firstElt(mth.getIncomingInvocations());
+        anc = invok.getSourceAnchor();
+        assertNotNull(anc);
+        assertEquals(IndexedFileAnchor.class, anc.getClass());
+        assertEquals((Integer)980,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
+        assertEquals((Integer)1061, (Integer) ((IndexedFileAnchor)anc).getEndPos());
+    }
+
+    @Test
+    public void testExcludepath()
+    {
+        String[] args = new String[] {
+                "-excludepath", "*Address*",
+                "-excludepath", "*erver*",
+                "test_src/LANModel/",
+        };
+
+        // parsing
+        parse(args);
+
+        int count=0;
+        for (Class clazz : entitiesOfType(Class.class)) {
+            if (!clazz.getIsStub() ) {
+                count++;
+            }
+        }
+        assertEquals(3, count);
+    }
 
 }

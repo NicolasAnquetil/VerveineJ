@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
@@ -48,6 +49,7 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	/**
+	 * TODO remove ?
 	 * Whether to summarize collected information at the level of classes or produce everything.
 	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation.<br>
 	 * Note: classSummary => not allLocals
@@ -83,6 +85,17 @@ public class VerveineJParser extends VerveineParser {
 	 */
 	protected Collection<String> argPath;
 	protected Collection<String> argFiles;
+
+	/**
+	 * pathnames to exclude from parsing.<br>
+	 * Accepts globbing expressions
+	 */
+	protected Collection<String> excludePaths;
+
+	/**
+	 * collection of matchers of file name to process excluding expr (see
+	 */
+	private Collection<Pattern> excludeMatchers;
 
 	/**
 	 * Java parser, provided by JDT
@@ -126,7 +139,7 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	/** Reads all jar in classpath from a file, one per line
-	 * @param filename of the file containing the jars of tyhe classpath
+	 * @param filename of the file containing the jars of the classpath
 	 * @return the collection of jar paths
 	 */
 	private List<String> readAllJars(String filename) {
@@ -153,6 +166,7 @@ public class VerveineJParser extends VerveineParser {
 		String[] classPath = new String[] {};
 		argPath = new ArrayList<String>();
 		argFiles = new ArrayList<String>();
+		excludePaths = new ArrayList<String>();
 
 		int i = 0;
 		while (i < args.length && args[i].trim().startsWith("-")) {
@@ -204,6 +218,13 @@ public class VerveineJParser extends VerveineParser {
 					}
 				} else {
 					System.err.println("-anchor requires an option (none|default|assoc)");
+				}
+			}
+			else if (arg.equals("-excludepath")) {
+				if (i < args.length) {
+					excludePaths.add(args[i++]);
+				} else {
+					System.err.println("-excludepath requires a globbing expression");
 				}
 			}
 			else {
@@ -291,6 +312,7 @@ public class VerveineJParser extends VerveineParser {
 		System.err.println("      [-cp CLASSPATH] classpath where to look for stubs");
 		System.err.println("      [-autocp DIR] gather all jars in DIR and put them in the classpath");
 		System.err.println("      [-filecp FILE] gather all jars listed in FILE (absolute paths) and put them in the classpath");
+		System.err.println("      [-excludepath GLOBBINGEXPR] A globbing expression of file path to exclude from parsing");
 		System.err.println("      [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] specifies version of Java");
 		System.err.println("      <files-to-parse>|<dirs-to-parse> list of source files to parse or directories to search for source files");
 		System.exit(0);
@@ -320,12 +342,21 @@ public class VerveineJParser extends VerveineParser {
 	}
 
 	protected void collectJavaFiles(Collection<String> paths, Collection<String> files) {
+		excludeMatchers = new ArrayList<>(excludePaths.size());
+		for (String expr : excludePaths) {
+			excludeMatchers.add(createMatcher(expr));
+		}
 		for (String p : paths) {
 			collectJavaFiles(new File(p), files);
 		}
 	}
 
 	protected void collectJavaFiles(File f, Collection<String> files) {
+		for (Pattern filter : excludeMatchers) {
+			if (filter.matcher(f.getName()).matches()) {
+				return;
+			}
+		}
 		if (f.isFile() && f.getName().endsWith(".java")) {
 			files.add(f.getAbsolutePath());
 		} else if (f.isDirectory()) {
@@ -333,9 +364,107 @@ public class VerveineJParser extends VerveineParser {
 				collectJavaFiles(child, files);
 			}
 		}
-		// else ignore it?
-
 	}
+
+	/**
+	 * Creates a regexp matcher form a globbing expression<br>
+	 * Glob to Regexp algorithm from <a href="https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns">https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns</a>
+	 */
+	private Pattern createMatcher(String expr) {
+		expr = expr.trim();
+		int strLen = expr.length();
+		StringBuilder sb = new StringBuilder(strLen);
+		sb.append('^');
+		if (! expr.startsWith("/")) {
+			// not absolute path, start with ".*"
+			if (! expr.startsWith("*")) {
+				sb.append(".*");
+			}
+		}
+		boolean escaping = false;
+		int inCurlies = 0;
+		for (char currentChar : expr.toCharArray()) {
+			switch (currentChar) {
+				case '*':
+					if (escaping)
+						sb.append("\\*");
+					else
+						sb.append(".*");
+					escaping = false;
+					break;
+				case '?':
+					if (escaping)
+						sb.append("\\?");
+					else
+						sb.append('.');
+					escaping = false;
+					break;
+				case '.':
+				case '(':
+				case ')':
+				case '+':
+				case '|':
+				case '^':
+				case '$':
+				case '@':
+				case '%':
+					sb.append('\\');
+					sb.append(currentChar);
+					escaping = false;
+					break;
+				case '\\':
+					if (escaping) {
+						sb.append("\\\\");
+						escaping = false;
+					}
+					else
+						escaping = true;
+					break;
+				case '{':
+					if (escaping) {
+						sb.append("\\{");
+					}
+					else {
+						sb.append('(');
+						inCurlies++;
+					}
+					escaping = false;
+					break;
+				case '}':
+					if (inCurlies > 0 && !escaping) {
+						sb.append(')');
+						inCurlies--;
+					}
+					else if (escaping)
+						sb.append("\\}");
+					else
+						sb.append("}");
+					escaping = false;
+					break;
+				case ',':
+					if (inCurlies > 0 && !escaping) {
+						sb.append('|');
+					}
+					else if (escaping)
+						sb.append("\\,");
+					else
+						sb.append(",");
+					break;
+				default:
+					escaping = false;
+					sb.append(currentChar);
+			}
+		}
+
+		if (! expr.endsWith("*")) {
+			sb.append(".*$");
+		}
+		else {
+			sb.append('$');
+		}
+		return Pattern.compile(sb.toString());
+	}
+
 
 	public void parse() {
 		ArrayList<String> sourceFiles = new ArrayList<String>();

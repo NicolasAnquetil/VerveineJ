@@ -1,9 +1,9 @@
-package fr.inria.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import java.util.Collection;
 import java.util.LinkedList;
 
-import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
+import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
 import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.ClassInstanceCreation;
@@ -19,7 +19,6 @@ import eu.synectique.verveine.core.gen.famix.Inheritance;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.Type;
-import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.Util;
 

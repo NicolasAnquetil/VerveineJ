@@ -1,4 +1,4 @@
-package adhoc;
+package lambdas;
 
 public class WithLambda {
 
@@ -12,6 +12,6 @@ public class WithLambda {
 
     public WithLambda() {
         Collection<Object> col;
-        col.forEach(o -> o.toString());
+        boolean found = col.stream().anyMatch(t -> System.out.print("lambda!"));
     }
 }

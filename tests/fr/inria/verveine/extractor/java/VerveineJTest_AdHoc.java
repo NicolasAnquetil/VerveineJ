@@ -15,30 +15,23 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ch.akuhn.fame.Repository;
 import org.junit.Before;
 import org.junit.Test;
 
 import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.VerveineUtilsForTests;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.CaughtException;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.DeclaredException;
 import eu.synectique.verveine.core.gen.famix.EnumValue;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Invocation;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.ParameterType;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import eu.synectique.verveine.core.gen.famix.Reference;
-import eu.synectique.verveine.core.gen.famix.ThrownException;
 import eu.synectique.verveine.core.gen.famix.Type;
 
 /**
@@ -46,10 +39,13 @@ import eu.synectique.verveine.core.gen.famix.Type;
  * @since November 25, 2010
  *
  */
-public class VerveineJTest_AdHoc {
+public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
-	protected Repository repo;
 	protected VerveineJParser parser;
+
+	public VerveineJTest_AdHoc() {
+	    super(false);
+    }
 
 	/**
 	 * @throws java.lang.Exception
@@ -70,11 +66,11 @@ public class VerveineJTest_AdHoc {
 	@Test
 	public void testUnresolvedDeclaration() {
 		 // note: lire() method unresolved because it throws ReadException which is not parsed here
-		parse(new String[]{"test_src/ad_hoc/ReadClient.java"});
+		parse(new String[]{"test_src/exceptions/ReadClient.java"});
 
 		int nbLire = 0;
 		Method lire = null;
-		for (Method m : VerveineUtilsForTests.selectElementsOfType(repo, Method.class)) {
+		for (Method m : entitiesOfType( Method.class)) {
 			if (m.getName().equals("lire")) {
 				nbLire++;
 				lire = m;
@@ -85,61 +81,11 @@ public class VerveineJTest_AdHoc {
 		assertEquals(6, lire.getOutgoingInvocations().size());
 	}
 
-	@Test
-	public void testLambdaTypedParameter() {
-		parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
-
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
-		assertNotNull(meth);
-
-		LocalVariable seg1 = null;
-		LocalVariable seg2 = null;
-		assertEquals(2, meth.getLocalVariables().size());
-		for (LocalVariable lvar : meth.getLocalVariables()) {
-			if (lvar.getName().equals("seg1")) {
-				seg1 = lvar;
-			}
-			else if (lvar.getName().equals("seg2")) {
-				seg2 = lvar;
-			}
-			else {
-				fail("Unknown local variable:" + lvar.getName());
-			}
-		}
-		assertNotNull(seg1);
-		assertNotNull(seg2);
-	}
-
-	@Test
-	public void testLambdaUnTypedParameter() {
-		parse(new String[] {"-alllocals", "test_src/ad_hoc/WithLambda.java"});
-
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "WithLambda");
-		assertNotNull(meth);
-
-		LocalVariable col = null;
-		LocalVariable o = null;
-		assertEquals(2, meth.getLocalVariables().size());
-		for (LocalVariable lvar : meth.getLocalVariables()) {
-			if (lvar.getName().equals("col")) {
-				col = lvar;
-			}
-			else if (lvar.getName().equals("o")) {
-				o = lvar;
-			}
-			else {
-				fail("Unknown local variable:" + lvar.getName());
-			}
-		}
-		assertNotNull(col);
-		assertNotNull(o);
-	}
-
 	@ Test
 	public void testConstructorInvocations() {
 		parse(new String[] {"test_src/ad_hoc/DefaultConstructor.java", "test_src/ad_hoc/InvokWithFullPath.java"});
 
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "methodWithClassScope");
+		Method meth = detectFamixElement( Method.class, "methodWithClassScope");
 		assertNotNull(meth);
 
 		// test outgoing invocation to constructor
@@ -148,7 +94,7 @@ public class VerveineJTest_AdHoc {
 
 		// test invocations' signatures
 		for (Invocation invok : methOutgoingInvocations) {
-			BehaviouralEntity invoked = invok.getCandidates().iterator().next();
+			BehaviouralEntity invoked = firstElt(invok.getCandidates());
 			assertTrue( "Unexpected invoked signature: "+invoked.getSignature(),
 					invok.getSignature().equals("DefaultConstructor()")
 							|| invok.getSignature().equals("JFrame(\"My title\")")
@@ -156,7 +102,7 @@ public class VerveineJTest_AdHoc {
 		}
 
 		// test constructors
-		Collection<Method> defaultContructors = VerveineUtilsForTests.listFamixElements(repo, Method.class, "DefaultConstructor");
+		Collection<Method> defaultContructors = entitiesNamed( Method.class, "DefaultConstructor");
 		assertEquals(2, defaultContructors.size());
 		for (Method m : defaultContructors) {
 			int nbParam = m.getParameters().size();
@@ -166,7 +112,7 @@ public class VerveineJTest_AdHoc {
 		}
 
 		for (Method m : defaultContructors) {
-			Invocation invok = m.getOutgoingInvocations().iterator().next();
+			Invocation invok = firstElt(m.getOutgoingInvocations());
 			if (m.getParameters().size() == 0) {
 				assertEquals("this(\"For testing\")", invok.getSignature());
 			}
@@ -176,13 +122,13 @@ public class VerveineJTest_AdHoc {
 		}
 
 		// get calling method in InvokWithFullPath
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "InvokWithFullPath");
-		meth = clazz.getMethods().iterator().next();
+		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "InvokWithFullPath");
+		meth = firstElt(clazz.getMethods());
 
 		// get called method in InvokWithFullPath
 		methOutgoingInvocations = meth.getOutgoingInvocations();
 		assertEquals(1, methOutgoingInvocations.size());
-        Invocation invok = methOutgoingInvocations.iterator().next();
+        Invocation invok = firstElt(methOutgoingInvocations);
 		assertEquals("Book(\"The Monster Book of Monsters\",\"Hagrid\")", invok.getSignature());
 	}
 
@@ -190,13 +136,13 @@ public class VerveineJTest_AdHoc {
 	public void testStubConstructor() {
 		parse(new String[] {"test_src/ad_hoc/DefaultConstructor.java"});
 
-		eu.synectique.verveine.core.gen.famix.Class stubClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "JFrame");
+		eu.synectique.verveine.core.gen.famix.Class stubClass = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "JFrame");
 		assertNotNull(stubClass);
 
 		// test outgoing invocation to constructor
 		assertEquals(1, stubClass.getMethods().size());
 
-		Method stubConstructor = stubClass.getMethods().iterator().next();
+		Method stubConstructor = firstElt(stubClass.getMethods());
 	
 		assertTrue(stubConstructor.getIsStub());
 		assertEquals( "constructor", stubConstructor.getKind());
@@ -205,10 +151,10 @@ public class VerveineJTest_AdHoc {
 
 	@Test
 	public void testDictionary() {
-		parse(new String[] {"test_src/ad_hoc/Dictionary.java"});
+		parse(new String[] {"test_src/generics/Dictionary.java"});
 
 		ParameterizableClass dico = null;
-		for (ParameterizableClass d : VerveineUtilsForTests.listFamixElements(repo, ParameterizableClass.class, "Dictionary")) {
+		for (ParameterizableClass d : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
 			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
 				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
 				dico = d;
@@ -231,76 +177,47 @@ public class VerveineJTest_AdHoc {
 	public void testStaticMembers() {
 		parse(new String[] {"test_src/ad_hoc/DefaultConstructor.java"});
 
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "methodWithClassScope");
+		Method meth = detectFamixElement( Method.class, "methodWithClassScope");
 		assertNotNull(meth);
 		assertTrue(meth.getHasClassScope());
 
-		meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "methodWithInstanceScope");
+		meth = detectFamixElement( Method.class, "methodWithInstanceScope");
 		assertNotNull(meth);
 		assertFalse(meth.getHasClassScope());
 
-		Attribute att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "FIELD_WITH_CLASS_SCOPE");
+		Attribute att = detectFamixElement( Attribute.class, "FIELD_WITH_CLASS_SCOPE");
 		assertNotNull(att);
 		assertTrue(att.getHasClassScope());
 
-		att = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "fieldWithInstanceScope");
+		att = detectFamixElement( Attribute.class, "fieldWithInstanceScope");
 		assertNotNull(att);
 		assertFalse(att.getHasClassScope());
 	}
 
 	@Test
 	public void testUnknownMethod() {
-		parse(new String[] {"test_src/ad_hoc/Dictionary.java"});
+		parse(new String[] {"test_src/generics/Dictionary.java"});
 
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "uniplementedMethod");
+		Method meth = detectFamixElement( Method.class, "uniplementedMethod");
 		assertNotNull(meth);
 		
 		assertEquals("uniplementedMethod(?,?)", meth.getSignature());
 	}
 
 	@Test
-	public void testExceptions() {
-		parse(new String[] {"test_src/ad_hoc/ReadClient.java", "test_src/ad_hoc/ReadException.java"});
-
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "lire");
-		assertNotNull(meth);
-
-		eu.synectique.verveine.core.gen.famix.Class excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
-		assertNotNull(excepClass);
-
-		assertEquals(1, meth.getDeclaredExceptions().size());
-		DeclaredException exD = meth.getDeclaredExceptions().iterator().next();
-		assertSame(meth, exD.getDefiningMethod());
-		assertSame(excepClass, exD.getExceptionClass());
-
-		assertEquals(1, meth.getThrownExceptions().size());
-		ThrownException exT = meth.getThrownExceptions().iterator().next();
-		assertSame(meth, exT.getDefiningMethod());
-		assertSame(excepClass, exT.getExceptionClass());
-
-		excepClass = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "IOException");
-		assertNotNull(excepClass);
-
-		assertEquals(1,meth.getCaughtExceptions().size());
-		CaughtException exC = meth.getCaughtExceptions().iterator().next();
-		assertSame(meth, exC.getDefiningMethod());
-		assertSame(excepClass, exC.getExceptionClass());
-	}
-
-	@Test
 	public void testClassWithNoBindingCreatedAsType() {
 		parse(new String[] {"test_src/ad_hoc/Example.java"});
 
-		eu.synectique.verveine.core.gen.famix.Type clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Type.class, "BackingStoreException");
+		eu.synectique.verveine.core.gen.famix.Type clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Type.class, "BackingStoreException");
 		assertNotNull(clazz);
 		assertEquals(eu.synectique.verveine.core.gen.famix.Class.class, clazz.getClass());
 	}
 
 	@Test
 	public void testClassVar() {
-		parse(new String[] {"test_src/ad_hoc/Dictionary.java"});
+		parse(new String[] {"test_src/generics/Dictionary.java"});
 
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "ensureFamixEntity");
+		Method meth = detectFamixElement( Method.class, "ensureFamixEntity");
 		assertNotNull(meth);
 
 		// might as well do some tests on the method itself
@@ -330,159 +247,18 @@ public class VerveineJTest_AdHoc {
 	}
 
 	@Test
-	public void testParameterizableClass() {
-		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/WrongInvocation.java", "test_src/ad_hoc/Dictionary.java"});
-
-		assertEquals(9, VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size());
-		// WrongInvocation -> List<X>, ArrayList<X>
-		// Dictionary -> Dictionary<X>, Map<X,Y>, Hashtable<X,Y>, Collection<X>, Class<X>, LinkedList<X>
-		// Card -> List<X>, ArrayList<X>
-		// XmlElement -> Class<X>
-		// -> List, ArrayList, Class, Collection, Map, Hashtable, Dictionary, LinkedList
-		// + Enum, but why ?
-		// previous version was going up the inheritance hierarchy for stubs. No longer the case
-		// these classes are no longer created: AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
-
-		ParameterizableClass generic = null;
-		for (ParameterizableClass g : VerveineUtilsForTests.listFamixElements(repo, ParameterizableClass.class, "Dictionary")) {
-			if (g.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
-				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
-				generic = g;
-				break;
-			}
-		}
-		assertNotNull(generic);
-		assertEquals("Dictionary", generic.getName());
-		assertEquals(2, generic.getTypes().size());  // <B> , ImplicitVars
-		for (Type t : generic.getTypes()) {
-			String typName = t.getName();
-			assertTrue(typName.equals("B") || typName.equals("ImplicitVars"));
-		}
-
-		assertEquals(1, generic.getParameters().size());
-
-		ParameterType dicoParam = VerveineUtilsForTests.detectFamixElement(repo, ParameterType.class, "B");
-		assertNotNull(dicoParam);
-		assertEquals("B", dicoParam.getName());
-		
-		assertSame(generic, dicoParam.getContainer());
-		assertSame(dicoParam, generic.getParameters().iterator().next());
-
-		/* Collection<Object> is not seen as parameterizable by JDT */
-		ParameterizableClass collec = VerveineUtilsForTests.detectFamixElement(repo, ParameterizableClass.class, "Collection");
-		assertNotNull(collec);
-	}
-
-	@Test
-	public void testParameterizedType() {
-		parse(new String[] {"test_src/ad_hoc/Card.java"});
-
-		eu.synectique.verveine.core.gen.famix.Class arrList = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "ArrayList");
-		assertNotNull(arrList);
-
-		Method newDeck = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "newDeck");
-		assertNotNull(newDeck);
-
-		// recover reference to ArrayList<Card> in newDeck()
-		ParameterizedType refedArrList = null;
-		assertEquals(1, newDeck.getOutgoingReferences().size());
-		for (Reference r : newDeck.getOutgoingReferences()) {
-			if (r.getTarget() instanceof ParameterizedType) {
-				refedArrList = (ParameterizedType) r.getTarget();
-				break;
-			}
-		}
-		assertNotNull(refedArrList);
-		assertEquals("ArrayList", refedArrList.getName());
-		assertEquals(arrList, refedArrList.getParameterizableClass());
-		assertEquals(arrList.getContainer(), refedArrList.getContainer());
-
-		assertEquals(1, refedArrList.getArguments().size());
-		assertEquals("Card", refedArrList.getArguments().iterator().next().getName());
-		
-		assertEquals(3, refedArrList.getIncomingReferences().size()); // Card.newDeck(), Card.INIT_BLOCK_NAME, WrongInvocation.getX()
-		for (Reference r : refedArrList.getIncomingReferences()) {
-			String refererName = r.getFrom().getName(); 
-			assertTrue(refererName.equals("newDeck") || refererName.equals("getX") || refererName.equals(JavaDictionary.INIT_BLOCK_NAME));
-		}
-	}
-
-	@Test  // issue 960
-	public void testStubStatusParameterizedTypes() {
-		parse(new String[] {"test_src/ad_hoc/Card.java"});
-
-		Collection<ParameterizedType> ptypes = VerveineUtilsForTests.selectElementsOfType(repo, ParameterizedType.class);
-		assertEquals(4,ptypes.size());  // Suit, Rank, List, ArrayList
-		for (ParameterizedType typ : ptypes) {
-			assertEquals(typ.getParameterizableClass().getIsStub(), typ.getIsStub());
-		}
-	}
-
-	@Test
-	public void testParameterTypeAsType() {
-		parse(new String[] {"test_src/ad_hoc/Dictionary.java"});
-
-		Method gebb = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "getEntityByBinding");
-		assertNotNull(gebb);
-		assertSame(1, gebb.getParameters().size());
-		
-		Parameter bnd = gebb.getParameters().iterator().next();
-		assertNotNull(bnd);
-		assertEquals("bnd", bnd.getName());
-		
-		Type b = bnd.getDeclaredType();
-		assertNotNull(b);
-		assertEquals("B", b.getName());
-		assertSame(ParameterType.class, b.getClass());
-		
-		ContainerEntity cont = b.getContainer();
-		assertNotNull(cont);
-		assertEquals("Dictionary", cont.getName());
-		assertSame(ParameterizableClass.class, cont.getClass());
-	}
-
-	@Test
 	public void testArrayListMatthias() {
 		parse(new String[] {"test_src/ad_hoc/Bla.java"});
 
-		assertEquals(6, VerveineUtilsForTests.selectElementsOfType(repo, eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays
-		assertEquals(2,  VerveineUtilsForTests.selectElementsOfType(repo, ParameterizableClass.class).size()); //
+		assertEquals(6, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays
+		assertEquals(2,  entitiesOfType( ParameterizableClass.class).size()); //
 	}
 
-	@Test
-	public void testMethodParameterArgumentTypes() {
-		parse(new String[] {"test_src/ad_hoc/Dictionary.java"});
-
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "ensureFamixEntity");
-		assertEquals(3, meth.getParameters().size());
-		for (Parameter param : meth.getParameters()) {
-			if (param.getName().equals("fmxClass")) {
-				Type classT = param.getDeclaredType();
-				assertNotNull(classT);
-				assertEquals("Class", classT.getName());
-				assertEquals(ParameterizedType.class, classT.getClass());
-				assertEquals(1, ((ParameterizedType)classT).getArguments().size());
-				Type t = ((ParameterizedType)classT).getArguments().iterator().next();
-				assertEquals("T", t.getName());
-				assertSame(meth, t.getBelongsTo());
-			}
-			else if (param.getName().equals("bnd")) {
-				Type b = param.getDeclaredType();
-				assertNotNull(b);
-				assertEquals("B", b.getName());
-				assertSame(meth.getBelongsTo(), b.getBelongsTo());  // b defined in Dictionary class just as the method
-			}
-			else {
-				assertEquals("name", param.getName());
-			}
-		}
-	}
-	
 	@Test
 	public void testMethodLocalVariableArgumentTypes() {
-		parse(new String[] {"test_src/ad_hoc/Dictionary.java"});
+		parse(new String[] {"test_src/generics/Dictionary.java"});
 
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "getEntityByName");
+		Method meth = detectFamixElement( Method.class, "getEntityByName");
 		assertNotNull(meth);
 		assertEquals(3, meth.getLocalVariables().size());
 		for (LocalVariable var : meth.getLocalVariables()) {
@@ -493,7 +269,7 @@ public class VerveineJTest_AdHoc {
 				assertEquals("Collection", collec.getName());
 				assertEquals(ParameterizedType.class, collec.getClass());
 				assertEquals(1, ((ParameterizedType)collec).getArguments().size());
-				Type t = ((ParameterizedType)collec).getArguments().iterator().next();
+				Type t = firstElt( ((ParameterizedType)collec).getArguments());
 				assertEquals("T", t.getName());
 				assertSame(meth, t.getBelongsTo());
 			}
@@ -503,7 +279,7 @@ public class VerveineJTest_AdHoc {
 				assertEquals("Collection", collec.getName());
 				assertEquals(ParameterizedType.class, collec.getClass());
 				assertEquals(1, ((ParameterizedType)collec).getArguments().size());
-				Type ne = ((ParameterizedType)collec).getArguments().iterator().next();
+				Type ne = firstElt( ((ParameterizedType)collec).getArguments());
 				assertEquals("NamedEntity", ne.getName());
 			}
 		}
@@ -511,53 +287,51 @@ public class VerveineJTest_AdHoc {
 
 	@Test
 	public void testMethodReturnArgumentTypes() {
-		parse(new String[] {"test_src/ad_hoc/Dictionary.java"});
+		parse(new String[] {"test_src/generics/Dictionary.java"});
 
-		Method fmxMethod = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "getEntityByName");
+		Method fmxMethod = detectFamixElement( Method.class, "getEntityByName");
 		assertNotNull(fmxMethod);
-		//assertEquals(1, fmxMethod.getDeclaredArgumentTypes().size());
-		//assertSame(TestVerveineUtils.detectElement(repo, Type.class, "T"), fmxMethod.getDeclaredArgumentTypes().iterator().next());
 	}
 
 	@Test
 	public void testEnumDecl() {
 		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java"});
 
-		eu.synectique.verveine.core.gen.famix.Class javaLangEnum = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "Enum");
+		eu.synectique.verveine.core.gen.famix.Class javaLangEnum = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "Enum");
 		assertNotNull(javaLangEnum);
 		assertEquals("lang", javaLangEnum.getBelongsTo().getName());
 		assertEquals(ParameterizableClass.class, javaLangEnum.getClass());
 		
-		eu.synectique.verveine.core.gen.famix.Class card = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "Card");
+		eu.synectique.verveine.core.gen.famix.Class card = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "Card");
 		assertNotNull(card);
 
-		eu.synectique.verveine.core.gen.famix.Enum rk = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Enum.class, "Rank");
+		eu.synectique.verveine.core.gen.famix.Enum rk = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Rank");
 		assertNotNull(rk);
 		assertEquals("Rank", rk.getName());
 		assertEquals(13, rk.getValues().size());
 		assertSame(card, rk.getBelongsTo());
 		assertNotNull(rk.getSourceAnchor());
 		assertEquals(1, rk.getSuperInheritances().size());
-		Type rkSuper = rk.getSuperInheritances().iterator().next().getSuperclass();
+		Type rkSuper = firstElt(rk.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, rkSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)rkSuper).getParameterizableClass());
 
-		EnumValue nine = VerveineUtilsForTests.detectFamixElement(repo, EnumValue.class, "NINE");
+		EnumValue nine = detectFamixElement( EnumValue.class, "NINE");
 		assertNotNull(nine);
 		assertEquals("NINE", nine.getName());
 		assertSame(rk, nine.getParentEnum());
 
-		eu.synectique.verveine.core.gen.famix.Enum st = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Enum.class, "Suit");
+		eu.synectique.verveine.core.gen.famix.Enum st = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Suit");
 		assertNotNull(st);
 		assertEquals("Suit", st.getName());
 		assertEquals(1, st.getSuperInheritances().size());
-		Type stSuper = st.getSuperInheritances().iterator().next().getSuperclass();
+		Type stSuper = firstElt(st.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, stSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)stSuper).getParameterizableClass());
 		assertEquals(4, st.getValues().size());
-		assertSame(VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "ad_hoc"), st.getBelongsTo());
+		assertSame(detectFamixElement( Namespace.class, "ad_hoc"), st.getBelongsTo());
 
-		EnumValue hrt = VerveineUtilsForTests.detectFamixElement(repo, EnumValue.class, "HEARTS");
+		EnumValue hrt = detectFamixElement( EnumValue.class, "HEARTS");
 		assertNotNull(hrt);
 		assertEquals("HEARTS", hrt.getName());
 		assertSame(st, hrt.getParentEnum());
@@ -575,14 +349,14 @@ public class VerveineJTest_AdHoc {
 			}
 		}
 
-		eu.synectique.verveine.core.gen.famix.Enum pl = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
+		eu.synectique.verveine.core.gen.famix.Enum pl = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
 		assertNotNull(pl);
 		assertEquals("Planet", pl.getName());
 		assertEquals(1, pl.getSuperInheritances().size());
-		Type plSuper = pl.getSuperInheritances().iterator().next().getSuperclass();
+		Type plSuper = firstElt(pl.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, plSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)plSuper).getParameterizableClass());
-		assertSame(VerveineUtilsForTests.detectFamixElement(repo, Namespace.class, "ad_hoc"), pl.getBelongsTo());
+		assertSame(detectFamixElement( Namespace.class, "ad_hoc"), pl.getBelongsTo());
 		assertEquals(8, pl.getValues().size());
 		assertEquals(4, pl.getAttributes().size());
 		assertEquals(7+2, pl.getMethods().size()); // 7 methods + <initializer> + implicit used: values()
@@ -592,7 +366,7 @@ public class VerveineJTest_AdHoc {
 	public void testEnumAccess() {
 		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java"});
 
-		eu.synectique.verveine.core.gen.famix.Enum st = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Enum.class, "Suit");
+		eu.synectique.verveine.core.gen.famix.Enum st = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Suit");
 		assertNotNull(st);
 		assertEquals(4, st.getValues().size());
 		boolean foundClubs = false;
@@ -600,13 +374,13 @@ public class VerveineJTest_AdHoc {
 			if (v.getName().equals("CLUBS")) {
 				foundClubs = true;
 				assertEquals(1, v.numberOfIncomingAccesses());
-				Access access = v.getIncomingAccesses().iterator().next();
+				Access access = firstElt(v.getIncomingAccesses());
 				assertEquals("toString", access.getFrom().getName());
 			}
 		}
 		assertTrue("Did not find CUBS EnumValue in Suit Enum", foundClubs);
 		
-		eu.synectique.verveine.core.gen.famix.Enum pl = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
+		eu.synectique.verveine.core.gen.famix.Enum pl = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
 		assertNotNull(pl);
 
 		assertEquals(8, pl.getValues().size());
@@ -621,10 +395,7 @@ public class VerveineJTest_AdHoc {
 
 		assertEquals(4, pl.getAttributes().size());
 		for (Attribute a : pl.getAttributes()) {
-			if ( a.getName().equals("G") || a.getName().equals("i") ) {
-				assertEquals(1, a.getIncomingAccesses().size());
-			}
-			else if (a.getName().equals("radius")) {
+			if ( a.getName().equals("G") || a.getName().equals("radius") || a.getName().equals("i") ) {
 				assertEquals(2, a.getIncomingAccesses().size());
 			}
 			else if (a.getName().equals("mass")) {
@@ -664,7 +435,7 @@ public class VerveineJTest_AdHoc {
 		Attribute mass_att = null;
 		Access access = null;
 
-		eu.synectique.verveine.core.gen.famix.Enum pl = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
+		eu.synectique.verveine.core.gen.famix.Enum pl = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
 		assertNotNull(pl);
 
 		assertEquals(4, pl.getAttributes().size());
@@ -678,9 +449,14 @@ public class VerveineJTest_AdHoc {
 		}
 		
 		assertNotNull("Attribute i in Planet not found", i_att);
-		assertEquals(1, i_att.getIncomingAccesses().size());
-		access = i_att.getIncomingAccesses().iterator().next();
-		assertFalse(access.getIsWrite());
+		assertEquals(2, i_att.getIncomingAccesses().size());
+		access = firstElt(i_att.getIncomingAccesses());
+		if (access.getAccessor().getName().equals("sillyArrayAssignement")) {
+            assertFalse(access.getIsWrite());
+        }
+        else {
+		    assertTrue(access.getIsWrite());
+        }
 		
 		assertNotNull("Attribute mass in Planet not found", mass_att);
 		assertEquals(4, mass_att.getIncomingAccesses().size());
@@ -699,7 +475,7 @@ public class VerveineJTest_AdHoc {
 	public void testStaticInitializationBlock() {
 		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java", "test_src/ad_hoc/InvokWithFullPath.java", "test_src/ad_hoc/DefaultConstructor.java"});
 
-		Collection<Method> l_meth = VerveineUtilsForTests.listFamixElements(repo, Method.class, JavaDictionary.INIT_BLOCK_NAME);
+		Collection<Method> l_meth = entitiesNamed( Method.class, JavaDictionary.INIT_BLOCK_NAME);
 		assertEquals(3, l_meth.size());
 		for (Method meth : l_meth) {
 			assertEquals(JavaDictionary.INIT_BLOCK_NAME+"()", meth.getSignature());
@@ -722,11 +498,11 @@ public class VerveineJTest_AdHoc {
 	public void testStaticInitializationBlockNewString() {
 		parse(new String[] {"test_src/ad_hoc/EnumConstWithInitNewString.java"});
 
-		eu.synectique.verveine.core.gen.famix.Enum fmx = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Enum.class, "EnumConstWithInitNewString");
+		eu.synectique.verveine.core.gen.famix.Enum fmx = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "EnumConstWithInitNewString");
 		assertNotNull(fmx);
 
 		assertEquals(1, fmx.numberOfValues());
-		assertEquals("ONE", fmx.getValues().iterator().next().getName());
+		assertEquals("ONE", firstElt(fmx.getValues()).getName());
 		
 		assertEquals(2, fmx.getMethods().size());  // constructor + INIT_BLOCK
 	}
@@ -735,17 +511,17 @@ public class VerveineJTest_AdHoc {
 	public void testWrongMethodOwner() {
 		parse(new String[] {"test_src/ad_hoc/InvokerWrongOwner.java"});
 
-		Method meth = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "methodWrongOwner");
+		Method meth = detectFamixElement( Method.class, "methodWrongOwner");
 		assertNotNull(meth);
 
-		assertEquals(VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "SuperWrongOwner"), meth.getParentType());
+		assertEquals(detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "SuperWrongOwner"), meth.getParentType());
 	}
 	
 	@Test
 	public void testModifiers() {
 		parse(new String[] {"test_src/ad_hoc/Modifiers.java"});
 
-		Attribute attribute = VerveineUtilsForTests.detectFamixElement(repo, Attribute.class, "privateFinalAttribute");
+		Attribute attribute = detectFamixElement( Attribute.class, "privateFinalAttribute");
 		assertNotNull(attribute);
 
 		assertEquals(2, attribute.getModifiers().size());
@@ -757,15 +533,15 @@ public class VerveineJTest_AdHoc {
 	public void testMultipleSignatures() {
 		parse(new String[] {"test_src/ad_hoc/MultipleSignatures.java"});
 
-		eu.synectique.verveine.core.gen.famix.Class throwable = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "Throwable");
+		eu.synectique.verveine.core.gen.famix.Class throwable = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "Throwable");
 		assertNotNull(throwable);
 		assertEquals(2, throwable.getMethods().size()); // printStackTrace() & printStackTrace(PrintWriter)
 
-		Method regular =  VerveineUtilsForTests.detectFamixElement(repo, Method.class, "callToRegularPrintStackTrace");
+		Method regular =  detectFamixElement( Method.class, "callToRegularPrintStackTrace");
 		assertNotNull(regular);
 		assertEquals(1, regular.getOutgoingInvocations().size());
 		
-		Method withParam =  VerveineUtilsForTests.detectFamixElement(repo, Method.class, "callToPrintStackTraceWithParam");
+		Method withParam =  detectFamixElement( Method.class, "callToPrintStackTraceWithParam");
 		assertNotNull(withParam);
 		assertEquals(3, withParam.getOutgoingInvocations().size());  // printStackTrace(new PrintWriter(new StringWriter()))
 	}
@@ -775,13 +551,13 @@ public class VerveineJTest_AdHoc {
 		// TODO sould use source within ad_hoc
 		parse(new String[] {"test_src/annotations/Serializer.java"});
 
-		Method seri = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "serialize");
+		Method seri = detectFamixElement( Method.class, "serialize");
 		assertNotNull(seri);
 		ContainerEntity owner = seri.getBelongsTo(); 
 		assertEquals("Serializer", owner.getName());  // just checking
 		
 		for (Invocation invok : seri.getOutgoingInvocations()) {
-			BehaviouralEntity invoked = invok.getCandidates().iterator().next();
+			BehaviouralEntity invoked = firstElt(invok.getCandidates());
 			if (invoked.getName().equals("serializeProperty")) {
 				assertEquals(owner, invoked.getBelongsTo());
 			}
@@ -792,7 +568,7 @@ public class VerveineJTest_AdHoc {
 	public void testInstanceOf() {
 		parse(new String[] {"test_src/ad_hoc/Planet.java"});
 
-		Method m = VerveineUtilsForTests.detectFamixElement(repo, Method.class, "sillyArrayAssignement");
+		Method m = detectFamixElement( Method.class, "sillyArrayAssignement");
 		assertNotNull(m);
 
 		Collection<Reference> refs = m.getOutgoingReferences();
@@ -818,7 +594,7 @@ public class VerveineJTest_AdHoc {
 	public void testPublicStaticInnerClass() {
 		parse(new String[] {"test_src/ad_hoc/StaticInnerClass.java"});
 
-		eu.synectique.verveine.core.gen.famix.Class clazz = VerveineUtilsForTests.detectFamixElement(repo, eu.synectique.verveine.core.gen.famix.Class.class, "ThisIsTheStaticInnerClass");
+		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "ThisIsTheStaticInnerClass");
 		assertNotNull(clazz);
 
 		// assertTrue(clazz.getIsPublic()); --- set as a modifier 
@@ -827,5 +603,20 @@ public class VerveineJTest_AdHoc {
 			assertTrue( mod.equals(JavaDictionary.MODIFIER_PUBLIC) || mod.equals(JavaDictionary.MODIFIER_STATIC) );
 		}
 	}
+
+    @Test
+    public void testSuperConstructorInvocation() {
+ 		parse(new String[] {"test_src/ad_hoc/StubSuperConstructor.java"});
+
+       Collection<Method> meths = entitiesNamed( Method.class, "StubSuperConstructor");
+
+        assertEquals(1, meths.size());
+        Method meth = firstElt(meths);
+        assertEquals(1, meth.getOutgoingInvocations().size());
+        Invocation invok = firstElt(meth.getOutgoingInvocations());
+        BehaviouralEntity invoked = firstElt(invok.getCandidates());
+        assertNotNull(invoked);
+        assertEquals("ArrayList", invoked.getName() );
+    }
 
 }

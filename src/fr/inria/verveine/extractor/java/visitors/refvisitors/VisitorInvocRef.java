@@ -1,4 +1,4 @@
-package fr.inria.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -8,10 +8,11 @@ import java.util.Iterator;
 import eu.synectique.verveine.core.Dictionary;
 
 import eu.synectique.verveine.core.gen.famix.*;
+import eu.synectique.verveine.core.gen.famix.Class;
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
-import fr.inria.verveine.extractor.java.GetVisitedEntityAbstractVisitor;
+import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 
 import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -82,30 +83,27 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 *             [ AnonymousClassDeclaration ]
 	 */
 	public boolean visit(ClassInstanceCreation node) {
-		if (node.getAnonymousClassDeclaration() == null) {
-			visitClassInstanceCreation(node);
+		visitClassInstanceCreation(node);
+		if ( (node.getAnonymousClassDeclaration() == null) && (!classSummary) ) {
+			Type clazz = node.getType();
+			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
-			if (!classSummary) {
-				Type clazz = node.getType();
-				eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
-
-				// create an invocation to the constructor
-				String typName;
-				if (fmx == null) {
-					typName = findTypeName(clazz);
-				}
-				else {
-					typName = fmx.getName();
-				}
-				methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
-				Invocation lastInvok = context.getLastInvocation();
-				if ( (anchors == anchorOptions.assoc)
-						&& (lastInvok != null)
-						&& (lastInvok.getSender() == context.topMethod())
-						&& (lastInvok.getReceiver() == null)
-						&& (lastInvok.getSignature().startsWith(typName))) {
-					dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
-				}
+			// create an invocation to the constructor
+			String typName;
+			if (fmx == null) {
+				typName = findTypeName(clazz);
+			}
+			else {
+				typName = fmx.getName();
+			}
+			methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
+			Invocation lastInvok = context.getLastInvocation();
+			if ( (anchors == anchorOptions.assoc)
+					&& (lastInvok != null)
+					&& (lastInvok.getSender() == context.topMethod())
+					&& (lastInvok.getReceiver() == null)
+					&& (lastInvok.getSignature().startsWith(typName))) {
+				dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
 			}
 		}
 		return super.visit(node);
@@ -322,11 +320,17 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 	public boolean visit(SuperConstructorInvocation node) {
 		// ConstructorInvocation (i.e. 'super(...)' ) happen in constructor, so the name is that of the superclass
-		Method invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!classSummary);
-		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
-		// also no parameters specified here, so no references to create either
+        Class superC = superClass();
+		Method invoked = null;
 
-		if (! classSummary) {
+//		if (superC != null) {
+//            invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), superC.getName(),  /*paramsType*/(Collection<String>) null, superC, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
+//        }
+//        else {
+		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!classSummary);
+//        }
+
+		if ( (invoked != null) && (! classSummary) ) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -346,7 +350,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		return super.visit(node);
 	}
 
-	// UTILITY METHODS
+    // UTILITY METHODS
 
 	/**
 	 * Handles an invocation of a method by creating the corresponding Famix Entity.
@@ -437,33 +441,33 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		// array[i].msg()
-		if (expr instanceof ArrayAccess) {
+		if ( NodeTypeChecker.isArrayAccess(expr)) {
 			return getReceiver(((ArrayAccess) expr).getArray());
 		}
 
 		// new type[].msg()
-		if (expr instanceof ArrayCreation) {
+		if ( NodeTypeChecker.isArrayCreation(expr)) {
 			//System.err.println("WARNING: Ignored receiver expression in method call: ArrayCreation");
 			return null;
 		}
 
 		// (variable = value).msg()
-		if (expr instanceof Assignment) {
+		if ( NodeTypeChecker.isAssignment(expr)) {
 			return getReceiver(((Assignment) expr).getLeftHandSide());
 		}
 
 		// ((type)expr).msg()
-		if (expr instanceof CastExpression) {
+		if ( NodeTypeChecker.isCastExpression(expr)) {
 			return getReceiver(((CastExpression) expr).getExpression());
 		}
 
 		// new Class().msg()
-		if (expr instanceof ClassInstanceCreation) {
+		if ( NodeTypeChecker.isClassInstanceCreation(expr)) {
 			return null;
 		}
 
 		// (cond-expr ? then-expr : else-expr).msg()
-		if (expr instanceof ConditionalExpression) {
+		if ( NodeTypeChecker.isConditionalExpression(expr)) {
 			// can be one or the other (then-expr/else-expr) so we choose one
 			NamedEntity ret = getReceiver(((ConditionalExpression) expr).getThenExpression());
 			if (ret == null) {
@@ -474,7 +478,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		// field.msg()
-		if (expr instanceof FieldAccess) {
+		if ( NodeTypeChecker.isFieldAccess(expr)) {
 			IVariableBinding bnd = ((FieldAccess) expr).resolveFieldBinding();
 			StructuralEntity fld = (StructuralEntity) dico.getEntityByKey(bnd);
 			/*StructuralEntity fld = ensureAccessedStructEntity(bnd, ((FieldAccess) expr).getName().getIdentifier(),
@@ -483,30 +487,30 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		// (left-expr oper right-expr).msg()
-		if (expr instanceof InfixExpression) {
+		if ( NodeTypeChecker.isInfixExpression(expr)) {
 			// anonymous receiver
 			return null;
 		}
 
 		// msg1().msg()
-		if (expr instanceof MethodInvocation) {
+		if (NodeTypeChecker.isMethodInvocation(expr)) {
 			return null;
 		}
 
 		// name.msg()
-		if (expr instanceof Name) {
+		if ( NodeTypeChecker.isName(expr)) {
 			// can be a class or a variable name
 			IBinding bnd = ((Name) expr).resolveBinding();
 			if (bnd == null) {
 				return null;
 			}
 			NamedEntity ret = null;
-			if (bnd instanceof ITypeBinding) {
+			if (bnd.getKind() == IBinding.TYPE) {
 				// msg() is a static method of Name so name should be a class, except if its an Enum
 				ret = dico.getEntityByKey(bnd);
 			}
 
-			if (bnd instanceof IVariableBinding) {
+			if (bnd.getKind() == IBinding.VARIABLE) {
 				return dico.getEntityByKey(bnd);
 			}
 
@@ -514,34 +518,34 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		// (expr).msg()
-		if (expr instanceof ParenthesizedExpression) {
+		if ( NodeTypeChecker.isParenthesizedExpression(expr)) {
 			return getReceiver(((ParenthesizedExpression) expr).getExpression());
 		}
 
 		// "string".msg()
-		if (expr instanceof StringLiteral) {
+		if ( NodeTypeChecker.isStringLiteral(expr)) {
 			return null;
 		}
 
 		// super.field.msg()
-		if (expr instanceof SuperFieldAccess) {
+		if ( NodeTypeChecker.isSuperFieldAccess(expr)) {
 			return dico.getEntityByKey(((SuperFieldAccess) expr).resolveFieldBinding());
 			/*return ensureAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(),
 					((SuperFieldAccess) expr).getName().getIdentifier(), /*typ* /null, /*owner* /null, /*accessor* /null);*/
 		}
 
 		// super.msg1().msg()
-		if (expr instanceof SuperMethodInvocation) {
+		if ( NodeTypeChecker.isSuperMethodInvocation(expr)) {
 			return null;
 		}
 
 		// this.msg()
-		if (expr instanceof ThisExpression) {
+		if ( NodeTypeChecker.isThisExpression(expr)) {
 			return this.dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! classSummary);
 		}
 
 		// type.class.msg()
-		if (expr instanceof TypeLiteral) {
+		if ( NodeTypeChecker.isTypeLiteral(expr)) {
 			// similar to a field access
 			return dico.getFamixAttribute(null, "class", dico.ensureFamixMetaClass(null));
 		}
@@ -561,18 +565,18 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 */
 	private eu.synectique.verveine.core.gen.famix.Type getInvokedMethodOwner(Expression expr, NamedEntity receiver) {
 		// ((type)expr).msg()
-		if (expr instanceof CastExpression) {
+		if ( NodeTypeChecker.isCastExpression(expr)) {
 			Type tcast = ((CastExpression) expr).getType();
 			return referedType(tcast, (ContainerEntity) this.context.top(), true);
 		}
 
 		// new Class().msg()
-		else if (expr instanceof ClassInstanceCreation) {
+		else if ( NodeTypeChecker.isClassInstanceCreation(expr)) {
 			return this.classInstanceCreated;
 		}
 
 		// msg1().msg()
-		else if (expr instanceof MethodInvocation) {
+		else if ( NodeTypeChecker.isMethodInvocation(expr)) {
 			IMethodBinding callerBnd = ((MethodInvocation) expr).resolveMethodBinding();
 			if (callerBnd != null) {
 				return referedType(callerBnd.getReturnType(), (ContainerEntity) this.context.top(), true);
@@ -582,18 +586,18 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		// (expr).msg()
-		else if (expr instanceof ParenthesizedExpression) {
+		else if ( NodeTypeChecker.isParenthesizedExpression(expr)) {
 			return getInvokedMethodOwner(((ParenthesizedExpression) expr).getExpression(), receiver);
 		}
 
 		// "string".msg()
-		else if (expr instanceof StringLiteral) {
+		else if ( NodeTypeChecker.isStringLiteral(expr)) {
 			return dico.ensureFamixType(null, "String", dico.ensureFamixNamespaceJavaLang(null),
 					/*alwaysPersist?*/true); // creating FamixClass java.lang.String
 		}
 
 		// super.msg1().msg()
-		else if (expr instanceof SuperMethodInvocation) {
+		else if ( NodeTypeChecker.isSuperMethodInvocation(expr)) {
 			IMethodBinding superBnd = ((SuperMethodInvocation) expr).resolveMethodBinding();
 			if (superBnd != null) {
 				return this.referedType(superBnd.getReturnType(), context.topType(), true);
@@ -626,5 +630,21 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			}
 		}
 	}
+
+    /**
+     * Finds the super class of the current class
+     * @return
+     */
+    private Class superClass() {
+        eu.synectique.verveine.core.gen.famix.Type clazz = context.topType();
+        Class superC = null;
+        for (Inheritance inh : clazz.getSuperInheritances()) {
+            if ( (inh.getSuperclass() instanceof Class) && (! ((Class) inh.getSuperclass()).getIsInterface()) ) {
+                superC = (Class) inh.getSuperclass();
+                break;
+            }
+        }
+        return superC;
+    }
 
 }

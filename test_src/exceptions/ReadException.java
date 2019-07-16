@@ -1,4 +1,4 @@
-package ad_hoc;
+package exceptions;
 
 public class ReadException extends Exception {
 

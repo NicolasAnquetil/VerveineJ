@@ -1,4 +1,4 @@
-package fr.inria.verveine.extractor.java.refvisitors;
+package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -9,8 +9,7 @@ import org.eclipse.jdt.core.dom.Type;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.SummarizingClassesAbstractVisitor;
-import fr.inria.verveine.extractor.java.VerveineJParser;
+import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 
 /**
  * A collection of useful utility methods that are needed in various ref visitors

@@ -428,7 +428,7 @@ public class StubBinding implements IBinding, ITypeBinding, IMethodBinding {
 
     @Override
     public ITypeBinding getErasure() {
-        return null;
+        return this;
     }
 
     @Override
