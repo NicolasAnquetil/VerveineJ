@@ -84,6 +84,9 @@ public class VisitorAccessRef extends AbstractRefVisitor {
             if (NodeTypeChecker.isSimpleName((ASTNode) arg)) {
                 visitAsSimpleName((ASTNode) arg);
             }
+            else {
+            	((ASTNode) arg).accept(this);
+			}
         }
         if (node.getAnonymousClassDeclaration() != null) {
             node.getAnonymousClassDeclaration().accept(this);
