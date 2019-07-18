@@ -135,17 +135,28 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         assertNotNull(xmle.getSourceAnchor());
         assertEquals(IndexedFileAnchor.class, xmle.getSourceAnchor().getClass());
         assertEquals("test_src/annotations/XmlElement.java", ((IndexedFileAnchor)xmle.getSourceAnchor()).getFileName());
-        assertEquals(62, ((IndexedFileAnchor)xmle.getSourceAnchor()).getStartPos());
-        assertEquals(176, ((IndexedFileAnchor)xmle.getSourceAnchor()).getEndPos());
+        if (isWindows()) {
+            assertEquals(66, ((IndexedFileAnchor) xmle.getSourceAnchor()).getStartPos());
+            assertEquals(188, ((IndexedFileAnchor) xmle.getSourceAnchor()).getEndPos());
+        }
+        else {
+            assertEquals(62, ((IndexedFileAnchor) xmle.getSourceAnchor()).getStartPos());
+            assertEquals(176, ((IndexedFileAnchor) xmle.getSourceAnchor()).getEndPos());
+        }
 
         AnnotationTypeAttribute req = detectFamixElement( AnnotationTypeAttribute.class, "required");
         assertNotNull(req);
         assertNotNull(req.getSourceAnchor());
         assertEquals(IndexedFileAnchor.class, req.getSourceAnchor().getClass());
         assertEquals("test_src/annotations/XmlElement.java", ((IndexedFileAnchor)req.getSourceAnchor()).getFileName());
-        assertEquals(120, ((IndexedFileAnchor)req.getSourceAnchor()).getStartPos());
-        assertEquals(145, ((IndexedFileAnchor)req.getSourceAnchor()).getEndPos());
-
+        if (isWindows()) {
+            assertEquals(128, ((IndexedFileAnchor) req.getSourceAnchor()).getStartPos());
+            assertEquals(153, ((IndexedFileAnchor) req.getSourceAnchor()).getEndPos());
+        }
+        else  {
+            assertEquals(120, ((IndexedFileAnchor) req.getSourceAnchor()).getStartPos());
+            assertEquals(145, ((IndexedFileAnchor) req.getSourceAnchor()).getEndPos());
+        }
     }
 
     @Test

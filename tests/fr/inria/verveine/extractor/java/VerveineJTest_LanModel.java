@@ -92,18 +92,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = 11+5; // 11+ Object,String,StringBuffer,PrintStream,System
-		// previous version was going up the inheritance hierarchy for stubs. No longer the case
-        // these classes are no longer created: AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
+		int nbClasses = 11+15; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
+		int nbInherit =9+21;
 
-		/* previous version was going up the inheritance hierarchy for stubs. No longer the case
 		if ( System.getProperty("java.version").startsWith("1.") &&
 				System.getProperty("java.version").charAt(2) >= '7' ) {
 			 // class Autocloseable starting in Java 7
 			nbClasses++;
 			nbInherit++;
 		}
-		*/
 
 		assertEquals( nbClasses, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size());
 		assertEquals(3,    entitiesOfType( PrimitiveType.class).size());//int,boolean,void
@@ -112,14 +109,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(2+4,  entitiesOfType( Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,   entitiesOfType( Parameter.class).size());
 		assertEquals(54,   entitiesOfType( Invocation.class).size());
-		assertEquals(12, entitiesOfType( Inheritance.class).size());
+		assertEquals(nbInherit,   entitiesOfType( Inheritance.class).size());
 		assertEquals(26,   entitiesOfType( Access.class).size());// 17 "internal" attributes + 9 System.out
 		assertEquals(0,    entitiesOfType( LocalVariable.class).size());
 		assertEquals(1,    entitiesOfType( AnnotationType.class).size()); //Override
 		assertEquals(2,    entitiesOfType( AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
 		assertEquals(32,   entitiesOfType( Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);// PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
 		// class Comparable is no longer created
-        assertEquals(0,    entitiesOfType( ParameterizableClass.class).size());
+        assertEquals(1,    entitiesOfType( ParameterizableClass.class).size()); //Comparable
 	}
 
 	@Test

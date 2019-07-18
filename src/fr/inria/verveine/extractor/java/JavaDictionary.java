@@ -2,6 +2,7 @@ package fr.inria.verveine.extractor.java;
 
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
+import java.util.LinkedList;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -309,7 +310,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 						name = "???";
 					}
 				}
-				name = "anonymous(" + name + ")";
+				name = ANONYMOUS_NAME_PREFIX + "(" + name + ")";
 			}
 		}
 
@@ -335,6 +336,23 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			}
 		}
 
+		// --------------- superclasses (including interfaces)
+		Collection<Type> sups = new LinkedList<Type>();
+		if (bnd != null) {
+			if (! bnd.isInterface()) {
+				ITypeBinding supbnd = bnd.getSuperclass();
+				if (supbnd != null) {
+					sups.add(ensureFamixType(supbnd, alwaysPersist));
+				}
+				else {
+					sups.add( ensureFamixClassObject(null));
+				}
+			}
+			for (ITypeBinding intbnd : bnd.getInterfaces()) {
+				sups.add( ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist));
+			}
+		}
+
 		// ---------------- create
 		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
@@ -351,6 +369,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			if (bnd != null) {
 				fmx.setIsInterface( bnd.isInterface());
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
+			}
+			if (persistIt) {
+				Inheritance lastInheritance = null;
+				for (Type sup : sups) {
+					lastInheritance = ensureFamixInheritance(sup, fmx, lastInheritance);
+					// TODO create FileAnchor for each inheritance link ???
+				}
 			}
 		}
 

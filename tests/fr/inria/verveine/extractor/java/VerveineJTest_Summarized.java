@@ -135,7 +135,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test(timeout=100)
 	public void testEntitiesNumber() {
-		int nbClasses = 10+5; // one less than in VerveineJTest_LanModel because anonymous class is not created
+		int nbClasses = 11+14; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
 
 		assertEquals(nbClasses, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size());
 		assertEquals(3,  entitiesOfType( PrimitiveType.class).size());
@@ -146,7 +146,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(0,  entitiesOfType( LocalVariable.class).size());
 		assertEquals(1,  entitiesOfType( AnnotationType.class).size());
 		assertEquals(0,  entitiesOfType( AnnotationInstance.class).size());    // Override annotations on methods
-		assertEquals(0,  entitiesOfType( ParameterizableClass.class).size());  // class Comparable no longer created
+		assertEquals(1,  entitiesOfType( ParameterizableClass.class).size());
 	}
 
 	@Test
@@ -199,7 +199,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		Collection<Inheritance> inherits;
 		Inheritance inh, inh2 = null;
 
-		assertEquals(10, entitiesOfType( Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
+		assertEquals(29, entitiesOfType( Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
 		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
@@ -251,16 +251,25 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(18, cmts.size());
 		for (Comment c : cmts) {
 			int length = 0;
+			int minLen = 0;
 			assertNotNull(c);
 			assertNotNull("Empty container for Comment", c.getContainer());
 			IndexedFileAnchor anc = (IndexedFileAnchor) c.getSourceAnchor();
 			length = (int)anc.getEndPos() - (int)anc.getStartPos();
 			// length of comments may vary slightly from one file to the other
 			if ( anc.getStartPos().intValue() > 5) { // i.e. not the one at the beginning of the file
-				assertTrue("Wrong comment length ("+length+") in:"+anc.getFileName(), (55 <= length) && (length <= 57) );
+				minLen = 55;
+				if (isWindows()) {
+					minLen += 4;
+				}
+				assertTrue("Wrong comment length ("+length+") in:"+anc.getFileName(), (minLen <= length) && (length <= minLen + 2) );
 			}
 			else {
-				assertTrue("Wrong comment length ("+length+") in:"+anc.getFileName(), (40 <= length) && (length <= 42));
+				minLen = 40;
+				if (isWindows()) {
+					minLen += 3;
+				}
+				assertTrue("Wrong comment length ("+length+") in:"+anc.getFileName(), (minLen <= length) && (length <= minLen + 2) );
 			}
 		}
 	}

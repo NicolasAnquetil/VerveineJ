@@ -250,8 +250,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testArrayListMatthias() {
 		parse(new String[] {"test_src/ad_hoc/Bla.java"});
 
-		assertEquals(6, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays
-		assertEquals(2,  entitiesOfType( ParameterizableClass.class).size()); //
+		assertEquals(15, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable
+		assertEquals(7,  entitiesOfType( ParameterizableClass.class).size()); //
 	}
 
 	@Test
@@ -610,13 +610,21 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
        Collection<Method> meths = entitiesNamed( Method.class, "StubSuperConstructor");
 
-        assertEquals(1, meths.size());
-        Method meth = firstElt(meths);
-        assertEquals(1, meth.getOutgoingInvocations().size());
-        Invocation invok = firstElt(meth.getOutgoingInvocations());
-        BehaviouralEntity invoked = firstElt(invok.getCandidates());
-        assertNotNull(invoked);
-        assertEquals("ArrayList", invoked.getName() );
+        assertEquals(2, meths.size());
+        for (Method meth : meths) {
+        	if (meth.numberOfParameters() == 0) {
+        		// empty constructor
+				assertEquals(0, meth.getOutgoingInvocations().size());
+			}
+        	else {
+				// the other (not empty) constructor
+				assertEquals(1, meth.getOutgoingInvocations().size());
+				Invocation invok = firstElt(meth.getOutgoingInvocations());
+				BehaviouralEntity invoked = firstElt(invok.getCandidates());
+				assertNotNull(invoked);
+				assertEquals("ArrayList<String>", invoked.getName() );
+			}
+		}
     }
 
 }

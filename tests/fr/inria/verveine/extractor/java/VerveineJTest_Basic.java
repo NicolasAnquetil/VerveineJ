@@ -308,4 +308,7 @@ public abstract class VerveineJTest_Basic {
 		}
 	}
 
+    protected boolean isWindows() {
+        return System.getProperty("os.name").toLowerCase().contains("win");
+    }
 }
