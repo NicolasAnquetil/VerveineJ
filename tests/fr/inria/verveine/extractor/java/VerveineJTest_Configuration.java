@@ -148,8 +148,14 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
             assertEquals(IndexedFileAnchor.class, anc.getClass());
             int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
             int ep = (Integer) ((IndexedFileAnchor)anc).getEndPos();
-            assertTrue("wrong startPos for Access: " + sp, (sp == 584) || (sp == 980) );
-            assertTrue("wrong endPos for Access: " + ep, (ep == 595) || (ep == 991) );
+			if (isWindows()){
+				assertTrue("wrong startPos for Access: " + sp, (sp == 618) || (sp == 1032));
+				assertTrue("wrong endPos for Access: " + ep, (ep == 629) || (ep == 1043));
+			}
+			else {
+				assertTrue("wrong startPos for Access: " + sp, (sp == 584) || (sp == 980));
+				assertTrue("wrong endPos for Access: " + ep, (ep == 595) || (ep == 991));
+			}
         }
 
         // testing invocation
@@ -163,8 +169,15 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
         anc = invok.getSourceAnchor();
         assertNotNull(anc);
         assertEquals(IndexedFileAnchor.class, anc.getClass());
-        assertEquals((Integer)980,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
-        assertEquals((Integer)1061, (Integer) ((IndexedFileAnchor)anc).getEndPos());
+		if (isWindows()){
+			assertEquals((Integer)1032,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals((Integer)1113, (Integer) ((IndexedFileAnchor)anc).getEndPos());
+		}
+		else {
+			assertEquals((Integer)980,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals((Integer)1061, (Integer) ((IndexedFileAnchor)anc).getEndPos());
+		}
+
     }
 
     @Test

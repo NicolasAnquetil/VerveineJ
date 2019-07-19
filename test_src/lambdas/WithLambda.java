@@ -1,5 +1,9 @@
 package lambdas;
 
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.Collection;
+
 public class WithLambda {
 
     private Set<String> segments = new TreeSet<>((String seg1, String seg2) -> {

@@ -32,7 +32,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
     @Test
     public void testParameterizableClass() {
-        assertEquals(7, entitiesOfType( ParameterizableClass.class).size());
+        assertEquals(12, entitiesOfType( ParameterizableClass.class).size());
         // WrongInvocation -> List<X>, ArrayList<X>
         // Dictionary -> Dictionary<X>, Map<X,Y>, Hashtable<X,Y>, Collection<X>, Class<X>, ArrayList<X>
 
@@ -100,7 +100,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
     @Test  // issue 960
     public void testStubStatusParameterizedTypes() {
         Collection<ParameterizedType> ptypes = entitiesOfType( ParameterizedType.class);
-        assertEquals(15,ptypes.size());  // List*1, ArrayList*2, Map*3, Collection<NamedEntity>, Collection<T>, Hashtable*3, Class*3, Dictionary*1
+        assertEquals(26,ptypes.size());  // List*1, ArrayList*2, Map*3, Collection<NamedEntity>, Collection<T>, Hashtable*3, Class*3, Dictionary*1 + all stub superclasses
         //coll2
         for (ParameterizedType typ : ptypes) {
             assertEquals(typ.getParameterizableClass().getIsStub(), typ.getIsStub());

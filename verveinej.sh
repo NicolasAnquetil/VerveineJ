@@ -10,6 +10,8 @@ fi
 # Directory for verveine source
 BASELIB=`dirname $0`/lib
 
+# on windows, convert backslashes to slashes so that file expansion will work
+BASELIB=$(sed 's:\\:/:g' <<< "$BASELIB")
 
 # JVM options e.g. -Xmx2500m to augment maximum memory size of the vm to 2.5Go.
 JOPT=""
@@ -34,9 +36,14 @@ else
 	VOPT=$JOPT
 	JOPT=""
 fi
-
+pathsep=":"
+# handle path separator for flavors of windows (MINGW in LibC via Pharo)
+case $(uname) in
+MINGW*|CYGWIN*)
+  pathsep=";"
+esac
 for i in $BASELIB/*.jar; do
-    CLASSPATH=$CLASSPATH:$i
+    CLASSPATH=$CLASSPATH$pathsep$i
 done
 CLASSPATH=`echo $CLASSPATH | cut -c2-`
 
