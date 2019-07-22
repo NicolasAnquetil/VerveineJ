@@ -1,17 +1,8 @@
 package fr.inria.verveine.extractor.java;
 
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
+import java.util.*;
 
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.IPackageBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.*;
 
 import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.core.Dictionary;
@@ -1830,6 +1821,46 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			((IndexedFileAnchor)fa).setEndPos(end);
 
 			fa.setFileName((String) ((CompilationUnit)node).getProperty(SOURCE_FILENAME_PROPERTY));
+			fmx.setSourceAnchor(fa);
+			famixRepo.add(fa);
+		}
+
+		return fa;
+	}
+
+	/**
+	 * Adds location information to a Famix Entity.
+	 * Location informations are: <b>name</b> of the source file and <b>line</b> position in this file. They are found in the JDT ASTNode: ast.
+	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
+	 * @param fmx -- Famix Entity to add the anchor to
+	 * @param node -- JDT ASTNode, where the information is extracted
+	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some association happening within <b>ast</b>
+	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null)
+	 */
+	public SourceAnchor addSourceAnchor(Method fmx, MethodDeclaration node, boolean oneLineAnchor) {
+		AbstractFileAnchor fa = null;
+
+		if ( (fmx != null) && (node != null) ) {
+			// position in source file
+
+			//Collect the possible beginner
+			List<ASTNode> methodDeclarationModifiers = new ArrayList<>();
+			methodDeclarationModifiers.addAll(node.modifiers());
+			if (node.getName() != null ) {
+				methodDeclarationModifiers.add(node.getName());
+			}
+			if (node.getReturnType2() != null){
+				methodDeclarationModifiers.add(node.getReturnType2());
+			}
+			int beg = (methodDeclarationModifiers.stream().mapToInt(el -> el.getStartPosition()).min().getAsInt()) + 1;
+			int end = node.getStartPosition() + node.getLength();
+
+
+			fa = new IndexedFileAnchor();
+			((IndexedFileAnchor)fa).setStartPos(beg);
+			((IndexedFileAnchor)fa).setEndPos(end);
+
+			fa.setFileName((String) node.getRoot().getProperty(SOURCE_FILENAME_PROPERTY));
 			fmx.setSourceAnchor(fa);
 			famixRepo.add(fa);
 		}
