@@ -122,9 +122,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(ClassInstanceCreation node) {
 		//		System.err.println("TRACE, Visiting ClassInstanceCreation: " + node);
 		if (node.getAnonymousClassDeclaration() != null) {
-			anonymousSuperTypeName = Util.jdtTypeName(node.getType());
-		} else {
-			anonymousSuperTypeName = null;
+			anonymousSuperTypeName.push(Util.jdtTypeName(node.getType()));
 		}
 		return super.visit(node);
 	}
@@ -139,7 +137,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-		fmx = this.dico.ensureFamixClass(bnd, Util.stringForAnonymousName(anonymousSuperTypeName, context), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
+		fmx = this.dico.ensureFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/false, modifiers, /*alwaysPersist?*/!classSummary);
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
@@ -157,7 +155,9 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public void endVisit(AnonymousClassDeclaration node) {
-		anonymousSuperTypeName = null;
+		if (!anonymousSuperTypeName.empty()) {
+			anonymousSuperTypeName.pop();
+		}
 		this.context.popType();
 		super.endVisit(node);
 	}

@@ -72,7 +72,7 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
         parse(new String[] {"test_src/comments"});
         List<Method> methods  = new ArrayList<>();
         methods.addAll(entitiesOfType(Method.class));
-        methods.sort((o1, o2) -> ((Integer)((IndexedFileAnchor) o1.getSourceAnchor()).getEndPos().intValue()).compareTo ((Integer)((IndexedFileAnchor) o2.getSourceAnchor()).getEndPos().intValue()));
+        methods.sort(Comparator.comparing(o -> ((Integer) ((IndexedFileAnchor) o.getSourceAnchor()).getEndPos().intValue())));
         assertEquals(10, methods.size());
         if(isWindows()){
             assertEquals(110, ((IndexedFileAnchor) methods.get(0).getSourceAnchor()).getEndPos().intValue());

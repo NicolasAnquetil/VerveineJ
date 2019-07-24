@@ -58,7 +58,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(AnonymousClassDeclaration node) {
 
 		ITypeBinding bnd = node.resolveBinding();
-		eu.synectique.verveine.core.gen.famix.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(anonymousSuperTypeName, context), /*owner*/(ContainerEntity)context.top());
+		eu.synectique.verveine.core.gen.famix.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
 
 		if ( (fmx != null) && (bnd != null) && (! classSummary) ){
 			ensureInheritances(bnd, fmx);
