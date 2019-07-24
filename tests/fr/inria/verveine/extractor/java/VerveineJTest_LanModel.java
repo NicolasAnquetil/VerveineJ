@@ -25,6 +25,7 @@ import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.SourceAnchor;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -67,6 +68,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			parseFile(f);
 		}
 	}
+
 
 	/**
 	 * Parses the file received in parameter independently from any other
@@ -389,26 +391,22 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(nodeClass);
 		Collection<Method> methods = nodeClass.getMethods();
 		assertFalse("No methods in Node class !", methods.isEmpty());
-		for (Method mNode : methods) {
-			if ( (mNode.getName().equals("Node")) ||
-				 (mNode.getName().equals("methodWithEmptyBody")) ||
-				 (mNode.getName().equals("canOriginate")) ||
-				 (mNode.getName().equals("canOutput")) ) {
-				assertEquals("Wrong number of parameter for method Node."+mNode.getName()+"()", 0, mNode.getParameters().size());
-			}
-			else if ( (mNode.getName().equals("name")) ||
-					  (mNode.getName().equals("nextNode")) ) {
-				assertTrue("Wrong number of parameter for method Node."+mNode.getName()+"()",  (mNode.getParameters().size()==0) || (mNode.getParameters().size()==1));
-			}
-			else if ( (mNode.getName().equals("accept")) ||
-					 (mNode.getName().equals("send")) ||
-					 (mNode.getName().equals("printOn")) ) {
-				assertEquals("Wrong number of parameter for method Node."+mNode.getName()+"()", 1, mNode.getParameters().size());
-			}
-			else {
-				fail("Unknown method name: "+ mNode.getName());
-			}
-		}
+		for (Method mNode : methods)
+            if ((mNode.getName().equals("Node")) ||
+                    (mNode.getName().equals("methodWithEmptyBody")) ||
+                    (mNode.getName().equals("canOriginate")) ||
+                    (mNode.getName().equals("canOutput"))) {
+                assertEquals("Wrong number of parameter for method Node." + mNode.getName() + "()", 0, mNode.getParameters().size());
+            } else if ((mNode.getName().equals("name")) ||
+                    (mNode.getName().equals("nextNode"))) {
+                assertTrue("Wrong number of parameter for method Node." + mNode.getName() + "()", (mNode.getParameters().size() == 0) || (mNode.getParameters().size() == 1));
+            } else if ((mNode.getName().equals("accept")) ||
+                    (mNode.getName().equals("send")) ||
+                    (mNode.getName().equals("printOn"))) {
+                assertEquals("Wrong number of parameter for method Node." + mNode.getName() + "()", 1, mNode.getParameters().size());
+            } else {
+                fail("Unknown method name: " + mNode.getName());
+            }
 		eu.synectique.verveine.core.gen.famix.Class iprintClass = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(iprintClass);
 		Method mPrint = firstElt(iprintClass.getMethods());
@@ -550,7 +548,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				}
 				else if (invoked.getSignature().equals("equals(Object)")) {
 					assertSame(detectFamixElement(Method.class, "equalsSingle"), inv.getSender());
-					assertEquals(null, inv.getReceiver());
+                    assertNull(inv.getReceiver());
 					assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "String"),
                                                                         ((Method)firstElt(inv.getCandidates())).getParentType());
 				}
@@ -641,8 +639,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(clazz, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
 		assertEquals("test_src/LANModel/moose/lan/server/PrintServer.java", ((IndexedFileAnchor)anc).getFileName());
-		assertEquals(235, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(528, ((IndexedFileAnchor)anc).getEndPos());
+		if(isWindows()){
+			assertEquals(251, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(558, ((IndexedFileAnchor)anc).getEndPos());
+		} else {
+			assertEquals(235, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(528, ((IndexedFileAnchor)anc).getEndPos());
+		}
 
 		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
@@ -651,10 +654,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for class Node", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Node.java"));
-		assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(1281, ((IndexedFileAnchor)anc).getEndPos());
-		
+        assertEquals("Wrong file source for class Node", "test_src/LANModel/moose/lan/Node.java", ((IndexedFileAnchor) anc).getFileName());
+		if(isWindows()){
+			assertEquals(69, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(1350, ((IndexedFileAnchor)anc).getEndPos());
+		} else {
+			assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(1281, ((IndexedFileAnchor)anc).getEndPos());
+		}
+
 		Method meth = detectFamixElement( Method.class, "equalsMultiple");
 		assertNotNull(meth);
 
@@ -662,10 +670,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(anc);
 		assertSame(meth, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/SingleDestinationAddress.java"));
-		assertEquals(695, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(782, ((IndexedFileAnchor)anc).getEndPos());
-		
+        assertEquals("Wrong file source for method SingleDestinationAddress.equalsMultiple()", "test_src/LANModel/moose/lan/SingleDestinationAddress.java", ((IndexedFileAnchor) anc).getFileName());
+		if(isWindows()){
+			assertEquals(733, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(822, ((IndexedFileAnchor)anc).getEndPos());
+		} else {
+			assertEquals(695, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(782, ((IndexedFileAnchor)anc).getEndPos());
+		}
+
 		Attribute att = detectFamixElement( Attribute.class, "originator");
 		assertNotNull(meth);
 
@@ -673,9 +686,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(anc);
 		assertSame(att, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for field Packet.originator", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Packet.java"));
-		assertEquals(217, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(240, ((IndexedFileAnchor)anc).getEndPos());
+        assertEquals("Wrong file source for field Packet.originator", "test_src/LANModel/moose/lan/Packet.java", ((IndexedFileAnchor) anc).getFileName());
+		if(isWindows()){
+			assertEquals(231, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(254, ((IndexedFileAnchor) anc).getEndPos());
+		} else {
+			assertEquals(217, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(240, ((IndexedFileAnchor) anc).getEndPos());
+		}
 		
 	}
 
@@ -730,8 +748,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			IndexedFileAnchor tmpAnc = (IndexedFileAnchor) c.getSourceAnchor();
 			if ( tmpAnc.getStartPos().intValue() > 5) { // i.e. not the one at the beginning of the file
 				anc = tmpAnc;
-				assertEquals(64, tmpAnc.getStartPos());
-				assertEquals(120, tmpAnc.getEndPos());
+				if(isWindows()){
+					assertEquals(69, tmpAnc.getStartPos());
+					assertEquals(129, tmpAnc.getEndPos());
+				} else {
+					assertEquals(64, tmpAnc.getStartPos());
+					assertEquals(120, tmpAnc.getEndPos());
+				}
 			}
 		}
 		assertNotNull(anc);
@@ -741,8 +764,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		cmts = meth.getComments();
 		assertEquals(1, cmts.size());
 		anc = firstElt(cmts).getSourceAnchor();
-		assertEquals(533, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(588, ((IndexedFileAnchor)anc).getEndPos());
+		if(isWindows()){
+			assertEquals(563, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(621, ((IndexedFileAnchor)anc).getEndPos());
+		} else {
+			assertEquals(533, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(588, ((IndexedFileAnchor)anc).getEndPos());
+		}
 
 		// testing the non javadoc comments (those that are treated)
 		clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
@@ -751,8 +779,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals("type", a.getName());
 		cmts = a.getComments();
 		assertEquals(1, cmts.size());
-		anc = (IndexedFileAnchor)firstElt(cmts).getSourceAnchor();
-		assertEquals(164, ((IndexedFileAnchor)anc).getStartPos().intValue());
+		anc = firstElt(cmts).getSourceAnchor();
+		if(isWindows()){
+			assertEquals(176, ((IndexedFileAnchor)anc).getStartPos().intValue());
+		} else {
+			assertEquals(164, ((IndexedFileAnchor)anc).getStartPos().intValue());
+		}
 	}
 	
 	@Test

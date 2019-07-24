@@ -51,20 +51,9 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
     @Test
     public void testAnonymousClassArePatateAndCanard() {
         parse(new String[] {"test_src/inner"});
-        List<Class> classes = entitiesOfType(Class.class).stream().filter(aClass -> !aClass.getIsStub() && aClass.getName().contains("Anonymous")).collect(Collectors.toList());
-        classes.sort(Comparator.comparing(NamedEntity::getName));
+        List<Class> classes = entitiesOfType(Class.class).stream().filter(aClass -> !aClass.getIsStub() && aClass.getName().contains("Anonymous")).sorted(Comparator.comparing(NamedEntity::getName)).collect(Collectors.toList());
         assertEquals("_Anonymous(Canard)", classes.get(0).getName());
         assertEquals("_Anonymous(Patate)", classes.get(1).getName());
     }
-
-    @Test
-    public void testSuperClassOfAnonymousClass () {
-        parse(new String[] {"test_src/inner"});
-        List<Class> classes = entitiesOfType(Class.class).stream().filter(aClass -> !aClass.getIsStub() && aClass.getName().contains("Anonymous")).collect(Collectors.toList());
-        classes.sort(Comparator.comparing(NamedEntity::getName));
-        assertEquals("" , classes.get(0).getSuperInheritances());
-        assertEquals("_Anonymous(Patate)", classes.get(1).getName());
-    }
-
 
 }
