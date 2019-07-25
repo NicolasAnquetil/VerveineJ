@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/moosetechnology/VerveineJ.svg?branch=monoVisitor)](https://travis-ci.org/moosetechnology/VerveineJ)
+[![Build Status](https://travis-ci.org/moosetechnology/VerveineJ.svg?branch=master)](https://travis-ci.org/moosetechnology/VerveineJ)
 
 A Java to MSE parser
 
