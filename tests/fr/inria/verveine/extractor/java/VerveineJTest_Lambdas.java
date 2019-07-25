@@ -101,7 +101,7 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
         assertNotNull(col);
         assertEquals("col", col.getName());
 
-        assertEquals(0, meth.getAccesses().size());
+        assertEquals(1, meth.getAccesses().size()); // access to "out" variable of System
     }
 
     @Test
