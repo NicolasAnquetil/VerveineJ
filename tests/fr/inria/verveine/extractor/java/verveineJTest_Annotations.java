@@ -27,7 +27,11 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         new File(VerveineJParser.OUTPUT_FILE).delete();
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
-        parser.setOptions(new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar", "test_src/annotations"});
+        if (isWindows()){
+            parser.setOptions(new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar;test_src/annotations/lib/stripes-1.5.5.jar", "test_src/annotations"});
+        } else {
+            parser.setOptions(new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar:test_src/annotations/lib/stripes-1.5.5.jar", "test_src/annotations"});
+        }
         parser.parse();
         //	parser.emitMSE(VerveineJParser.OUTPUT_FILE);
     }
@@ -53,7 +57,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         AnnotationInstanceAttribute swVal = firstElt(sw.getAttributes());
         assertNotNull(swVal);
         assertEquals("value", swVal.getAnnotationTypeAttribute().getName());
-        assertEquals("serial", swVal.getValue());
+        assertEquals("\"serial\"", swVal.getValue());
 
     }
 
@@ -105,7 +109,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     }
 
-    @Test  // issue 714
+    @Test
     public void testAnnotParamIsClass(){
         Attribute att = detectFamixElement( Attribute.class, "time");
         assertNotNull(att);
@@ -144,7 +148,13 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
             assertEquals(176, ((IndexedFileAnchor) xmle.getSourceAnchor()).getEndPos());
         }
 
-        AnnotationTypeAttribute req = detectFamixElement( AnnotationTypeAttribute.class, "required");
+        AnnotationTypeAttribute req = null;
+        for (AnnotationInstanceAttribute aia : firstElt(xmle.getInstances()).getAttributes()) {
+            if (aia.getAnnotationTypeAttribute().getName().equals("required")) {
+                req = aia.getAnnotationTypeAttribute();
+            }
+        }
+        //AnnotationTypeAttribute req = detectFamixElement( AnnotationTypeAttribute.class, "required");
         assertNotNull(req);
         assertNotNull(req.getSourceAnchor());
         assertEquals(IndexedFileAnchor.class, req.getSourceAnchor().getClass());
@@ -169,6 +179,30 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         assertNotNull(inst);
         assertEquals("SuppressWarnings", inst.getAnnotationType().getName());
         assertSame(inst.getAnnotatedEntity(), param);
+        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
+        assertEquals("\"blah\"", att.getValue());
+    }
+
+    @Test
+    public void testAnnotationCollectionOfString() {
+        Method meth = detectFamixElement( Method.class, "setPassword");
+        assertNotNull(meth);
+
+        assertEquals(1, meth.getAnnotationInstances().size());
+        AnnotationInstance inst = firstElt(meth.getAnnotationInstances());
+        assertNotNull(inst);
+
+        assertEquals(2, inst.getAttributes().size());
+
+        for( AnnotationInstanceAttribute att : inst.getAttributes()) {
+            if (att.getAnnotationTypeAttribute().getName().equals("on")) {
+                assertEquals("{\"signon\", \"newAccount\", \"editAccount\"}", att.getValue());
+            } else if (att.getAnnotationTypeAttribute().getName().equals("required")) {
+                assertEquals("true", att.getValue());
+            } else {
+                fail("We are in an attribute that does not exist");
+            }
+        }
     }
 
     @Test

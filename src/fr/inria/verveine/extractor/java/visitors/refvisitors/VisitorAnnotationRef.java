@@ -218,7 +218,9 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 			// we want just its name
 			attFamixVal = ((ITypeBinding)attVal).getName() + ".class";
 		}
-		else {
+		else if (attVal instanceof String) {
+			attFamixVal = "\"" + attVal.toString() + "\"";
+		} else {
 			attFamixVal = attVal.toString();
 		}
 		return attFamixVal;
