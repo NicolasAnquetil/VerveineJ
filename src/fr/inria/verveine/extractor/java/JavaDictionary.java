@@ -65,6 +65,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_PROTECTED= "protected";
 	public static final String MODIFIER_FINAL    = "final";
 	public static final String MODIFIER_STATIC    = "static";
+	public static final String MODIFIER_TRANSIENT = "transient";
 
 	/**
 	 * Result of utility methods for checking matching between two entities
@@ -1484,6 +1485,13 @@ public class JavaDictionary extends Dictionary<IBinding> {
             fmx.addModifiers(MODIFIER_ABSTRACT);
         }
         fmx.setHasClassScope(Modifier.isStatic(mod));
+		if (Modifier.isTransient(mod)) {
+			fmx.addModifiers(MODIFIER_TRANSIENT);
+		}
+		if (Modifier.isStatic(mod)){
+			fmx.addModifiers(MODIFIER_STATIC);
+		}
+
     }
 
     public void setClassModifiers(Class fmx, int mod) {

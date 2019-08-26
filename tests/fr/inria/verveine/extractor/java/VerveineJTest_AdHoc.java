@@ -627,4 +627,20 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
     }
 
+    @Test
+	public void testMethodModifiers(){
+		parse(new String[] {"test_src/ad_hoc/Modifiers.java"});
+
+		Collection<Method> meths = entitiesNamed( Method.class, "methodModifiers");
+
+		assertEquals(1, meths.size());
+		Method method = firstElt(meths);
+
+		assertNotNull(method);
+		assertEquals(3, method.getModifiers().size());
+		assertTrue( method.getModifiers().contains("transient"));
+		assertTrue( method.getModifiers().contains("public"));
+		assertTrue( method.getModifiers().contains("static"));
+	}
+
 }
