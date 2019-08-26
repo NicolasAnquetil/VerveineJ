@@ -637,10 +637,28 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method method = firstElt(meths);
 
 		assertNotNull(method);
-		assertEquals(3, method.getModifiers().size());
+		assertEquals(6, method.getModifiers().size());
 		assertTrue( method.getModifiers().contains("transient"));
 		assertTrue( method.getModifiers().contains("public"));
 		assertTrue( method.getModifiers().contains("static"));
+		assertTrue( method.getModifiers().contains("final"));
+		assertTrue( method.getModifiers().contains("volatile"));
+		assertTrue( method.getModifiers().contains("synchronized"));
+	}
+
+	@Test
+	public void testAttributeModifiers(){
+		parse(new String[] {"test_src/ad_hoc/Modifiers.java"});
+
+		Attribute attribute = firstElt(entitiesNamed( Attribute.class, "attribute"));
+
+		assertNotNull(attribute);
+		assertEquals(5, attribute.getModifiers().size());
+		assertTrue( attribute.getModifiers().contains("public"));
+		assertTrue( attribute.getModifiers().contains("static"));
+		assertTrue( attribute.getModifiers().contains("transient"));
+		assertTrue( attribute.getModifiers().contains("volatile"));
+		assertTrue( attribute.getModifiers().contains("final"));
 	}
 
 }

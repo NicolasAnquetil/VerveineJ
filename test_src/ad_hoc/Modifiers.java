@@ -3,7 +3,9 @@ package ad_hoc;
 public class Modifiers {
 	private final String privateFinalAttribute;
 
-	public static transient void methodModifiers(){
+	public final static transient volatile String attribute;
+
+	public final static transient synchronized volatile void methodModifiers(){
 		System.out.println("Hello World");
 	}
 

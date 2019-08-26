@@ -66,7 +66,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_FINAL    = "final";
 	public static final String MODIFIER_STATIC    = "static";
 	public static final String MODIFIER_TRANSIENT = "transient";
-
+	public static final String MODIFIER_VOLATILE = "volatile";
+	public static final String MODIFIER_SYNCHRONIZED = "synchronized";
 	/**
 	 * Result of utility methods for checking matching between two entities
 	 */
@@ -1476,6 +1477,18 @@ public class JavaDictionary extends Dictionary<IBinding> {
     public void setAttributeModifiers(Attribute fmx, int mod) {
         setNamedEntityModifiers(fmx, mod);
         fmx.setHasClassScope(Modifier.isStatic(mod));
+        if (Modifier.isTransient(mod)) {
+			fmx.addModifiers(MODIFIER_TRANSIENT);
+		}
+		if (Modifier.isStatic(mod)){
+			fmx.addModifiers(MODIFIER_STATIC);
+		}
+		if (Modifier.isSynchronized(mod)){
+			fmx.addModifiers(MODIFIER_SYNCHRONIZED);
+		}
+		if (Modifier.isVolatile(mod)){
+			fmx.addModifiers(MODIFIER_VOLATILE);
+		}
     }
 
     public void setMethodModifiers(Method fmx, int mod) {
@@ -1490,6 +1503,12 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 		if (Modifier.isStatic(mod)){
 			fmx.addModifiers(MODIFIER_STATIC);
+		}
+		if (Modifier.isSynchronized(mod)){
+			fmx.addModifiers(MODIFIER_SYNCHRONIZED);
+		}
+		if (Modifier.isVolatile(mod)){
+			fmx.addModifiers(MODIFIER_VOLATILE);
 		}
 
     }

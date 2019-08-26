@@ -3,3 +3,6 @@ bin/*
 output.mse
 other_output.mse
 testrep/*
+.idea/
+
+out/
