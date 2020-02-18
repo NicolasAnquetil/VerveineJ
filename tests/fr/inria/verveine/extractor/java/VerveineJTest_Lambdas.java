@@ -1,15 +1,13 @@
 package fr.inria.verveine.extractor.java;
 
-import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.VerveineUtilsForTests;
+import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.LocalVariable;
 import eu.synectique.verveine.core.gen.famix.Method;
-import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
-import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.Collection;
 
 import static org.junit.Assert.*;
 
@@ -104,6 +102,15 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
         assertEquals("col", col.getName());
 
         assertEquals(0, meth.getAccesses().size());
+    }
+
+    @Test
+    public void testAccessInDeclaration(){
+        parse(new String[] {"-alllocals", "-anchor", "assoc", "test_src/lambdas"});
+        Collection<Access> accesses = entitiesOfType(Access.class);
+        assertEquals(6, accesses.size());
+
+
     }
 
 }
