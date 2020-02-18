@@ -77,20 +77,16 @@
   				  <include name="*.jar"/>
 				</fileset>
 			</classpath>
-			<!-- Output is XML, could also be plain-->
+			<!-- Output is plain, could also be XML-->
 			<formatter type="plain" />
-			<test name="fr.inria.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
-			<test name="fr.inria.verveine.extractor.java.VerveineJTest_AdHoc" todir="${test.report.dir}" />
-			<test name="fr.inria.verveine.extractor.java.VerveineJTest_ArrayListMatthias" todir="${test.report.dir}" />
-			<test name="fr.inria.verveine.extractor.java.VerveineJTest_AnnotationTest" todir="${test.report.dir}" />
-			<test name="fr.inria.verveine.extractor.java.VerveineJTest_Summarized" todir="${test.report.dir}" />
-			<test name="fr.inria.verveine.extractor.java.VerveineJTest_JWSBasic" todir="${test.report.dir}" />
-			<test name="fr.inria.verveine.extractor.java.VerveineJTest_Configuration" todir="${test.report.dir}" />
+			<batchtest todir="${test.report.dir}">
+				<fileset dir="${testsrc.dir}" includes="**/*.java" excludes="**/VerveineJTest_Basic.java" />
+			</batchtest>
 		</junit>
 	</target>
 
-	<!-- Run the JUnit Tests -->
-	<!-- Output is XML, could also be plain-->
+	<!-- Run JUnit TestLAN -->
+	<!-- Output is plain, could also be XML-->
 	<target name="test_lan">
 		<junit printsummary="on" fork="true" haltonfailure="no">
 			<classpath>
