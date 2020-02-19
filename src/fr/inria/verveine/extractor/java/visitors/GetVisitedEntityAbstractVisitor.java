@@ -44,6 +44,13 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		this.context = new EntityStack();
 	}
 
+	// a generic visit method for node lists
+    protected void visitNodeList(List<ASTNode> list) {
+        for (ASTNode child : list) {
+            child.accept(this);
+        }
+    }
+
 	// two visit methods never used
 
 	@Override

@@ -1,10 +1,5 @@
 package fr.inria.verveine.extractor.java;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
-
 import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
@@ -13,6 +8,8 @@ import eu.synectique.verveine.core.gen.famix.*;
 import eu.synectique.verveine.core.gen.famix.Class;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
@@ -58,7 +55,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		// works in team with testAlllocals
 		parse(new String[]{"test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
 		assertEquals(3, entitiesOfType( LocalVariable.class).size());  // nom, num, e
-		assertEquals(4, entitiesOfType( Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom
+		assertEquals(8, entitiesOfType( Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom + 4 "this"
 	}
 
 	@Test
@@ -67,7 +64,29 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		parse(new String[]{"-alllocals", "test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
 
 		assertEquals(5, entitiesOfType( LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
-		assertEquals(32, entitiesOfType( Access.class).size());  // ReadClient*4 ; lire*20 ; setNum*3 ; getNum*1 ; setNom*3 ; getNom*1
+        int accessReadClient = 0;
+        int accessLire = 0;
+        int accessSetNum = 0;
+        int accessGetNum = 0;
+        int accessSetNom = 0;
+        int accessGetNom = 0;
+        for (Access acc : entitiesOfType( Access.class)) {
+            switch (acc.getAccessor().getName()) {
+                case "ReadClient": accessReadClient++; break;
+                case "lire": accessLire++; break;
+                case "getNum": accessGetNum++; break;
+                case "setNum": accessSetNum++; break;
+                case "getNom": accessGetNom++; break;
+                case "setNom": accessSetNom++; break;
+                default: fail("Unknown accessor name: " + acc.getAccessor().getName()); break;
+            }
+        }
+        assertEquals(4, accessReadClient);
+        assertEquals(20, accessLire);
+        assertEquals(1, accessGetNum);
+        assertEquals(3, accessSetNum);
+        assertEquals(1, accessGetNom);
+        assertEquals(3, accessSetNom);
 	}
 
 	@Test
