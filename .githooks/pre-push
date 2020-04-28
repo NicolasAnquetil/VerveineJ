@@ -1,0 +1,16 @@
+#!/bin/sh
+
+# An hook script to verify that we are pushing new libs
+# This ensures that all libraries have been regenerated when we push
+#
+
+NEWJAVAFILES=`find src tests -name \*.java -newer ./lib/verveine.extractor.java.jar`
+
+if (test -n "$NEWJAVAFILES")
+then
+    echo "Please re-generate the lib files by running 'ant jar'"
+    exit 1
+fi
+
+
+exit 0

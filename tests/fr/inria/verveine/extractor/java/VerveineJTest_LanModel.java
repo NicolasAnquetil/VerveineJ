@@ -112,7 +112,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(26,   entitiesOfType( Parameter.class).size());
 		assertEquals(54,   entitiesOfType( Invocation.class).size());
 		assertEquals(nbInherit,   entitiesOfType( Inheritance.class).size());
-		assertEquals(26,   entitiesOfType( Access.class).size());// 17 "internal" attributes + 9 System.out
+		assertEquals(45,   entitiesOfType( Access.class).size());// 17 "internal" attributes + 9 System.out + 18 "this" + 1 "super"
 		assertEquals(0,    entitiesOfType( LocalVariable.class).size());
 		assertEquals(1,    entitiesOfType( AnnotationType.class).size()); //Override
 		assertEquals(2,    entitiesOfType( AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
@@ -617,15 +617,27 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			}
 		}
 		assertNotNull(output);
-		assertEquals(4, output.getAccesses().size());
+        //int foundThePacket = 0;
+        int foundOut = 0;
+        int foundSelf = 0;
+        int foundPrinter = 0;
 		for (Access acc : output.getAccesses()) {
 			assertEquals(output, acc.getAccessor());
-			assertTrue("Unexpected field accessed: "+acc.getVariable().getName(),
-					acc.getVariable().getName().equals("thePacket") || acc.getVariable().getName().equals("out") || acc.getVariable().getName().equals("printer"));
-			assertTrue( acc.getIsRead());
-			assertFalse( acc.getIsWrite());
-		}
-	}
+			switch (acc.getVariable().getName()) {
+                //case "thePacket": foundThePacket++; break;
+                case "out":       foundOut++;       break;
+                case "self":      foundSelf++;      break;
+                case "printer":   foundPrinter++;   break;
+                default: fail("Unexpected field accessed: "+acc.getVariable().getName());
+            }
+            assertTrue( acc.getIsRead());
+    	    assertFalse( acc.getIsWrite());
+    	}
+        //assertEquals(1, foundThePacket);
+        assertEquals(3, foundOut);
+        assertEquals(1, foundSelf);
+        assertEquals(1, foundPrinter);
+    }
 
 	@Test
 	public void testSourceAnchors() {
