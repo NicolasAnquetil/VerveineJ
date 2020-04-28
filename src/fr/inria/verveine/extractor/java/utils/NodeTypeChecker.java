@@ -5,7 +5,8 @@ import org.eclipse.jdt.core.dom.*;
 /**
  * Checks the type of ASTNodes without having to use instanceof<br>
  * <p>Uses double dispatch (ASTVisitor infrastructure).
- * For this class to work as a "double-dispatcher" and not a visitor, all visit method must return false</p>
+ * For this class to work as a "double-dispatcher" and not a visitor, all visit method must return false (see after all static methods.
+ * And the actual result is sored in a variable</p>
  * <p>The testing methods are static and use a singleton visitor</p>
  */
 public class NodeTypeChecker extends ASTVisitor {
@@ -21,6 +22,10 @@ public class NodeTypeChecker extends ASTVisitor {
         }
         return instance;
     }
+
+    /*
+     * static methods to simplify external calls
+     */
 
     public static boolean isArrayAccess(ASTNode node) {
         return getInstance().checkNodeType(node, ENodeTypes.ARRAYACCESS);
@@ -84,7 +89,7 @@ public class NodeTypeChecker extends ASTVisitor {
     protected boolean[] checkResults;
     
     protected NodeTypeChecker() {
-	checkResults = new boolean[ENodeTypes.values().length];
+	    checkResults = new boolean[ENodeTypes.values().length];
     }
 
     private boolean checkNodeType(ASTNode node, ENodeTypes typeToCheck) {

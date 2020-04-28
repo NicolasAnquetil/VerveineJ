@@ -95,9 +95,8 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
         Method meth = detectFamixElement( Method.class, "WithLambda");
         assertNotNull(meth);
 
-        LocalVariable col = null;
         assertEquals(1, meth.getLocalVariables().size());
-        col = firstElt(meth.getLocalVariables());
+        LocalVariable col = firstElt(meth.getLocalVariables());
         assertNotNull(col);
         assertEquals("col", col.getName());
 
