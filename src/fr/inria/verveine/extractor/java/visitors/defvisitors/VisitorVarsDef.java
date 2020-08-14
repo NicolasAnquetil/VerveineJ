@@ -323,7 +323,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			if ((!classSummary) && (anchors != anchorOptions.none)) {
-				dico.addSourceAnchor(fmx, varDecl.getParent(), /*oneLineAnchor*/true);
+				dico.addSourceAnchor(fmx, varDecl, /*oneLineAnchor*/true);
 			}
 		}
 
