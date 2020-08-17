@@ -1,11 +1,9 @@
 language: java
 jdk:
   - openjdk10
+install: ant deps
 
 script: ant junit
-
-before_script:
-   - sudo apt-get install ant-optional
 
 notifications:
     email:
