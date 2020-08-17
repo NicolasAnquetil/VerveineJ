@@ -70,7 +70,7 @@
 	</target>
 
 	<!-- Run the JUnit Tests -->
-		<target name="junit" depends="jar">
+	<target name="junit" depends="jar">
 		<junit printsummary="on" fork="true" haltonfailure="yes">
 			<classpath>
 				<fileset dir="${dist.dir}">
@@ -87,7 +87,6 @@
 						<exclude name="**/*VerveineJTest_Basic.java"/>
         			</fileset>
       			</batchtest>
-
 		</junit>
 	</target>
 
