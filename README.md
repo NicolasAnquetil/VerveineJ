@@ -1,5 +1,7 @@
 # VerveineJ
 
+[![Use Java 10](https://img.shields.io/badge/Java-10-brightgreen)](https://jdk.java.net/10/)
+
 A Java to MSE parser
 
 Based on JDT, it parser java code to export it in the MSE format used by the Moose data analysis platform.
@@ -22,5 +24,6 @@ git clone git@github.com:moosetechnology/VerveineJ.git
 ## Developers
 
 To test the project, remember that you **must** disable the `assert` by removing (or not using) the -ea parameter.
+You also need to run test one by one (fork method in IntelliJ).
 
 > You can also use And or the pre-created IntelliJ build
