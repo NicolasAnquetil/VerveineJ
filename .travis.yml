@@ -1,9 +1,16 @@
+os: linux
+dist: xenial
 language: java
-
-script: ant junit
-
+jdk:
+  - openjdk10
+addons:
+  apt:
+    packages:
+      - ant
 before_script:
    - sudo apt-get install ant-optional
+
+script: ant junit
 
 notifications:
     email:
