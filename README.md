@@ -1,6 +1,6 @@
 # VerveineJ
 
-[![Use Java 10](https://img.shields.io/badge/Java-10-brightgreen)](https://jdk.java.net/10/)
+[![Use Java 10](https://img.shields.io/badge/Java-10-brightgreen)](https://jdk.java.net/10/) ![Build travis](https://api.travis-ci.com/moosetechnology/VerveineJ.svg?branch=master&status=passed)
 
 A Java to MSE parser
 
