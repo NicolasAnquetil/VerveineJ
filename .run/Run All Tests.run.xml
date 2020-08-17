@@ -8,6 +8,7 @@
     <option name="VM_PARAMETERS" />
     <option name="PARAMETERS" value="" />
     <dir value="$PROJECT_DIR$/tests" />
+    <fork_mode value="method" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

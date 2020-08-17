@@ -700,11 +700,11 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(IndexedFileAnchor.class, anc.getClass());
         assertEquals("Wrong file source for field Packet.originator", "test_src/LANModel/moose/lan/Packet.java", ((IndexedFileAnchor) anc).getFileName());
 		if(isWindows()){
-			assertEquals(231, ((IndexedFileAnchor) anc).getStartPos());
-			assertEquals(254, ((IndexedFileAnchor) anc).getEndPos());
+			assertEquals(244, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(253, ((IndexedFileAnchor) anc).getEndPos());
 		} else {
-			assertEquals(217, ((IndexedFileAnchor) anc).getStartPos());
-			assertEquals(240, ((IndexedFileAnchor) anc).getEndPos());
+			assertEquals(230, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(239, ((IndexedFileAnchor) anc).getEndPos());
 		}
 		
 	}
