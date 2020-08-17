@@ -4,6 +4,7 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import eu.synectique.verveine.core.Dictionary;
 
@@ -17,6 +18,7 @@ import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor
 import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.internal.compiler.ast.Argument;
 
 public class VisitorInvocRef extends AbstractRefVisitor {
 
@@ -243,11 +245,6 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
 			dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
 		}
-		
-		/* really needed ?
-		if (callingExpr instanceof SimpleName) {
-			visitSimpleName((SimpleName) callingExpr);
-		}*/
 
 		return super.visit(node);
 	}
