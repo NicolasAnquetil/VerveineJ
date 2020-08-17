@@ -1,7 +1,10 @@
 language: java
 jdk:
   - openjdk10
-install: ant deps
+addons:
+  apt:
+    packages:
+      - ant
 
 script: ant junit
 
