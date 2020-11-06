@@ -4,35 +4,17 @@
 package fr.inria.verveine.extractor.java;
 
 
-import java.io.File;
-import java.util.Collection;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.Comment;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
-import eu.synectique.verveine.core.gen.famix.SourceAnchor;
-
-import org.junit.After;
+import eu.synectique.verveine.core.gen.famix.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.function.Predicate.not;
+import java.io.File;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import static org.junit.Assert.*;
+
+import java.lang.Exception;
 
 /**
  * @author Nicolas Anquetil
