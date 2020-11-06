@@ -6,6 +6,7 @@ package fr.inria.verveine.extractor.java;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import eu.synectique.verveine.core.gen.famix.Access;
@@ -29,6 +30,8 @@ import eu.synectique.verveine.core.gen.famix.SourceAnchor;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import static java.util.function.Predicate.not;
 import static org.junit.Assert.*;
 
 /**
@@ -96,7 +99,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testEntitiesNumber() {
 		int nbClasses = 11+14+1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
-		int nbInherit =9+21+1;
+		int nbInherit =9+21+1+2; // + 2 are the relation of the anonymous IPrinter
 
 		if ( System.getProperty("java.version").startsWith("1.") &&
 				System.getProperty("java.version").charAt(2) >= '7' ) {
@@ -107,11 +110,11 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		assertEquals( nbClasses, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size());
 		assertEquals(3,    entitiesOfType( PrimitiveType.class).size());//int,boolean,void
-		assertEquals(40+8, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
+		assertEquals(40+8+1, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>} + Call to the constructor of anonymous IPrinter
 		assertEquals(10+1, entitiesOfType( Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,  entitiesOfType( Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,   entitiesOfType( Parameter.class).size());
-		assertEquals(54,   entitiesOfType( Invocation.class).size());
+		assertEquals(55,   entitiesOfType( Invocation.class).size());
 		assertEquals(nbInherit,   entitiesOfType( Inheritance.class).size());
 		assertEquals(45,   entitiesOfType( Access.class).size());// 17 "internal" attributes + 9 System.out + 18 "this" + 1 "super"
 		assertEquals(0,    entitiesOfType( LocalVariable.class).size());
