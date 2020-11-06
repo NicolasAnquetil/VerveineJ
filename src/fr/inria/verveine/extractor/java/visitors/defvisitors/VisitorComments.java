@@ -1,6 +1,5 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
@@ -24,12 +23,13 @@ import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
+import org.moosetechnology.model.famix.famix.AnnotationTypeAttribute;
+import org.moosetechnology.model.famix.famix.Method;
+import org.moosetechnology.model.famix.famix.NamedEntity;
+import org.moosetechnology.model.famix.famix.StructuralEntity;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -92,7 +92,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		eu.synectique.verveine.core.gen.famix.Class fmx = visitTypeDeclaration( node);
+		org.moosetechnology.model.famix.famix.Class fmx = visitTypeDeclaration( node);
 		if (fmx != null) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);

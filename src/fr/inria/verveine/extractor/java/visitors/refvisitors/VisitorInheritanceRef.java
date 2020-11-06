@@ -14,11 +14,11 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.Type;
+import org.moosetechnology.model.famix.famix.ContainerEntity;
+import org.moosetechnology.model.famix.famix.Inheritance;
+import org.moosetechnology.model.famix.famix.Namespace;
+import org.moosetechnology.model.famix.famix.ParameterizableClass;
+import org.moosetechnology.model.famix.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.Util;
 
@@ -33,7 +33,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 	}
 
 	public boolean visit(TypeDeclaration node) {
-		eu.synectique.verveine.core.gen.famix.Class fmx = visitTypeDeclaration(node);
+		org.moosetechnology.model.famix.famix.Class fmx = visitTypeDeclaration(node);
 		ITypeBinding bnd = node.resolveBinding();
 		if ((fmx != null) && (bnd != null)) {
 			ensureInheritances(bnd, fmx);
@@ -58,7 +58,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(AnonymousClassDeclaration node) {
 
 		ITypeBinding bnd = node.resolveBinding();
-		eu.synectique.verveine.core.gen.famix.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
+		org.moosetechnology.model.famix.famix.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
 
 		if ( (fmx != null) && (bnd != null) && (! classSummary) ){
 			ensureInheritances(bnd, fmx);
@@ -77,7 +77,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
 	public boolean visit(EnumDeclaration node) {
 		ITypeBinding bnd = node.resolveBinding();
-		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
+		org.moosetechnology.model.famix.famix.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
 
 		if ( (fmx != null) && (bnd != null) ){
 			// --------------- implicit superclass java.lang.Enum<> cannot use ensureInheritances(bnd,fmx)
@@ -153,7 +153,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
 	// UTILITY METHODS
 
-	protected void ensureInheritances(ITypeBinding bnd, eu.synectique.verveine.core.gen.famix.Type fmx) {
+	protected void ensureInheritances(ITypeBinding bnd, org.moosetechnology.model.famix.famix.Type fmx) {
 		Inheritance lastInheritance = null;
 
 		// --------------- superclass

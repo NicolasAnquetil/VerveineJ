@@ -5,42 +5,45 @@ import java.util.*;
 import org.eclipse.jdt.core.dom.*;
 
 import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.gen.famix.AbstractFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.Association;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.Class;
-import eu.synectique.verveine.core.gen.famix.Comment;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Enum;
-import eu.synectique.verveine.core.gen.famix.EnumValue;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.ParameterType;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.ParameterizedType;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
-import eu.synectique.verveine.core.gen.famix.Reference;
-import eu.synectique.verveine.core.gen.famix.SourceAnchor;
-import eu.synectique.verveine.core.gen.famix.SourcedEntity;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
-import eu.synectique.verveine.core.gen.famix.Type;
-import eu.synectique.verveine.core.gen.famix.UnknownVariable;
+import fr.inria.verveine.extractor.core.Dictionary;
+import org.moosetechnology.model.famix.famix.AbstractFileAnchor;
+import org.moosetechnology.model.famix.famix.Access;
+import org.moosetechnology.model.famix.famix.AnnotationType;
+import org.moosetechnology.model.famix.famix.AnnotationTypeAttribute;
+import org.moosetechnology.model.famix.famixtraits.TAssociation;
+import org.moosetechnology.model.famix.famix.Attribute;
+import org.moosetechnology.model.famix.famix.BehaviouralEntity;
+import org.moosetechnology.model.famix.famix.Class;
+import org.moosetechnology.model.famix.famix.Comment;
+import org.moosetechnology.model.famix.famix.ContainerEntity;
+import org.moosetechnology.model.famix.famix.Enum;
+import org.moosetechnology.model.famix.famix.EnumValue;
+import org.moosetechnology.model.famix.famix.ImplicitVariable;
+import org.moosetechnology.model.famix.famix.IndexedFileAnchor;
+import org.moosetechnology.model.famix.famix.Inheritance;
+import org.moosetechnology.model.famix.famix.Invocation;
+import org.moosetechnology.model.famix.famix.LocalVariable;
+import org.moosetechnology.model.famix.famix.Method;
+import org.moosetechnology.model.famix.famix.NamedEntity;
+import org.moosetechnology.model.famix.famix.Namespace;
+import org.moosetechnology.model.famix.famix.Parameter;
+import org.moosetechnology.model.famix.famix.ParameterType;
+import org.moosetechnology.model.famix.famix.ParameterizableClass;
+import org.moosetechnology.model.famix.famix.ParameterizedType;
+import org.moosetechnology.model.famix.famix.PrimitiveType;
+import org.moosetechnology.model.famix.famix.Reference;
+import org.moosetechnology.model.famix.famix.SourceAnchor;
+import org.moosetechnology.model.famix.famix.SourcedEntity;
+import org.moosetechnology.model.famix.famix.StructuralEntity;
+import org.moosetechnology.model.famix.famix.Type;
+import org.moosetechnology.model.famix.famix.UnknownVariable;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
+import org.moosetechnology.model.famix.famixtraits.TComment;
+import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixtraits.TType;
 
 /**
- * A {@link eu.synectique.verveine.core.Dictionary} specialized for Java
+ * A {@link fr.inria.verveine.extractor.core.Dictionary} specialized for Java
  * @author anquetil
  */
 public class JavaDictionary extends Dictionary<IBinding> {
@@ -68,6 +71,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_TRANSIENT = "transient";
 	public static final String MODIFIER_VOLATILE = "volatile";
 	public static final String MODIFIER_SYNCHRONIZED = "synchronized";
+
 	/**
 	 * Result of utility methods for checking matching between two entities
 	 */
@@ -88,22 +92,22 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	@Override
-	public Inheritance ensureFamixInheritance(Type sup, Type sub, Association prev) {
+	public Inheritance ensureFamixInheritance(Type sup, Type sub, TAssociation prev) {
 		return super.ensureFamixInheritance(sup, sub, prev);
 	}
 
 	@Override
-	public Reference addFamixReference(BehaviouralEntity src, Type tgt, Association prev) {
+	public Reference addFamixReference(BehaviouralEntity src, Type tgt, TAssociation prev) {
 		return super.addFamixReference(src, tgt, prev);
 	}
 
 	@Override
-	public Invocation addFamixInvocation(BehaviouralEntity sender, BehaviouralEntity invoked, NamedEntity receiver, String signature, Association prev) {
+	public Invocation addFamixInvocation(BehaviouralEntity sender, BehaviouralEntity invoked, NamedEntity receiver, String signature, TAssociation prev) {
 		return super.addFamixInvocation( sender, invoked, receiver, signature, prev);
 	}
 
 	@Override
-	public Access addFamixAccess(BehaviouralEntity accessor, StructuralEntity var, boolean isWrite, Association prev) {
+	public Access addFamixAccess(BehaviouralEntity accessor, StructuralEntity var, boolean isWrite, TAssociation prev) {
 		return super.addFamixAccess(accessor, var, isWrite, prev);
 	}
 
@@ -263,8 +267,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	@SuppressWarnings("deprecation")
-	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClass(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
-		eu.synectique.verveine.core.gen.famix.Class fmx = null;
+	public org.moosetechnology.model.famix.famix.Class ensureFamixClass(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+		org.moosetechnology.model.famix.famix.Class fmx = null;
 
 		// --------------- some special cases
 		if (bnd!=null) {
@@ -277,7 +281,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// ---------------- to avoid useless computations if we can
-		fmx = (eu.synectique.verveine.core.gen.famix.Class)getEntityByKey(bnd);
+		fmx = (org.moosetechnology.model.famix.famix.Class)getEntityByKey(bnd);
 		if (fmx != null) {
 			return fmx;
 		}
@@ -322,7 +326,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// --------------- recover from name ?
-		for (eu.synectique.verveine.core.gen.famix.Class candidate : this.getEntityByName(eu.synectique.verveine.core.gen.famix.Class.class, name)) {
+		for (org.moosetechnology.model.famix.famix.Class candidate : this.getEntityByName(org.moosetechnology.model.famix.famix.Class.class, name)) {
 			if ( matchAndMapClass(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
@@ -428,7 +432,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			if (parentClass != null) {
 				Type tmpOwn = this.ensureFamixType(parentClass, /*alwaysPersist?*/persistIt);
 				if (tmpOwn instanceof ParameterizedType) {
-					owner = ((ParameterizedType) tmpOwn).getParameterizableClass();
+					owner = (ContainerEntity) ((ParameterizedType) tmpOwn).getParameterizableClass();
 				}
 				else {
 					owner = tmpOwn;
@@ -527,11 +531,11 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return super.ensureFamixPrimitiveType(bnd, name);
 	}
 
-	public eu.synectique.verveine.core.gen.famix.Enum ensureFamixEnum(ITypeBinding bnd, String name, ContainerEntity owner) {
-		eu.synectique.verveine.core.gen.famix.Enum fmx = null;
+	public org.moosetechnology.model.famix.famix.Enum ensureFamixEnum(ITypeBinding bnd, String name, ContainerEntity owner) {
+		org.moosetechnology.model.famix.famix.Enum fmx = null;
 
 		// --------------- to avoid useless computations if we can
-		fmx = (eu.synectique.verveine.core.gen.famix.Enum)getEntityByKey(bnd);
+		fmx = (org.moosetechnology.model.famix.famix.Enum)getEntityByKey(bnd);
 		if (fmx != null) {
 			return fmx;
 		}
@@ -557,7 +561,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		}
 
 		// --------------- recover from name ?
-		for (eu.synectique.verveine.core.gen.famix.Enum candidate : getEntityByName(eu.synectique.verveine.core.gen.famix.Enum.class, name) ) {
+		for (org.moosetechnology.model.famix.famix.Enum candidate : getEntityByName(org.moosetechnology.model.famix.famix.Enum.class, name) ) {
 			if ( matchAndMapType(bnd, name, owner, candidate) ) {
 				fmx = candidate;
 				break;
@@ -578,7 +582,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * helper method, we know the type exists, ensureFamixEnum will recover it
 	 */
-	public eu.synectique.verveine.core.gen.famix.Enum getFamixEnum(ITypeBinding bnd, String name, ContainerEntity owner) {
+	public org.moosetechnology.model.famix.famix.Enum getFamixEnum(ITypeBinding bnd, String name, ContainerEntity owner) {
 		return ensureFamixEnum(bnd, name, owner);
 	}
 
@@ -964,7 +968,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
 	private boolean matchAndMapClass(ITypeBinding bnd, String name, ContainerEntity owner, Type candidate) {
-		if (! (candidate instanceof eu.synectique.verveine.core.gen.famix.Class)) {
+		if (! (candidate instanceof org.moosetechnology.model.famix.famix.Class)) {
 			return false;
 		}
 
@@ -1038,7 +1042,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					if ( ((Method) candidate).getDeclaredType() == null ) {
 						return false;
 					}
-					else if (! matchAndMapType(bnd.getReturnType(), null, null, ((Method) candidate).getDeclaredType()) ) {
+					else if (! matchAndMapType(bnd.getReturnType(), null, null, (NamedEntity) ((Method) candidate).getDeclaredType()) ) {
 						return false;
 					}
 					// else OK for now
@@ -1055,7 +1059,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 					if ( ((Method) candidate).getDeclaredType() == null ) {
 						return false;
 					}
-					else if (! matchAndMapType(null, retTyp.getName(), retTyp.getBelongsTo(), ((Method) candidate).getDeclaredType()) ) {
+					else if (! matchAndMapType(null, retTyp.getName(), retTyp.getBelongsTo(), (NamedEntity) ((Method) candidate).getDeclaredType()) ) {
 						return false;
 					}
 					// else OK for now
@@ -1195,7 +1199,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 			ContainerEntity ownerOwner = (owner != null) ? owner.getBelongsTo() : null;
 			String ownerSig = (owner != null) ? ((Method)owner).getSignature() : null;
-			Type ownerReturn = (owner != null) ? ((Method)owner).getDeclaredType() : null;
+			Type ownerReturn = (owner != null) ? (Type) ((Method)owner).getDeclaredType() : null;
 
 			if ( matchAndMapMethod(methBnd, ownerSig, ownerReturn, ownerOwner, (Method)candidateOwner) ) {
 				return CheckResult.MATCH;
@@ -1324,7 +1328,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Params: see {@link Dictionary#ensureFamixMethod(Object, String, String, Type, Type, boolean)}.
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type ret, Type owner, int modifiers, boolean persistIt) {
+	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type ret, TType owner, int modifiers, boolean persistIt) {
 		Method fmx = null;
 		String sig;
 		boolean delayedRetTyp;
@@ -1392,7 +1396,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 						delayedRetTyp = true;
 					}
 					else {
-						ret = this.ensureFamixType(retTypBnd, /*ctxt*/owner, /*alwaysPersist?*/persistIt);
+						ret = this.ensureFamixType(retTypBnd, /*ctxt*/(ContainerEntity) owner, /*alwaysPersist?*/persistIt);
 					}
 				}
 			}
@@ -1408,7 +1412,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				if (classBnd != null) {
 					Type tmpOwn = ensureFamixType(classBnd, /*alwaysPersist?*/persistIt);
 					if (tmpOwn instanceof ParameterizedType) {
-						owner = ((ParameterizedType) tmpOwn).getParameterizableClass();
+						owner = (TType) ((ParameterizedType) tmpOwn).getParameterizableClass();
 					}
 					else {
 						owner = tmpOwn;
@@ -1422,14 +1426,14 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (Method candidate : this.getEntityByName(Method.class, name)) {
-			if ( matchAndMapMethod(bnd, sig, ret, owner, candidate) ) {
+			if ( matchAndMapMethod(bnd, sig, ret, (ContainerEntity) owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
 		}
 
 		if (fmx == null) {
-			fmx = super.ensureFamixMethod(bnd, name, sig, ret, owner, persistIt);
+			fmx = super.ensureFamixMethod(bnd, name, sig, ret, (Type) owner, persistIt);
 		}
 
 		if (fmx!=null) {
@@ -1441,7 +1445,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 		if ( (fmx != null) && delayedRetTyp ) {
 			int retTypModifiers = (retTypBnd != null) ? retTypBnd.getModifiers() : UNKNOWN_MODIFIERS;
-			fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/fmx, /*ctxt*/owner, retTypModifiers, /*alwaysPersist?*/persistIt));
+			fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/fmx, /*ctxt*/(ContainerEntity) owner, retTypModifiers, /*alwaysPersist?*/persistIt));
 		}
 
 		return fmx;
@@ -1493,7 +1497,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
     public void setMethodModifiers(Method fmx, int mod) {
         setNamedEntityModifiers(fmx, mod);
-        if (fmx.getIsAbstract()) {
+        if (Modifier.isAbstract(mod)) {
             // don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
             fmx.addModifiers(MODIFIER_ABSTRACT);
         }
@@ -1515,7 +1519,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
     public void setClassModifiers(Class fmx, int mod) {
         setNamedEntityModifiers(fmx, mod);
-        if (fmx.getIsAbstract()) {
+        if (Modifier.isAbstract(mod)) {
             // don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
             fmx.addModifiers(MODIFIER_ABSTRACT);
         }
@@ -1581,7 +1585,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 				if (classBnd != null) {
 					Type tmpOwn = ensureFamixType(classBnd, /*alwaysPersist?*/persistIt);
 					if (tmpOwn instanceof ParameterizedType) {
-						owner = ((ParameterizedType) tmpOwn).getParameterizableClass();
+						owner = (Type) ((ParameterizedType) tmpOwn).getParameterizableClass();
 					}
 					else {
 						owner = tmpOwn;
@@ -1707,7 +1711,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix LocalVariable associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixLocalVariable(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}
+	 * Params: see {@link Dictionary#ensureFamixLocalVariable(Object, String, Type, org.moosetechnology.model.famix.famix.BehaviouralEntity, boolean)}
 	 * @param persistIt  -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if <b>bnd</b> and <b>name</b> are null, or <b>bnd</b> and <b>owner</b> are null, or in case of a Famix error
 	 */
@@ -1807,8 +1811,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		int startPos = jCmt.getStartPosition();
 		boolean found = false;
 
-		for (Comment cmt : fmx.getComments()) {
-			if (((IndexedFileAnchor)cmt.getSourceAnchor()).getStartPos().intValue() == startPos) {
+		for (TComment cmt : fmx.getComments()) {
+			Comment cmt2 = (Comment)cmt;
+			if (((IndexedFileAnchor)cmt2.getSourceAnchor()).getStartPos().intValue() == startPos) {
 				found = true;
 				break;
 			}
@@ -1823,10 +1828,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
 	 * @param fmx -- Famix Entity to add the anchor to
 	 * @param node -- JDT ASTNode, where the information is extracted
-	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some association happening within <b>ast</b>
+	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some TAssociation happening within <b>ast</b>
 	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null)
 	 */
-	public SourceAnchor addSourceAnchor(SourcedEntity fmx, ASTNode node, boolean oneLineAnchor) {
+	public SourceAnchor addSourceAnchor(TSourceEntity fmx, ASTNode node, boolean oneLineAnchor) {
 		AbstractFileAnchor fa = null;
 
 		if ( (fmx != null) && (node != null) ) {
@@ -1861,7 +1866,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
 	 * @param fmx -- Famix Entity to add the anchor to
 	 * @param node -- JDT ASTNode, where the information is extracted
-	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some association happening within <b>ast</b>
+	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some TAssociation happening within <b>ast</b>
 	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null)
 	 */
 	public SourceAnchor addSourceAnchor(Method fmx, MethodDeclaration node, boolean oneLineAnchor) {
@@ -1922,8 +1927,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * @param bnd -- a potential binding for the java "Object" class
 	 * @return a Famix class for "Object"
 	 */
-	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClassObject(ITypeBinding bnd) {
-		eu.synectique.verveine.core.gen.famix.Class fmx =  ensureFamixUniqEntity(eu.synectique.verveine.core.gen.famix.Class.class, bnd, OBJECT_NAME);
+	public org.moosetechnology.model.famix.famix.Class ensureFamixClassObject(ITypeBinding bnd) {
+		org.moosetechnology.model.famix.famix.Class fmx =  ensureFamixUniqEntity(org.moosetechnology.model.famix.famix.Class.class, bnd, OBJECT_NAME);
 
 		if (fmx != null) {
 			fmx.setContainer( ensureFamixNamespaceJavaLang(null));
@@ -1935,10 +1940,10 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	/** Ensures the Java meta-class: Class<>
 	 */
-	public eu.synectique.verveine.core.gen.famix.Class ensureFamixMetaClass(ITypeBinding bnd) {
+	public org.moosetechnology.model.famix.famix.Class ensureFamixMetaClass(ITypeBinding bnd) {
 		Namespace javaLang = ensureFamixNamespaceJavaLang( (bnd == null) ? null : bnd.getPackage());
 		// always persist the MetaClass whatever the value of VerveineJParser.classSummary
-		eu.synectique.verveine.core.gen.famix.Class fmx =  this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC&Modifier.FINAL, /*alwaysPersist?*/true);
+		org.moosetechnology.model.famix.famix.Class fmx =  this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC&Modifier.FINAL, /*alwaysPersist?*/true);
 
 		if ( (fmx != null) && (fmx.getSuperInheritances() == null) ) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, null);
@@ -1947,7 +1952,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 		return fmx;
 	}
 
-	public eu.synectique.verveine.core.gen.famix.Class getFamixMetaClass(ITypeBinding bnd) {
+	public org.moosetechnology.model.famix.famix.Class getFamixMetaClass(ITypeBinding bnd) {
 		Namespace javaLang = ensureFamixNamespaceJavaLang( (bnd == null) ? null : bnd.getPackage());
 		return  this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, UNKNOWN_MODIFIERS, /*alwaysPersist?*/false);
 	}
@@ -1956,8 +1961,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * Creates or recovers the Famix Class that will own all stub methods (for which the real owner is unknown)
 	 * @return a Famix class
 	 */
-	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClassStubOwner() {
-		eu.synectique.verveine.core.gen.famix.Class fmx = super.ensureFamixClassStubOwner();
+	public org.moosetechnology.model.famix.famix.Class ensureFamixClassStubOwner() {
+		org.moosetechnology.model.famix.famix.Class fmx = super.ensureFamixClassStubOwner();
 		ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
 
 		return fmx;
@@ -1969,8 +1974,8 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	 * JDT does not create a binding for these classes, so we create a stub one here.
 	 * @return a Famix class
 	 */
-	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClassArray() {
-		eu.synectique.verveine.core.gen.famix.Class fmx = ensureFamixUniqEntity(eu.synectique.verveine.core.gen.famix.Class.class, null, ARRAYS_NAME);
+	public org.moosetechnology.model.famix.famix.Class ensureFamixClassArray() {
+		org.moosetechnology.model.famix.famix.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famix.famix.Class.class, null, ARRAYS_NAME);
 		if (fmx != null) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
 			fmx.setContainer( ensureFamixNamespaceDefault());

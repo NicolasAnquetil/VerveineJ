@@ -3,18 +3,14 @@ package fr.inria.verveine.extractor.java.visitors.defvisitors;
 import org.eclipse.jdt.core.dom.*;
 
 import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.Enum;
-import eu.synectique.verveine.core.gen.famix.EnumValue;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.moosetechnology.model.famix.famix.*;
+import org.moosetechnology.model.famix.famix.Enum;
 
 import java.util.List;
 
@@ -300,7 +296,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	// "SomeClass.class"
 	public boolean visit(TypeLiteral node) {
-		eu.synectique.verveine.core.gen.famix.Type javaMetaClass = dico.getFamixMetaClass(null);
+		org.moosetechnology.model.famix.famix.Type javaMetaClass = dico.getFamixMetaClass(null);
 		dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass,	/*persistIt*/!classSummary);
 
 		return super.visit(node);
@@ -315,7 +311,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 		switch (structKind) {
 		case PARAMETER:	fmx = dico.ensureFamixParameter(bnd, name, (Method) owner, /*persistIt*/!classSummary);										break;
-		case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (eu.synectique.verveine.core.gen.famix.Type) owner, /*persistIt*/!classSummary);	break;
+		case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (org.moosetechnology.model.famix.famix.Type) owner, /*persistIt*/!classSummary);	break;
 		case LOCALVAR: 	fmx = dico.ensureFamixLocalVariable(bnd, name, (Method) owner, /*persistIt*/!classSummary);									break;
 		default:		fmx = null;
 		}

@@ -9,17 +9,16 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.lang.Exception;
 import java.util.Collection;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Namespace;
+import org.moosetechnology.model.famix.famix.*;
+import org.moosetechnology.model.famix.famixtraits.TAnnotationInstance;
+import org.moosetechnology.model.famix.famixtraits.TAttribute;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 
 /**
@@ -60,34 +59,36 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		assertEquals(3, ann.getInstances().size());
 
 		assertEquals(3, ann.getAttributes().size());
-		for (Attribute a : ann.getAttributes()) {
+		for (TAttribute ta : ann.getAttributes()) {
+			Attribute a = (Attribute) ta;
 			assertEquals(AnnotationTypeAttribute.class, a.getClass());
 			assertTrue(a.getName().equals("name") || a.getName().equals("serviceName") || a.getName().equals("targetNamespace"));
 		}
 
 		// Class annotation
-		eu.synectique.verveine.core.gen.famix.Class cl = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "SimpleBean");
+		org.moosetechnology.model.famix.famix.Class cl = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "SimpleBean");
 		assertNotNull(cl);
 		assertEquals(2, cl.getAnnotationInstances().size());
-		for (AnnotationInstance ai :cl.getAnnotationInstances() ) {
-			if (ai.getAnnotationType().getName().equals("WebService")) {
-				assertEquals(detectFamixElement(Namespace.class, "jws"), ai.getAnnotationType().getBelongsTo());
+		for (TAnnotationInstance a :cl.getAnnotationInstances() ) {
+			AnnotationInstance ai = (AnnotationInstance) a;
+			if (((TNamedEntity) ai.getAnnotationType()).getName().equals("WebService")) {
+				assertEquals(detectFamixElement(Namespace.class, "jws"), ((AnnotationType) ai.getAnnotationType()).getBelongsTo());
 			}
-			else if (ai.getAnnotationType().getName().equals("SOAPBinding")) {
-				assertEquals(detectFamixElement(Namespace.class, "soap"), ai.getAnnotationType().getBelongsTo());
+			else if (((TNamedEntity)ai.getAnnotationType()).getName().equals("SOAPBinding")) {
+				assertEquals(detectFamixElement(Namespace.class, "soap"), ((AnnotationType) ai.getAnnotationType()).getBelongsTo());
 			}
 			else {
-				assertTrue("Unexpected AnnotationInstance for SimpleBean: "+ ai.getAnnotationType().getName(), false);
+				assertTrue("Unexpected AnnotationInstance for SimpleBean: "+ ((AnnotationType)ai.getAnnotationType()).getName(), false);
 			}
 		}
 
 		// Method annotations
 		Method rep = detectFamixElement(Method.class, "orderResponse");
 		assertNotNull(rep);
-		Collection<AnnotationInstance> annInstances = rep.getAnnotationInstances();
+		Collection<TAnnotationInstance> annInstances = rep.getAnnotationInstances();
 		assertEquals(1, annInstances.size());
-		AnnotationInstance annInst = firstElt(annInstances);
-		assertEquals("WebMethod", annInst.getAnnotationType().getName());
+		TAnnotationInstance annInst = firstElt(annInstances);
+		assertEquals("WebMethod", ((TNamedEntity)((AnnotationInstance)annInst).getAnnotationType()).getName());
 
 		
 	}

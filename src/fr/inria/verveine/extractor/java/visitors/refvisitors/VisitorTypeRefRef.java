@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.*;
 
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Reference;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
+import org.moosetechnology.model.famix.famix.BehaviouralEntity;
+import org.moosetechnology.model.famix.famix.ContainerEntity;
+import org.moosetechnology.model.famix.famix.Method;
+import org.moosetechnology.model.famix.famix.Reference;
+import org.moosetechnology.model.famix.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 
@@ -70,7 +70,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		visitClassInstanceCreation(node);
 		if (node.getAnonymousClassDeclaration() == null) {
 			Type clazz = node.getType();
-			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+			org.moosetechnology.model.famix.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
 			if (!classSummary) {
 				ref = dico.addFamixReference( (BehaviouralEntity) context.top(), fmx, context.getLastReference());
@@ -200,7 +200,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	}
 
 	public boolean visit(InstanceofExpression node) {
-		eu.synectique.verveine.core.gen.famix.Type fmx = null;
+		org.moosetechnology.model.famix.famix.Type fmx = null;
 		Type clazz = node.getRightOperand();
 		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
@@ -291,7 +291,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	    if (this.searchTypeRef) {
             IBinding bnd = node.resolveBinding();
             if ( (bnd != null) && (bnd.getKind() == IBinding.TYPE) ) {
-                eu.synectique.verveine.core.gen.famix.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+                org.moosetechnology.model.famix.famix.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
                 Reference ref = dico.addFamixReference((BehaviouralEntity) context.top(), referred, context.getLastReference());
                 context.setLastReference(ref);
             }
@@ -319,7 +319,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 //		if ( (bnd != null) && (bnd instanceof ITypeBinding) ) {
 //			referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
 
-	private void setVariablesDeclaredType(List<VariableDeclaration> vars, eu.synectique.verveine.core.gen.famix.Type varTyp) {
+	private void setVariablesDeclaredType(List<VariableDeclaration> vars, org.moosetechnology.model.famix.famix.Type varTyp) {
 		for (VariableDeclaration var : vars) {
 			StructuralEntity fmx = (StructuralEntity) dico.getEntityByKey(var.resolveBinding());
 			if (fmx != null) {

@@ -7,8 +7,6 @@ import java.util.List;
 
 import java.security.MessageDigest;
 
-import eu.synectique.verveine.core.gen.famix.*;
-import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -19,6 +17,8 @@ import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisit
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.moosetechnology.model.famix.famix.*;
+import org.moosetechnology.model.famix.famix.ParameterizedType;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -70,7 +70,11 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
-		eu.synectique.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top(), /*isGeneric*/tparams.size()>0, node.getModifiers(), /*alwaysPersist?*/persistIt);
+		org.moosetechnology.model.famix.famix.Class fmx = dico.ensureFamixClass(
+				bnd, /*name*/node.getName().getIdentifier(),
+				(ContainerEntity) /*owner*/context.top(),
+				/*isGeneric*/tparams.size()>0,
+				node.getModifiers(), /*alwaysPersist?*/persistIt);
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
@@ -133,7 +137,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
-		eu.synectique.verveine.core.gen.famix.Class fmx = null;
+		org.moosetechnology.model.famix.famix.Class fmx = null;
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
@@ -167,7 +171,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 //		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
+		org.moosetechnology.model.famix.famix.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
@@ -235,7 +239,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
             paramTypes.add( Util.jdtTypeName(param.getType()));
         }
 
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*owner*/context.topType(), node.getModifiers(), /*persitIt*/!classSummary);
+		Method fmx = dico.ensureFamixMethod(bnd,
+				node.getName().getIdentifier(),
+				paramTypes,
+				/*owner*/context.topType(),
+				node.getModifiers(),
+				/*persitIt*/!classSummary);
 
 		if (fmx != null) {
 			fmx.setIsStub(false);

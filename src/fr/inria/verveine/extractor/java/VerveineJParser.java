@@ -16,10 +16,17 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 
-import eu.synectique.verveine.core.VerveineParser;
-import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.SourceLanguage;
+import fr.inria.verveine.extractor.core.VerveineParser;
+import org.moosetechnology.model.famix.famix.JavaSourceLanguage;
+import org.moosetechnology.model.famix.famix.Namespace;
+import org.moosetechnology.model.famix.famix.SourceLanguage;
+import org.moosetechnology.model.famix.famixreplication.FamixReplicationModel;
+import org.moosetechnology.model.famix.famixtraits.FamixModel;
+import org.moosetechnology.model.famix.famixtraits.FamixTraitsModel;
+import org.moosetechnology.model.famix.moose.MooseModel;
+import org.moosetechnology.model.famix.moosequery.MooseQueryModel;
+import org.moosetechnology.model.famix.smalltalk.SmalltalkModel;
+import org.moosetechnology.model.famix.tagging.TaggingModel;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -104,6 +111,12 @@ public class VerveineJParser extends VerveineParser {
 
 	public VerveineJParser() {
 		super();
+		FamixReplicationModel.importInto(this.getFamixRepo().getMetamodel());
+		FamixTraitsModel.importInto(this.getFamixRepo().getMetamodel());
+		MooseModel.importInto(this.getFamixRepo().getMetamodel());
+		MooseQueryModel.importInto(this.getFamixRepo().getMetamodel());
+		SmalltalkModel.importInto(this.getFamixRepo().getMetamodel());
+		TaggingModel.importInto(this.getFamixRepo().getMetamodel());
 
 		jdtParser = ASTParser.newParser(AST.JLS8);
 	}

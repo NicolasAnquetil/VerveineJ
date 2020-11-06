@@ -65,10 +65,12 @@ import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 
-import eu.synectique.verveine.core.gen.famix.*;
+import org.moosetechnology.model.famix.famix.*;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.moosetechnology.model.famix.famixtraits.TInheritance;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import static org.junit.Assert.*;
 
@@ -137,7 +139,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	public void testEntitiesNumber() {
 		int nbClasses = 11+14; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
 
-		assertEquals(nbClasses, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size());
+		assertEquals(nbClasses, entitiesOfType( org.moosetechnology.model.famix.famix.Class.class).size());
 		assertEquals(3,  entitiesOfType( PrimitiveType.class).size());
 		assertEquals(0,  entitiesOfType( Method.class).size());
 		assertEquals(0,  entitiesOfType( Attribute.class).size());
@@ -176,8 +178,8 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(9,  entitiesOfType( Reference.class).size());  // Node:1 , WorkStation:2 , FileServer:2 , PrintServer:4
 
 		for (Reference ref : entitiesOfType( Reference.class)) {
-			assertNotNull(ref.getTarget());
-			assertNotNull(ref.getSource());
+			assertNotNull(ref.getReferredType());
+			assertNotNull(ref.getReferencer());
 		}
 	}
 
@@ -195,50 +197,50 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
         // --OutputServer extends Node
         // --FileServer extends OutputServer
 
-		eu.synectique.verveine.core.gen.famix.Class clazz;
-		Collection<Inheritance> inherits;
+		org.moosetechnology.model.famix.famix.Class clazz;
+		Collection<TInheritance> inherits;
 		Inheritance inh, inh2 = null;
 
 		assertEquals(29, entitiesOfType( Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size());
-		inh = firstElt(inherits);
+		inh = (Inheritance) firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "OutputServer"), inh.getSuperclass());
 
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node");
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size());
-		inh = firstElt(inherits);
+		inh = (Inheritance) firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 		
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
         inherits = clazz.getSuperInheritances();
 		assertEquals(2, inherits.size()); // superInheritances: Object and IPrinter (in this order)
-		for (Inheritance inheritance : inherits) {
+		for (TInheritance inheritance : inherits) {
 			assertSame(clazz, inheritance.getSubclass());
-			if (inheritance.getSuperclass().getName().equals("IPrinter")) {
-				inh2 = inheritance;
-				assertNull(inheritance.getNext());
-				assertSame(inheritance,inheritance.getPrevious().getNext());
-				assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
+			if (((TNamedEntity)inheritance.getSuperclass()).getName().equals("IPrinter")) {
+				inh2 = (Inheritance) inheritance;
+				assertNull(inh2.getNext());
+				assertSame(inheritance,inh2.getPrevious().getNext());
+				assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
 			} else {
-				inh = inheritance;
-				assertNull(inheritance.getPrevious());
-				assertSame(inheritance,inheritance.getNext().getPrevious());
-				assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
+				inh = (Inheritance) inheritance;
+				assertNull(inh.getPrevious());
+				assertSame(inheritance,inh.getNext().getPrevious());
+				assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
 			}
 		}
 		assertSame(inh.getNext(), inh2);
 		assertSame(inh2.getPrevious(), inh);
 
-        clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+        clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "IPrinter");
         assertNotNull(clazz);
         inherits = clazz.getSubInheritances();
         assertEquals(1, inherits.size());

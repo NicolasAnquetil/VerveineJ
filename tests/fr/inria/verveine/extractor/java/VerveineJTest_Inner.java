@@ -1,10 +1,10 @@
 package fr.inria.verveine.extractor.java;
 
 
-import eu.synectique.verveine.core.gen.famix.Class;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
+import org.moosetechnology.model.famix.famix.Class;
+import org.moosetechnology.model.famix.famix.IndexedFileAnchor;
+import org.moosetechnology.model.famix.famix.Method;
+import org.moosetechnology.model.famix.famix.NamedEntity;
 import org.junit.Before;
 import org.junit.Test;
 

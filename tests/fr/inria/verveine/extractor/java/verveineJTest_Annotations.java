@@ -2,9 +2,10 @@ package fr.inria.verveine.extractor.java;
 
 import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.core.gen.famix.*;
+import org.moosetechnology.model.famix.famix.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famix.famixtraits.*;
 
 import java.io.File;
 import java.lang.Exception;
@@ -38,7 +39,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationSubClass() {
-        eu.synectique.verveine.core.gen.famix.Class cl = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "SubAnnotation");
+        org.moosetechnology.model.famix.famix.Class cl = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "SubAnnotation");
         assertNotNull(cl);
 
         AnnotationType getProp = detectFamixElement(AnnotationType.class, "GetProperty");
@@ -47,45 +48,46 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testClassAnnotation() {
-        eu.synectique.verveine.core.gen.famix.Class cl = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Serializer");
+        org.moosetechnology.model.famix.famix.Class cl = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Serializer");
         assertEquals(1, cl.getAnnotationInstances().size());
-        AnnotationInstance sw = firstElt(cl.getAnnotationInstances());
+        AnnotationInstance sw = (AnnotationInstance) firstElt(cl.getAnnotationInstances());
         assertNotNull(sw);
-        assertEquals("SuppressWarnings", sw.getAnnotationType().getName());
+        assertEquals("SuppressWarnings", ((TNamedEntity)sw.getAnnotationType()).getName());
         assertSame(sw.getAnnotatedEntity(), cl);
         assertEquals(1, sw.getAttributes().size());
-        AnnotationInstanceAttribute swVal = firstElt(sw.getAttributes());
+        AnnotationInstanceAttribute swVal = (AnnotationInstanceAttribute) firstElt(sw.getAttributes());
         assertNotNull(swVal);
-        assertEquals("value", swVal.getAnnotationTypeAttribute().getName());
+        assertEquals("value", ((TNamedEntity)swVal.getAnnotationTypeAttribute()).getName());
         assertEquals("\"serial\"", swVal.getValue());
 
     }
 
     @Test
     public void testMethodAnnotation() {
-        eu.synectique.verveine.core.gen.famix.Class book = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Book");
-        Collection<Method> bookMethods = book.getMethods();
+        org.moosetechnology.model.famix.famix.Class book = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Book");
+        Collection<TMethod> bookMethods = book.getMethods();
 
        AnnotationType getProp = detectFamixElement(AnnotationType.class, "GetProperty");
        assertNotNull(getProp);
        AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) firstElt(getProp.getAttributes());
 
         assertEquals(12, bookMethods.size());
-        for (Method meth : bookMethods) {
-            Collection<AnnotationInstance> annInstances = meth.getAnnotationInstances();
-            if (meth.getName().startsWith("get")) {
+        for (TMethod tmeth : bookMethods) {
+            Method meth = (Method) tmeth;
+            Collection<TAnnotationInstance> annInstances = meth.getAnnotationInstances();
+            if (((TNamedEntity)meth).getName().startsWith("get")) {
                 assertEquals(1, annInstances.size());
-                AnnotationInstance annInst = firstElt(annInstances);
+                AnnotationInstance annInst = (AnnotationInstance) firstElt(annInstances);
                 assertSame(getProp, annInst.getAnnotationType());
                 assertEquals(1, annInst.getAttributes().size());
-                AnnotationInstanceAttribute getValInst = firstElt(annInst.getAttributes());
+                AnnotationInstanceAttribute getValInst = (AnnotationInstanceAttribute) firstElt(annInst.getAttributes());
                 assertSame(getAtt, getValInst.getAnnotationTypeAttribute());
 
             }
-            else if (meth.getName().startsWith("set")) {
+            else if (((TNamedEntity)meth).getName().startsWith("set")) {
                 assertEquals(1, annInstances.size());
-                AnnotationInstance annInst = firstElt(annInstances);
-                assertEquals("SetProperty", annInst.getAnnotationType().getName());
+                AnnotationInstance annInst = (AnnotationInstance) firstElt(annInstances);
+                assertEquals("SetProperty", ((TNamedEntity) annInst.getAnnotationType()).getName());
             }
             else {
                 assertEquals(0, annInstances.size());
@@ -95,15 +97,15 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAttributeAnnotation() {
-        eu.synectique.verveine.core.gen.famix.Class book = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Book");
-        Collection<Attribute> bookAttributes = book.getAttributes();
+        org.moosetechnology.model.famix.famix.Class book = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Book");
+        Collection<TAttribute> bookAttributes = book.getAttributes();
         assertEquals(6, bookAttributes.size());
-        for (Attribute att : bookAttributes) {
-            if (att.getName().equals("time")) {
-                assertEquals(1, att.getAnnotationInstances().size());
+        for (TAttribute att : bookAttributes) {
+            if (((TNamedEntity)att).getName().equals("time")) {
+                assertEquals(1, ((Attribute)att).getAnnotationInstances().size());
             }
             else {
-                assertEquals(0, att.getAnnotationInstances().size());
+                assertEquals(0, ((Attribute)att).getAnnotationInstances().size());
             }
         }
 
@@ -115,19 +117,20 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         assertNotNull(att);
 
         assertEquals(1, att.getAnnotationInstances().size());
-        AnnotationInstance ann = firstElt(att.getAnnotationInstances());
+        AnnotationInstance ann = (AnnotationInstance) firstElt(att.getAnnotationInstances());
         assertNotNull(ann);
-        assertEquals("XmlElement", ann.getAnnotationType().getName());
+        assertEquals("XmlElement", ((TNamedEntity) ann.getAnnotationType()).getName());
         assertSame(ann.getAnnotatedEntity(), att);
         assertEquals(3, ann.getAttributes().size());
 
-        for (AnnotationInstanceAttribute annAtt : ann.getAttributes()) {
-            if (annAtt.getAnnotationTypeAttribute().getName().equals("type")) {
+        for (TAnnotationInstanceAttribute tannAtt : ann.getAttributes()) {
+            AnnotationInstanceAttribute annAtt = (AnnotationInstanceAttribute) tannAtt;
+            if (((TNamedEntity) annAtt.getAnnotationTypeAttribute()).getName().equals("type")) {
                 assertEquals("String.class", annAtt.getValue());
             }
             else {
-                assertTrue( annAtt.getAnnotationTypeAttribute().getName().equals("name") ||
-                        annAtt.getAnnotationTypeAttribute().getName().equals("required"));
+                assertTrue( ((TNamedEntity)annAtt.getAnnotationTypeAttribute()).getName().equals("name") ||
+                        ((TNamedEntity)annAtt.getAnnotationTypeAttribute()).getName().equals("required"));
             }
         }
     }
@@ -149,9 +152,10 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         }
 
         AnnotationTypeAttribute req = null;
-        for (AnnotationInstanceAttribute aia : firstElt(xmle.getInstances()).getAttributes()) {
-            if (aia.getAnnotationTypeAttribute().getName().equals("required")) {
-                req = aia.getAnnotationTypeAttribute();
+        for (TAnnotationInstanceAttribute taia : ((AnnotationInstance)firstElt(xmle.getInstances())).getAttributes()) {
+            AnnotationInstanceAttribute aia = (AnnotationInstanceAttribute) taia;
+            if (((TNamedEntity)aia.getAnnotationTypeAttribute()).getName().equals("required")) {
+                req = (AnnotationTypeAttribute) aia.getAnnotationTypeAttribute();
             }
         }
         //AnnotationTypeAttribute req = detectFamixElement( AnnotationTypeAttribute.class, "required");
@@ -175,11 +179,11 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         assertNotNull(param);
 
         assertEquals(1, param.getAnnotationInstances().size());
-        AnnotationInstance inst = firstElt(param.getAnnotationInstances());
+        AnnotationInstance inst = (AnnotationInstance) firstElt(param.getAnnotationInstances());
         assertNotNull(inst);
-        assertEquals("SuppressWarnings", inst.getAnnotationType().getName());
+        assertEquals("SuppressWarnings", ((TNamedEntity)inst.getAnnotationType()).getName());
         assertSame(inst.getAnnotatedEntity(), param);
-        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
+        AnnotationInstanceAttribute att = (AnnotationInstanceAttribute) firstElt(inst.getAttributes());
         assertEquals("\"blah\"", att.getValue());
     }
 
@@ -189,15 +193,16 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         assertNotNull(meth);
 
         assertEquals(1, meth.getAnnotationInstances().size());
-        AnnotationInstance inst = firstElt(meth.getAnnotationInstances());
+        AnnotationInstance inst = (AnnotationInstance) firstElt(meth.getAnnotationInstances());
         assertNotNull(inst);
 
         assertEquals(2, inst.getAttributes().size());
 
-        for( AnnotationInstanceAttribute att : inst.getAttributes()) {
-            if (att.getAnnotationTypeAttribute().getName().equals("on")) {
+        for( TAnnotationInstanceAttribute tatt : inst.getAttributes()) {
+            AnnotationInstanceAttribute att = (AnnotationInstanceAttribute) tatt;
+            if (((TNamedEntity)att.getAnnotationTypeAttribute()).getName().equals("on")) {
                 assertEquals("{\"signon\", \"newAccount\", \"editAccount\"}", att.getValue());
-            } else if (att.getAnnotationTypeAttribute().getName().equals("required")) {
+            } else if (((TNamedEntity)att.getAnnotationTypeAttribute()).getName().equals("required")) {
                 assertEquals("true", att.getValue());
             } else {
                 fail("We are in an attribute that does not exist");
@@ -220,84 +225,84 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
         assertNotNull(annTyp);
         assertFalse(annTyp.getIsStub());
         assertEquals(1, annTyp.numberOfAttributes());
-        assertEquals("value", firstElt(annTyp.getAttributes()).getName());
+        assertEquals("value", ((TNamedEntity)firstElt(annTyp.getAttributes())).getName());
         assertEquals(2, annTyp.numberOfInstances());
 
         annTyp = detectFamixElement( AnnotationType.class, "Interceptors");
         assertNotNull(annTyp);
         assertTrue(annTyp.getIsStub());
         assertEquals(1, annTyp.numberOfAttributes());
-        assertEquals("value", firstElt(annTyp.getAttributes()).getName());
+        assertEquals("value", ((TNamedEntity)firstElt(annTyp.getAttributes())).getName());
         assertEquals(3, annTyp.numberOfInstances());
     }
 
     @Test
     public void testAnnotationInstanceAttribute() {
-        eu.synectique.verveine.core.gen.famix.Class clss = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "AnnotatedClass");
+        org.moosetechnology.model.famix.famix.Class clss = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "AnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
-        AnnotationInstance inst = firstElt(clss.getAnnotationInstances());
-        assertEquals("Interceptors", inst.getAnnotationType().getName());
+        AnnotationInstance inst = (AnnotationInstance) firstElt(clss.getAnnotationInstances());
+        assertEquals("Interceptors", ((TNamedEntity)inst.getAnnotationType()).getName());
         assertSame(inst.getAnnotatedEntity(), clss);
 
         assertEquals(1, inst.numberOfAttributes());
-        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
+        AnnotationInstanceAttribute att = (AnnotationInstanceAttribute) firstElt(inst.getAttributes());
         assertNotNull(att);
-        assertEquals("value", att.getAnnotationTypeAttribute().getName());
+        assertEquals("value", ((TNamedEntity)att.getAnnotationTypeAttribute()).getName());
 
         assertEquals("FirstInterceptorClass.class", att.getValue());
     }
 
     @Test
     public void testAnnotationInstanceArrayOfOne() {
-        eu.synectique.verveine.core.gen.famix.Class clss = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "AThirdAnnotatedClass");
+        org.moosetechnology.model.famix.famix.Class clss = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "AThirdAnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
-        AnnotationInstance inst = firstElt(clss.getAnnotationInstances());
+        AnnotationInstance inst = (AnnotationInstance) firstElt(clss.getAnnotationInstances());
         assertNotNull(inst);
-        assertEquals("Interceptors", inst.getAnnotationType().getName());
+        assertEquals("Interceptors", ((TNamedEntity)inst.getAnnotationType()).getName());
         assertSame(inst.getAnnotatedEntity(), clss);
 
         assertEquals(1, inst.numberOfAttributes());
-        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
+        AnnotationInstanceAttribute att = (AnnotationInstanceAttribute) firstElt(inst.getAttributes());
         assertNotNull(att);
-        assertEquals("value", att.getAnnotationTypeAttribute().getName());
+        assertEquals("value", ((TNamedEntity)att.getAnnotationTypeAttribute()).getName());
 
         assertEquals("FirstInterceptorClass.class", att.getValue());
     }
 
     @Test
     public void testAnnotationInstanceEmptyArrayForValue() {
-        eu.synectique.verveine.core.gen.famix.Class clss = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "AnotherInterceptorClass");
+        org.moosetechnology.model.famix.famix.Class clss = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "AnotherInterceptorClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
-        AnnotationInstance inst = firstElt(clss.getAnnotationInstances());
+        AnnotationInstance inst = (AnnotationInstance) firstElt(clss.getAnnotationInstances());
         assertNotNull(inst);
 
         assertEquals(1, inst.numberOfAttributes());
-        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
+        AnnotationInstanceAttribute att = (AnnotationInstanceAttribute) firstElt(inst.getAttributes());
         assertNotNull(att);
         assertEquals("{}", att.getValue());
     }
 
     @Test
     public void testAnnotationInstanceArray() {
-        eu.synectique.verveine.core.gen.famix.Class clss = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "AnotherAnnotatedClass");
+        org.moosetechnology.model.famix.famix.Class clss = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "AnotherAnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
-        AnnotationInstance inst = firstElt(clss.getAnnotationInstances());
+        AnnotationInstance inst = (AnnotationInstance) firstElt(clss.getAnnotationInstances());
         assertNotNull(inst);
-        assertEquals("Interceptors", inst.getAnnotationType().getName());
+        assertEquals("Interceptors", ((TNamedEntity)inst.getAnnotationType()).getName());
         assertSame(inst.getAnnotatedEntity(), clss);
 
         assertEquals(1, inst.numberOfAttributes());
-        AnnotationInstanceAttribute att = firstElt(inst.getAttributes());
+        AnnotationInstanceAttribute att = (AnnotationInstanceAttribute) firstElt(inst.getAttributes());
         assertNotNull(att);
-        assertEquals("value", att.getAnnotationTypeAttribute().getName());
+        assertEquals("value", ((TNamedEntity)att.getAnnotationTypeAttribute()).getName());
 
         assertEquals("{FirstInterceptorClass.class, AnotherInterceptorClass.class}", att.getValue());
     }

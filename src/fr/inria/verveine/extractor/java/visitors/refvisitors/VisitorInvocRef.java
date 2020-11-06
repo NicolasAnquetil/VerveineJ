@@ -8,8 +8,8 @@ import java.util.List;
 
 import eu.synectique.verveine.core.Dictionary;
 
-import eu.synectique.verveine.core.gen.famix.*;
-import eu.synectique.verveine.core.gen.famix.Class;
+import org.moosetechnology.model.famix.famix.*;
+import org.moosetechnology.model.famix.famix.Class;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
@@ -19,13 +19,15 @@ import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.internal.compiler.ast.Argument;
+import org.moosetechnology.model.famix.famixtraits.TInheritance;
+import org.moosetechnology.model.famix.famixtraits.TType;
 
 public class VisitorInvocRef extends AbstractRefVisitor {
 
 	/**
 	 * Useful to keep the FamixType created in the specific case of "new SomeClass().someMethod()"
 	 */
-	private eu.synectique.verveine.core.gen.famix.Type classInstanceCreated = null;
+	private org.moosetechnology.model.famix.famix.Type classInstanceCreated = null;
 
 	/**
 	 * The source code of the visited AST.
@@ -88,7 +90,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		visitClassInstanceCreation(node);
 		if ( (node.getAnonymousClassDeclaration() == null) && (!classSummary) ) {
 			Type clazz = node.getType();
-			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+			org.moosetechnology.model.famix.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 			// create an invocation to the constructor
 			String typName;
@@ -257,11 +259,11 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		String calledName = node.getName().getFullyQualifiedName();
 
 		if (bnd == null) {
-			Iterator<Inheritance> iter = this.context.topType().getSuperInheritances().iterator();
-			eu.synectique.verveine.core.gen.famix.Type superClass = iter.next().getSuperclass();
+			Iterator<TInheritance> iter = this.context.topType().getSuperInheritances().iterator();
+			org.moosetechnology.model.famix.famixtraits.TType superClass = (TType) iter.next().getSuperclass();
 			/* This code does not seem to do anything worthwhile
-			  while ((superClass instanceof eu.synectique.verveine.core.gen.famix.Class)
-					&& (((eu.synectique.verveine.core.gen.famix.Class) superClass).getIsInterface())
+			  while ((superClass instanceof org.moosetechnology.model.famix.famix.Class)
+					&& (((org.moosetechnology.model.famix.famix.Class) superClass).getIsInterface())
 					&& iter.hasNext()) {
 				iter.next().getSuperclass();
 			}*/
@@ -359,7 +361,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 * TODO Why are Invocations, Accesses and References not created through a method in JavaDictionnary ?
 	 */
 	private Invocation methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver,
-			eu.synectique.verveine.core.gen.famix.Type methOwner, Collection<Expression> l_args) {
+			org.moosetechnology.model.famix.famixtraits.TType methOwner, Collection<Expression> l_args) {
 		BehaviouralEntity sender = this.context.topMethod();
 		Method invoked = null;
 		Invocation invok = null;
@@ -390,10 +392,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner,
 							modifiers, /*persistIt*/!classSummary);
 				} else {
-					eu.synectique.verveine.core.gen.famix.Type owner;
+					org.moosetechnology.model.famix.famixtraits.TType owner;
 
 					if (receiver != null)
-						owner = (eu.synectique.verveine.core.gen.famix.Type) receiver;
+						owner = (org.moosetechnology.model.famix.famix.Type) receiver;
 					else
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
@@ -560,7 +562,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 * @param receiver -- the FAMIX Entity describing the receiver
 	 * @return the Famix Entity or null if could not find it
 	 */
-	private eu.synectique.verveine.core.gen.famix.Type getInvokedMethodOwner(Expression expr, NamedEntity receiver) {
+	private org.moosetechnology.model.famix.famixtraits.TType getInvokedMethodOwner(Expression expr, NamedEntity receiver) {
 		// ((type)expr).msg()
 		if ( NodeTypeChecker.isCastExpression(expr)) {
 			Type tcast = ((CastExpression) expr).getType();
@@ -618,8 +620,8 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 						}*/
 			else if (receiver instanceof StructuralEntity) {
 				return ((StructuralEntity) receiver).getDeclaredType();
-			} else if (receiver instanceof eu.synectique.verveine.core.gen.famix.Type) {
-				return (eu.synectique.verveine.core.gen.famix.Type) receiver;
+			} else if (receiver instanceof org.moosetechnology.model.famix.famix.Type) {
+				return (org.moosetechnology.model.famix.famix.Type) receiver;
 			}
 			// ... what else ?
 			else {
@@ -633,9 +635,9 @@ public class VisitorInvocRef extends AbstractRefVisitor {
      * @return
      */
     private Class superClass() {
-        eu.synectique.verveine.core.gen.famix.Type clazz = context.topType();
+        org.moosetechnology.model.famix.famix.Type clazz = context.topType();
         Class superC = null;
-        for (Inheritance inh : clazz.getSuperInheritances()) {
+        for (TInheritance inh : clazz.getSuperInheritances()) {
             if ( (inh.getSuperclass() instanceof Class) && (! ((Class) inh.getSuperclass()).getIsInterface()) ) {
                 superC = (Class) inh.getSuperclass();
                 break;

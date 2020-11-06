@@ -5,17 +5,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
+import fr.inria.verveine.extractor.core.EntityStack;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import org.eclipse.jdt.core.dom.*;
 
-import eu.synectique.verveine.core.EntityStack;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.extractor.java.utils.Util;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.moosetechnology.model.famix.famix.*;
+import org.moosetechnology.model.famix.famixtraits.TMethod;
 
 /**
  * This visitor offers methods to recover FamixEntities from the main JDT Entities and may put them in the context Stack<br>
@@ -91,10 +89,10 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Can only be a class or interface declaration
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
-	protected eu.synectique.verveine.core.gen.famix.Class visitTypeDeclaration(TypeDeclaration node) {
+	protected org.moosetechnology.model.famix.famix.Class visitTypeDeclaration(TypeDeclaration node) {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		eu.synectique.verveine.core.gen.famix.Class fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
+		org.moosetechnology.model.famix.famix.Class fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		if (fmx != null) {
 			this.context.pushType(fmx);
 		}
@@ -102,7 +100,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected void endVisitTypeDeclaration(TypeDeclaration node) {
-		if (context.topType() instanceof eu.synectique.verveine.core.gen.famix.Class) {
+		if (context.topType() instanceof org.moosetechnology.model.famix.famix.Class) {
 			context.pop();
 		}
 		super.endVisit(node);
@@ -122,8 +120,8 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	/**
 	 * See field {@link GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
 	 */
-	protected eu.synectique.verveine.core.gen.famix.Class visitAnonymousClassDeclaration(AnonymousClassDeclaration node) {
-		eu.synectique.verveine.core.gen.famix.Class fmx = null;
+	protected org.moosetechnology.model.famix.famix.Class visitAnonymousClassDeclaration(AnonymousClassDeclaration node) {
+		org.moosetechnology.model.famix.famix.Class fmx = null;
 
         ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
@@ -135,7 +133,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected void endVisitAnonymousClassDeclaration(AnonymousClassDeclaration node) {
-		if (context.top()  instanceof  eu.synectique.verveine.core.gen.famix.Class) {
+		if (context.top()  instanceof  org.moosetechnology.model.famix.famix.Class) {
 			context.pop();
 		}
 		if(!anonymousSuperTypeName.empty()) {
@@ -143,10 +141,10 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		}
 	}
 
-	protected eu.synectique.verveine.core.gen.famix.Enum visitEnumDeclaration(EnumDeclaration node) {
+	protected org.moosetechnology.model.famix.famix.Enum visitEnumDeclaration(EnumDeclaration node) {
         ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-        eu.synectique.verveine.core.gen.famix.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
+        org.moosetechnology.model.famix.famix.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
 			this.context.pushType(fmx);
 		}
@@ -154,7 +152,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected void endVisitEnumDeclaration(EnumDeclaration node) {
-		if (context.top() instanceof eu.synectique.verveine.core.gen.famix.Enum) {
+		if (context.top() instanceof org.moosetechnology.model.famix.famix.Enum) {
 			this.context.popType();
 		}
 		super.endVisit(node);
@@ -282,7 +280,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
 	private Method ctxtPushInitializerMethod() {
-        eu.synectique.verveine.core.gen.famix.Type owner = context.topType();
+        org.moosetechnology.model.famix.famix.Type owner = context.topType();
         Method fmx = recoverInitializerMethod(owner);
         if (fmx == null) {
             fmx = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<String>(), /*returnType*/null, owner, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
@@ -299,12 +297,12 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
      * Cannot do it with ensureFamixMethod because we have no binding, no parameter, no return type
      * on which ensureFamixMethod relies
      */
-    private Method recoverInitializerMethod(eu.synectique.verveine.core.gen.famix.Type owner) {
+    private Method recoverInitializerMethod(org.moosetechnology.model.famix.famix.Type owner) {
 	    Method ret = null;
         if (owner != null) {
-            for (Method meth : owner.getMethods()) {
-                if (meth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
-                    ret = meth;
+            for (TMethod meth : owner.getMethods()) {
+                if (((Method)meth).getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+                    ret = (Method) meth;
                     break;
                 }
             }

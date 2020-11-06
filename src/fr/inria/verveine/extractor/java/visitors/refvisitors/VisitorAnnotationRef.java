@@ -21,10 +21,10 @@ import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
+import org.moosetechnology.model.famix.famix.AnnotationInstanceAttribute;
+import org.moosetechnology.model.famix.famix.AnnotationType;
+import org.moosetechnology.model.famix.famix.AnnotationTypeAttribute;
+import org.moosetechnology.model.famix.famix.NamedEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 

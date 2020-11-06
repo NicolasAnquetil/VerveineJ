@@ -5,8 +5,8 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.ParameterType;
+import org.moosetechnology.model.famix.famix.NamedEntity;
+import org.moosetechnology.model.famix.famix.ParameterType;
 
 /**
  * A conveniency class to introduce the {@link #classSummary} flag and a method that uses it.
@@ -16,7 +16,7 @@ public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntity
 
 	/**
 	 * Whether to summarize collected information at the level of classes or produce everything
-	 * (see {@link VerveineJParser#classSummary}).
+	 * (see {@link VerveineJParser}).
 	 */
 	protected boolean classSummary = false;
 

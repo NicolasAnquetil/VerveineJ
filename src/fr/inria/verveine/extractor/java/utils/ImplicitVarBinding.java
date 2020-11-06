@@ -8,8 +8,7 @@ import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 
 import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.gen.famix.Method;
-
+import org.moosetechnology.model.famix.famix.Method;
 
 
 /**

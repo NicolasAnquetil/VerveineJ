@@ -1,13 +1,12 @@
 package fr.inria.verveine.extractor.java;
 
-
-import eu.synectique.verveine.core.gen.famix.Class;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
+import org.moosetechnology.model.famix.famix.*;
+import org.moosetechnology.model.famix.famix.Class;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.lang.Exception;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;

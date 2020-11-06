@@ -1,5 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
+import fr.inria.verveine.extractor.core.EntityStack;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
@@ -7,8 +8,7 @@ import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import eu.synectique.verveine.core.EntityStack;
-import eu.synectique.verveine.core.gen.famix.Namespace;
+import org.moosetechnology.model.famix.famix.Namespace;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 
 /**

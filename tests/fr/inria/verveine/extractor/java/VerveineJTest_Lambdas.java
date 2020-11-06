@@ -1,10 +1,11 @@
 package fr.inria.verveine.extractor.java;
 
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
+import org.moosetechnology.model.famix.famix.Access;
+import org.moosetechnology.model.famix.famix.LocalVariable;
+import org.moosetechnology.model.famix.famix.Method;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famix.famixtraits.TLocalVariable;
 
 import java.io.File;
 import java.util.Collection;
@@ -43,7 +44,8 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
         LocalVariable seg1 = null;
         LocalVariable seg2 = null;
         assertEquals(2, meth.getLocalVariables().size());
-        for (LocalVariable lvar : meth.getLocalVariables()) {
+        for (TLocalVariable tlvar : meth.getLocalVariables()) {
+            LocalVariable lvar = (LocalVariable) tlvar;
             if (lvar.getName().equals("seg1")) {
                 seg1 = lvar;
             }
@@ -69,7 +71,8 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
         LocalVariable found = null;
         LocalVariable t = null;
         assertEquals(3, meth.getLocalVariables().size());
-        for (LocalVariable lvar : meth.getLocalVariables()) {
+        for (TLocalVariable tlvar : meth.getLocalVariables()) {
+            LocalVariable lvar = (LocalVariable) tlvar;
             if (lvar.getName().equals("col")) {
                 col = lvar;
             }
@@ -96,7 +99,7 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
         assertNotNull(meth);
 
         assertEquals(1, meth.getLocalVariables().size());
-        LocalVariable col = firstElt(meth.getLocalVariables());
+        LocalVariable col = (LocalVariable) firstElt(meth.getLocalVariables());
         assertNotNull(col);
         assertEquals("col", col.getName());
 

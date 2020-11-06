@@ -5,17 +5,18 @@ import java.util.List;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
 
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Enum;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
+import org.moosetechnology.model.famix.famix.Access;
+import org.moosetechnology.model.famix.famix.Attribute;
+import org.moosetechnology.model.famix.famix.ContainerEntity;
+import org.moosetechnology.model.famix.famix.Enum;
+import org.moosetechnology.model.famix.famix.ImplicitVariable;
+import org.moosetechnology.model.famix.famix.Method;
+import org.moosetechnology.model.famix.famix.PrimitiveType;
+import org.moosetechnology.model.famix.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 /**
  * A visitor that extracts accesses to variables.
@@ -251,7 +252,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if ( (anchors == anchorOptions.assoc)
 				// check that lastAccess corresponds to current one
 				&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
-				&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
+				&& ((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getName().getIdentifier())) {
 			dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
 		}
 		return false;
@@ -271,7 +272,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			if ( (anchors == anchorOptions.assoc)
 					// check that lastAccess corresponds to current one
 					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
-					&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
+					&& (((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getName().getIdentifier()))) {
 				dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -447,7 +448,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
             if ( (anchors == anchorOptions.assoc)
                     // check that lastAccess corresponds to current one
                     && (lastAccess != null) && (lastAccess.getAccessor() == accessor)
-                    && (lastAccess.getVariable().getName().equals(node.getIdentifier()))) {
+                    && (((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getIdentifier()))) {
                 dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
             }
         }
@@ -471,7 +472,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
     }
 
 	private StructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name,
-			eu.synectique.verveine.core.gen.famix.Type typ, ContainerEntity owner, Method accessor) {
+			org.moosetechnology.model.famix.famix.Type typ, ContainerEntity owner, Method accessor) {
 		StructuralEntity accessed = null;
 
 		if (bnd == null) {
@@ -485,7 +486,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if (bnd.isEnumConstant()) {
 			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/!classSummary);
 		} else if (bnd.isField()) {
-			accessed = dico.ensureFamixAttribute(bnd, name, typ, (eu.synectique.verveine.core.gen.famix.Type) owner,
+			accessed = dico.ensureFamixAttribute(bnd, name, typ, (org.moosetechnology.model.famix.famix.Type) owner,
 					/*persistIt*/!classSummary);
 			if (classSummary) {
 				if (!(accessed.getDeclaredType() instanceof PrimitiveType)) {
@@ -501,7 +502,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			}
 		} else if (bnd.isParameter() && (! inLambda)) {
 			if (!classSummary) {
-				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, /*persistIt*/!classSummary);
+				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, true);
 			}
 		} else {
 			// it seems it is a variable.
@@ -540,8 +541,8 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if (accessed.getBelongsTo() == accessor) {
 			return true;
 		}
-		if (accessor.getParentType().getName().startsWith(JavaDictionary.ANONYMOUS_NAME_PREFIX)) {
-			return localVariable(accessed, (Method)accessor.getParentType().getContainer());
+		if (((TNamedEntity) accessor.getParentType()).getName().startsWith(JavaDictionary.ANONYMOUS_NAME_PREFIX)) {
+			return localVariable(accessed, ((Method)((org.moosetechnology.model.famix.famix.Type) accessor.getParentType()).getContainer()));
 		}
 		return false;
 	}

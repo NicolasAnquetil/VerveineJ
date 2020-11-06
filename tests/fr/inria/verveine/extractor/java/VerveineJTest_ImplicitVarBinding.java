@@ -3,14 +3,14 @@ package fr.inria.verveine.extractor.java;
 import static org.junit.Assert.*;
 
 import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
+import fr.inria.verveine.extractor.core.Dictionary;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.gen.famix.Method;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
+import org.moosetechnology.model.famix.famix.ImplicitVariable;
+import org.moosetechnology.model.famix.famix.Method;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import java.io.File;
 import java.util.Collection;
@@ -65,7 +65,7 @@ public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
         assertEquals(4,   implicits.size());
 
         for (ImplicitVariable var : implicits) {
-            switch (var.getParentBehaviouralEntity().getName()) {
+            switch (((TNamedEntity)var.getParentBehaviouralEntity()).getName()) {
                 case "Dictionary" :
                     assertEquals(5, var.getIncomingAccesses().size());
 // actually generates 6 accesses:
@@ -91,7 +91,7 @@ public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
                     assertEquals(1, var.getReceivingInvocations().size());
                     break;
                 default :
-                    fail("Unknown ImplicitVariable owner: " + var.getParentBehaviouralEntity().getName());
+                    fail("Unknown ImplicitVariable owner: " + ((TNamedEntity)var.getParentBehaviouralEntity()).getName());
             }
         }
     }

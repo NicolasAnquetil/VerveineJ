@@ -5,29 +5,17 @@ package fr.inria.verveine.extractor.java;
 
 
 import java.io.File;
+import java.lang.Exception;
 import java.util.Collection;
 
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.Comment;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
-import eu.synectique.verveine.core.gen.famix.SourceAnchor;
+import org.moosetechnology.model.famix.famix.*;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famix.famixtraits.*;
+import org.w3c.dom.Attr;
+
 import static org.junit.Assert.*;
 
 /**
@@ -104,7 +92,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			nbInherit++;
 		}
 
-		assertEquals( nbClasses, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size());
+		assertEquals( nbClasses, entitiesOfType(org.moosetechnology.model.famix.famix.Class.class).size());
 		assertEquals(3,    entitiesOfType( PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+8, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10+1, entitiesOfType( Attribute.class).size());//10+{System.out}
@@ -123,13 +111,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testClassProperties() {
-		eu.synectique.verveine.core.gen.famix.Class clazz;
+		org.moosetechnology.model.famix.famix.Class clazz;
 
 		Namespace pckg = detectFamixElement( Namespace.class, "lan");
 		assertNotNull(pckg);
 		assertEquals("lan", pckg.getName());	
 
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		assertEquals("Node", clazz.getName());
 		assertEquals(11, clazz.numberOfMethods());
@@ -137,7 +125,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(pckg, clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
 		assertEquals("SingleDestinationAddress", clazz.getName());
 		assertEquals(5, clazz.numberOfMethods());
@@ -145,11 +133,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(pckg, clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 
-		eu.synectique.verveine.core.gen.famix.Class outputServ = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer");
+		org.moosetechnology.model.famix.famix.Class outputServ = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "OutputServer");
 		assertNotNull(outputServ);
 		assertEquals("OutputServer", outputServ.getName());
 		assertEquals(4, outputServ.getMethods().size());
-		for (Method mth : outputServ.getMethods()) {
+		for (TMethod tmth : outputServ.getMethods()) {
+			Method mth = (Method) tmth;
 			String nm = mth.getName();
 			assertTrue("Unknown method name: "+nm, nm.equals(JavaDictionary.INIT_BLOCK_NAME) || nm.equals("accept") || nm.equals("canOutput") || nm.equals("output") );
 		}
@@ -160,7 +149,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(pckg);
 		assertEquals("server", pckg.getName());
 
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "IPrinter");
 		assertNotNull(clazz);
 		assertEquals("IPrinter", clazz.getName());
 		assertEquals(1, clazz.numberOfMethods());
@@ -168,18 +157,18 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(pckg, clazz.getContainer());
 		assertTrue(clazz.getIsInterface());
 
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
 		assertEquals("XPrinter", clazz.getName());
 		assertEquals(2, clazz.numberOfMethods());
 		assertEquals(1, clazz.numberOfAttributes());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer"), clazz.getContainer());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "PrintServer"), clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 	}
 
 	@Test
 	public void testAnonymous() {
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "_Anonymous(IPrinter)");
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "_Anonymous(IPrinter)");
 		assertNotNull(clazz);
 		assertEquals("_Anonymous(IPrinter)", clazz.getName());
 		assertEquals(1, clazz.numberOfMethods());
@@ -187,7 +176,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(detectFamixElement(Method.class, "PrintServer"), clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 
-		Method mth = firstElt(clazz.getMethods());
+		Method mth = (Method) firstElt(clazz.getMethods());
 		assertEquals("print", mth.getName());
         assertEquals(1, mth.getOutgoingReferences().size());  // System
         assertEquals(1, mth.getAccesses().size());   // out
@@ -216,64 +205,65 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testNamedEntities() {
-		JavaDictionary dico = new JavaDictionary(repo);
+		JavaDictionary javaDictionary = new JavaDictionary(repo);
 		
-		assertNotSame(dico.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true),dico.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true));
+		assertNotSame(javaDictionary.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true),javaDictionary.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true));
 		
-		Namespace javaLang = dico.ensureFamixNamespaceJavaLang(null);
+		Namespace javaLang = javaDictionary.ensureFamixNamespaceJavaLang(null);
 		assertEquals( JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());
-		assertSame(javaLang, dico.ensureFamixNamespaceJavaLang(null));
+		assertSame(javaLang, javaDictionary.ensureFamixNamespaceJavaLang(null));
 		assertTrue(javaLang.getIsStub());
 
-		eu.synectique.verveine.core.gen.famix.Class obj = dico.ensureFamixClassObject(null);
+		org.moosetechnology.model.famix.famix.Class obj = javaDictionary.ensureFamixClassObject(null);
 		assertEquals(JavaDictionary.OBJECT_NAME, obj.getName());
-		assertSame(obj, dico.ensureFamixClassObject(null));
+		assertSame(obj, javaDictionary.ensureFamixClassObject(null));
 		assertEquals(0, obj.getSuperInheritances().size());
 		assertSame(javaLang, obj.getContainer());
 		
-		eu.synectique.verveine.core.gen.famix.Class fmx = dico.ensureFamixClassStubOwner();
+		org.moosetechnology.model.famix.famix.Class fmx = javaDictionary.ensureFamixClassStubOwner();
 		assertEquals(JavaDictionary.STUB_METHOD_CONTAINER_NAME, fmx.getName());
-		assertSame(fmx, dico.ensureFamixClassStubOwner());
+		assertSame(fmx, javaDictionary.ensureFamixClassStubOwner());
 	}
 
 	@Test
 	public void testInheritance() {
-		eu.synectique.verveine.core.gen.famix.Class clazz;
-		Collection<Inheritance> superInheritances;
+		org.moosetechnology.model.famix.famix.Class clazz;
+		Collection<TInheritance> superInheritances;
 		Inheritance inh, inh2 = null;
 		
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(1, superInheritances.size());
-		inh = firstElt(superInheritances);
+		inh = (Inheritance) firstElt(superInheritances);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer"), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "OutputServer"), inh.getSuperclass());
 
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(1, superInheritances.size());
-		inh = firstElt(superInheritances);
+		inh = (Inheritance) firstElt(superInheritances);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 		
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(2, superInheritances.size()); // superInheritances: Object and IPrinter (in this order)
-		for (Inheritance inheritance : superInheritances) {
+		for (TInheritance tinheritance : superInheritances) {
+			Inheritance inheritance = (Inheritance) tinheritance;
 			assertSame(clazz, inheritance.getSubclass());
-			if (inheritance.getSuperclass().getName().equals("IPrinter")) {
+			if (((TNamedEntity) inheritance.getSuperclass()).getName().equals("IPrinter")) {
 				inh2 = inheritance;
 				assertNull(inheritance.getNext());
 				assertSame(inheritance,inheritance.getPrevious().getNext());
-				assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
+				assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "IPrinter"), inheritance.getSuperclass());
 			} else {
 				inh = inheritance;
 				assertNull(inheritance.getPrevious());
 				assertSame(inheritance,inheritance.getNext().getPrevious());
-				assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
+				assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
 			}
 		}
 		assertSame(inh.getNext(), inh2);
@@ -286,21 +276,22 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(mweb);
 		assertEquals("methodWithEmptyBody", mweb.getName());
 		assertEquals("methodWithEmptyBody()", mweb.getSignature());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node"), mweb.getParentType());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node"), mweb.getParentType());
 		assertSame(detectFamixElement(PrimitiveType.class, "void"), mweb.getDeclaredType());
 
 		Method em = detectFamixElement(Method.class, "equalsMultiple");
 		assertNotNull(em);
 		assertEquals("equalsMultiple", em.getName());
 		assertEquals("equalsMultiple(AbstractDestinationAddress)", em.getSignature());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress"), em.getParentType());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "SingleDestinationAddress"), em.getParentType());
 		assertSame(detectFamixElement(PrimitiveType.class, "boolean"), em.getDeclaredType());
 		assertEquals("29F586AA07B1D80186CC5981C16F6442", em.getBodyHash());
 
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "FileServer");
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "FileServer");
 		assertNotNull(clazz);
 		Method n = null;
-		for (Method m : clazz.getMethods()) {
+		for (TMethod tm : clazz.getMethods()) {
+			Method m = (Method) tm;
 			if (m.getName().equals("name")) {
 				n = m;
 				break;
@@ -309,14 +300,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(n);
 		assertEquals("name", n.getName());
 		assertEquals("name()", n.getSignature());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "FileServer"), n.getParentType());
-		assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "String"), n.getDeclaredType());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "FileServer"), n.getParentType());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "String"), n.getDeclaredType());
 		
 		//constructors
 		Collection<Method> methods = entitiesOfType( Method.class);
 		assertFalse("No method found !", methods.isEmpty());
 		for (Method m : methods) {
-			if (m.getName().equals(m.getParentType().getName())) {
+			if (m.getName().equals(((TNamedEntity) m.getParentType()).getName())) {
 				assertEquals("constructor", m.getKind());
 			}
 			else {
@@ -328,18 +319,19 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testFieldType() {
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node");
 		assertNotNull(clazz);
-		Collection<Attribute> l_atts = clazz.getAttributes();
+		Collection<TAttribute> l_atts = clazz.getAttributes();
 		assertEquals(2, l_atts.size());
-		for (Attribute a : l_atts) {
+		for (TAttribute ta : l_atts) {
+			Attribute a = (Attribute) ta;
 			if (a.getName().equals("nextNode")) {
 				assertSame(clazz, a.getParentType());
 				assertSame(clazz, a.getDeclaredType());
 			}
 			else if (a.getName().equals("name")) {
 				assertSame(clazz, a.getParentType());
-				assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "String"), a.getDeclaredType());
+				assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "String"), a.getDeclaredType());
 			}
 			else {
 				fail("Unknown attribute: "+a.getName());
@@ -366,17 +358,17 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(ns);
 		assertTrue(ns.getIsStub());
 
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, JavaDictionary.OBJECT_NAME);
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(clazz);
 		assertTrue(clazz.getIsStub());
 		assertSame(ns, clazz.getContainer());
 		
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "String");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "String");
 		assertNotNull(clazz);
 		assertTrue(clazz.getIsStub());
 		assertSame(ns, clazz.getContainer());
 		
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsStub());
 		
@@ -387,35 +379,38 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testParameter() {
-		eu.synectique.verveine.core.gen.famix.Class nodeClass = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		org.moosetechnology.model.famix.famix.Class nodeClass = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node");
 		assertNotNull(nodeClass);
-		Collection<Method> methods = nodeClass.getMethods();
+		Collection<TMethod> methods = nodeClass.getMethods();
 		assertFalse("No methods in Node class !", methods.isEmpty());
-		for (Method mNode : methods)
-            if ((mNode.getName().equals("Node")) ||
-                    (mNode.getName().equals("methodWithEmptyBody")) ||
-                    (mNode.getName().equals("canOriginate")) ||
-                    (mNode.getName().equals("canOutput"))) {
-                assertEquals("Wrong number of parameter for method Node." + mNode.getName() + "()", 0, mNode.getParameters().size());
-            } else if ((mNode.getName().equals("name")) ||
-                    (mNode.getName().equals("nextNode"))) {
-                assertTrue("Wrong number of parameter for method Node." + mNode.getName() + "()", (mNode.getParameters().size() == 0) || (mNode.getParameters().size() == 1));
-            } else if ((mNode.getName().equals("accept")) ||
-                    (mNode.getName().equals("send")) ||
-                    (mNode.getName().equals("printOn"))) {
-                assertEquals("Wrong number of parameter for method Node." + mNode.getName() + "()", 1, mNode.getParameters().size());
-            } else {
-                fail("Unknown method name: " + mNode.getName());
-            }
-		eu.synectique.verveine.core.gen.famix.Class iprintClass = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+		for (TMethod tmNode : methods) {
+			Method mNode = (Method) tmNode;
+			if ((mNode.getName().equals("Node")) ||
+					(mNode.getName().equals("methodWithEmptyBody")) ||
+					(mNode.getName().equals("canOriginate")) ||
+					(mNode.getName().equals("canOutput"))) {
+				assertEquals("Wrong number of parameter for method Node." + mNode.getName() + "()", 0, mNode.getParameters().size());
+			} else if ((mNode.getName().equals("name")) ||
+					(mNode.getName().equals("nextNode"))) {
+				assertTrue("Wrong number of parameter for method Node." + mNode.getName() + "()", (mNode.getParameters().size() == 0) || (mNode.getParameters().size() == 1));
+			} else if ((mNode.getName().equals("accept")) ||
+					(mNode.getName().equals("send")) ||
+					(mNode.getName().equals("printOn"))) {
+				assertEquals("Wrong number of parameter for method Node." + mNode.getName() + "()", 1, mNode.getParameters().size());
+			} else {
+				fail("Unknown method name: " + mNode.getName());
+			}
+		}
+		org.moosetechnology.model.famix.famix.Class iprintClass = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "IPrinter");
 		assertNotNull(iprintClass);
-		Method mPrint = firstElt(iprintClass.getMethods());
+		Method mPrint = (Method) firstElt(iprintClass.getMethods());
 		assertEquals(2, mPrint.getParameters().size());
-		for (Parameter p : mPrint.getParameters()) {
+		for (TParameter tp : mPrint.getParameters()) {
+			Parameter p = (Parameter) tp;
 			assertSame(mPrint, p.getParentBehaviouralEntity());
 			assertTrue(p.getName().equals("contents") || p.getName().equals("rv"));
 			if (p.getName().equals("contents")) {
-				assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "String"), p.getDeclaredType());
+				assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "String"), p.getDeclaredType());
 			}
 			else if (p.getName().equals("rv")) {
 				assertSame(detectFamixElement(PrimitiveType.class, "boolean"), p.getDeclaredType());
@@ -429,14 +424,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testImplicitVar() {
 		boolean testRan = false;
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
-		Collection<Method> methods = clazz.getMethods();
-		for (Method m : methods) {
+		Collection<TMethod> methods = clazz.getMethods();
+		for (TMethod tm : methods) {
+			Method m = (Method) tm;
 			if (m.getName().equals("isDestinationFor" )) {
 				testRan = true;
 				assertEquals(1, m.getOutgoingInvocations().size());
-				Invocation invok = firstElt(m.getOutgoingInvocations());
+				Invocation invok = (Invocation) firstElt(m.getOutgoingInvocations());
 				assertEquals(ImplicitVariable.class, invok.getReceiver().getClass());
 				
 				ImplicitVariable iv = (ImplicitVariable) invok.getReceiver();
@@ -448,14 +444,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertTrue("Method SingleDestinationAddress.isDestinationFor() not found", testRan);
 
 		testRan = false;
-		clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
+		clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "WorkStation");
 		assertNotNull(clazz);
 		methods = clazz.getMethods();
-		for (Method m : methods) {
+		for (TMethod tm : methods) {
+			Method m = (Method) tm;
 			if (m.getName().equals("name" )) {
 				testRan = true;
 				assertEquals(1, m.getOutgoingInvocations().size());
-				Invocation invok = firstElt(m.getOutgoingInvocations());
+				Invocation invok = (Invocation) firstElt(m.getOutgoingInvocations());
 				assertEquals(ImplicitVariable.class, invok.getReceiver().getClass());
 				
 				ImplicitVariable iv = (ImplicitVariable) invok.getReceiver();
@@ -469,11 +466,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testInvocation() {
-		eu.synectique.verveine.core.gen.famix.Class nodeClass = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		org.moosetechnology.model.famix.famix.Class nodeClass = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node");
 		assertNotNull(nodeClass);
-		Collection<Method> methods = nodeClass.getMethods();
+		Collection<TMethod> methods = nodeClass.getMethods();
 		assertFalse("No method found in Node !", methods.isEmpty());
-		for (Method mNode : methods) {
+		for (TMethod tmNode : methods) {
+			Method mNode = (Method) tmNode;
 			if ( (mNode.getName().equals("name")) ||
 				 (mNode.getName().equals("nextNode")) ||
 				 (mNode.getName().equals("methodWithEmptyBody")) ||
@@ -498,17 +496,18 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		// test that the chain (next/previous) of invocations is correct
         boolean testRan = false;
-		for (Method mNode : methods) {
-			Collection<Invocation> invocations = mNode.getOutgoingInvocations();
-			if (mNode.getName().equals("accept")) {
-				Invocation invok = firstElt(invocations);
+		for (TMethod mNode : methods) {
+			Collection<TInvocation> invocations = ((Method) mNode).getOutgoingInvocations();
+			if (((TNamedEntity)mNode).getName().equals("accept")) {
+				Invocation invok = (Invocation) firstElt(invocations);
 				assertNull(invok.getPrevious());
 				assertNull(invok.getNext());
 				testRan = true;
 			}
-			else if (mNode.getName().equals("send"))  {
+			else if (((TNamedEntity)mNode).getName().equals("send"))  {
 				int nbNull = 0;
-				for (Invocation invok : invocations) {
+				for (TInvocation tinvok : invocations) {
+					Invocation invok = (Invocation) tinvok;
 					Invocation previous = (Invocation) invok.getPrevious();
 					if (previous == null) {
 						nbNull++;
@@ -524,32 +523,32 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		}
 		assertTrue("No interesting invocation found", testRan);
 
-		eu.synectique.verveine.core.gen.famix.Class sdaClass = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		org.moosetechnology.model.famix.famix.Class sdaClass = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(sdaClass);
 		methods = sdaClass.getMethods();
 		assertFalse("No method found in SingleDestinationAddress !", methods.isEmpty());
-		for (Method mSDA : methods) {
-			for (Invocation inv : mSDA.getOutgoingInvocations()) {
+		for (TMethod mSDA : methods) {
+			for (TInvocation inv : ((Method) mSDA).getOutgoingInvocations()) {
 				assertEquals(1, inv.getCandidates().size());
 
-				BehaviouralEntity invoked = firstElt(inv.getCandidates());
+				BehaviouralEntity invoked = (BehaviouralEntity) firstElt(inv.getCandidates());
 
 				assertTrue( "Unexpected invoked method signature: "+invoked.getSignature(),
 						invoked.getSignature().equals("equalsSingle(String)") || invoked.getSignature().equals("id()") || invoked.getSignature().equals("equals(Object)"));
 				if (invoked.getSignature().equals("equalsSingle(String)")) {
 					assertSame(sdaClass, ((Method)inv.getSender()).getParentType());
-					assertEquals("self", inv.getReceiver().getName());
+					assertEquals("self", ((TNamedEntity) inv.getReceiver()).getName());
 					assertSame(detectFamixElement(Method.class, "equalsSingle"), firstElt(inv.getCandidates()));
 				}
 				else if (invoked.getSignature().equals("id()")) {
 					assertSame(detectFamixElement(Method.class, "equalsSingle"), inv.getSender());
-					assertEquals("self", inv.getReceiver().getName());
+					assertEquals("self", ((TNamedEntity) inv.getReceiver()).getName());
 					assertSame(sdaClass, ((Method)firstElt(inv.getCandidates())).getParentType());
 				}
 				else if (invoked.getSignature().equals("equals(Object)")) {
 					assertSame(detectFamixElement(Method.class, "equalsSingle"), inv.getSender());
                     assertNull(inv.getReceiver());
-					assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "String"),
+					assertSame(detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "String"),
                                                                         ((Method)firstElt(inv.getCandidates())).getParentType());
 				}
 				else {
@@ -569,23 +568,23 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		att = detectFamixElement( Attribute.class, "name");
 		assertNotNull(att);
 		assertEquals(2, att.getIncomingAccesses().size());
-		for (Access acc : att.getIncomingAccesses()) {
-			accessor = acc.getAccessor();
+		for (TAccess acc : att.getIncomingAccesses()) {
+			accessor = (BehaviouralEntity) acc.getAccessor();
 			assertEquals("name", accessor.getName());
 
 			assertSame(Method.class, accessor.getClass());
-			assertEquals("Node", ((Method)accessor).getParentType().getName());
+			assertEquals("Node", ((TNamedEntity)((Method)accessor).getParentType()).getName());
 
 			if ( accessor.getSignature().equals("name()") ) {
-				assertTrue("Wrong read/write property in access to:" + acc.getVariable().getName() + " from:" + accessor.getSignature(),
+				assertTrue("Wrong read/write property in access to:" + ((TNamedEntity)acc.getVariable()).getName() + " from:" + accessor.getSignature(),
 						acc.getIsRead());
-				assertFalse("Wrong read/write property in access to:" + acc.getVariable().getName() + " from:" + accessor.getSignature(),
+				assertFalse("Wrong read/write property in access to:" + ((TNamedEntity)acc.getVariable()).getName() + " from:" + accessor.getSignature(),
 						acc.getIsWrite());
 			}
 			else {
-				assertFalse("Wrong read/write property in access to:" + acc.getVariable().getName() + " from:" + accessor.getSignature(),
+				assertFalse("Wrong read/write property in access to:" + ((TNamedEntity)acc.getVariable()).getName() + " from:" + accessor.getSignature(),
 						acc.getIsRead());
-				assertTrue("Wrong read/write property in access to:" + acc.getVariable().getName() + " from:" + accessor.getSignature(),
+				assertTrue("Wrong read/write property in access to:" + ((TNamedEntity)acc.getVariable()).getName() + " from:" + accessor.getSignature(),
 						acc.getIsWrite());
 			}
 		}
@@ -593,16 +592,16 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		att = detectFamixElement( Attribute.class, "serverType");
 		assertNotNull(att);
 		assertEquals(2, att.getIncomingAccesses().size());   // OutputServer: "protected String serverType = ..." ; FileServer: "this.serverType = ..."
-		acces = firstElt(att.getIncomingAccesses());
-		accessor = acces.getAccessor();
+		acces = (Access) firstElt(att.getIncomingAccesses());
+		accessor = (BehaviouralEntity) acces.getAccessor();
 
 		assertSame(Method.class, accessor.getClass());
 		if ( accessor.getName().equals("setServerType")) {
-		    assertEquals("FileServer", ((Method)accessor).getParentType().getName());
+		    assertEquals("FileServer", ((TNamedEntity)((Method)accessor).getParentType()).getName());
         }
         else {
             assertEquals(JavaDictionary.INIT_BLOCK_NAME, accessor.getName());
-            assertEquals("OutputServer", ((Method)accessor).getParentType().getName());
+            assertEquals("OutputServer", ((TNamedEntity)((Method)accessor).getParentType()).getName());
         }
 
 		assertFalse( acces.getIsRead());
@@ -611,7 +610,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		// finds method PrintServer.output()
 		Method output = null;
 		for (Method m : entitiesNamed( Method.class, "output")) {
-			if (m.getParentType().getName().equals("PrintServer")) {
+			if (((TNamedEntity)m.getParentType()).getName().equals("PrintServer")) {
 				output = m;
 				break;
 			}
@@ -621,14 +620,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
         int foundOut = 0;
         int foundSelf = 0;
         int foundPrinter = 0;
-		for (Access acc : output.getAccesses()) {
+		for (TAccess acc : output.getAccesses()) {
 			assertEquals(output, acc.getAccessor());
-			switch (acc.getVariable().getName()) {
+			switch (((TNamedEntity)acc.getVariable()).getName()) {
                 //case "thePacket": foundThePacket++; break;
                 case "out":       foundOut++;       break;
                 case "self":      foundSelf++;      break;
                 case "printer":   foundPrinter++;   break;
-                default: fail("Unexpected field accessed: "+acc.getVariable().getName());
+                default: fail("Unexpected field accessed: "+ ((TNamedEntity)acc.getVariable()).getName());
             }
             assertTrue( acc.getIsRead());
     	    assertFalse( acc.getIsWrite());
@@ -643,10 +642,10 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testSourceAnchors() {
 		SourceAnchor anc = null;
 		
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "XPrinter");
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "XPrinter");
 		assertNotNull(clazz);
 
-		anc = clazz.getSourceAnchor();
+		anc = (SourceAnchor) clazz.getSourceAnchor();
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
@@ -659,10 +658,10 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			assertEquals(528, ((IndexedFileAnchor)anc).getEndPos());
 		}
 
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Node");
 		assertNotNull(clazz);
 
-		anc = clazz.getSourceAnchor();
+		anc = (SourceAnchor) clazz.getSourceAnchor();
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
@@ -678,7 +677,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Method meth = detectFamixElement( Method.class, "equalsMultiple");
 		assertNotNull(meth);
 
-		anc = meth.getSourceAnchor();
+		anc = (SourceAnchor) meth.getSourceAnchor();
 		assertNotNull(anc);
 		assertSame(meth, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
@@ -694,7 +693,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Attribute att = detectFamixElement( Attribute.class, "originator");
 		assertNotNull(meth);
 
-		anc = att.getSourceAnchor();
+		anc = (SourceAnchor) att.getSourceAnchor();
 		assertNotNull(anc);
 		assertSame(att, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
@@ -711,7 +710,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testModifiers() {
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "OutputServer");
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "OutputServer");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsInterface());
 		assertTrue(clazz.getIsAbstract());
@@ -722,7 +721,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertFalse(clazz.getModifiers().contains("final"));
 		
 		assertEquals(4, clazz.getMethods().size());
-		for (Method m : clazz.getMethods()) {
+		for (TMethod tm : clazz.getMethods()) {
+			Method m = (Method) tm;
 			if (m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
 				assertFalse(m.getModifiers().contains("public"));
 			}
@@ -741,7 +741,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		}
 		
 		assertEquals(1, clazz.getAttributes().size());
-		Attribute a = firstElt(clazz.getAttributes());
+		Attribute a = (Attribute) firstElt(clazz.getAttributes());
 		assertFalse(a.getModifiers().contains("public"));
 		assertFalse(a.getModifiers().contains("private"));
 		assertTrue(a.getModifiers().contains("protected"));
@@ -751,13 +751,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testComment() {
 		// testing javadoc
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
-		Collection<Comment> cmts = clazz.getComments();
+		Collection<TComment> cmts = clazz.getComments();
 		assertEquals(2, cmts.size());  // file javaDoc + class javaDoc
 		SourceAnchor anc = null;
-		for (Comment c : cmts) {
-			IndexedFileAnchor tmpAnc = (IndexedFileAnchor) c.getSourceAnchor();
+		for (TComment c : cmts) {
+			IndexedFileAnchor tmpAnc = (IndexedFileAnchor) ((Comment) c).getSourceAnchor();
 			if ( tmpAnc.getStartPos().intValue() > 5) { // i.e. not the one at the beginning of the file
 				anc = tmpAnc;
 				if(isWindows()){
@@ -775,7 +775,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(meth);
 		cmts = meth.getComments();
 		assertEquals(1, cmts.size());
-		anc = firstElt(cmts).getSourceAnchor();
+		anc = (SourceAnchor) ((Comment)firstElt(cmts)).getSourceAnchor();
 		if(isWindows()){
 			assertEquals(563, ((IndexedFileAnchor)anc).getStartPos());
 			assertEquals(621, ((IndexedFileAnchor)anc).getEndPos());
@@ -785,13 +785,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		}
 
 		// testing the non javadoc comments (those that are treated)
-		clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
+		clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "WorkStation");
 		assertNotNull(clazz);
-		Attribute a = firstElt(clazz.getAttributes());
+		Attribute a = (Attribute) firstElt(clazz.getAttributes());
 		assertEquals("type", a.getName());
 		cmts = a.getComments();
 		assertEquals(1, cmts.size());
-		anc = firstElt(cmts).getSourceAnchor();
+		anc = (SourceAnchor) ((Comment)firstElt(cmts)).getSourceAnchor();
 		if(isWindows()){
 			assertEquals(176, ((IndexedFileAnchor)anc).getStartPos().intValue());
 		} else {
@@ -805,7 +805,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(3, lMeths.size());
 		for (Method m : lMeths) {
 			assertNotNull(m);
-			eu.synectique.verveine.core.gen.famix.Class owner = (eu.synectique.verveine.core.gen.famix.Class) m.getParentType();
+			org.moosetechnology.model.famix.famix.Class owner = (org.moosetechnology.model.famix.famix.Class) m.getParentType();
 			assertNotNull(owner);
 			if (owner.getName().equals("OutputServer")) {
 			assertEquals(2, m.getCyclomaticComplexity());
@@ -827,39 +827,41 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	
 	@Test
 	public void testAnnotation() {
-		eu.synectique.verveine.core.gen.famix.Class clazz;
-		Collection<AnnotationInstance> annInstances;
+		org.moosetechnology.model.famix.famix.Class clazz;
+		Collection<TAnnotationInstance> annInstances;
 		
-		AnnotationType annType = detectFamixElement(eu.synectique.verveine.core.gen.famix.AnnotationType.class, "Override");
+		AnnotationType annType = detectFamixElement(org.moosetechnology.model.famix.famix.AnnotationType.class, "Override");
 		assertNotNull(annType);
 		assertEquals("Override", annType.getName());
 		
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "PrintServer");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "PrintServer");
 		assertNotNull(clazz);
-		Collection<Method> methods = clazz.getMethods();
+		Collection<TMethod> methods = clazz.getMethods();
 		assertFalse("No method found in PrintServer",methods.isEmpty());
-		for (Method method : methods) {
+		for (TMethod tmethod : methods) {
+			Method method = (Method) tmethod;
 			annInstances = method.getAnnotationInstances();
 			if (method.getName().equals("output")) {
 				assertEquals(1, annInstances.size());
-				AnnotationInstance annInstance = firstElt(annInstances);
-				assertEquals("Override", annInstance.getAnnotationType().getName());
+				AnnotationInstance annInstance = (AnnotationInstance) firstElt(annInstances);
+				assertEquals("Override", ((TNamedEntity) annInstance.getAnnotationType()).getName());
 				assertSame(annType, annInstance.getAnnotationType());
 				assertSame(method, annInstance.getAnnotatedEntity());
 			} else {
 				assertEquals(0, annInstances.size());
 			}
 		}
-		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "SingleDestinationAddress");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
         methods = clazz.getMethods();
 		assertFalse("No method found in SingleDestinationAddress",methods.isEmpty());
-		for (Method method : methods) {
+		for (TMethod tmethod : methods) {
+			Method method = (Method) tmethod;
 			annInstances = method.getAnnotationInstances();
 			if (method.getName().equals("isDestinationFor")) {
 				assertEquals(1, annInstances.size());
-				AnnotationInstance annInstance = firstElt(annInstances);
-				assertEquals("Override", annInstance.getAnnotationType().getName());
+				AnnotationInstance annInstance = (AnnotationInstance) firstElt(annInstances);
+				assertEquals("Override", ((TNamedEntity) annInstance.getAnnotationType()).getName());
 				assertSame(annType, annInstance.getAnnotationType());
 				assertSame(method, annInstance.getAnnotatedEntity());
 			} else {

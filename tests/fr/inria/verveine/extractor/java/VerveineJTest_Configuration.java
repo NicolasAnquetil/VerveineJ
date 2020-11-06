@@ -4,10 +4,12 @@ import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 
-import eu.synectique.verveine.core.gen.famix.*;
-import eu.synectique.verveine.core.gen.famix.Class;
+import org.moosetechnology.model.famix.famix.*;
+import org.moosetechnology.model.famix.famix.Class;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famix.famixtraits.TAccess;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import static org.junit.Assert.*;
 
@@ -71,14 +73,14 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
         int accessSetNom = 0;
         int accessGetNom = 0;
         for (Access acc : entitiesOfType( Access.class)) {
-            switch (acc.getAccessor().getName()) {
+            switch (((TNamedEntity)acc.getAccessor()).getName()) {
                 case "ReadClient": accessReadClient++; break;
                 case "lire": accessLire++; break;
                 case "getNum": accessGetNum++; break;
                 case "setNum": accessSetNum++; break;
                 case "getNom": accessGetNom++; break;
                 case "setNom": accessSetNom++; break;
-                default: fail("Unknown accessor name: " + acc.getAccessor().getName()); break;
+                default: fail("Unknown accessor name: " + ((TNamedEntity)acc.getAccessor()).getName()); break;
             }
         }
         assertEquals(4, accessReadClient);
@@ -161,8 +163,8 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
         Attribute prtr = detectFamixElement( Attribute.class, "printer");
         assertNotNull(prtr);
         assertEquals(2, prtr.getIncomingAccesses().size());
-        for (Access acc : prtr.getIncomingAccesses()) {
-            anc = acc.getSourceAnchor();
+        for (TAccess tacc : prtr.getIncomingAccesses()) {
+            anc = (SourceAnchor) ((Access) tacc).getSourceAnchor();
             assertNotNull(anc);
             assertEquals(IndexedFileAnchor.class, anc.getClass());
             int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
@@ -178,14 +180,14 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
         }
 
         // testing invocation
-        eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
+        org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "IPrinter");
         assertNotNull(clazz);
-        Method mth = firstElt(clazz.getMethods());  // first (and sole) method
+        Method mth = (Method) firstElt(clazz.getMethods());  // first (and sole) method
         assertNotNull(mth);
         assertEquals("print", mth.getName());
         assertEquals(1, mth.getIncomingInvocations().size());
-        Invocation invok = firstElt(mth.getIncomingInvocations());
-        anc = invok.getSourceAnchor();
+        Invocation invok = (Invocation) firstElt(mth.getIncomingInvocations());
+        anc = (SourceAnchor) invok.getSourceAnchor();
         assertNotNull(anc);
         assertEquals(IndexedFileAnchor.class, anc.getClass());
 		if (isWindows()){

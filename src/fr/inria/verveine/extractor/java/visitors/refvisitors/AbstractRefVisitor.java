@@ -6,10 +6,10 @@ import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.jdt.core.dom.Type;
 
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import org.moosetechnology.model.famix.famix.ContainerEntity;
+import org.moosetechnology.model.famix.famix.ParameterizableClass;
 
 /**
  * A collection of useful utility methods that are needed in various ref visitors
@@ -59,7 +59,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	 * @param isClass we are sure that the type is actually a class
 	 * @return a famix type or null
 	 */
-	protected eu.synectique.verveine.core.gen.famix.Type referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
+	protected org.moosetechnology.model.famix.famix.Type referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
 		if (typ == null) {
 			return null;
 		} else if (typ.resolveBinding() != null) {
@@ -86,8 +86,8 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	/**
 	 * Same as {@link AbstractRefVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
-	protected eu.synectique.verveine.core.gen.famix.Type referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
-		eu.synectique.verveine.core.gen.famix.Type fmxTyp = null;
+	protected org.moosetechnology.model.famix.famix.Type referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
+		org.moosetechnology.model.famix.famix.Type fmxTyp = null;
 
 		if (bnd == null) {
 			return null;
@@ -115,9 +115,9 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
-				eu.synectique.verveine.core.gen.famix.Type fmxTArg = this.referedType(targ, ctxt, false);
+				org.moosetechnology.model.famix.famix.Type fmxTArg = this.referedType(targ, ctxt, false);
 				if ((fmxTArg != null) && persistClass(targ)) {
-					((eu.synectique.verveine.core.gen.famix.ParameterizedType) fmxTyp).addArguments(fmxTArg);
+					((org.moosetechnology.model.famix.famix.ParameterizedType) fmxTyp).addArguments(fmxTArg);
 				}
 			}
 		} else {

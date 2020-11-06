@@ -12,27 +12,17 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.lang.Exception;
 import java.util.Collection;
 import java.util.Iterator;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.Dictionary;
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.EnumValue;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.ParameterizedType;
-import eu.synectique.verveine.core.gen.famix.Reference;
-import eu.synectique.verveine.core.gen.famix.Type;
+import fr.inria.verveine.extractor.core.Dictionary;
+import org.moosetechnology.model.famix.famix.*;
+import org.moosetechnology.model.famix.famix.Enum;
+import org.moosetechnology.model.famix.famixtraits.*;
 
 /**
  * @author Nicolas Anquetil
@@ -89,12 +79,13 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertNotNull(meth);
 
 		// test outgoing invocation to constructor
-		Collection<Invocation> methOutgoingInvocations = meth.getOutgoingInvocations();
+		Collection<TInvocation> methOutgoingInvocations = meth.getOutgoingInvocations();
 		assertEquals(3, methOutgoingInvocations.size());
 
 		// test invocations' signatures
-		for (Invocation invok : methOutgoingInvocations) {
-			BehaviouralEntity invoked = firstElt(invok.getCandidates());
+		for (TInvocation tinvok : methOutgoingInvocations) {
+			Invocation invok = (Invocation)tinvok;
+			BehaviouralEntity invoked = (BehaviouralEntity) firstElt(invok.getCandidates());
 			assertTrue( "Unexpected invoked signature: "+invoked.getSignature(),
 					invok.getSignature().equals("DefaultConstructor()")
 							|| invok.getSignature().equals("JFrame(\"My title\")")
@@ -112,7 +103,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 
 		for (Method m : defaultContructors) {
-			Invocation invok = firstElt(m.getOutgoingInvocations());
+			Invocation invok = (Invocation) firstElt(m.getOutgoingInvocations());
 			if (m.getParameters().size() == 0) {
 				assertEquals("this(\"For testing\")", invok.getSignature());
 			}
@@ -122,13 +113,13 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 
 		// get calling method in InvokWithFullPath
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "InvokWithFullPath");
-		meth = firstElt(clazz.getMethods());
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "InvokWithFullPath");
+		meth = (Method) firstElt(clazz.getMethods());
 
 		// get called method in InvokWithFullPath
 		methOutgoingInvocations = meth.getOutgoingInvocations();
 		assertEquals(1, methOutgoingInvocations.size());
-        Invocation invok = firstElt(methOutgoingInvocations);
+        Invocation invok = (Invocation) firstElt(methOutgoingInvocations);
 		assertEquals("Book(\"The Monster Book of Monsters\",\"Hagrid\")", invok.getSignature());
 	}
 
@@ -136,13 +127,13 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testStubConstructor() {
 		parse(new String[] {"test_src/ad_hoc/DefaultConstructor.java"});
 
-		eu.synectique.verveine.core.gen.famix.Class stubClass = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "JFrame");
+		org.moosetechnology.model.famix.famix.Class stubClass = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "JFrame");
 		assertNotNull(stubClass);
 
 		// test outgoing invocation to constructor
 		assertEquals(1, stubClass.getMethods().size());
 
-		Method stubConstructor = firstElt(stubClass.getMethods());
+		Method stubConstructor = (Method) firstElt(stubClass.getMethods());
 	
 		assertTrue(stubConstructor.getIsStub());
 		assertEquals( "constructor", stubConstructor.getKind());
@@ -165,9 +156,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(7, dico.getMethods().size());
 		assertEquals(3, dico.getAttributes().size());
 
-		for (Attribute a : dico.getAttributes()) {
+		for (TAttribute ta : dico.getAttributes()) {
+			Attribute a = (Attribute) ta;
 			assertEquals(dico, a.getBelongsTo());
-			Type t = a.getDeclaredType();
+			Type t = (Type) a.getDeclaredType();
 			assertEquals("Map", t.getName());
 			assertEquals(ParameterizedType.class, t.getClass());
 		}
@@ -208,9 +200,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testClassWithNoBindingCreatedAsType() {
 		parse(new String[] {"test_src/ad_hoc/Example.java"});
 
-		eu.synectique.verveine.core.gen.famix.Type clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Type.class, "BackingStoreException");
+		org.moosetechnology.model.famix.famix.Type clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Type.class, "BackingStoreException");
 		assertNotNull(clazz);
-		assertEquals(eu.synectique.verveine.core.gen.famix.Class.class, clazz.getClass());
+		assertEquals(org.moosetechnology.model.famix.famix.Class.class, clazz.getClass());
 	}
 
 	@Test
@@ -223,10 +215,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		// might as well do some tests on the method itself
 		// not very unit-testing, but it's some more tests
 		assertEquals(3, meth.getParameters().size());
-		for (Parameter p : meth.getParameters()) {
+		for (TParameter tp : meth.getParameters()) {
+			Parameter p = (Parameter) tp;
 			if (p.getName().equals("fmxClass")) {
 				assertEquals(ParameterizedType.class, p.getDeclaredType().getClass());
-				assertEquals("Class", p.getDeclaredType().getName());
+				assertEquals("Class", ((TNamedEntity)p.getDeclaredType()).getName());
 			}
 			else {
 				assertTrue("Unknown parameter for ensureFamixEntity: "+p.getName(),
@@ -238,8 +231,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		// here start the really intended tests
 		assertEquals(2, meth.getAccesses().size());  // only 2 non-local variable accessed:  ImplicitVariable.class, Dictionary.mapBind
 		boolean classFieldFound = false;
-		for (Access acc : meth.getAccesses()) {
-			if (acc.getTo().getName().equals("class")) {
+		for (TAccess acc : meth.getAccesses()) {
+			if (((TNamedEntity)acc.getVariable()).getName().equals("class")) {
 				classFieldFound = true;
 			}
 		}
@@ -250,7 +243,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testArrayListMatthias() {
 		parse(new String[] {"test_src/ad_hoc/Bla.java"});
 
-		assertEquals(15, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable
+		assertEquals(15, entitiesOfType( org.moosetechnology.model.famix.famix.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable
 		assertEquals(7,  entitiesOfType( ParameterizableClass.class).size()); //
 	}
 
@@ -261,25 +254,26 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method meth = detectFamixElement( Method.class, "getEntityByName");
 		assertNotNull(meth);
 		assertEquals(3, meth.getLocalVariables().size());
-		for (LocalVariable var : meth.getLocalVariables()) {
+		for (TLocalVariable tvar : meth.getLocalVariables()) {
+			LocalVariable var = (LocalVariable) tvar;
 			Type collec;
 			if (var.getName().equals("ret")) {
-				collec = var.getDeclaredType();
+				collec = (Type) var.getDeclaredType();
 				assertNotNull(collec);
 				assertEquals("Collection", collec.getName());
 				assertEquals(ParameterizedType.class, collec.getClass());
 				assertEquals(1, ((ParameterizedType)collec).getArguments().size());
-				Type t = firstElt( ((ParameterizedType)collec).getArguments());
+				Type t = (Type) firstElt( ((ParameterizedType)collec).getArguments());
 				assertEquals("T", t.getName());
 				assertSame(meth, t.getBelongsTo());
 			}
 			if (var.getName().equals("l_name")) {
-				collec = var.getDeclaredType();
+				collec = (Type) var.getDeclaredType();
 				assertNotNull(collec);
 				assertEquals("Collection", collec.getName());
 				assertEquals(ParameterizedType.class, collec.getClass());
 				assertEquals(1, ((ParameterizedType)collec).getArguments().size());
-				Type ne = firstElt( ((ParameterizedType)collec).getArguments());
+				Type ne = (Type)firstElt( ((ParameterizedType)collec).getArguments());
 				assertEquals("NamedEntity", ne.getName());
 			}
 		}
@@ -297,22 +291,22 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testEnumDecl() {
 		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java"});
 
-		eu.synectique.verveine.core.gen.famix.Class javaLangEnum = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "Enum");
+		org.moosetechnology.model.famix.famix.Class javaLangEnum = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "Enum");
 		assertNotNull(javaLangEnum);
 		assertEquals("lang", javaLangEnum.getBelongsTo().getName());
 		assertEquals(ParameterizableClass.class, javaLangEnum.getClass());
 		
-		eu.synectique.verveine.core.gen.famix.Class card = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "Card");
+		org.moosetechnology.model.famix.famix.Class card = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "Card");
 		assertNotNull(card);
 
-		eu.synectique.verveine.core.gen.famix.Enum rk = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Rank");
+		org.moosetechnology.model.famix.famix.Enum rk = detectFamixElement( org.moosetechnology.model.famix.famix.Enum.class, "Rank");
 		assertNotNull(rk);
 		assertEquals("Rank", rk.getName());
-		assertEquals(13, rk.getValues().size());
+		assertEquals(13, rk.getEnumValues().size());
 		assertSame(card, rk.getBelongsTo());
 		assertNotNull(rk.getSourceAnchor());
 		assertEquals(1, rk.getSuperInheritances().size());
-		Type rkSuper = firstElt(rk.getSuperInheritances()).getSuperclass();
+		Type rkSuper = (Type) firstElt(rk.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, rkSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)rkSuper).getParameterizableClass());
 
@@ -321,14 +315,14 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals("NINE", nine.getName());
 		assertSame(rk, nine.getParentEnum());
 
-		eu.synectique.verveine.core.gen.famix.Enum st = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Suit");
+		org.moosetechnology.model.famix.famix.Enum st = detectFamixElement( org.moosetechnology.model.famix.famix.Enum.class, "Suit");
 		assertNotNull(st);
 		assertEquals("Suit", st.getName());
 		assertEquals(1, st.getSuperInheritances().size());
-		Type stSuper = firstElt(st.getSuperInheritances()).getSuperclass();
+		Type stSuper = (Type) firstElt(st.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, stSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)stSuper).getParameterizableClass());
-		assertEquals(4, st.getValues().size());
+		assertEquals(4, st.getEnumValues().size());
 		assertSame(detectFamixElement( Namespace.class, "ad_hoc"), st.getBelongsTo());
 
 		EnumValue hrt = detectFamixElement( EnumValue.class, "HEARTS");
@@ -337,7 +331,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertSame(st, hrt.getParentEnum());
 
 		assertEquals(3, card.getAttributes().size());
-		for (Attribute a : card.getAttributes()) {
+		for (TAttribute ta : card.getAttributes()) {
+			Attribute a = (Attribute) ta;
 			if (a.getName().equals("rank")) {
 				assertEquals(rk, a.getDeclaredType());
 			}
@@ -349,15 +344,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 
-		eu.synectique.verveine.core.gen.famix.Enum pl = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
+		org.moosetechnology.model.famix.famix.Enum pl = detectFamixElement( org.moosetechnology.model.famix.famix.Enum.class, "Planet");
 		assertNotNull(pl);
 		assertEquals("Planet", pl.getName());
 		assertEquals(1, pl.getSuperInheritances().size());
-		Type plSuper = firstElt(pl.getSuperInheritances()).getSuperclass();
+		Type plSuper = (Type) firstElt(pl.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, plSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType)plSuper).getParameterizableClass());
 		assertSame(detectFamixElement( Namespace.class, "ad_hoc"), pl.getBelongsTo());
-		assertEquals(8, pl.getValues().size());
+		assertEquals(8, pl.getEnumValues().size());
 		assertEquals(4, pl.getAttributes().size());
 		assertEquals(7+2, pl.getMethods().size()); // 7 methods + <initializer> + implicit used: values()
 	}
@@ -366,25 +361,27 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testEnumAccess() {
 		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java"});
 
-		eu.synectique.verveine.core.gen.famix.Enum st = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Suit");
+		org.moosetechnology.model.famix.famix.Enum st = detectFamixElement( org.moosetechnology.model.famix.famix.Enum.class, "Suit");
 		assertNotNull(st);
-		assertEquals(4, st.getValues().size());
+		assertEquals(4, st.getEnumValues().size());
 		boolean foundClubs = false;
-		for (EnumValue v : st.getValues()) {
+		for (TEnumValue tv : st.getEnumValues()) {
+			EnumValue v = (EnumValue) tv;
 			if (v.getName().equals("CLUBS")) {
 				foundClubs = true;
 				assertEquals(1, v.numberOfIncomingAccesses());
-				Access access = firstElt(v.getIncomingAccesses());
-				assertEquals("toString", access.getFrom().getName());
+				Access access = (Access) firstElt(v.getIncomingAccesses());
+				assertEquals("toString", ((TNamedEntity) access.getAccessor()).getName());
 			}
 		}
 		assertTrue("Did not find CUBS EnumValue in Suit Enum", foundClubs);
 		
-		eu.synectique.verveine.core.gen.famix.Enum pl = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
+		org.moosetechnology.model.famix.famix.Enum pl = detectFamixElement( org.moosetechnology.model.famix.famix.Enum.class, "Planet");
 		assertNotNull(pl);
 
-		assertEquals(8, pl.getValues().size());
-		for (EnumValue v : pl.getValues()) {
+		assertEquals(8, pl.getEnumValues().size());
+		for (TEnumValue tv : pl.getEnumValues()) {
+			EnumValue v = (EnumValue) tv;
 			if (v.getName().equals("EARTH")) {
 				assertEquals(1, v.getIncomingAccesses().size());
 			}
@@ -394,7 +391,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 
 		assertEquals(4, pl.getAttributes().size());
-		for (Attribute a : pl.getAttributes()) {
+		for (TAttribute ta : pl.getAttributes()) {
+			Attribute a = (Attribute) ta;
 			if ( a.getName().equals("G") || a.getName().equals("radius") || a.getName().equals("i") ) {
 				assertEquals(2, a.getIncomingAccesses().size());
 			}
@@ -407,7 +405,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 
 		assertEquals(7+2, pl.getMethods().size());  // see testEnumDecl()
-		for (Method m : pl.getMethods()) {
+		for (TMethod tm : pl.getMethods()) {
+			Method m = (Method) tm;
 			if ( m.getName().equals("Planet") || m.getName().equals("main") || m.getName().equals("sillyArrayAssignement")
 					|| m.getName().equals(JavaDictionary.INIT_BLOCK_NAME) ) {
 				assertEquals(0, m.getIncomingInvocations().size());
@@ -435,11 +434,12 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Attribute mass_att = null;
 		Access access = null;
 
-		eu.synectique.verveine.core.gen.famix.Enum pl = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "Planet");
+		org.moosetechnology.model.famix.famix.Enum pl = detectFamixElement( org.moosetechnology.model.famix.famix.Enum.class, "Planet");
 		assertNotNull(pl);
 
 		assertEquals(4, pl.getAttributes().size());
-		for (Attribute a : pl.getAttributes()) {
+		for (TAttribute ta : pl.getAttributes()) {
+			Attribute a = (Attribute) ta;
 			if ( a.getName().equals("i") ) {
 				i_att = a;
 			}
@@ -450,8 +450,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		
 		assertNotNull("Attribute i in Planet not found", i_att);
 		assertEquals(2, i_att.getIncomingAccesses().size());
-		access = firstElt(i_att.getIncomingAccesses());
-		if (access.getAccessor().getName().equals("sillyArrayAssignement")) {
+		access = (Access) firstElt(i_att.getIncomingAccesses());
+		if (((TNamedEntity) access.getAccessor()).getName().equals("sillyArrayAssignement")) {
             assertFalse(access.getIsWrite());
         }
         else {
@@ -460,13 +460,14 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		
 		assertNotNull("Attribute mass in Planet not found", mass_att);
 		assertEquals(4, mass_att.getIncomingAccesses().size());
-		for (Access acc : mass_att.getIncomingAccesses() ) {
-			if ( acc.getAccessor().getName().equals("Planet") ||
-				 acc.getAccessor().getName().equals("sillyArrayAssignement") ) {
+		for (TAccess tacc : mass_att.getIncomingAccesses() ) {
+			Access acc = (Access) tacc;
+			if ( ((TNamedEntity)acc.getAccessor()).getName().equals("Planet") ||
+					((TNamedEntity)acc.getAccessor()).getName().equals("sillyArrayAssignement") ) {
 				assertTrue(acc.getIsWrite());
 			}
 			else {
-				assertFalse("Access to mass is write in method: " + acc.getAccessor().getSignature(), acc.getIsWrite());
+				assertFalse("Access to mass is write in method: " + ((Method)acc.getAccessor()).getSignature(), acc.getIsWrite());
 			}
 		}
 	}
@@ -479,17 +480,17 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(3, l_meth.size());
 		for (Method meth : l_meth) {
 			assertEquals(JavaDictionary.INIT_BLOCK_NAME+"()", meth.getSignature());
-			if (meth.getParentType().getName().equals("Card")) {
+			if (((TNamedEntity)meth.getParentType()).getName().equals("Card")) {
 				assertEquals(5, meth.getOutgoingInvocations().size());
 			}
-			else if (meth.getParentType().getName().equals("Planet")) {
+			else if (((TNamedEntity)meth.getParentType()).getName().equals("Planet")) {
 				assertEquals(0, meth.getOutgoingInvocations().size());
 			}
-			else if (meth.getParentType().getName().equals("DefaultConstructor")) {
+			else if (((TNamedEntity)meth.getParentType()).getName().equals("DefaultConstructor")) {
 				assertEquals(0, meth.getOutgoingInvocations().size());
 			}
 			else {
-				fail("Unknown class with an <Initializer> method: " + meth.getParentType().getName());
+				fail("Unknown class with an <Initializer> method: " + ((TNamedEntity)meth.getParentType()).getName());
 			}
 		}
 	}
@@ -498,11 +499,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testStaticInitializationBlockNewString() {
 		parse(new String[] {"test_src/ad_hoc/EnumConstWithInitNewString.java"});
 
-		eu.synectique.verveine.core.gen.famix.Enum fmx = detectFamixElement( eu.synectique.verveine.core.gen.famix.Enum.class, "EnumConstWithInitNewString");
+		org.moosetechnology.model.famix.famix.Enum fmx = detectFamixElement( org.moosetechnology.model.famix.famix.Enum.class, "EnumConstWithInitNewString");
 		assertNotNull(fmx);
 
 		assertEquals(1, fmx.numberOfValues());
-		assertEquals("ONE", firstElt(fmx.getValues()).getName());
+		assertEquals("ONE", ((TNamedEntity)firstElt(fmx.getEnumValues())).getName());
 		
 		assertEquals(2, fmx.getMethods().size());  // constructor + INIT_BLOCK
 	}
@@ -514,7 +515,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method meth = detectFamixElement( Method.class, "methodWrongOwner");
 		assertNotNull(meth);
 
-		assertEquals(detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "SuperWrongOwner"), meth.getParentType());
+		assertEquals(detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "SuperWrongOwner"), meth.getParentType());
 	}
 	
 	@Test
@@ -533,7 +534,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testMultipleSignatures() {
 		parse(new String[] {"test_src/ad_hoc/MultipleSignatures.java"});
 
-		eu.synectique.verveine.core.gen.famix.Class throwable = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "Throwable");
+		org.moosetechnology.model.famix.famix.Class throwable = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "Throwable");
 		assertNotNull(throwable);
 		assertEquals(2, throwable.getMethods().size()); // printStackTrace() & printStackTrace(PrintWriter)
 
@@ -556,8 +557,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		ContainerEntity owner = seri.getBelongsTo(); 
 		assertEquals("Serializer", owner.getName());  // just checking
 		
-		for (Invocation invok : seri.getOutgoingInvocations()) {
-			BehaviouralEntity invoked = firstElt(invok.getCandidates());
+		for (TInvocation invok : seri.getOutgoingInvocations()) {
+			BehaviouralEntity invoked = (BehaviouralEntity) firstElt(invok.getCandidates());
 			if (invoked.getName().equals("serializeProperty")) {
 				assertEquals(owner, invoked.getBelongsTo());
 			}
@@ -571,20 +572,20 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method m = detectFamixElement( Method.class, "sillyArrayAssignement");
 		assertNotNull(m);
 
-		Collection<Reference> refs = m.getOutgoingReferences();
+		Collection<TReference> refs = m.getOutgoingReferences();
 		assertEquals(2, refs.size());
 
 		Type referred;
-		Iterator<Reference> iter = refs.iterator();
+		Iterator<TReference> iter = refs.iterator();
 
-		referred = iter.next().getTarget();
+		referred = (Type) iter.next().getReferredType();
 		if (referred.getName().equals("IOException")) {
-		    referred = iter.next().getTarget();
+		    referred = (Type) iter.next().getReferredType();
 		    assertEquals("Planet", referred.getName());
         }
         else {
 		    assertEquals("Planet", referred.getName());
-		    referred = iter.next().getTarget();
+		    referred = (Type) iter.next().getReferredType();
 		    assertEquals("IOException", referred.getName());
 
         }
@@ -594,7 +595,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testPublicStaticInnerClass() {
 		parse(new String[] {"test_src/ad_hoc/StaticInnerClass.java"});
 
-		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "ThisIsTheStaticInnerClass");
+		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "ThisIsTheStaticInnerClass");
 		assertNotNull(clazz);
 
 		// assertTrue(clazz.getIsPublic()); --- set as a modifier 
@@ -619,8 +620,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
         	else {
 				// the other (not empty) constructor
 				assertEquals(1, meth.getOutgoingInvocations().size());
-				Invocation invok = firstElt(meth.getOutgoingInvocations());
-				BehaviouralEntity invoked = firstElt(invok.getCandidates());
+				Invocation invok = (Invocation) firstElt(meth.getOutgoingInvocations());
+				BehaviouralEntity invoked = (BehaviouralEntity) firstElt(invok.getCandidates());
 				assertNotNull(invoked);
 				assertEquals("ArrayList<String>", invoked.getName() );
 			}
