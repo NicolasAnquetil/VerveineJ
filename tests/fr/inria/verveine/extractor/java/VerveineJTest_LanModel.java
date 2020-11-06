@@ -9,12 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.lang.Exception;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
-
-import java.lang.Exception;
 
 /**
  * @author Nicolas Anquetil
@@ -80,18 +79,18 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = 11+14+1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
-		int nbInherit =9+21+1+2; // + 2 are the relation of the anonymous IPrinter
+		int nbClasses = 11 + 14 + 1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
+		int nbInherit = 9 + 21 + 1;
 
-		if ( System.getProperty("java.version").startsWith("1.") &&
-				System.getProperty("java.version").charAt(2) >= '7' ) {
-			 // class Autocloseable starting in Java 7
+		if (System.getProperty("java.version").startsWith("1.") &&
+				System.getProperty("java.version").charAt(2) >= '7') {
+			// class Autocloseable starting in Java 7
 			nbClasses++;
 			nbInherit++;
 		}
 
-		assertEquals( nbClasses, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size());
-		assertEquals(3,    entitiesOfType( PrimitiveType.class).size());//int,boolean,void
+		assertEquals(nbClasses, entitiesOfType(eu.synectique.verveine.core.gen.famix.Class.class).size());
+		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+8+1, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>} + Call to the constructor of anonymous IPrinter
 		assertEquals(10+1, entitiesOfType( Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,  entitiesOfType( Namespace.class).size());//2+{moose,java.lang,java.io,java}
