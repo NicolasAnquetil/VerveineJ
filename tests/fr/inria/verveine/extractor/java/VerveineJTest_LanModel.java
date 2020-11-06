@@ -6,6 +6,7 @@ package fr.inria.verveine.extractor.java;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
@@ -182,12 +183,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "_Anonymous(IPrinter)");
 		assertNotNull(clazz);
 		assertEquals("_Anonymous(IPrinter)", clazz.getName());
-		assertEquals(1, clazz.numberOfMethods());
+		assertEquals(2, clazz.numberOfMethods()); // the method print and the stub constructor
 		assertEquals(0, clazz.numberOfAttributes());
 		assertSame(detectFamixElement(Method.class, "PrintServer"), clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 
-		Method mth = firstElt(clazz.getMethods());
+		Method mth = firstElt(clazz.getMethods().stream().filter(aMethod -> !aMethod.getIsStub()).collect(Collectors.toList()));
 		assertEquals("print", mth.getName());
         assertEquals(1, mth.getOutgoingReferences().size());  // System
         assertEquals(1, mth.getAccesses().size());   // out

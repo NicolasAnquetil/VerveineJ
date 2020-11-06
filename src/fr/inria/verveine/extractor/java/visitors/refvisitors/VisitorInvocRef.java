@@ -13,6 +13,7 @@ import eu.synectique.verveine.core.gen.famix.Class;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
+import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 
 import org.eclipse.jdt.core.dom.*;
@@ -86,18 +87,30 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 */
 	public boolean visit(ClassInstanceCreation node) {
 		visitClassInstanceCreation(node);
-		if ( (node.getAnonymousClassDeclaration() == null) && (!classSummary) ) {
-			Type clazz = node.getType();
-			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+		if ((!classSummary)) {
 
-			// create an invocation to the constructor
 			String typName;
-			if (fmx == null) {
-				typName = findTypeName(clazz);
-			}
-			else {
+			eu.synectique.verveine.core.gen.famix.Type fmx;
+
+			if (node.getAnonymousClassDeclaration() != null) {
+				ITypeBinding bnd = node.resolveTypeBinding();
+				fmx =
+						this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
 				typName = fmx.getName();
 			}
+			else {
+
+				Type clazz = node.getType();
+				fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+
+				// create an invocation to the constructor
+				if (fmx == null) {
+					typName = findTypeName(clazz);
+				} else {
+					typName = fmx.getName();
+				}
+			}
+
 			methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
 			Invocation lastInvok = context.getLastInvocation();
 			if ( (anchors == anchorOptions.assoc)
