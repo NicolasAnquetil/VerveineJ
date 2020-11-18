@@ -4,9 +4,14 @@
 package fr.inria.verveine.extractor.java;
 
 
+import eu.synectique.verveine.core.gen.famix.*;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 import org.moosetechnology.model.famix.famix.*;
 
@@ -82,23 +87,23 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = 11+14+1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
-		int nbInherit =9+21+1;
+		int nbClasses = 11 + 14 + 1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
+		int nbInherit = 9 + 21 + 1;
 
-		if ( System.getProperty("java.version").startsWith("1.") &&
-				System.getProperty("java.version").charAt(2) >= '7' ) {
-			 // class Autocloseable starting in Java 7
+		if (System.getProperty("java.version").startsWith("1.") &&
+				System.getProperty("java.version").charAt(2) >= '7') {
+			// class Autocloseable starting in Java 7
 			nbClasses++;
 			nbInherit++;
 		}
 
 		assertEquals( nbClasses, entitiesOfType(org.moosetechnology.model.famix.famix.Class.class).size());
 		assertEquals(3,    entitiesOfType( PrimitiveType.class).size());//int,boolean,void
-		assertEquals(40+8, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
+		assertEquals(40+8+1, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10+1, entitiesOfType( Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,  entitiesOfType( Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,   entitiesOfType( Parameter.class).size());
-		assertEquals(54,   entitiesOfType( Invocation.class).size());
+		assertEquals(55,   entitiesOfType( Invocation.class).size());
 		assertEquals(nbInherit,   entitiesOfType( Inheritance.class).size());
 		assertEquals(45,   entitiesOfType( Access.class).size());// 17 "internal" attributes + 9 System.out + 18 "this" + 1 "super"
 		assertEquals(0,    entitiesOfType( LocalVariable.class).size());
@@ -171,12 +176,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "_Anonymous(IPrinter)");
 		assertNotNull(clazz);
 		assertEquals("_Anonymous(IPrinter)", clazz.getName());
-		assertEquals(1, clazz.numberOfMethods());
+		assertEquals(2, clazz.numberOfMethods()); // the method print and the stub constructor
 		assertEquals(0, clazz.numberOfAttributes());
 		assertSame(detectFamixElement(Method.class, "PrintServer"), clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 
-		Method mth = (Method) firstElt(clazz.getMethods());
+		Method mth = firstElt(clazz.getMethods().stream().filter(aMethod -> !aMethod.getIsStub()).collect(Collectors.toList()));
 		assertEquals("print", mth.getName());
         assertEquals(1, mth.getOutgoingReferences().size());  // System
         assertEquals(1, mth.getAccesses().size());   // out
