@@ -1,12 +1,11 @@
 package fr.inria.verveine.extractor.java;
 
 
-import org.moosetechnology.model.famix.famix.Class;
-import org.moosetechnology.model.famix.famix.IndexedFileAnchor;
-import org.moosetechnology.model.famix.famix.Method;
-import org.moosetechnology.model.famix.famix.NamedEntity;
+import org.moosetechnology.model.famix.famix.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famix.famix.Class;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import java.io.File;
 import java.lang.Exception;
@@ -61,7 +60,7 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
     public void testInvocationsOfPatateAndCanardConstructor() {
         parse(new String[] {"test_src/inner"});
         List<Invocation> invocations = entitiesOfType(Invocation.class).stream()
-                .sorted(Comparator.comparing(anInvocation2 -> ((Invocation)anInvocation2).getSender().getName()))
+                .sorted(Comparator.comparing(anInvocation2 -> ((TNamedEntity) ((Invocation)anInvocation2).getSender()).getName()))
                 .collect(Collectors.toList());
         assertEquals(invocations.size(), 3);
         assert(invocations.get(0).getSignature().startsWith("Canard("));
