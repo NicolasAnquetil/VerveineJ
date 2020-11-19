@@ -104,12 +104,6 @@ public class Type extends ContainerEntity implements TTraitUser, TWithTypeAliase
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "isAbstract", derived = true)
-    public Boolean getIsAbstract() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "isInnerClass", derived = true)
     public Boolean getIsInnerClass() {
         // TODO: this is a derived property, implement this method manually.

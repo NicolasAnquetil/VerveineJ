@@ -78,7 +78,7 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TOODe
 
     @FameProperty(name = "isInterface")
     public Boolean getIsInterface() {
-        return isInterface;
+        return isInterface != null && isInterface;
     }
 
     public void setIsInterface(Boolean isInterface) {

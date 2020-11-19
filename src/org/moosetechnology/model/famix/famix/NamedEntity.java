@@ -110,8 +110,7 @@ public class NamedEntity extends SourcedEntity implements TNamedEntity, TSourceE
     
     @FameProperty(name = "isAbstract", derived = true)
     public Boolean getIsAbstract() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
+        return this.modifiers.contains("abstract");
     }
     
     @FameProperty(name = "duplicationRate", derived = true)
