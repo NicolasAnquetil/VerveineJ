@@ -92,7 +92,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		if ((!classSummary)) {
 
 			String typName;
-			eu.synectique.verveine.core.gen.famix.Type fmx;
+			org.moosetechnology.model.famix.famix.Type fmx;
 
 			if (node.getAnonymousClassDeclaration() != null) {
 				ITypeBinding bnd = node.resolveTypeBinding();
@@ -651,10 +651,13 @@ public class VisitorInvocRef extends AbstractRefVisitor {
         org.moosetechnology.model.famix.famix.Type clazz = context.topType();
         Class superC = null;
         for (TInheritance inh : clazz.getSuperInheritances()) {
-            if ( (inh.getSuperclass() instanceof Class) && (! ((Class) inh.getSuperclass()).getIsInterface()) ) {
-                superC = (Class) inh.getSuperclass();
-                break;
-            }
+			if (inh.getSuperclass() instanceof Class) {
+				Class superclass = (Class) inh.getSuperclass();
+				if (superclass.getIsInterface() == null || !superclass.getIsInterface()) {
+					superC = (Class) inh.getSuperclass();
+					break;
+				}
+			}
         }
         return superC;
     }
