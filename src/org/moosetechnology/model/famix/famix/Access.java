@@ -44,7 +44,7 @@ public class Access extends Entity implements TAccess, TAssociation, TSourceEnti
 
 
     private Boolean isWrite;
-    @FameProperty(name = "isWrite", derived = true)
+    @FameProperty(name = "isWrite")
     public Boolean getIsWrite() {
         return isWrite;
     }
@@ -215,8 +215,7 @@ public class Access extends Entity implements TAccess, TAssociation, TSourceEnti
     
     @FameProperty(name = "isRead", derived = true)
     public Boolean getIsRead() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
+        return !getIsWrite();
     }
     
     @FameProperty(name = "isStub")

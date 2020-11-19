@@ -72,7 +72,8 @@ public class BehaviouralEntity extends ContainerEntity implements TWithReference
 
 
     private Number numberOfStatements;
-    @FameProperty(name = "numberOfStatements", derived = true)
+
+    @FameProperty(name = "numberOfStatements")
     public Number getNumberOfStatements() {
         return numberOfStatements;
     }

@@ -96,8 +96,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 			if (node.getAnonymousClassDeclaration() != null) {
 				ITypeBinding bnd = node.resolveTypeBinding();
-				fmx =
-						this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
+				fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
 				typName = fmx.getName();
 			}
 			else {

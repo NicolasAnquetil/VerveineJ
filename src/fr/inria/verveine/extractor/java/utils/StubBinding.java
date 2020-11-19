@@ -271,10 +271,6 @@ public class StubBinding implements IBinding, ITypeBinding, IMethodBinding {
         return false;
     }
 
-    @Override
-    public boolean isRecord() {
-        return false;
-    }
 
     @Override
     public boolean isFromSource() {
@@ -454,11 +450,6 @@ public class StubBinding implements IBinding, ITypeBinding, IMethodBinding {
     }
 
     @Override
-    public boolean isCompactConstructor() {
-        return false;
-    }
-
-    @Override
     public boolean isDefaultConstructor() {
         return false;
     }
@@ -486,11 +477,6 @@ public class StubBinding implements IBinding, ITypeBinding, IMethodBinding {
     @Override
     public boolean overrides(IMethodBinding iMethodBinding) {
         return false;
-    }
-
-    @Override
-    public IVariableBinding[] getSyntheticOuterLocals() {
-        return new IVariableBinding[0];
     }
 
     @Override

@@ -168,12 +168,6 @@ public class Function extends BehaviouralEntity implements TDefinedInModule, TSo
         parentModule.getModuleEntities().add(this);
     }
     
-    @FameProperty(name = "numberOfStatements", derived = true)
-    public Number getNumberOfStatements() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "declaredType", opposite = "typedEntities")
     public TType getDeclaredType() {
         return declaredType;

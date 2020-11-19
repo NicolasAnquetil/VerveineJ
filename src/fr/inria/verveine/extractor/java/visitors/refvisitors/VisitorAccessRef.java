@@ -502,7 +502,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			}
 		} else if (bnd.isParameter() && (! inLambda)) {
 			if (!classSummary) {
-				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, true);
+				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, classSummary);
 			}
 		} else {
 			// it seems it is a variable.

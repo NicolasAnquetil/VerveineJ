@@ -50,8 +50,6 @@ public class ImplicitVariable extends StructuralEntity implements TNamedEntity, 
     private Boolean isStub;
     
     private TSourceLanguage declaredSourceLanguage;
-    
-
 
     @FameProperty(name = "numberOfGlobalAccesses", derived = true)
     public Number getNumberOfGlobalAccesses() {

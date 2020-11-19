@@ -408,7 +408,7 @@ public class Dictionary<B> {
             Access var5 = new Access();
             var5.setAccessor(var1);
             var5.setVariable(var2);
-            var5.setIsWrite(new Boolean(var3));
+            var5.setIsWrite(var3);
             this.chainPrevNext(var4, var5);
             this.famixRepoAdd(var5);
             return var5;

@@ -441,7 +441,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				
 				ImplicitVariable iv = (ImplicitVariable) invok.getReceiver();
 				assertEquals("self", iv.getName());
-				assertSame(m, iv.getBelongsTo());
+				assertSame(m, iv.getParentBehaviouralEntity());
 			}
 
 		}
@@ -461,7 +461,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				
 				ImplicitVariable iv = (ImplicitVariable) invok.getReceiver();
 				assertEquals("super", iv.getName());
-				assertSame(m, iv.getBelongsTo());
+				assertSame(m, iv.getParentBehaviouralEntity());
 			}
 		}
 		assertTrue("Method WorkStation.name() not found", testRan);

@@ -138,14 +138,14 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test(timeout=100)
 	public void testEntitiesNumber() {
-		int nbClasses = 11+14; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
+		int nbClasses = 11+14+1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
 
 		assertEquals(nbClasses, entitiesOfType( org.moosetechnology.model.famix.famix.Class.class).size());
 		assertEquals(3,  entitiesOfType( PrimitiveType.class).size());
-		assertEquals(0,  entitiesOfType( Method.class).size());
+		assertEquals(6,  entitiesOfType( Method.class).size());
 		assertEquals(0,  entitiesOfType( Attribute.class).size());
 		assertEquals(2+4, entitiesOfType( Namespace.class).size());
-		assertEquals(0,  entitiesOfType( Parameter.class).size());
+		assertEquals(6,  entitiesOfType( Parameter.class).size());
 		assertEquals(0,  entitiesOfType( LocalVariable.class).size());
 		assertEquals(1,  entitiesOfType( AnnotationType.class).size());
 		assertEquals(0,  entitiesOfType( AnnotationInstance.class).size());    // Override annotations on methods
@@ -174,7 +174,6 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	}
 
 	@Test
-	@Ignore
 	public void testReferences() {
 		assertEquals(9,  entitiesOfType( Reference.class).size());  // Node:1 , WorkStation:2 , FileServer:2 , PrintServer:4
 
