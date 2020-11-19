@@ -428,7 +428,8 @@ public class Dictionary<B> {
         if (var1 != null && var2 != null) {
             DeclaredException var3 = new DeclaredException();
             var3.setExceptionClass(var2);
-            var3.setDefiningMethod(var1);
+            var3.setDefiningEntity(var1);
+            var3.setDefiningMethod(var1); // Should be removed for FamixJava but keep it in Compatibility
             this.famixRepoAdd(var3);
             return var3;
         } else {
@@ -440,7 +441,8 @@ public class Dictionary<B> {
         if (var1 != null && var2 != null) {
             CaughtException var3 = new CaughtException();
             var3.setExceptionClass(var2);
-            var3.setDefiningMethod(var1);
+            var3.setDefiningEntity(var1);
+            var3.setDefiningMethod(var1); // Should be removed for FamixJava but keep it in Compatibility
             this.famixRepoAdd(var3);
             return var3;
         } else {
@@ -452,7 +454,8 @@ public class Dictionary<B> {
         if (var1 != null && var2 != null) {
             ThrownException var3 = new ThrownException();
             var3.setExceptionClass(var2);
-            var3.setDefiningMethod(var1);
+            var3.setDefiningEntity(var1);
+            var3.setDefiningMethod(var1); // Should be removed for FamixJava but keep it in Compatibility
             this.famixRepoAdd(var3);
             return var3;
         } else {
