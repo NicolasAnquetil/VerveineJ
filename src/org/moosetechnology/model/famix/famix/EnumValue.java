@@ -14,7 +14,9 @@ public class EnumValue extends StructuralEntity implements TEnumValue {
 
     private TWithEnumValues parentEnum;
     
-
+    public ContainerEntity getBelongsTo() {
+        return (ContainerEntity) this.getParentEnum();
+    }
 
     @FameProperty(name = "parentEnum", opposite = "enumValues", container = true)
     public TWithEnumValues getParentEnum() {

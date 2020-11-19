@@ -363,12 +363,6 @@ public class Method extends BehaviouralEntity implements TWithReferences, TWithC
         this.hasClassScope = hasClassScope;
     }
     
-    @FameProperty(name = "numberOfStatements", derived = true)
-    public Number getNumberOfStatements() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "declaredType", opposite = "typedEntities")
     public TType getDeclaredType() {
         return declaredType;

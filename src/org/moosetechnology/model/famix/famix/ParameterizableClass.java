@@ -5,7 +5,10 @@ import ch.akuhn.fame.internal.MultivalueSet;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.FameDescription;
 import java.util.*;
+import java.util.stream.Collectors;
+
 import ch.akuhn.fame.FamePackage;
+import eu.synectique.verveine.core.gen.famix.Type;
 import org.moosetechnology.model.famix.famixtraits.TParameterizedType;
 import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 
@@ -20,8 +23,8 @@ public class ParameterizableClass extends Class implements TWithParameterizedTyp
 
     @FameProperty(name = "parameters", derived = true)
     public Collection<ParameterType> getParameters() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
+        return this.getTypes().stream().filter(tType -> tType instanceof ParameterType)
+                .map(tType -> (ParameterType) tType).collect(Collectors.toList());
     }
         
     @FameProperty(name = "parameterizedTypes", opposite = "parameterizableClass", derived = true)
