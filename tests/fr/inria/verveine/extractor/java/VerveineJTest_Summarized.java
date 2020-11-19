@@ -132,6 +132,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		parser.parse();
 		
 		new File(VerveineJParser.OUTPUT_FILE).delete();  // delete old MSE file
+		System.gc(); // In Windows free the link to the file. Must be used for incremental parsing tests
 		parser.emitMSE(VerveineJParser.OUTPUT_FILE);  // to create a new one
 	}
 
