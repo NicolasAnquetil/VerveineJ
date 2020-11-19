@@ -57,7 +57,7 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${verveine.jar}"
 		     basedir="${build.dir}"
-		     includes="fr/inria/verveine/extractor/java/**/*.class"
+		     includes="**/*.class"
 		/>
 	</target>
 

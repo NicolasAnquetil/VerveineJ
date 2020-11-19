@@ -8,7 +8,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import ch.akuhn.fame.FamePackage;
-import eu.synectique.verveine.core.gen.famix.Type;
 import org.moosetechnology.model.famix.famixtraits.TParameterizedType;
 import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 
