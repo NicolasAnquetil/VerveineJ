@@ -234,7 +234,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		IMethodBinding bnd = (IMethodBinding) StubBinding.getDeclarationBinding(node);
 
-        Collection<String> paramTypes = new ArrayList<String>();
+        Collection<String> paramTypes = new ArrayList<>();
         for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
             paramTypes.add( Util.jdtTypeName(param.getType()));
         }
