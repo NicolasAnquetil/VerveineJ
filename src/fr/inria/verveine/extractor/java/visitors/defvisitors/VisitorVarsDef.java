@@ -2,7 +2,6 @@ package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
 import org.eclipse.jdt.core.dom.*;
 
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.Enum;
@@ -11,6 +10,7 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.NamedEntity;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
+import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;

@@ -18,7 +18,6 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
@@ -33,6 +32,7 @@ import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.ParameterizedType;
 import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.Type;
+import fr.inria.verveine.core.Dictionary;
 
 /**
  * @author Nicolas Anquetil

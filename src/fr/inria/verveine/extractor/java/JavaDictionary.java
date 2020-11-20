@@ -5,7 +5,6 @@ import java.util.*;
 import org.eclipse.jdt.core.dom.*;
 
 import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.AbstractFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
@@ -37,10 +36,11 @@ import eu.synectique.verveine.core.gen.famix.SourcedEntity;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.core.gen.famix.Type;
 import eu.synectique.verveine.core.gen.famix.UnknownVariable;
+import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 /**
- * A {@link eu.synectique.verveine.core.Dictionary} specialized for Java
+ * A {@link fr.inria.verveine.core.Dictionary} specialized for Java
  * @author anquetil
  */
 public class JavaDictionary extends Dictionary<IBinding> {

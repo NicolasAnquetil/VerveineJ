@@ -1,7 +1,8 @@
 package fr.inria.verveine.extractor.java;
 
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.*;
+import fr.inria.verveine.core.Dictionary;
+
 import org.junit.Before;
 import org.junit.Test;
 

@@ -16,10 +16,10 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 
-import eu.synectique.verveine.core.VerveineParser;
 import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.SourceLanguage;
+import fr.inria.verveine.core.VerveineParser;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)

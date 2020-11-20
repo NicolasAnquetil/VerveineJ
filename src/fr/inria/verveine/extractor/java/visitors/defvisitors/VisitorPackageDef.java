@@ -7,8 +7,8 @@ import org.eclipse.jdt.core.dom.ImportDeclaration;
 import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
-import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.Namespace;
+import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 
 /**

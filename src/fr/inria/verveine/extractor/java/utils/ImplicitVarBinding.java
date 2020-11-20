@@ -7,8 +7,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.Method;
+import fr.inria.verveine.core.Dictionary;
 
 
 

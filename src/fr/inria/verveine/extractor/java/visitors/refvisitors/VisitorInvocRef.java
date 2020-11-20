@@ -6,10 +6,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import eu.synectique.verveine.core.Dictionary;
-
 import eu.synectique.verveine.core.gen.famix.*;
 import eu.synectique.verveine.core.gen.famix.Class;
+import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;

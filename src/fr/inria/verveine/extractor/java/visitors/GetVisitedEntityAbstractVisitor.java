@@ -5,11 +5,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Stack;
 
+import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import org.eclipse.jdt.core.dom.*;
 
-import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;

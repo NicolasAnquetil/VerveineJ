@@ -8,8 +8,8 @@ import eu.synectique.verveine.core.gen.famix.Inheritance;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.Method;
+import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 import java.io.File;
