@@ -1,8 +1,5 @@
 bin/*
-.idea/*
-output.mse
-other_output.mse
+*.mse
 testrep/*
 .idea/
-
 out/
