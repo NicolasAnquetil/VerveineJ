@@ -5,7 +5,7 @@ import eu.synectique.verveine.core.gen.famix.CaughtException;
 import eu.synectique.verveine.core.gen.famix.DeclaredException;
 import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.ThrownException;
-import fr.inria.verveine.core.VerveineUtilsForTests;
+import fr.inria.verveine.extractor.java.utils.VerveineUtilsForTests;
 
 import org.junit.Before;
 import org.junit.Test;

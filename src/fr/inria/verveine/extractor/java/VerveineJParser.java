@@ -1,10 +1,14 @@
 package fr.inria.verveine.extractor.java;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,10 +20,12 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 
+import ch.akuhn.fame.Repository;
+import eu.synectique.verveine.core.gen.famix.Entity;
+import eu.synectique.verveine.core.gen.famix.FAMIXModel;
 import eu.synectique.verveine.core.gen.famix.JavaSourceLanguage;
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.SourceLanguage;
-import fr.inria.verveine.core.VerveineParser;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -27,8 +33,13 @@ import fr.inria.verveine.core.VerveineParser;
  * java -cp lib/org.eclipse.jdt.core_3.6.0.v_A48.jar:../Fame:/usr/local/share/eclipse/plugins/org.eclipse.equinox.common_3.5.1.R35x_v20090807-1100.jar:/usr/local/share/eclipse/plugins/org.eclipse.equinox.preferences_3.2.301.R35x_v20091117.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.jobs_3.4.100.v20090429-1800.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.contenttype_3.4.1.R35x_v20090826-0451.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.resources_3.5.2.R35x_v20091203-1235.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.runtime_3.5.0.v20090525.jar:/usr/local/share/eclipse/plugins/org.eclipse.osgi_3.5.2.R35x_v20100126.jar:../Fame/lib/akuhn-util-r28011.jar:lib/fame.jar:bin eu.synectique.verveine.extractor.java.VerveineJParser [files|directory]_to_parse
  */
 
-public class VerveineJParser extends VerveineParser {
+public class VerveineJParser {
 
+	/**
+	 * Name of the default file where to put the MSE model
+	 */
+	public final static String OUTPUT_FILE = "output.mse";
+	
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
 
 	/**
@@ -61,13 +72,13 @@ public class VerveineJParser extends VerveineParser {
 	 * More exactly, the problems occur when the entity inside links back to the entity outside.
 	 * And since all association are bidirectional, it can happen very easily.</p>
 	 */
-	private boolean classSummary = false;
+	protected boolean classSummary = false;
 
 	/**
 	 * Whether to output all local variables (even those with primitive type) or not (default is not).<br>
 	 * Note: allLocals => not classSummary
 	 */
-	private boolean allLocals = false;
+	protected boolean allLocals = false;
 
 	/**
 	 * Option: The version of Java expected by the parser
@@ -95,16 +106,31 @@ public class VerveineJParser extends VerveineParser {
 	/**
 	 * collection of matchers of file name to process excluding expr (see
 	 */
-	private Collection<Pattern> excludeMatchers;
+	protected Collection<Pattern> excludeMatchers;
 
 	/**
 	 * Java parser, provided by JDT
 	 */
 	protected ASTParser jdtParser = null;
 
-	public VerveineJParser() {
-		super();
+	/**
+	 * Name of the file where to put the MSE model.
+	 * Defaults to {@link VerveineParser#OUTPUT_FILE}
+	 */
+	protected String outputFileName;
 
+	protected boolean incrementalParsing = false;
+
+	/**
+	 * Famix repository where the entities are stored
+	 */
+	protected Repository famixRepo;
+
+	protected String[] classPathOptions;
+
+	public VerveineJParser() {
+		setOutputFileName(OUTPUT_FILE);
+		setFamixRepo(new Repository(FAMIXModel.metamodel()));
 		jdtParser = ASTParser.newParser(AST.JLS8);
 	}
 
@@ -112,19 +138,7 @@ public class VerveineJParser extends VerveineParser {
 		return new JavaSourceLanguage();
 	}
 
-	public static void printFnames(String sDir) {
-		File[] faFiles = new File(sDir).listFiles();
-		for (File file : faFiles) {
-			if (file.getName().matches("^(.*jar)")) {
-				System.out.println(file.getAbsolutePath());
-			}
-			if (file.isDirectory()) {
-				printFnames(file.getAbsolutePath());
-			}
-		}
-	}
-
-	public static List<String> collectAllJars(String sDir) {
+	protected static List<String> collectAllJars(String sDir) {
 		File[] faFiles = new File(sDir).listFiles();
 		List<String> tmpPath = new ArrayList<String>();
 		for (File file : faFiles) {
@@ -142,7 +156,7 @@ public class VerveineJParser extends VerveineParser {
 	 * @param filename of the file containing the jars of the classpath
 	 * @return the collection of jar paths
 	 */
-	private List<String> readAllJars(String filename) {
+	protected List<String> readAllJars(String filename) {
 		List<String> tmpPath = new ArrayList<String>();
 		try {
 			BufferedReader fcp = new BufferedReader(new FileReader(filename));
@@ -162,86 +176,25 @@ public class VerveineJParser extends VerveineParser {
 		return tmpPath;
 	}
 
-	public void setOptions(String[] args) {
-		String[] classPath = new String[] {};
+	protected void setOptions(String[] args) {
+		classPathOptions = new String[] {};
 		argPath = new ArrayList<String>();
 		argFiles = new ArrayList<String>();
 		excludePaths = new ArrayList<String>();
 
 		int i = 0;
 		while (i < args.length && args[i].trim().startsWith("-")) {
-		    String arg = args[i++].trim();
-
-			if (arg.equals("-h")) {
+			try {
+				i += setOption(args, i);
+			}
+			catch (IllegalArgumentException e) {
+				System.err.println(e.getMessage());
 				usage();
 			}
-			else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
-				setCodeVersion(arg);
-			}
-			else if (arg.equals("-summary")) {
-				this.classSummary = true;
-				this.allLocals = false;
-			}
-			else if (arg.equals("-alllocals")) {
-				this.classSummary = false;
-				this.allLocals = true;
-			}
-			else if (arg.equals("-autocp")) {
-				if (i < args.length) {
-					classPath = addToClassPath(classPath,collectAllJars(args[i++]) );
-				} else {
-					System.err.println("-autocp requires a root folder");
-				}
-			}
-			else if (arg.equals("-filecp")) {
-				if (i < args.length) {
-					classPath = addToClassPath(classPath, readAllJars(args[i++]));
-				} else {
-					System.err.println("-filecp requires a filename");
-				}
-			}
-			else if (arg.equals("-cp")) {
-				if (i < args.length) {
-					classPath = addToClassPath(classPath,  Arrays.asList(args[i++].split(System.getProperty("path.separator"))));
-				}
-				else {
-					System.err.println("-cp requires a classPath");
-				}	
-			}
-			else if (arg.equals("-anchor")) {
-				if (i < args.length) {
-					String anchor = args[i++];
-					this.anchors = anchorOptions.getValue(anchor);
-					if (this.anchors == null) {
-						System.err.println("unknown option to -anchor: "+anchor+", assuming default");
-						this.anchors = anchorOptions.entity;
-					}
-				} else {
-					System.err.println("-anchor requires an option (none|default|assoc)");
-				}
-			}
-			else if (arg.equals("-excludepath")) {
-				if (i < args.length) {
-					excludePaths.add(args[i++]);
-				} else {
-					System.err.println("-excludepath requires a globbing expression");
-				}
-			}
-			else {
-				int j = super.setOption(i - 1, args);
-				if (j > 0) {     // j is the number of args consumed by super.setOption()
-					i += j;      // advance by that number of args
-					i--;         // 1 will be added at the beginning of the loop ("args[i++]")
-				}
-				else {
-					System.err.println("** Unrecognized option: " + arg);
-					usage();
-				}
-			}
 		}
+
 		while (i < args.length) {
-			String arg;
-			arg = args[i++];
+			String arg = args[i++].trim();
 			if (arg.endsWith(".java") && new File(arg).isFile()) {
 				argFiles.add(arg);
 			} else {
@@ -249,9 +202,7 @@ public class VerveineJParser extends VerveineParser {
 			}
 		}
 
-//for (int j =0; j<classPath.length; j++) { System.out.println("CLASSPATH:"+classPath[j]);}
-		
-		jdtParser.setEnvironment(classPath, /*sourcepathEntries*/argPath.toArray(new String[0]), /*encodings*/null, /*includeRunningVMBootclasspath*/true);
+		jdtParser.setEnvironment(classPathOptions, /*sourcepathEntries*/argPath.toArray(new String[0]), /*encodings*/null, /*includeRunningVMBootclasspath*/true);
 		jdtParser.setResolveBindings(true);
 		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
 
@@ -270,13 +221,107 @@ public class VerveineJParser extends VerveineParser {
 		jdtParser.setCompilerOptions(options);
 	}
 
+	/**
+	 * treats 1 argument or more starting at position <code>i</code> in the array of arguments <code>args</code>
+	 * @return The number of argument(s) treated
+	 */
+	protected int setOption(String[] args, int i) throws IllegalArgumentException {
+		String arg = args[i].trim();
+		int argumentsTreated = 1;
+
+		if (arg.equals("-h")) {
+			usage();
+		}
+		else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
+			setCodeVersion(arg);
+		}
+		else if (arg.equals("-summary")) {
+			this.classSummary = true;
+			this.allLocals = false;
+		}
+		else if (arg.equals("-alllocals")) {
+			this.classSummary = false;
+			this.allLocals = true;
+		}
+		else if ( (arg.charAt(0) == '-') && (arg.endsWith("cp")) ) {
+			classPathOptions = setOptionClassPath(classPathOptions, args, i);
+			argumentsTreated++;
+		}
+		else if (arg.equals("-anchor")) {
+			setOptionAnchor(args, i);
+			argumentsTreated++;
+		}
+		else if (arg.equals("-excludepath")) {
+			if (i < args.length) {
+				excludePaths.add(args[i+1]);
+				argumentsTreated++;
+			} else {
+				throw new IllegalArgumentException("-excludepath requires a globbing expression");
+			}
+		}
+		else if (arg.equals("-o")) {
+			if (i < args.length) {
+				outputFileName = args[i+1].trim();
+				argumentsTreated++;
+			} else {
+				throw new IllegalArgumentException("-o requires a filename");
+			}
+		}
+		else if (arg.equals("-i")) {
+			this.incrementalParsing = true;
+		}
+		else {
+			throw new IllegalArgumentException("** Unrecognized option: " + arg);
+		}
+
+		return argumentsTreated;
+	}
+
+	protected String[] setOptionClassPath(String[] classPath, String[] args, int i) throws IllegalArgumentException {
+		if (args[i].equals("-autocp")) {
+			if (i < args.length) {
+				return addToClassPath(classPath,collectAllJars(args[i+1]) );
+			} else {
+				throw new IllegalArgumentException("-autocp requires a root folder");
+			}
+		}
+		else if (args[i].equals("-filecp")) {
+			if (i < args.length) {
+				return addToClassPath(classPath, readAllJars(args[i+1]));
+			} else {
+				throw new IllegalArgumentException("-filecp requires a filename");
+			}
+		}
+		else if (args[i].equals("-cp")) {
+			if (i < args.length) {
+				return addToClassPath(classPath,  Arrays.asList(args[i+1].split(System.getProperty("path.separator"))));
+			}
+			else {
+				throw new IllegalArgumentException("-cp requires a classPath");
+			}	
+		}
+		return classPath;
+	}
+
+	protected void setOptionAnchor(String[] args, int i) {
+		if (i < args.length) {
+			String anchor = args[i+1].trim();
+			this.anchors = anchorOptions.getValue(anchor);
+			if (this.anchors == null) {
+				throw new IllegalArgumentException("unknown option to -anchor: "+anchor);
+			}
+		} else {
+			throw new IllegalArgumentException("-anchor requires an option (none|default|assoc)");
+		}
+	}
+
 
 	/**
 	 * @param classPath
 	 * @param tmpPath
 	 * @return
 	 */
-	private String[] addToClassPath(String[] classPath, List<String> tmpPath) {
+	protected String[] addToClassPath(String[] classPath, List<String> tmpPath) {
 		int oldlength = classPath.length;
 		int newlength = oldlength + tmpPath.size();
 		classPath = Arrays.copyOf(classPath, newlength);
@@ -300,7 +345,7 @@ public class VerveineJParser extends VerveineParser {
 		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
 		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
-		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: "+VerveineParser.OUTPUT_FILE+")");
+		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: "+OUTPUT_FILE+")");
 		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
 		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
 		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
@@ -370,7 +415,7 @@ public class VerveineJParser extends VerveineParser {
 	 * Creates a regexp matcher form a globbing expression<br>
 	 * Glob to Regexp algorithm from <a href="https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns">https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns</a>
 	 */
-	private Pattern createMatcher(String expr) {
+	protected Pattern createMatcher(String expr) {
 		expr = expr.trim();
 		int strLen = expr.length();
 		StringBuilder sb = new StringBuilder(strLen);
@@ -492,7 +537,7 @@ public class VerveineJParser extends VerveineParser {
 	 * As explained in JavaDictionary, Namespaces are created with their fully qualified name.
 	 * We need now to give them their simple name
 	 */
-	private void compressNamespacesNames() {
+	protected void compressNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
 			String name = ns.getName();
 			int last = name.lastIndexOf('.');
@@ -505,13 +550,13 @@ public class VerveineJParser extends VerveineParser {
 	/**
 	 * @see VerveineJParser#compressNamespacesNames()
 	 */
-	private void expandNamespacesNames() {
+	protected void expandNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
 			expandNamespaceName(ns);
 		}
 	}
 
-	private void expandNamespaceName(Namespace ns) {
+	protected void expandNamespaceName(Namespace ns) {
 		String name = ns.getName();
 		if (name.indexOf('.') > 0) {
 			return;
@@ -526,20 +571,70 @@ public class VerveineJParser extends VerveineParser {
 		}
 	}
 
-	public static void main(String[] args) {
-		/*LicenceChecker checker = new LicenceChecker();
-		int licenceCheck = checker.checkLicence();
+	public void setOutputFileName(String outputFileName) {
+		this.outputFileName = outputFileName;
+	}
 
-		if (licenceCheck != LicenceChecker.OK) {
-			cannotContinue(checker, licenceCheck);
-		}*/
-		
+	protected boolean linkToExisting() {
+		File existingMSE = new File(OUTPUT_FILE);
+		if (existingMSE.exists() && this.incrementalParsing) {
+			this.getFamixRepo().importMSEFile(OUTPUT_FILE);
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
-		VerveineJParser parser = new VerveineJParser();
-		parser.setOptions(args);
-		parser.parse();
-		// parser.debug();
-		parser.emitMSE();
+	/**
+	 * "closes" the repository, by adding to it a SourceLanguage entity if their is none.
+	 * The SourceLanguage entity is the one returned by getMyLgge().
+	 * Also outputs repository to a MSE file
+	 */
+	public void emitMSE() {
+		this.emitMSE(this.outputFileName);
+	}
+
+	public void emitMSE(String outputFile) {
+		try {
+			emitMSE(new FileOutputStream(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void emitMSE(OutputStream output) {
+		// Adds default SourceLanguage for the repository
+		if ( (listAll(SourceLanguage.class).size() == 0) && (getMyLgge() != null) ) {
+			getFamixRepo().add( getMyLgge());
+		}
+	
+		// Outputting to a file
+		try {
+			//famixRepo.exportMSE(new FileWriter(OUTPUT_FILE));
+			famixRepo.exportMSE(new BufferedWriter(new OutputStreamWriter(output,"UTF8")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Returns a Collection of all FAMIXEntities in the repository of the given fmxClass
+	 */
+	public <T extends Entity> Collection<T> listAll(Class<T> fmxClass) {
+		return getFamixRepo().all(fmxClass);
+	}
+
+	public Repository getFamixRepo() {
+		return famixRepo;
+	}
+
+	public void setFamixRepo(Repository famixRepo) {
+		this.famixRepo = famixRepo;
+	}
+
+	public String getOutputFileName() {
+		return outputFileName;
 	}
 
 }

@@ -36,14 +36,13 @@ import eu.synectique.verveine.core.gen.famix.SourcedEntity;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import eu.synectique.verveine.core.gen.famix.Type;
 import eu.synectique.verveine.core.gen.famix.UnknownVariable;
-import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 /**
- * A {@link fr.inria.verveine.core.Dictionary} specialized for Java
+ * A {@link fr.inria.verveine.extractor.java.AbstractDictionary} specialized for Java
  * @author anquetil
  */
-public class JavaDictionary extends Dictionary<IBinding> {
+public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 	/**
 	 * A property added to CompilationUnits to record the name of the source file they belong to.
@@ -108,7 +107,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Returns the namespace with {@link Dictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
+	 * Returns the namespace with {@link AbstractDictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
 	 */
 	public Namespace getFamixNamespaceDefault() {
 		Collection<Namespace> l = getEntityByName( Namespace.class, DEFAULT_PCKG_NAME);
@@ -122,7 +121,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	/**
 	 * Returns a Famix Namespace associated with its IPackageBinding and/or fully qualified name.
-	 * The Entity is created if it does not exist (see also {@link Dictionary#ensureFamixNamespace(Object, String)}).
+	 * The Entity is created if it does not exist (see also {@link AbstractDictionary#ensureFamixNamespace(Object, String)}).
 	 * Also creates or recovers recusively it's parent namespaces.<br>
 	 * At least one of <b>bnd</b> and <b>name</b> must be non null.
 	 * @param bnd -- the JDT Binding that may be used as a uniq key to recover this namespace
@@ -169,7 +168,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Recovers or creates a Famix Type (see also {@link Dictionary#ensureFamixType(Object, String, ContainerEntity, boolean)}
+	 * Recovers or creates a Famix Type (see also {@link AbstractDictionary#ensureFamixType(Object, String, ContainerEntity, boolean)}
 	 * @param bnd -- binding for the type to create
 	 * @param name of the type
 	 * @param owner of the type
@@ -258,7 +257,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Class associated with the ITypeBinding.
 	 * The Entity is created if it does not exist.
-	 * Params: see {@link Dictionary#ensureFamixClass(Object, String, ContainerEntity, boolean)}.
+	 * Params: see {@link AbstractDictionary#ensureFamixClass(Object, String, ContainerEntity, boolean)}.
 	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
@@ -1321,7 +1320,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Method associated with the IMethodBinding. The Entity is created if it does not exist.
 	 * The Entity is created if it does not exist.
-	 * Params: see {@link Dictionary#ensureFamixMethod(Object, String, String, Type, Type, boolean)}.
+	 * Params: see {@link AbstractDictionary#ensureFamixMethod(Object, String, String, Type, Type, boolean)}.
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type ret, Type owner, int modifiers, boolean persistIt) {
@@ -1538,7 +1537,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Attribute associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixAttribute(Object, String, Type, Type, boolean)}.
+	 * Params: see {@link AbstractDictionary#ensureFamixAttribute(Object, String, Type, Type, boolean)}.
 	 * @param persistIt -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
@@ -1707,7 +1706,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix LocalVariable associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixLocalVariable(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}
+	 * Params: see {@link AbstractDictionary#ensureFamixLocalVariable(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}
 	 * @param persistIt  -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if <b>bnd</b> and <b>name</b> are null, or <b>bnd</b> and <b>owner</b> are null, or in case of a Famix error
 	 */

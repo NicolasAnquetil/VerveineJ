@@ -8,8 +8,8 @@ import org.eclipse.jdt.core.dom.PackageDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import eu.synectique.verveine.core.gen.famix.Namespace;
-import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.utils.EntityStack;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest

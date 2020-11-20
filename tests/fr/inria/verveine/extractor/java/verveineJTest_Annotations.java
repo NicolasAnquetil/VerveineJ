@@ -2,7 +2,7 @@ package fr.inria.verveine.extractor.java;
 
 import ch.akuhn.fame.Repository;
 import eu.synectique.verveine.core.gen.famix.*;
-import fr.inria.verveine.core.VerveineUtilsForTests;
+import fr.inria.verveine.extractor.java.utils.VerveineUtilsForTests;
 
 import org.junit.Before;
 import org.junit.Test;

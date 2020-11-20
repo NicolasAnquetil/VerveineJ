@@ -1,4 +1,4 @@
-package fr.inria.verveine.core;
+package fr.inria.verveine.extractor.java.utils;
 
 import java.util.Collection;
 import java.util.Vector;

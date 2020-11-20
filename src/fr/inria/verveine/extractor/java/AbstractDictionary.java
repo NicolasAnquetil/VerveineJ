@@ -1,4 +1,4 @@
-package fr.inria.verveine.core;
+package fr.inria.verveine.extractor.java;
 
 import java.util.Collection;
 import java.util.Hashtable;
@@ -47,7 +47,7 @@ import eu.synectique.verveine.core.gen.famix.Type;
  *Entities are mapped to keys. Typically the key will be a binding provided by the parser used
  * @param <B> The class of the keys, typically a JDT binding or a CDT binding, ...
  */
-public class Dictionary<B> {
+public class AbstractDictionary<B> {
 
 	public static final String DEFAULT_PCKG_NAME = "<Default Package>";
 	public static final String STUB_METHOD_CONTAINER_NAME = "<StubMethodContainer>";
@@ -69,7 +69,7 @@ public class Dictionary<B> {
 	 */
 	protected Map<B,NamedEntity> keyToEntity;
 	/**
-	 * A reverse dictionary (see {@link Dictionary#keyToEntity}) to find the key of an entity.
+	 * A reverse dictionary (see {@link AbstractDictionary#keyToEntity}) to find the key of an entity.
 	 */
 	protected Map<NamedEntity,B> entityToKey;
 
@@ -81,7 +81,7 @@ public class Dictionary<B> {
 	/**
 	 * Yet another dictionary for implicit variables ('self' and 'super')
 	 * Because they are implicit, they may not have a binding provided by the parser,
-	 * or may have the same binding than their associated type so they can't be kept easily in {@link Dictionary#keyToEntity}
+	 * or may have the same binding than their associated type so they can't be kept easily in {@link AbstractDictionary#keyToEntity}
 	 */
 	@Deprecated
 	protected Map<Type,ImplicitVars> typeToImpVar;
@@ -99,7 +99,7 @@ public class Dictionary<B> {
 	/** Constructor taking a FAMIX repository
 	 * @param famixRepo
 	 */
-	public Dictionary(Repository famixRepo) {
+	public AbstractDictionary(Repository famixRepo) {
 		this.famixRepo = famixRepo;
 		
 		this.keyToEntity = new Hashtable<B,NamedEntity>();
@@ -190,7 +190,7 @@ public class Dictionary<B> {
 	 * Returns the Famix Entity associated to the given key.
 	 * <b>Note</b>: Be careful than ImplicitVariables share the same binding than their associated Class and cannot be retrieved with this method.
 	 * In such a case, this method will always retrieve the Class associated to the key.
-	 * To get an ImplicitVariable from the key, use {@link Dictionary#getImplicitVariableByBinding(Object, String)}
+	 * To get an ImplicitVariable from the key, use {@link AbstractDictionary#getImplicitVariableByBinding(Object, String)}
 	 * @param key -- the key
 	 * @return the Famix Entity associated to the binding or null if not found
 	 */
@@ -214,7 +214,7 @@ public class Dictionary<B> {
 
 	/**
 	 * Creates and returns a FAMIX Entity of the type <b>fmxClass</b>.
-	 * The Entity is always created (see {@link Dictionary#ensureFamixEntity(Class, Object, String, boolean)}).
+	 * The Entity is always created (see {@link AbstractDictionary#ensureFamixEntity(Class, Object, String, boolean)}).
 	 * @param fmxClass -- the FAMIX class of the instance to create
 	 * @param name -- the name of the new instance must not be null (and this is not tested)
 	 * @param persistIt -- whether the Entity should be persisted in the Famix repository
@@ -694,7 +694,7 @@ public class Dictionary<B> {
 
 	/**
 	 * Returns the Famix ImplicitVariable associated to the given binding and name (self or super).
-	 * See also {@link Dictionary#getEntityByKey(Object)}
+	 * See also {@link AbstractDictionary#getEntityByKey(Object)}
 	 * @param bnd -- the binding
 	 * @return the Famix Entity associated to the binding or null if not found
 	 */

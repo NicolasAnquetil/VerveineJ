@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import eu.synectique.verveine.core.gen.famix.Method;
-import fr.inria.verveine.core.Dictionary;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 import java.io.File;
@@ -39,19 +38,19 @@ public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
 
 	@Test
 	public void testUniqForMethod() {
-		assertEquals(getImplicitVar(mth1, Dictionary.SELF_NAME), getImplicitVar(mth1, Dictionary.SELF_NAME));
-		assertEquals(getImplicitVar(mth1, Dictionary.SUPER_NAME), getImplicitVar(mth1, Dictionary.SUPER_NAME));
+		assertEquals(getImplicitVar(mth1, AbstractDictionary.SELF_NAME), getImplicitVar(mth1, AbstractDictionary.SELF_NAME));
+		assertEquals(getImplicitVar(mth1, AbstractDictionary.SUPER_NAME), getImplicitVar(mth1, AbstractDictionary.SUPER_NAME));
 	}
 
     @Test
 	public void testDiffForMethods() {
-		assertNotEquals(getImplicitVar(mth1, Dictionary.SELF_NAME), getImplicitVar(mth2, Dictionary.SELF_NAME));
-		assertNotEquals(getImplicitVar(mth1, Dictionary.SUPER_NAME), getImplicitVar(mth2, Dictionary.SUPER_NAME));
+		assertNotEquals(getImplicitVar(mth1, AbstractDictionary.SELF_NAME), getImplicitVar(mth2, AbstractDictionary.SELF_NAME));
+		assertNotEquals(getImplicitVar(mth1, AbstractDictionary.SUPER_NAME), getImplicitVar(mth2, AbstractDictionary.SUPER_NAME));
 	}
 
 	@Test
 	public void testSefDiffSuper() {
-		assertNotEquals(getImplicitVar(mth1, Dictionary.SELF_NAME), getImplicitVar(mth1, Dictionary.SUPER_NAME));
+		assertNotEquals(getImplicitVar(mth1, AbstractDictionary.SELF_NAME), getImplicitVar(mth1, AbstractDictionary.SUPER_NAME));
 	}
 
 	@Test

@@ -6,7 +6,6 @@ import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleType;
 
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import fr.inria.verveine.core.EntityStack;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 
 public class Util {
