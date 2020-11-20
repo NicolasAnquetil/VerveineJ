@@ -29,6 +29,7 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 
 /**
@@ -63,13 +64,8 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	 */
 	private Javadoc compilUnitComment;
 
-	/**
-	 * If there is a comment on a VariableDeclaration (which possibly have several "variables"), we keep the comment for the first declaration
-	 */
-	private boolean varDeclarationFragmentHasComment;
-
-	public VisitorComments(JavaDictionary dico, boolean classSummary) {
-		super(dico, classSummary);
+	public VisitorComments(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 	}
 	// VISITOR METHODS
 
@@ -172,7 +168,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		Method fmx = visitMethodDeclaration( node);
 
-		if ( (fmx != null) && (! classSummary) ){
+		if ( (fmx != null) && (! summarizeClasses()) ){
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 
@@ -200,7 +196,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
 		AnnotationTypeAttribute fmx = visitAnnotationTypeMemberDeclaration( node);
-		if ( (fmx != null) && (! classSummary) ) {
+		if ( (fmx != null) && (! summarizeClasses()) ) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 			return super.visit(node);
@@ -217,7 +213,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(Initializer node) {
 		Method fmx = visitInitializer(node);
-		if ( (fmx != null) && (! classSummary) ) {
+		if ( (fmx != null) && (! summarizeClasses()) ) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 			return super.visit(node);
@@ -243,7 +239,6 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	public boolean visit(FieldDeclaration node) {
 		structuralType = StructuralEntityKinds.ATTRIBUTE;
 		entityJavadoc = node.getJavadoc();
-		varDeclarationFragmentHasComment = (nodeOptionalComment(node) != null);
 
 		return super.visit(node);
 	}
@@ -299,7 +294,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 		StructuralEntity fmx = null;
 		Comment cmt = null;
 
-		if (classSummary) {
+		if (summarizeClasses()) {
 			return;
 		}
 
@@ -315,17 +310,20 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 			// recover the famix entity
 			switch (structuralKind) {
-				case ATTRIBUTE:
-					fmx = dico.getFamixAttribute(bnd, name, context.topType());
-					break;
+			case ATTRIBUTE:
+				fmx = dico.getFamixAttribute(bnd, name, context.topType());
+				break;
 
-				case PARAMETER:
-					fmx = dico.getFamixParameter(bnd, name, context.topMethod());
-					break;
+			case PARAMETER:
+				fmx = dico.getFamixParameter(bnd, name, context.topMethod());
+				break;
 
-				case LOCALVAR:
-					fmx = dico.getFamixLocalVariable(bnd, name, context.topMethod());
-					break;
+			case LOCALVAR:
+				fmx = dico.getFamixLocalVariable(bnd, name, context.topMethod());
+				break;
+
+			default:
+				break;
 			}
 
 			if (! fmx.getIsStub()) {

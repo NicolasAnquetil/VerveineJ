@@ -30,23 +30,6 @@ import eu.synectique.verveine.core.gen.famix.SourceLanguage;
 
 public class VerveineJParser {
 
-	/**
-	 * Possible options for SourceAnchors: no source anchor, only entities [default], entities and associations
-	 */
-	public enum anchorOptions {
-		none, entity, assoc;
-
-		public static anchorOptions getValue(String option) {
-			switch (option) {
-				case "none": return none;
-				case "default":
-				case "entity": return entity;
-				case "assoc": return assoc;
-				default: return null;
-			}
-		}
-	}
-
 	public VerveineJOptions options;
 
 	/**
@@ -74,158 +57,21 @@ public class VerveineJParser {
 		return new JavaSourceLanguage();
 	}
 
-	protected static List<String> collectAllJars(String sDir) {
-		File[] faFiles = new File(sDir).listFiles();
-		List<String> tmpPath = new ArrayList<String>();
-		for (File file : faFiles) {
-			if (file.getName().endsWith("jar")) {
-				tmpPath.add(file.getAbsolutePath());
-			}
-			if (file.isDirectory()) {
-				tmpPath.addAll(collectAllJars(file.getAbsolutePath()));
-			}
-		}
-		return tmpPath;
-	}
-
-	protected void collectJavaFiles(Collection<String> paths, Collection<String> files) {
-		options.excludeMatchers = new ArrayList<>(options.excludePaths.size());
-		for (String expr : options.excludePaths) {
-			options.excludeMatchers.add(createMatcher(expr));
-		}
-		for (String p : paths) {
-			collectJavaFiles(new File(p), files);
-		}
-	}
-
-	protected void collectJavaFiles(File f, Collection<String> files) {
-		for (Pattern filter : options.excludeMatchers) {
-			if (filter.matcher(f.getName()).matches()) {
-				return;
-			}
-		}
-		if (f.isFile() && f.getName().endsWith(".java")) {
-			files.add(f.getAbsolutePath());
-		} else if (f.isDirectory()) {
-			for (File child : f.listFiles()) {
-				collectJavaFiles(child, files);
-			}
-		}
-	}
-
-	/**
-	 * Creates a regexp matcher form a globbing expression<br>
-	 * Glob to Regexp algorithm from <a href="https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns">https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns</a>
-	 */
-	protected Pattern createMatcher(String expr) {
-		expr = expr.trim();
-		int strLen = expr.length();
-		StringBuilder sb = new StringBuilder(strLen);
-		sb.append('^');
-		if (! expr.startsWith("/")) {
-			// not absolute path, start with ".*"
-			if (! expr.startsWith("*")) {
-				sb.append(".*");
-			}
-		}
-		boolean escaping = false;
-		int inCurlies = 0;
-		for (char currentChar : expr.toCharArray()) {
-			switch (currentChar) {
-				case '*':
-					if (escaping)
-						sb.append("\\*");
-					else
-						sb.append(".*");
-					escaping = false;
-					break;
-				case '?':
-					if (escaping)
-						sb.append("\\?");
-					else
-						sb.append('.');
-					escaping = false;
-					break;
-				case '.':
-				case '(':
-				case ')':
-				case '+':
-				case '|':
-				case '^':
-				case '$':
-				case '@':
-				case '%':
-					sb.append('\\');
-					sb.append(currentChar);
-					escaping = false;
-					break;
-				case '\\':
-					if (escaping) {
-						sb.append("\\\\");
-						escaping = false;
-					}
-					else
-						escaping = true;
-					break;
-				case '{':
-					if (escaping) {
-						sb.append("\\{");
-					}
-					else {
-						sb.append('(');
-						inCurlies++;
-					}
-					escaping = false;
-					break;
-				case '}':
-					if (inCurlies > 0 && !escaping) {
-						sb.append(')');
-						inCurlies--;
-					}
-					else if (escaping)
-						sb.append("\\}");
-					else
-						sb.append("}");
-					escaping = false;
-					break;
-				case ',':
-					if (inCurlies > 0 && !escaping) {
-						sb.append('|');
-					}
-					else if (escaping)
-						sb.append("\\,");
-					else
-						sb.append(",");
-					break;
-				default:
-					escaping = false;
-					sb.append(currentChar);
-			}
-		}
-
-		if (! expr.endsWith("*")) {
-			sb.append(".*$");
-		}
-		else {
-			sb.append('$');
-		}
-		return Pattern.compile(sb.toString());
-	}
-
 	public void parse() {
-		ArrayList<String> sourceFiles = new ArrayList<String>();
 
 		if (this.linkToExisting()) {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), options.argPath, options.argFiles, options.classSummary, options.allLocals, options.anchors);
-
-		sourceFiles.addAll(options.argFiles);
-		collectJavaFiles(options.argPath, sourceFiles);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), options);
 
 		try {
-			jdtParser.createASTs(sourceFiles.toArray(new String[0]), /*encodings*/null, /*bindingKeys*/new String[0], /*requestor*/req, /*monitor*/null);
+			jdtParser.createASTs(
+					options.sourceFilesToParse(),
+					/*encodings*/null,
+					/*bindingKeys*/new String[0],
+					/*requestor*/req,
+					/*monitor*/null);
 		}
 		catch (java.lang.IllegalStateException e) {
 			System.out.println("VerveineJ could not launch parser, received error: " + e.getMessage());

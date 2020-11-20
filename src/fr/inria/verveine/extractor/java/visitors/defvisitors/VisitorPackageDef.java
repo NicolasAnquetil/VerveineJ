@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 
 import eu.synectique.verveine.core.gen.famix.Namespace;
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.EntityStack;
 
 /**
@@ -32,7 +33,7 @@ public class VisitorPackageDef extends ASTVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 
-	public VisitorPackageDef(JavaDictionary dico) {
+	public VisitorPackageDef(JavaDictionary dico, VerveineJOptions options) {
 		this.dico = dico;
 		this.context = new EntityStack();
 	}

@@ -15,9 +15,25 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTParser;
 
-import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
-
 public class VerveineJOptions {
+
+	/**
+	 * Possible options for SourceAnchors: no source anchor, only entities [default], entities and associations
+	 */
+	public enum AnchorOptions {
+		none, entity, assoc;
+	
+		public static AnchorOptions getValue(String option) {
+			switch (option) {
+				case "default":
+				case "entity": return entity;
+				case "assoc": return assoc;
+				case "none": return none;
+				default: return null;
+			}
+		}
+	}
+
 
 	/**
 	 * Name of the default file where to put the MSE model
@@ -39,50 +55,50 @@ public class VerveineJOptions {
 	 * More exactly, the problems occur when the entity inside links back to the entity outside.
 	 * And since all association are bidirectional, it can happen very easily.</p>
 	 */
-	public boolean classSummary;
+	protected boolean classSummary;
 
 	/**
 	 * Whether to output all local variables (even those with primitive type) or not (default is not).<br>
 	 * Note: allLocals => not classSummary
 	 */
-	public boolean allLocals;
+	protected boolean allLocals;
 
 	/**
 	 * Option: The version of Java expected by the parser
 	 */
-	public String codeVers;
+	protected String codeVers;
 
 	/**
-	 * Option: Whether to put Sourceanchor in the entities and/or associations
+	 * Option: Whether to put SourceAnchors in the entities and/or associations
 	 */
-	public anchorOptions anchors;
+	protected AnchorOptions anchors;
 
 	/**
 	 * The arguments that were passed to the parser
 	 * Needed to relativize the source file names
 	 */
-	public Collection<String> argPath;
-	public Collection<String> argFiles;
-	public String[] classPathOptions;
+	protected Collection<String> argPath;
+	protected Collection<String> argFiles;
+	protected String[] classPathOptions;
 
 	/**
 	 * pathnames to exclude from parsing.<br>
 	 * Accepts globbing expressions
 	 */
-	public Collection<String> excludePaths;
+	protected Collection<String> excludePaths;
 
 	/**
 	 * collection of matchers of file name to process excluding expr (see
 	 */
-	public Collection<Pattern> excludeMatchers;
+	protected Collection<Pattern> excludeMatchers;
 
 	/**
 	 * Name of the file where to put the MSE model.
 	 * Defaults to {@link VerveineParser#OUTPUT_FILE}
 	 */
-	public String outputFileName;
+	protected String outputFileName;
 
-	public boolean incrementalParsing;
+	protected boolean incrementalParsing;
 
 	public VerveineJOptions() {
 		this.classSummary = false;
@@ -114,7 +130,7 @@ public class VerveineJOptions {
 			codeVers = DEFAULT_CODE_VERSION;
 		}
 		if (anchors == null) {
-			anchors = anchorOptions.getValue("default");
+			anchors = VerveineJOptions.AnchorOptions.getValue("default");
 		}
 	
 		while (i < args.length) {
@@ -189,7 +205,7 @@ public class VerveineJOptions {
 	protected String[] setOptionClassPath( String[] classPath, String[] args, int i) throws IllegalArgumentException {
 		if (args[i].equals("-autocp")) {
 			if (i < args.length) {
-				return addToClassPath(classPath,VerveineJParser.collectAllJars(args[i+1]) );
+				return addToClassPath(classPath, collectAllJars(args[i+1]) );
 			} else {
 				throw new IllegalArgumentException("-autocp requires a root folder");
 			}
@@ -210,6 +226,20 @@ public class VerveineJOptions {
 			}	
 		}
 		return classPath;
+	}
+
+	protected List<String> collectAllJars(String sDir) {
+		File[] faFiles = new File(sDir).listFiles();
+		List<String> tmpPath = new ArrayList<String>();
+		for (File file : faFiles) {
+			if (file.getName().endsWith("jar")) {
+				tmpPath.add(file.getAbsolutePath());
+			}
+			if (file.isDirectory()) {
+				tmpPath.addAll(collectAllJars(file.getAbsolutePath()));
+			}
+		}
+		return tmpPath;
 	}
 
 	protected String[] addToClassPath(String[] classPath, List<String> tmpPath) {
@@ -249,7 +279,7 @@ public class VerveineJOptions {
 	protected void setOptionAnchor( String[] args, int i) {
 		if (i < args.length) {
 			String anchor = args[i+1].trim();
-			anchors = anchorOptions.getValue(anchor);
+			anchors = VerveineJOptions.AnchorOptions.getValue(anchor);
 			if (anchors == null) {
 				throw new IllegalArgumentException("unknown option to -anchor: "+anchor);
 			}
@@ -313,10 +343,6 @@ public class VerveineJOptions {
 	
 	}
 
-	public void setOutputFileName(String outputFileName) {
-		this.outputFileName = OUTPUT_FILE;
-	}
-
 	public String getOutputFileName() {
 		return this.outputFileName;
 	}
@@ -334,6 +360,157 @@ public class VerveineJOptions {
 	
 		jdtParser.setCompilerOptions(javaCoreOptions);
 
+	}
+
+
+	/**
+	 * Creates a regexp matcher form a globbing expression<br>
+	 * Glob to Regexp algorithm from <a href="https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns">https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns</a>
+	 */
+	protected Pattern createMatcher(String expr) {
+		expr = expr.trim();
+		int strLen = expr.length();
+		StringBuilder sb = new StringBuilder(strLen);
+		sb.append('^');
+		if (! expr.startsWith("/")) {
+			// not absolute path, start with ".*"
+			if (! expr.startsWith("*")) {
+				sb.append(".*");
+			}
+		}
+		boolean escaping = false;
+		int inCurlies = 0;
+		for (char currentChar : expr.toCharArray()) {
+			switch (currentChar) {
+				case '*':
+					if (escaping)
+						sb.append("\\*");
+					else
+						sb.append(".*");
+					escaping = false;
+					break;
+				case '?':
+					if (escaping)
+						sb.append("\\?");
+					else
+						sb.append('.');
+					escaping = false;
+					break;
+				case '.':
+				case '(':
+				case ')':
+				case '+':
+				case '|':
+				case '^':
+				case '$':
+				case '@':
+				case '%':
+					sb.append('\\');
+					sb.append(currentChar);
+					escaping = false;
+					break;
+				case '\\':
+					if (escaping) {
+						sb.append("\\\\");
+						escaping = false;
+					}
+					else
+						escaping = true;
+					break;
+				case '{':
+					if (escaping) {
+						sb.append("\\{");
+					}
+					else {
+						sb.append('(');
+						inCurlies++;
+					}
+					escaping = false;
+					break;
+				case '}':
+					if (inCurlies > 0 && !escaping) {
+						sb.append(')');
+						inCurlies--;
+					}
+					else if (escaping)
+						sb.append("\\}");
+					else
+						sb.append("}");
+					escaping = false;
+					break;
+				case ',':
+					if (inCurlies > 0 && !escaping) {
+						sb.append('|');
+					}
+					else if (escaping)
+						sb.append("\\,");
+					else
+						sb.append(",");
+					break;
+				default:
+					escaping = false;
+					sb.append(currentChar);
+			}
+		}
+
+		if (! expr.endsWith("*")) {
+			sb.append(".*$");
+		}
+		else {
+			sb.append('$');
+		}
+		return Pattern.compile(sb.toString());
+	}
+
+	protected void collectJavaFiles(Collection<String> paths, Collection<String> files) {
+		excludeMatchers = new ArrayList<>(excludePaths.size());
+		for (String expr : excludePaths) {
+			excludeMatchers.add(createMatcher(expr));
+		}
+		for (String p : paths) {
+			collectJavaFiles(new File(p), files);
+		}
+	}
+
+	protected void collectJavaFiles(File f, Collection<String> files) {
+		for (Pattern filter : excludeMatchers) {
+			if (filter.matcher(f.getName()).matches()) {
+				return;
+			}
+		}
+		if (f.isFile() && f.getName().endsWith(".java")) {
+			files.add(f.getAbsolutePath());
+		} else if (f.isDirectory()) {
+			for (File child : f.listFiles()) {
+				collectJavaFiles(child, files);
+			}
+		}
+	}
+
+	protected String[] sourceFilesToParse() {
+		ArrayList<String> sourceFiles = new ArrayList<String>();
+		
+		sourceFiles.addAll(argFiles);
+		collectJavaFiles(argPath, sourceFiles);
+	
+		return sourceFiles.toArray( new String[sourceFiles.size()] );
+	}
+
+
+	public boolean withAnchors() {
+		return anchors != AnchorOptions.none;
+	}
+
+	public boolean withAnchors(AnchorOptions anchorOption) {
+		return anchors == anchorOption;
+	}
+
+	public boolean withLocals() {
+		return allLocals;
+	}
+
+	public boolean summarizeClasses() {
+		return classSummary;
 	}
 
 }

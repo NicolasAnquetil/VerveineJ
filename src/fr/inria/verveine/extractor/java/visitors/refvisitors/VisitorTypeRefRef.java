@@ -10,14 +10,9 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.Reference;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 
 public class VisitorTypeRefRef extends AbstractRefVisitor {
-
-	/**
-	 * what sourceAnchors to create
-	 */
-	private anchorOptions anchors;
 
     /**
      * Global variable indicating whether a name could be a typeReference
@@ -25,9 +20,8 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      */
 	private boolean searchTypeRef;
 
-	public VisitorTypeRefRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
-		super(dico, classSummary);
-		this.anchors = anchors;
+	public VisitorTypeRefRef(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 		this.searchTypeRef = false;
 	}
 
@@ -72,12 +66,12 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			Type clazz = node.getType();
 			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
-			if (!classSummary) {
+			if (! summarizeClasses()) {
 				ref = dico.addFamixReference( (BehaviouralEntity) context.top(), fmx, context.getLastReference());
 				context.setLastReference(ref);
 			}
 
-			if ((anchors != anchorOptions.assoc) && (ref != null) ) {
+			if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {
 				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -205,13 +199,13 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 		Reference ref = null;
-		if (classSummary) {
+		if (summarizeClasses()) {
 			//ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
 		}
 		else {
 			ref = dico.addFamixReference((BehaviouralEntity) context.top(), fmx, context.getLastReference());
 			context.setLastReference(ref);
-    		if (anchors == anchorOptions.assoc) {
+    		if (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) {
 	    		dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
 		    }
         }
@@ -267,7 +261,8 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		return visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());
 	}
 
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public boolean visit(MethodInvocation node) {
         Expression receivr = node.getExpression();
         if (receivr != null) {

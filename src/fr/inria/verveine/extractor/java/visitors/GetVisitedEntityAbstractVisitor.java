@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Stack;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.EntityStack;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import org.eclipse.jdt.core.dom.*;
@@ -25,13 +26,20 @@ import fr.inria.verveine.extractor.java.utils.Util;
 public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 
 	/**
+	 * The options that control the behavior of the parser
+	 */
+	protected VerveineJOptions options;
+
+	/**
 	 * A stack that keeps the current definition context (package/class/method)
 	 */
 	protected EntityStack context;
+
 	/** 
 	 * A dictionary allowing to recover created FAMIX Entities
 	 */
 	protected JavaDictionary dico;
+
 	/**
 	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
 	 * we are in its parent node: a ClassInstanceCreation.
@@ -40,8 +48,10 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 */
 	protected Stack<String> anonymousSuperTypeName;
 
-	public GetVisitedEntityAbstractVisitor(JavaDictionary dico) {
+	public GetVisitedEntityAbstractVisitor(JavaDictionary dico, VerveineJOptions options) {
+		super();
 		this.dico = dico;
+		this.options = options;
 		this.context = new EntityStack();
 		this.anonymousSuperTypeName = new Stack<>();
 	}

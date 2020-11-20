@@ -14,7 +14,7 @@ import eu.synectique.verveine.core.gen.famix.Method;
 import eu.synectique.verveine.core.gen.famix.PrimitiveType;
 import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 /**
@@ -30,22 +30,10 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 
-    /**
-     * Whether to output all local variables (even those with primitive type or not (default is not).
-     */
-    private boolean allLocals;
-
-	/**
-	 * what sourceAnchors to create
-	 */
-	private anchorOptions anchors;
-
 	private boolean inLambda;
 
-	public VisitorAccessRef(JavaDictionary dico, boolean classSummary, boolean allLocals, anchorOptions anchors) {
-		super(dico, classSummary);
-		this.allLocals = allLocals;
-		this.anchors = anchors;
+	public VisitorAccessRef(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 		this.inLambda = false;
 	}
 
@@ -62,6 +50,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		endVisitCompilationUnit(node);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(TypeDeclaration node) {
 		if (visitTypeDeclaration( node) != null) {
@@ -93,6 +82,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		if (visitAnonymousClassDeclaration( node) != null) {
@@ -108,6 +98,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		endVisitAnonymousClassDeclaration( node);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(EnumDeclaration node) {
 		if (visitEnumDeclaration( node) != null) {
@@ -230,6 +221,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		endVisitFieldDeclaration(node);
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(EnumConstantDeclaration node) {
         if (visitEnumConstantDeclaration(node)) {
             visitNodeList(node.arguments());
@@ -248,7 +240,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		// FIXME if bnd == null we have a problem
 		ensureAccessedStructEntity(bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
 		Access lastAccess = context.getLastAccess();
-		if ( (anchors == anchorOptions.assoc)
+		if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc))
 				// check that lastAccess corresponds to current one
 				&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
 				&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
@@ -268,7 +260,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			ensureAccessedStructEntity((IVariableBinding) bnd, node.getName().getIdentifier(), /*typ*/null,
 					/*owner*/null, accessor);
 			Access lastAccess = context.getLastAccess();
-			if ( (anchors == anchorOptions.assoc)
+			if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc))
 					// check that lastAccess corresponds to current one
 					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
 					&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
@@ -349,6 +341,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
         return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(ForStatement node) {
         visitNodeList(node.initializers());
         visitIfNotNull( node.getExpression());
@@ -376,6 +369,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
         return false;
 	}
 
+	@SuppressWarnings("unchecked")
 	public boolean visit(SwitchStatement node) {
         visitIfNotNull( node.getExpression());
         visitNodeList(node.statements());
@@ -403,14 +397,19 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	@Override
 	public boolean visit(ThisExpression node) {
 		IBinding bnd = ImplicitVarBinding.getInstance(context.topMethod(), JavaDictionary.SELF_NAME);
-		ImplicitVariable fmx = dico.ensureFamixImplicitVariable(bnd, JavaDictionary.SELF_NAME, this.context.topType(), context.topMethod(), /*persistIt*/!classSummary);
+		ImplicitVariable fmx = dico.ensureFamixImplicitVariable(
+				bnd, 
+				JavaDictionary.SELF_NAME, 
+				this.context.topType(), 
+				context.topMethod(), 
+				/*persistIt*/! summarizeClasses());
 		if (fmx != null) {
 			Method accessor = this.context.topMethod();
 
 			createAccess(accessor, fmx, inAssignmentLHS);
 
 			Access lastAccess = context.getLastAccess();
-			if ( (anchors == anchorOptions.assoc) && (lastAccess != null) ) {
+			if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (lastAccess != null) ) {
 				dico.addSourceAnchor(lastAccess, node.getParent(), /*oneLineAnchor*/true);
 			}
 		}
@@ -444,7 +443,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
             ensureAccessedStructEntity((IVariableBinding) bnd, node.getIdentifier(), /*typ*/null, /*owner*/null,
                     accessor);
             Access lastAccess = context.getLastAccess();
-            if ( (anchors == anchorOptions.assoc)
+            if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
                     // check that lastAccess corresponds to current one
                     && (lastAccess != null) && (lastAccess.getAccessor() == accessor)
                     && (lastAccess.getVariable().getName().equals(node.getIdentifier()))) {
@@ -483,11 +482,11 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 
 		// could also test: "owner instanceof Enum" in case bnd == null
 		if (bnd.isEnumConstant()) {
-			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/!classSummary);
+			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/! summarizeClasses());
 		} else if (bnd.isField()) {
 			accessed = dico.ensureFamixAttribute(bnd, name, typ, (eu.synectique.verveine.core.gen.famix.Type) owner,
-					/*persistIt*/!classSummary);
-			if (classSummary) {
+					/*persistIt*/! summarizeClasses());
+			if (summarizeClasses()) {
 				if (!(accessed.getDeclaredType() instanceof PrimitiveType)) {
 					//dico.addFamixReference(findHighestType(accessed.getBelongsTo()),
 					//		findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
@@ -500,8 +499,8 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 				((Attribute) accessed).setParentType(dico.ensureFamixClassArray());
 			}
 		} else if (bnd.isParameter() && (! inLambda)) {
-			if (!classSummary) {
-				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, /*persistIt*/!classSummary);
+			if (! summarizeClasses()) {
+				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, /*persistIt*/! summarizeClasses());
 			}
 		} else {
 			// it seems it is a variable.
@@ -523,9 +522,9 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	private void createAccess(Method accessor, StructuralEntity accessed, boolean isLHS) {
 		// create local accesses?
 		if ((accessed != null) && (accessor != null)) {
-			if (classSummary) {
+			if (summarizeClasses()) {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
-			} else if (allLocals || (! localVariable(accessed, accessor)) ) {
+			} else if (options.withLocals() || (! localVariable(accessed, accessor)) ) {
 				context.setLastAccess(
 						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
 			}

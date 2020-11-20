@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.dom.Type;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 
 /**
@@ -16,11 +17,9 @@ import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisit
  */
 public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 
-	public AbstractRefVisitor(JavaDictionary dico, boolean classSummary) {
-		super(dico, classSummary);
+	public AbstractRefVisitor(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 	}
-
-
 
 	protected String findTypeName(org.eclipse.jdt.core.dom.Type t) {
 		if (t == null) {
