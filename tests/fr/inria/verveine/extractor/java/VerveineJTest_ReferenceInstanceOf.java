@@ -1,19 +1,14 @@
 package fr.inria.verveine.extractor.java;
 
 
-import eu.synectique.verveine.core.gen.famix.Class;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
+import static org.junit.Assert.assertEquals;
+
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
+import eu.synectique.verveine.core.gen.famix.Class;
 
 public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
 
@@ -26,15 +21,15 @@ public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJParser.OUTPUT_FILE).delete();
+        new File(VerveineJOptions.OUTPUT_FILE).delete();
         parser = new VerveineJParser();
         repo = parser.getFamixRepo();
     }
 
     private void parse(String[] sources) {
-        parser.setOptions(sources);
+        parser.configure( sources);
         parser.parse();
-        parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+        parser.emitMSE(VerveineJOptions.OUTPUT_FILE);
     }
 
     @Test

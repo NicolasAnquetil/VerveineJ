@@ -16,7 +16,7 @@ public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntity
 
 	/**
 	 * Whether to summarize collected information at the level of classes or produce everything
-	 * (see {@link VerveineJParser#classSummary}).
+	 * (see {@link VerveineJParser#options.classSummary}).
 	 */
 	protected boolean classSummary = false;
 

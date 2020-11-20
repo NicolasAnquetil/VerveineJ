@@ -57,7 +57,7 @@ public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
     public void testAccessesInvocationsFromParse() {
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
-        parser.setOptions(new String[] {"-anchor" , "assoc", "test_src/generics/Dictionary.java"});
+        parser.configure( new String[] {"-anchor" , "assoc", "test_src/generics/Dictionary.java"});
         parser.parse();
 
         Collection<ImplicitVariable> implicits = entitiesOfType( ImplicitVariable.class);
