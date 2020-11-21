@@ -5,7 +5,6 @@ import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleType;
 
-import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 

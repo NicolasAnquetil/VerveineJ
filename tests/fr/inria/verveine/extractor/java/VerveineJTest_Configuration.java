@@ -24,21 +24,21 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
+		new File(VerveineJOptions.OUTPUT_FILE).delete();
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 	}
 
 	private void parse(String[] sources) {
-		parser.setOptions(sources);
+		parser.configure( sources);
 		parser.parse();
-		//parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+		//parser.emitMSE(VerveineJOptions.OUTPUT_FILE);
 	}
 
 	@Test
 	public void testChangeOutputFilePath()
 	{
-		new File(VerveineJParser.OUTPUT_FILE).delete();
+		new File(VerveineJOptions.OUTPUT_FILE).delete();
 
 		new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).delete();
 		assertFalse(new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).exists());
@@ -47,7 +47,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		parser.emitMSE();
 
 		assertTrue(new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).exists());
-		assertFalse(new File(VerveineJParser.OUTPUT_FILE).exists());
+		assertFalse(new File(VerveineJOptions.OUTPUT_FILE).exists());
 	}
 
 	@Test

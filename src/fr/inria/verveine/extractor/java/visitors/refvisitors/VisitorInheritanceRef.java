@@ -20,6 +20,7 @@ import eu.synectique.verveine.core.gen.famix.Namespace;
 import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import eu.synectique.verveine.core.gen.famix.Type;
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
 
 /** A visitor to record inheritance relationships.<br>
@@ -28,8 +29,8 @@ import fr.inria.verveine.extractor.java.utils.Util;
  */
 public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
-	public VisitorInheritanceRef(JavaDictionary dico, boolean classSummary) {
-		super(dico, classSummary);
+	public VisitorInheritanceRef(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 	}
 
 	public boolean visit(TypeDeclaration node) {
@@ -60,7 +61,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 		ITypeBinding bnd = node.resolveBinding();
 		eu.synectique.verveine.core.gen.famix.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
 
-		if ( (fmx != null) && (bnd != null) && (! classSummary) ){
+		if ( (fmx != null) && (bnd != null) && (! summarizeClasses()) ){
 			ensureInheritances(bnd, fmx);
 
 			this.context.pushType(fmx);

@@ -1,18 +1,26 @@
 package fr.inria.verveine.extractor.java;
 
-import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.VerveineUtilsForTests;
-import eu.synectique.verveine.core.gen.famix.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import java.io.File;
+import java.util.Collection;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
-import java.lang.Exception;
-import java.util.Collection;
-
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
+import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
+import eu.synectique.verveine.core.gen.famix.AnnotationType;
+import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
+import eu.synectique.verveine.core.gen.famix.Attribute;
+import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
+import eu.synectique.verveine.core.gen.famix.Method;
+import eu.synectique.verveine.core.gen.famix.Parameter;
 
 public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
@@ -24,13 +32,13 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJParser.OUTPUT_FILE).delete();
+        new File(VerveineJOptions.OUTPUT_FILE).delete();
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         if (isWindows()){
-            parser.setOptions(new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar;test_src/annotations/lib/stripes-1.5.5.jar", "test_src/annotations"});
+            parser.configure( new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar;test_src/annotations/lib/stripes-1.5.5.jar", "test_src/annotations"});
         } else {
-            parser.setOptions(new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar:test_src/annotations/lib/stripes-1.5.5.jar", "test_src/annotations"});
+            parser.configure( new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar:test_src/annotations/lib/stripes-1.5.5.jar", "test_src/annotations"});
         }
         parser.parse();
         //	parser.emitMSE(VerveineJParser.OUTPUT_FILE);
