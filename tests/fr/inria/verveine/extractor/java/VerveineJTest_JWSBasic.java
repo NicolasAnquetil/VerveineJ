@@ -49,7 +49,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 	@Test
 	public void testEntitiesNumber() {
 		assertEquals(3, entitiesOfType( AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
-		// JDT no longer returns not resolved anotations: @Session, @WLHttpTransport,
+		// JDT no longer returns unresolved annotations: @Session, @WLHttpTransport,
 	}
 
 	@Test

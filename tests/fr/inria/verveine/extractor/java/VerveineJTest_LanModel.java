@@ -5,6 +5,7 @@ package fr.inria.verveine.extractor.java;
 
 
 import eu.synectique.verveine.core.gen.famix.*;
+import eu.synectique.verveine.core.gen.famix.Class;
 import fr.inria.verveine.extractor.java.utils.VerveineUtilsForTests;
 
 import org.junit.Before;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -81,23 +83,32 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = 11 + 14 + 1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
-		int nbInherit = 9 + 21 + 1;
-
-		if (VerveineUtilsForTests.javaVersion() >= 7) {
-			// class Autocloseable starting in Java 7
-			nbClasses++;
-			nbInherit++;
-		}
 		
-		assertEquals(nbClasses, entitiesOfType(eu.synectique.verveine.core.gen.famix.Class.class).size());
+		Stream<eu.synectique.verveine.core.gen.famix.Class> allClasses = entitiesOfType(eu.synectique.verveine.core.gen.famix.Class.class)
+				.stream()
+				.filter(c -> ! c.getIsStub());
+		assertEquals(11, allClasses.count() );
+		// Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable,AutoCloseable
+		allClasses = entitiesOfType(eu.synectique.verveine.core.gen.famix.Class.class)
+				.stream()
+				.filter(c -> c.getIsStub());
+		assertEquals(15, allClasses.count() );
+
+		Stream<Inheritance> allInheritances = entitiesOfType(Inheritance.class)
+				.stream()
+				.filter(i -> !i.getFrom().getIsStub() );
+		assertEquals(12,   allInheritances.count() );
+		allInheritances = entitiesOfType(Inheritance.class)
+				.stream()
+				.filter(i -> i.getFrom().getIsStub() );
+		assertEquals(19,   allInheritances.count() );
+
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+8+1, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>} + Call to the constructor of anonymous IPrinter
 		assertEquals(10+1, entitiesOfType( Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,  entitiesOfType( Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,   entitiesOfType( Parameter.class).size());
 		assertEquals(55,   entitiesOfType( Invocation.class).size());
-		assertEquals(nbInherit,   entitiesOfType( Inheritance.class).size());
 		assertEquals(45,   entitiesOfType( Access.class).size());// 17 "internal" attributes + 9 System.out + 18 "this" + 1 "super"
 		assertEquals(0,    entitiesOfType( LocalVariable.class).size());
 		assertEquals(1,    entitiesOfType( AnnotationType.class).size()); //Override
