@@ -3,3 +3,4 @@ bin/*
 testrep/*
 .idea/
 out/
+/bin/
