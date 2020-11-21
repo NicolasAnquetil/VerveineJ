@@ -70,29 +70,47 @@
 
 	<!-- Run the JUnit Tests -->
 	<target name="junit" depends="jar">
-		<junit printsummary="on" fork="true" haltonfailure="yes">
+		<junit printsummary="on" fork="true" haltonfailure="true" haltonerror="true">
 			<classpath>
 				<fileset dir="${dist.dir}">
-  				  <include name="*.jar"/>
+  				   <include name="*.jar"/>
 				</fileset>
 			</classpath>
-			<!-- Output is XML, could also be plain-->
 			<formatter type="plain"/>
 			<formatter type="xml" />
 			
 			 <batchtest fork="yes" todir="${test.report.dir}">
-			        <fileset dir="${testsrc.dir}">
-          				<include name="**/*Test*.java"/>
-						<exclude name="**/*VerveineJTest_Basic.java"/>
-        			</fileset>
-      			</batchtest>
+			     <fileset dir="${testsrc.dir}">
+          		 	<include name="**/*.java"/>
+					<exclude name="**/*VerveineJTest_Basic.java"/>
+        		</fileset>
+      		 </batchtest>
+		</junit>
+	</target>
+
+	<!-- Run the JUnit Tests even in case of errors -->
+	<target name="junit_all" depends="jar">
+		<junit printsummary="on" fork="true"  haltonfailure="off" haltonerror="off">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				   <include name="*.jar"/>
+				</fileset>
+			</classpath>
+			<formatter type="plain"/>
+			<formatter type="xml" />
+			
+			 <batchtest fork="yes" todir="${test.report.dir}">
+			     <fileset dir="${testsrc.dir}">
+          		 	<include name="**/*.java"/>
+					<exclude name="**/*VerveineJTest_Basic.java"/>
+        		</fileset>
+      		 </batchtest>
 		</junit>
 	</target>
 
 	<!-- Run JUnit TestLAN -->
-	<!-- Output is plain, could also be XML-->
 	<target name="test_lan">
-		<junit printsummary="on" fork="true" haltonfailure="no">
+		<junit printsummary="on" fork="true" haltonfailure="true" haltonerror="true">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
