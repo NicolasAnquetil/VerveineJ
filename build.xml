@@ -25,7 +25,6 @@
 		<mkdir dir="${test.report.dir}" />
 	</target>
 
-	<!-- Update source for licence checking -->
 	<target name="compile" depends="clean, makedir">
 		<javac srcdir="${src.dir}" destdir="${build.dir}" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<classpath>
@@ -57,7 +56,7 @@
 	<target name="jar" depends="compile">
 		<jar destfile="${verveine.jar}"
 		     basedir="${build.dir}"
-		     includes="fr/inria/verveine/extractor/java/**/*.class"
+		     includes="fr/inria/verveine/**/*.class"
 		/>
 	</target>
 
@@ -71,17 +70,22 @@
 
 	<!-- Run the JUnit Tests -->
 	<target name="junit" depends="jar">
-		<junit printsummary="on" fork="true" haltonfailure="no">
+		<junit printsummary="on" fork="true" haltonfailure="yes">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
 				</fileset>
 			</classpath>
-			<!-- Output is plain, could also be XML-->
-			<formatter type="plain" />
-			<batchtest todir="${test.report.dir}">
-				<fileset dir="${testsrc.dir}" includes="**/*.java" excludes="**/VerveineJTest_Basic.java" />
-			</batchtest>
+			<!-- Output is XML, could also be plain-->
+			<formatter type="plain"/>
+			<formatter type="xml" />
+			
+			 <batchtest fork="yes" todir="${test.report.dir}">
+			        <fileset dir="${testsrc.dir}">
+          				<include name="**/*Test*.java"/>
+						<exclude name="**/*VerveineJTest_Basic.java"/>
+        			</fileset>
+      			</batchtest>
 		</junit>
 	</target>
 

@@ -1,20 +1,10 @@
 package fr.inria.verveine.extractor.java;
 
-import java.util.Collection;
-import java.util.ConcurrentModificationException;
-import java.util.LinkedList;
+import java.util.*;
 
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IMethodBinding;
-import org.eclipse.jdt.core.dom.IPackageBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.*;
 
 import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.AbstractFileAnchor;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
@@ -49,10 +39,10 @@ import eu.synectique.verveine.core.gen.famix.UnknownVariable;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 
 /**
- * A {@link eu.synectique.verveine.core.Dictionary} specialized for Java
+ * A {@link fr.inria.verveine.extractor.java.AbstractDictionary} specialized for Java
  * @author anquetil
  */
-public class JavaDictionary extends Dictionary<IBinding> {
+public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 	/**
 	 * A property added to CompilationUnits to record the name of the source file they belong to.
@@ -74,7 +64,9 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	public static final String MODIFIER_PROTECTED= "protected";
 	public static final String MODIFIER_FINAL    = "final";
 	public static final String MODIFIER_STATIC    = "static";
-
+	public static final String MODIFIER_TRANSIENT = "transient";
+	public static final String MODIFIER_VOLATILE = "volatile";
+	public static final String MODIFIER_SYNCHRONIZED = "synchronized";
 	/**
 	 * Result of utility methods for checking matching between two entities
 	 */
@@ -115,7 +107,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Returns the namespace with {@link Dictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
+	 * Returns the namespace with {@link AbstractDictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
 	 */
 	public Namespace getFamixNamespaceDefault() {
 		Collection<Namespace> l = getEntityByName( Namespace.class, DEFAULT_PCKG_NAME);
@@ -129,7 +121,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 
 	/**
 	 * Returns a Famix Namespace associated with its IPackageBinding and/or fully qualified name.
-	 * The Entity is created if it does not exist (see also {@link Dictionary#ensureFamixNamespace(Object, String)}).
+	 * The Entity is created if it does not exist (see also {@link AbstractDictionary#ensureFamixNamespace(Object, String)}).
 	 * Also creates or recovers recusively it's parent namespaces.<br>
 	 * At least one of <b>bnd</b> and <b>name</b> must be non null.
 	 * @param bnd -- the JDT Binding that may be used as a uniq key to recover this namespace
@@ -176,7 +168,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	}
 
 	/**
-	 * Recovers or creates a Famix Type (see also {@link Dictionary#ensureFamixType(Object, String, ContainerEntity, boolean)}
+	 * Recovers or creates a Famix Type (see also {@link AbstractDictionary#ensureFamixType(Object, String, ContainerEntity, boolean)}
 	 * @param bnd -- binding for the type to create
 	 * @param name of the type
 	 * @param owner of the type
@@ -265,7 +257,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Class associated with the ITypeBinding.
 	 * The Entity is created if it does not exist.
-	 * Params: see {@link Dictionary#ensureFamixClass(Object, String, ContainerEntity, boolean)}.
+	 * Params: see {@link AbstractDictionary#ensureFamixClass(Object, String, ContainerEntity, boolean)}.
 	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
@@ -1328,7 +1320,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Method associated with the IMethodBinding. The Entity is created if it does not exist.
 	 * The Entity is created if it does not exist.
-	 * Params: see {@link Dictionary#ensureFamixMethod(Object, String, String, Type, Type, boolean)}.
+	 * Params: see {@link AbstractDictionary#ensureFamixMethod(Object, String, String, Type, Type, boolean)}.
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type ret, Type owner, int modifiers, boolean persistIt) {
@@ -1484,6 +1476,18 @@ public class JavaDictionary extends Dictionary<IBinding> {
     public void setAttributeModifiers(Attribute fmx, int mod) {
         setNamedEntityModifiers(fmx, mod);
         fmx.setHasClassScope(Modifier.isStatic(mod));
+        if (Modifier.isTransient(mod)) {
+			fmx.addModifiers(MODIFIER_TRANSIENT);
+		}
+		if (Modifier.isStatic(mod)){
+			fmx.addModifiers(MODIFIER_STATIC);
+		}
+		if (Modifier.isSynchronized(mod)){
+			fmx.addModifiers(MODIFIER_SYNCHRONIZED);
+		}
+		if (Modifier.isVolatile(mod)){
+			fmx.addModifiers(MODIFIER_VOLATILE);
+		}
     }
 
     public void setMethodModifiers(Method fmx, int mod) {
@@ -1493,6 +1497,19 @@ public class JavaDictionary extends Dictionary<IBinding> {
             fmx.addModifiers(MODIFIER_ABSTRACT);
         }
         fmx.setHasClassScope(Modifier.isStatic(mod));
+		if (Modifier.isTransient(mod)) {
+			fmx.addModifiers(MODIFIER_TRANSIENT);
+		}
+		if (Modifier.isStatic(mod)){
+			fmx.addModifiers(MODIFIER_STATIC);
+		}
+		if (Modifier.isSynchronized(mod)){
+			fmx.addModifiers(MODIFIER_SYNCHRONIZED);
+		}
+		if (Modifier.isVolatile(mod)){
+			fmx.addModifiers(MODIFIER_VOLATILE);
+		}
+
     }
 
     public void setClassModifiers(Class fmx, int mod) {
@@ -1520,7 +1537,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix Attribute associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixAttribute(Object, String, Type, Type, boolean)}.
+	 * Params: see {@link AbstractDictionary#ensureFamixAttribute(Object, String, Type, Type, boolean)}.
 	 * @param persistIt -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
@@ -1689,7 +1706,7 @@ public class JavaDictionary extends Dictionary<IBinding> {
 	/**
 	 * Returns a Famix LocalVariable associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * Params: see {@link Dictionary#ensureFamixLocalVariable(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}
+	 * Params: see {@link AbstractDictionary#ensureFamixLocalVariable(Object, String, Type, eu.synectique.verveine.core.gen.famix.BehaviouralEntity, boolean)}
 	 * @param persistIt  -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if <b>bnd</b> and <b>name</b> are null, or <b>bnd</b> and <b>owner</b> are null, or in case of a Famix error
 	 */
@@ -1830,6 +1847,46 @@ public class JavaDictionary extends Dictionary<IBinding> {
 			((IndexedFileAnchor)fa).setEndPos(end);
 
 			fa.setFileName((String) ((CompilationUnit)node).getProperty(SOURCE_FILENAME_PROPERTY));
+			fmx.setSourceAnchor(fa);
+			famixRepo.add(fa);
+		}
+
+		return fa;
+	}
+
+	/**
+	 * Adds location information to a Famix Entity.
+	 * Location informations are: <b>name</b> of the source file and <b>line</b> position in this file. They are found in the JDT ASTNode: ast.
+	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
+	 * @param fmx -- Famix Entity to add the anchor to
+	 * @param node -- JDT ASTNode, where the information is extracted
+	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some association happening within <b>ast</b>
+	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null)
+	 */
+	public SourceAnchor addSourceAnchor(Method fmx, MethodDeclaration node, boolean oneLineAnchor) {
+		AbstractFileAnchor fa = null;
+
+		if ( (fmx != null) && (node != null) ) {
+			// position in source file
+
+			//Collect the possible beginner
+			List<ASTNode> methodDeclarationModifiers = new ArrayList<>();
+			methodDeclarationModifiers.addAll(node.modifiers());
+			if (node.getName() != null ) {
+				methodDeclarationModifiers.add(node.getName());
+			}
+			if (node.getReturnType2() != null){
+				methodDeclarationModifiers.add(node.getReturnType2());
+			}
+			int beg = (methodDeclarationModifiers.stream().mapToInt(el -> el.getStartPosition()).min().getAsInt()) + 1;
+			int end = node.getStartPosition() + node.getLength();
+
+
+			fa = new IndexedFileAnchor();
+			((IndexedFileAnchor)fa).setStartPos(beg);
+			((IndexedFileAnchor)fa).setEndPos(end);
+
+			fa.setFileName((String) node.getRoot().getProperty(SOURCE_FILENAME_PROPERTY));
 			fmx.setSourceAnchor(fa);
 			famixRepo.add(fa);
 		}

@@ -1,7 +1,7 @@
 package fr.inria.verveine.extractor.java;
 
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.*;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,10 +22,10 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJParser.OUTPUT_FILE).delete();
+        new File(VerveineJOptions.OUTPUT_FILE).delete();
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
-        parser.setOptions(new String[] {"test_src/generics"});
+        parser.configure( new String[] {"test_src/generics"});
         parser.parse();
         //parser.emitMSE(VerveineJParser.OUTPUT_FILE);
     }
@@ -39,7 +39,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
         ParameterizableClass generic = null;
         for (ParameterizableClass g : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
-            if (g.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
+            if (g.getBelongsTo().getName().equals(AbstractDictionary.DEFAULT_PCKG_NAME)) {
                 // note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
                 generic = g;
                 break;

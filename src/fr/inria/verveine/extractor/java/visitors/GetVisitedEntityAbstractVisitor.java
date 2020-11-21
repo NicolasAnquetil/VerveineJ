@@ -3,12 +3,14 @@ package fr.inria.verveine.extractor.java.visitors;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Stack;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
+import fr.inria.verveine.extractor.java.utils.EntityStack;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import org.eclipse.jdt.core.dom.*;
 
-import eu.synectique.verveine.core.EntityStack;
 import eu.synectique.verveine.core.gen.famix.AnnotationType;
 import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
 import eu.synectique.verveine.core.gen.famix.ContainerEntity;
@@ -24,24 +26,34 @@ import fr.inria.verveine.extractor.java.utils.Util;
 public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 
 	/**
+	 * The options that control the behavior of the parser
+	 */
+	protected VerveineJOptions options;
+
+	/**
 	 * A stack that keeps the current definition context (package/class/method)
 	 */
 	protected EntityStack context;
+
 	/** 
 	 * A dictionary allowing to recover created FAMIX Entities
 	 */
 	protected JavaDictionary dico;
+
 	/**
 	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
 	 * we are in its parent node: a ClassInstanceCreation.
 	 * So we must keep this type from the visit(ClassInstanceCreation) to be used in visit(AnonymousClassDeclaration).<br>
 	 * Note that in some special cases one can also have an anonymous class definition without specifying its superclass.
 	 */
-	protected String anonymousSuperTypeName;
+	protected Stack<String> anonymousSuperTypeName;
 
-	public GetVisitedEntityAbstractVisitor(JavaDictionary dico) {
+	public GetVisitedEntityAbstractVisitor(JavaDictionary dico, VerveineJOptions options) {
+		super();
 		this.dico = dico;
+		this.options = options;
 		this.context = new EntityStack();
+		this.anonymousSuperTypeName = new Stack<>();
 	}
 
 	// a generic visit method for node lists
@@ -113,9 +125,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 */
 	protected void visitClassInstanceCreation(ClassInstanceCreation node) {
 		if (node.getAnonymousClassDeclaration() != null) {
-			anonymousSuperTypeName = Util.jdtTypeName(node.getType());
-		} else {
-			anonymousSuperTypeName = null;
+			anonymousSuperTypeName.push(Util.jdtTypeName(node.getType()));
 		}
 	}
 
@@ -127,7 +137,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 
         ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-        fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(anonymousSuperTypeName,context), /*owner*/(ContainerEntity)context.top());
+        fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(),context), /*owner*/(ContainerEntity)context.top());
 		if (fmx != null) {
 			this.context.pushType(fmx);
 		}
@@ -138,7 +148,9 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		if (context.top()  instanceof  eu.synectique.verveine.core.gen.famix.Class) {
 			context.pop();
 		}
-		anonymousSuperTypeName = null;
+		if(!anonymousSuperTypeName.empty()) {
+			anonymousSuperTypeName.pop();
+		}
 	}
 
 	protected eu.synectique.verveine.core.gen.famix.Enum visitEnumDeclaration(EnumDeclaration node) {
@@ -324,4 +336,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		super.endVisit(node);
 	}
 
+	protected String getAnonymousSuperTypeName() {
+		return anonymousSuperTypeName.empty() ? null : anonymousSuperTypeName.peek();
+	}
 }

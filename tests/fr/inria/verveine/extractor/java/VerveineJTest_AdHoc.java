@@ -18,7 +18,6 @@ import java.util.Iterator;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.Access;
 import eu.synectique.verveine.core.gen.famix.Attribute;
 import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
@@ -52,15 +51,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
+		new File(VerveineJOptions.OUTPUT_FILE).delete();
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 	}
 
 	private void parse(String[] sources) {
-		parser.setOptions(sources);
+		parser.configure( sources);
 		parser.parse();
-		parser.emitMSE(VerveineJParser.OUTPUT_FILE);
+		parser.emitMSE(VerveineJOptions.OUTPUT_FILE);
 	}
 
 	@Test
@@ -155,7 +154,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 		ParameterizableClass dico = null;
 		for (ParameterizableClass d : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
-			if (d.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
+			if (d.getBelongsTo().getName().equals(AbstractDictionary.DEFAULT_PCKG_NAME)) {
 				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
 				dico = d;
 				break;
@@ -626,5 +625,39 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
     }
+
+    @Test
+	public void testMethodModifiers(){
+		parse(new String[] {"test_src/ad_hoc/Modifiers.java"});
+
+		Collection<Method> meths = entitiesNamed( Method.class, "methodModifiers");
+
+		assertEquals(1, meths.size());
+		Method method = firstElt(meths);
+
+		assertNotNull(method);
+		assertEquals(6, method.getModifiers().size());
+		assertTrue( method.getModifiers().contains("transient"));
+		assertTrue( method.getModifiers().contains("public"));
+		assertTrue( method.getModifiers().contains("static"));
+		assertTrue( method.getModifiers().contains("final"));
+		assertTrue( method.getModifiers().contains("volatile"));
+		assertTrue( method.getModifiers().contains("synchronized"));
+	}
+
+	@Test
+	public void testAttributeModifiers(){
+		parse(new String[] {"test_src/ad_hoc/Modifiers.java"});
+
+		Attribute attribute = firstElt(entitiesNamed( Attribute.class, "attribute"));
+
+		assertNotNull(attribute);
+		assertEquals(5, attribute.getModifiers().size());
+		assertTrue( attribute.getModifiers().contains("public"));
+		assertTrue( attribute.getModifiers().contains("static"));
+		assertTrue( attribute.getModifiers().contains("transient"));
+		assertTrue( attribute.getModifiers().contains("volatile"));
+		assertTrue( attribute.getModifiers().contains("final"));
+	}
 
 }

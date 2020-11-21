@@ -7,8 +7,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 
-import eu.synectique.verveine.core.Dictionary;
 import eu.synectique.verveine.core.gen.famix.Method;
+import fr.inria.verveine.extractor.java.AbstractDictionary;
 
 
 
@@ -43,12 +43,12 @@ public class ImplicitVarBinding implements IBinding {
 			allImplicitVarBnd.put(owner, vars);
 		}
 		else {
-			bnd = (name.equals(Dictionary.SELF_NAME) ? vars.self_iv : vars.super_iv);
+			bnd = (name.equals(AbstractDictionary.SELF_NAME) ? vars.self_iv : vars.super_iv);
 		}
 
 		if (bnd == null) {
 			bnd = new ImplicitVarBinding(owner,name);
-			if (name.equals(Dictionary.SELF_NAME)) {
+			if (name.equals(AbstractDictionary.SELF_NAME)) {
 				vars.self_iv = bnd;
 			}
 			else {

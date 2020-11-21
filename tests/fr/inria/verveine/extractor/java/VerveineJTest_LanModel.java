@@ -4,29 +4,15 @@
 package fr.inria.verveine.extractor.java;
 
 
-import java.io.File;
-import java.util.Collection;
-
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.Comment;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
-import eu.synectique.verveine.core.gen.famix.SourceAnchor;
-
+import eu.synectique.verveine.core.gen.famix.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.io.File;
+import java.lang.Exception;
+import java.util.Collection;
+import java.util.stream.Collectors;
+
 import static org.junit.Assert.*;
 
 /**
@@ -47,7 +33,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
+		new File(VerveineJOptions.OUTPUT_FILE).delete();
 
 		String[] files = new String[] {
 				"AbstractDestinationAddress.java",
@@ -68,6 +54,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		}
 	}
 
+
 	/**
 	 * Parses the file received in parameter independently from any other
 	 * The "separate parsing" mechanism should ensure that linkages are appropriately done
@@ -83,32 +70,32 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(args);
+		parser.configure( args);
 		parser.parse();
 		
-		new File(VerveineJParser.OUTPUT_FILE).delete();  // delete old MSE file
-		parser.emitMSE(VerveineJParser.OUTPUT_FILE);  // to create a new one
+		new File(VerveineJOptions.OUTPUT_FILE).delete();  // delete old MSE file
+		parser.emitMSE(VerveineJOptions.OUTPUT_FILE);  // to create a new one
 	}
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = 11+14; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable}
-		int nbInherit =9+21;
+		int nbClasses = 11 + 14 + 1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
+		int nbInherit = 9 + 21 + 1;
 
-		if ( System.getProperty("java.version").startsWith("1.") &&
-				System.getProperty("java.version").charAt(2) >= '7' ) {
-			 // class Autocloseable starting in Java 7
+		if (System.getProperty("java.version").startsWith("1.") &&
+				System.getProperty("java.version").charAt(2) >= '7') {
+			// class Autocloseable starting in Java 7
 			nbClasses++;
 			nbInherit++;
 		}
 
-		assertEquals( nbClasses, entitiesOfType( eu.synectique.verveine.core.gen.famix.Class.class).size());
-		assertEquals(3,    entitiesOfType( PrimitiveType.class).size());//int,boolean,void
-		assertEquals(40+8, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
+		assertEquals(nbClasses, entitiesOfType(eu.synectique.verveine.core.gen.famix.Class.class).size());
+		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
+		assertEquals(40+8+1, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>} + Call to the constructor of anonymous IPrinter
 		assertEquals(10+1, entitiesOfType( Attribute.class).size());//10+{System.out}
 		assertEquals(2+4,  entitiesOfType( Namespace.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26,   entitiesOfType( Parameter.class).size());
-		assertEquals(54,   entitiesOfType( Invocation.class).size());
+		assertEquals(55,   entitiesOfType( Invocation.class).size());
 		assertEquals(nbInherit,   entitiesOfType( Inheritance.class).size());
 		assertEquals(45,   entitiesOfType( Access.class).size());// 17 "internal" attributes + 9 System.out + 18 "this" + 1 "super"
 		assertEquals(0,    entitiesOfType( LocalVariable.class).size());
@@ -180,12 +167,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "_Anonymous(IPrinter)");
 		assertNotNull(clazz);
 		assertEquals("_Anonymous(IPrinter)", clazz.getName());
-		assertEquals(1, clazz.numberOfMethods());
+		assertEquals(2, clazz.numberOfMethods()); // the method print and the stub constructor
 		assertEquals(0, clazz.numberOfAttributes());
 		assertSame(detectFamixElement(Method.class, "PrintServer"), clazz.getContainer());
 		assertFalse(clazz.getIsInterface());
 
-		Method mth = firstElt(clazz.getMethods());
+		Method mth = firstElt(clazz.getMethods().stream().filter(aMethod -> !aMethod.getIsStub()).collect(Collectors.toList()));
 		assertEquals("print", mth.getName());
         assertEquals(1, mth.getOutgoingReferences().size());  // System
         assertEquals(1, mth.getAccesses().size());   // out
@@ -389,26 +376,22 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(nodeClass);
 		Collection<Method> methods = nodeClass.getMethods();
 		assertFalse("No methods in Node class !", methods.isEmpty());
-		for (Method mNode : methods) {
-			if ( (mNode.getName().equals("Node")) ||
-				 (mNode.getName().equals("methodWithEmptyBody")) ||
-				 (mNode.getName().equals("canOriginate")) ||
-				 (mNode.getName().equals("canOutput")) ) {
-				assertEquals("Wrong number of parameter for method Node."+mNode.getName()+"()", 0, mNode.getParameters().size());
-			}
-			else if ( (mNode.getName().equals("name")) ||
-					  (mNode.getName().equals("nextNode")) ) {
-				assertTrue("Wrong number of parameter for method Node."+mNode.getName()+"()",  (mNode.getParameters().size()==0) || (mNode.getParameters().size()==1));
-			}
-			else if ( (mNode.getName().equals("accept")) ||
-					 (mNode.getName().equals("send")) ||
-					 (mNode.getName().equals("printOn")) ) {
-				assertEquals("Wrong number of parameter for method Node."+mNode.getName()+"()", 1, mNode.getParameters().size());
-			}
-			else {
-				fail("Unknown method name: "+ mNode.getName());
-			}
-		}
+		for (Method mNode : methods)
+            if ((mNode.getName().equals("Node")) ||
+                    (mNode.getName().equals("methodWithEmptyBody")) ||
+                    (mNode.getName().equals("canOriginate")) ||
+                    (mNode.getName().equals("canOutput"))) {
+                assertEquals("Wrong number of parameter for method Node." + mNode.getName() + "()", 0, mNode.getParameters().size());
+            } else if ((mNode.getName().equals("name")) ||
+                    (mNode.getName().equals("nextNode"))) {
+                assertTrue("Wrong number of parameter for method Node." + mNode.getName() + "()", (mNode.getParameters().size() == 0) || (mNode.getParameters().size() == 1));
+            } else if ((mNode.getName().equals("accept")) ||
+                    (mNode.getName().equals("send")) ||
+                    (mNode.getName().equals("printOn"))) {
+                assertEquals("Wrong number of parameter for method Node." + mNode.getName() + "()", 1, mNode.getParameters().size());
+            } else {
+                fail("Unknown method name: " + mNode.getName());
+            }
 		eu.synectique.verveine.core.gen.famix.Class iprintClass = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
 		assertNotNull(iprintClass);
 		Method mPrint = firstElt(iprintClass.getMethods());
@@ -550,7 +533,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				}
 				else if (invoked.getSignature().equals("equals(Object)")) {
 					assertSame(detectFamixElement(Method.class, "equalsSingle"), inv.getSender());
-					assertEquals(null, inv.getReceiver());
+                    assertNull(inv.getReceiver());
 					assertSame(detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "String"),
                                                                         ((Method)firstElt(inv.getCandidates())).getParentType());
 				}
@@ -653,8 +636,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(clazz, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
 		assertEquals("test_src/LANModel/moose/lan/server/PrintServer.java", ((IndexedFileAnchor)anc).getFileName());
-		assertEquals(235, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(528, ((IndexedFileAnchor)anc).getEndPos());
+		if(isWindows()){
+			assertEquals(251, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(558, ((IndexedFileAnchor)anc).getEndPos());
+		} else {
+			assertEquals(235, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(528, ((IndexedFileAnchor)anc).getEndPos());
+		}
 
 		clazz = detectFamixElement(eu.synectique.verveine.core.gen.famix.Class.class, "Node");
 		assertNotNull(clazz);
@@ -663,10 +651,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(anc);
 		assertSame(clazz, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for class Node", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Node.java"));
-		assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(1281, ((IndexedFileAnchor)anc).getEndPos());
-		
+        assertEquals("Wrong file source for class Node", "test_src/LANModel/moose/lan/Node.java", ((IndexedFileAnchor) anc).getFileName());
+		if(isWindows()){
+			assertEquals(69, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(1350, ((IndexedFileAnchor)anc).getEndPos());
+		} else {
+			assertEquals(64, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(1281, ((IndexedFileAnchor)anc).getEndPos());
+		}
+
 		Method meth = detectFamixElement( Method.class, "equalsMultiple");
 		assertNotNull(meth);
 
@@ -674,10 +667,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(anc);
 		assertSame(meth, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for method SingleDestinationAddress.equalsMultiple()", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/SingleDestinationAddress.java"));
-		assertEquals(695, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(782, ((IndexedFileAnchor)anc).getEndPos());
-		
+        assertEquals("Wrong file source for method SingleDestinationAddress.equalsMultiple()", "test_src/LANModel/moose/lan/SingleDestinationAddress.java", ((IndexedFileAnchor) anc).getFileName());
+		if(isWindows()){
+			assertEquals(733, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(822, ((IndexedFileAnchor)anc).getEndPos());
+		} else {
+			assertEquals(695, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(782, ((IndexedFileAnchor)anc).getEndPos());
+		}
+
 		Attribute att = detectFamixElement( Attribute.class, "originator");
 		assertNotNull(meth);
 
@@ -685,9 +683,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(anc);
 		assertSame(att, anc.getElement());
 		assertSame(IndexedFileAnchor.class, anc.getClass());
-		assertTrue("Wrong file source for field Packet.originator", ((IndexedFileAnchor)anc).getFileName().equals("test_src/LANModel/moose/lan/Packet.java"));
-		assertEquals(217, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(240, ((IndexedFileAnchor)anc).getEndPos());
+        assertEquals("Wrong file source for field Packet.originator", "test_src/LANModel/moose/lan/Packet.java", ((IndexedFileAnchor) anc).getFileName());
+		if(isWindows()){
+			assertEquals(244, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(253, ((IndexedFileAnchor) anc).getEndPos());
+		} else {
+			assertEquals(230, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(239, ((IndexedFileAnchor) anc).getEndPos());
+		}
 		
 	}
 
@@ -742,8 +745,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			IndexedFileAnchor tmpAnc = (IndexedFileAnchor) c.getSourceAnchor();
 			if ( tmpAnc.getStartPos().intValue() > 5) { // i.e. not the one at the beginning of the file
 				anc = tmpAnc;
-				assertEquals(64, tmpAnc.getStartPos());
-				assertEquals(120, tmpAnc.getEndPos());
+				if(isWindows()){
+					assertEquals(69, tmpAnc.getStartPos());
+					assertEquals(129, tmpAnc.getEndPos());
+				} else {
+					assertEquals(64, tmpAnc.getStartPos());
+					assertEquals(120, tmpAnc.getEndPos());
+				}
 			}
 		}
 		assertNotNull(anc);
@@ -753,8 +761,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		cmts = meth.getComments();
 		assertEquals(1, cmts.size());
 		anc = firstElt(cmts).getSourceAnchor();
-		assertEquals(533, ((IndexedFileAnchor)anc).getStartPos());
-		assertEquals(588, ((IndexedFileAnchor)anc).getEndPos());
+		if(isWindows()){
+			assertEquals(563, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(621, ((IndexedFileAnchor)anc).getEndPos());
+		} else {
+			assertEquals(533, ((IndexedFileAnchor)anc).getStartPos());
+			assertEquals(588, ((IndexedFileAnchor)anc).getEndPos());
+		}
 
 		// testing the non javadoc comments (those that are treated)
 		clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "WorkStation");
@@ -763,8 +776,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals("type", a.getName());
 		cmts = a.getComments();
 		assertEquals(1, cmts.size());
-		anc = (IndexedFileAnchor)firstElt(cmts).getSourceAnchor();
-		assertEquals(164, ((IndexedFileAnchor)anc).getStartPos().intValue());
+		anc = firstElt(cmts).getSourceAnchor();
+		if(isWindows()){
+			assertEquals(176, ((IndexedFileAnchor)anc).getStartPos().intValue());
+		} else {
+			assertEquals(164, ((IndexedFileAnchor)anc).getStartPos().intValue());
+		}
 	}
 	
 	@Test

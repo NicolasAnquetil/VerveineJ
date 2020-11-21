@@ -1,0 +1,5 @@
+bin/*
+*.mse
+testrep/*
+.idea/
+out/

@@ -5,18 +5,51 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import eu.synectique.verveine.core.Dictionary;
-
-import eu.synectique.verveine.core.gen.famix.*;
-import eu.synectique.verveine.core.gen.famix.Class;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
-import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
-import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
-
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
+import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.ArrayAccess;
+import org.eclipse.jdt.core.dom.Assignment;
+import org.eclipse.jdt.core.dom.CastExpression;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.ConditionalExpression;
+import org.eclipse.jdt.core.dom.ConstructorInvocation;
+import org.eclipse.jdt.core.dom.EnumConstantDeclaration;
+import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.FieldAccess;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.Initializer;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.ParenthesizedExpression;
+import org.eclipse.jdt.core.dom.SuperConstructorInvocation;
+import org.eclipse.jdt.core.dom.SuperFieldAccess;
+import org.eclipse.jdt.core.dom.SuperMethodInvocation;
 import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+
+import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
+import eu.synectique.verveine.core.gen.famix.Class;
+import eu.synectique.verveine.core.gen.famix.ContainerEntity;
+import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
+import eu.synectique.verveine.core.gen.famix.Inheritance;
+import eu.synectique.verveine.core.gen.famix.Invocation;
+import eu.synectique.verveine.core.gen.famix.Method;
+import eu.synectique.verveine.core.gen.famix.NamedEntity;
+import eu.synectique.verveine.core.gen.famix.StructuralEntity;
+import fr.inria.verveine.extractor.java.AbstractDictionary;
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
+import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
+import fr.inria.verveine.extractor.java.utils.Util;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 
 public class VisitorInvocRef extends AbstractRefVisitor {
 
@@ -36,14 +69,8 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 
-	/**
-	 * what sourceAnchors to create
-	 */
-	private anchorOptions anchors;
-
-	public VisitorInvocRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
-		super(dico, classSummary);
-		this.anchors = anchors;
+	public VisitorInvocRef(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 	}
 
 	// VISITOR METHODS
@@ -84,21 +111,33 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 */
 	public boolean visit(ClassInstanceCreation node) {
 		visitClassInstanceCreation(node);
-		if ( (node.getAnonymousClassDeclaration() == null) && (!classSummary) ) {
-			Type clazz = node.getType();
-			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+		if ((!summarizeClasses())) {
 
-			// create an invocation to the constructor
 			String typName;
-			if (fmx == null) {
-				typName = findTypeName(clazz);
-			}
-			else {
+			eu.synectique.verveine.core.gen.famix.Type fmx;
+
+			if (node.getAnonymousClassDeclaration() != null) {
+				ITypeBinding bnd = node.resolveTypeBinding();
+				fmx =
+						this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
 				typName = fmx.getName();
 			}
+			else {
+
+				Type clazz = node.getType();
+				fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+
+				// create an invocation to the constructor
+				if (fmx == null) {
+					typName = findTypeName(clazz);
+				} else {
+					typName = fmx.getName();
+				}
+			}
+
 			methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
 			Invocation lastInvok = context.getLastInvocation();
-			if ( (anchors == anchorOptions.assoc)
+			if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
 					&& (lastInvok != null)
 					&& (lastInvok.getSender() == context.topMethod())
 					&& (lastInvok.getReceiver() == null)
@@ -237,17 +276,12 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}//context
 
 		Invocation lastInvok = context.getLastInvocation();
-		if ( (anchors == anchorOptions.assoc)
+		if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
 			dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
 		}
-		
-		/* really needed ?
-		if (callingExpr instanceof SimpleName) {
-			visitSimpleName((SimpleName) callingExpr);
-		}*/
 
 		return super.visit(node);
 	}
@@ -255,7 +289,11 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	public boolean visit(SuperMethodInvocation node) {
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
-		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, this.context.topType(), context.topMethod(), /*persistIt*/!classSummary);
+		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(
+				AbstractDictionary.SUPER_NAME, 
+				this.context.topType(), 
+				context.topMethod(), 
+				/*persistIt*/!summarizeClasses());
 		IMethodBinding bnd = node.resolveMethodBinding();
 		String calledName = node.getName().getFullyQualifiedName();
 
@@ -274,7 +312,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		Invocation lastInvok = context.getLastInvocation();
-		if ( (anchors == anchorOptions.assoc)
+		if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
@@ -292,11 +330,11 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		String name = context.topMethod().getName();
 		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
 				/*paramTypes*/(Collection<String>) null, /*retType*/null, /*owner*/context.topType(), modifiers,
-				/*persistIt*/!classSummary);
+				/*persistIt*/!summarizeClasses());
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either
 
-		if (!classSummary) {
+		if (!summarizeClasses()) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -304,13 +342,17 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			if (signature.endsWith(";")) {
 				signature = signature.substring(0, signature.length() - 1);
 			}
-			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
+			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(
+					AbstractDictionary.SELF_NAME, 
+					context.topType(), 
+					context.topMethod(), 
+					/*persistIt=true*/!summarizeClasses());
 			
 			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
 			
-			if ( (anchors == anchorOptions.assoc) && (invok != null)) {
+			if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc) && (invok != null)) {
 				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -327,10 +369,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 //            invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), superC.getName(),  /*paramsType*/(Collection<String>) null, superC, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
 //        }
 //        else {
-		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!classSummary);
+		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!summarizeClasses());
 //        }
 
-		if ( (invoked != null) && (! classSummary) ) {
+		if ( (invoked != null) && (! summarizeClasses()) ) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -338,11 +380,15 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			if (signature.endsWith(";")) {
 				signature = signature.substring(0, signature.length() - 1);
 			}
-			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(Dictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt=true*/!classSummary);
+			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(
+					AbstractDictionary.SUPER_NAME, 
+					context.topType(), 
+					context.topMethod(), 
+					/*persistIt=true*/!summarizeClasses());
 			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
-			if (anchors == anchorOptions.assoc) {
+			if (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) {
 				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -391,7 +437,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				int modifiers = (calledBnd != null) ? calledBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 				if ((receiver != null) && (receiver instanceof StructuralEntity)) {
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner,
-							modifiers, /*persistIt*/!classSummary);
+							modifiers, /*persistIt*/!summarizeClasses());
 				} else {
 					eu.synectique.verveine.core.gen.famix.Type owner;
 
@@ -401,10 +447,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null,
-							/*owner*/owner, modifiers, /*persistIt*/!classSummary);
+							/*owner*/owner, modifiers, /*persistIt*/!summarizeClasses());
 				}
 				
-				if (! classSummary) {
+				if (! summarizeClasses()) {
 					String signature = calledName + "(";
 					boolean first = true;
 					for (Expression a : l_args) {
@@ -437,7 +483,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		// msg(), same as ThisExpression
 		if (expr == null) {
 			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod(),
-					/*persistIt*/!classSummary);
+					/*persistIt*/!summarizeClasses());
 		}
 
 		// array[i].msg()
@@ -541,7 +587,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// this.msg()
 		if ( NodeTypeChecker.isThisExpression(expr)) {
-			return this.dico.ensureFamixImplicitVariable(Dictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! classSummary);
+			return this.dico.ensureFamixImplicitVariable(AbstractDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeClasses());
 		}
 
 		// type.class.msg()
