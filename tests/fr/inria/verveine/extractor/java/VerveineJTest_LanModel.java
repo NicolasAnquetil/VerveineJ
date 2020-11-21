@@ -5,6 +5,8 @@ package fr.inria.verveine.extractor.java;
 
 
 import eu.synectique.verveine.core.gen.famix.*;
+import fr.inria.verveine.extractor.java.utils.VerveineUtilsForTests;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -82,13 +84,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		int nbClasses = 11 + 14 + 1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
 		int nbInherit = 9 + 21 + 1;
 
-		if (System.getProperty("java.version").startsWith("1.") &&
-				System.getProperty("java.version").charAt(2) >= '7') {
+		if (VerveineUtilsForTests.javaVersion() >= 7) {
 			// class Autocloseable starting in Java 7
 			nbClasses++;
 			nbInherit++;
 		}
-
+		
 		assertEquals(nbClasses, entitiesOfType(eu.synectique.verveine.core.gen.famix.Class.class).size());
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40+8+1, entitiesOfType( Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>} + Call to the constructor of anonymous IPrinter

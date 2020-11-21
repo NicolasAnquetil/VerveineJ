@@ -14,6 +14,22 @@ import eu.synectique.verveine.core.gen.famix.NamedEntity;
 public class VerveineUtilsForTests {
 
 	/**
+	 * Computes Java version as an int
+	 */
+	public static int javaVersion() {
+	    String version = System.getProperty("java.version");
+	    if(version.startsWith("1.")) {
+	        version = version.substring(2, 3);
+	    } else {
+	        int dot = version.indexOf(".");
+	        if(dot != -1) {
+	        	version = version.substring(0, dot);
+	        }
+	    }
+	    return Integer.parseInt(version);
+	}	
+
+	/**
 	 * Returns a Collection of all FAMIXEntities in repository of the given fmxClass.
 	 * Same method as listAll(Class<T extends Entity>) defined in VerveineParser
 	 */
