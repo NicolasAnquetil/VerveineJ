@@ -5,8 +5,6 @@ package fr.inria.verveine.extractor.java;
 
 
 import eu.synectique.verveine.core.gen.famix.*;
-import eu.synectique.verveine.core.gen.famix.Class;
-import fr.inria.verveine.extractor.java.utils.VerveineUtilsForTests;
 
 import org.junit.Before;
 import org.junit.Test;
