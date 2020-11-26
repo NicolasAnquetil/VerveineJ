@@ -1,14 +1,13 @@
 package fr.inria.verveine.extractor.java.utils;
 
-import java.util.Hashtable;
-import java.util.Map;
-
+import fr.inria.verveine.extractor.core.Dictionary;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
-
-import eu.synectique.verveine.core.Dictionary;
 import org.moosetechnology.model.famix.famix.Method;
+
+import java.util.Hashtable;
+import java.util.Map;
 
 
 /**
@@ -17,6 +16,7 @@ import org.moosetechnology.model.famix.famix.Method;
  * But implicit variables don't have associated JDT binding
  * So we create this class that will implement a fake IBinding for each implicit variables in each behaviouralEntity it appears in.
  * The actual key will composed from the binding of its owner behaviouralEntity and its name (this, super)
+ *
  * @author Anquetil
  */
 public class ImplicitVarBinding implements IBinding {

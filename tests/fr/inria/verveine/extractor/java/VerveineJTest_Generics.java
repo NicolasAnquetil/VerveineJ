@@ -1,9 +1,9 @@
 package fr.inria.verveine.extractor.java;
 
-import eu.synectique.verveine.core.Dictionary;
-import org.moosetechnology.model.famix.famix.*;
+import fr.inria.verveine.extractor.core.Dictionary;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famix.famix.*;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famix.famixtraits.TParameter;
 import org.moosetechnology.model.famix.famixtraits.TParameterizedType;

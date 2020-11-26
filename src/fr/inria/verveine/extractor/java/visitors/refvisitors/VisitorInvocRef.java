@@ -1,34 +1,30 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-
-import eu.synectique.verveine.core.Dictionary;
-
-import org.moosetechnology.model.famix.famix.*;
-import org.moosetechnology.model.famix.famix.Class;
+import fr.inria.verveine.extractor.core.Dictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
-
-import org.eclipse.jdt.core.dom.*;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.internal.compiler.ast.Argument;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famix.famix.Class;
+import org.moosetechnology.model.famix.famix.*;
 import org.moosetechnology.model.famix.famixtraits.TInheritance;
 import org.moosetechnology.model.famix.famixtraits.TType;
+
+import java.io.RandomAccessFile;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 
 public class VisitorInvocRef extends AbstractRefVisitor {
 
 	/**
 	 * Useful to keep the FamixType created in the specific case of "new SomeClass().someMethod()"
 	 */
-	private org.moosetechnology.model.famix.famix.Type classInstanceCreated = null;
+	private final org.moosetechnology.model.famix.famix.Type classInstanceCreated = null;
 
 	/**
 	 * The source code of the visited AST.
@@ -44,7 +40,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	private anchorOptions anchors;
+	private final anchorOptions anchors;
 
 	public VisitorInvocRef(JavaDictionary dico, boolean classSummary, anchorOptions anchors) {
 		super(dico, classSummary);
@@ -302,7 +298,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		String name = context.topMethod().getName();
 		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
-				/*paramTypes*/(Collection<String>) null, /*retType*/null, /*owner*/context.topType(), modifiers,
+				/*paramTypes*/null, /*retType*/null, /*owner*/context.topType(), modifiers,
 				/*persistIt*/!classSummary);
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either

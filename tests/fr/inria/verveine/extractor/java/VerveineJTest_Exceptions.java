@@ -1,20 +1,16 @@
 package fr.inria.verveine.extractor.java;
 
-import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.VerveineUtilsForTests;
+import org.junit.Before;
+import org.junit.Test;
 import org.moosetechnology.model.famix.famix.CaughtException;
 import org.moosetechnology.model.famix.famix.DeclaredException;
 import org.moosetechnology.model.famix.famix.Method;
 import org.moosetechnology.model.famix.famix.ThrownException;
-import org.junit.Before;
-import org.junit.Test;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 

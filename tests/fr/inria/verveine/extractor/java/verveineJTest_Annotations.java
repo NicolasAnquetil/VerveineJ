@@ -1,10 +1,8 @@
 package fr.inria.verveine.extractor.java;
 
-import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.VerveineUtilsForTests;
-import org.moosetechnology.model.famix.famix.*;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famix.famix.*;
 import org.moosetechnology.model.famix.famixtraits.*;
 
 import java.io.File;
@@ -12,8 +10,6 @@ import java.lang.Exception;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
 
 public class verveineJTest_Annotations extends VerveineJTest_Basic {
 

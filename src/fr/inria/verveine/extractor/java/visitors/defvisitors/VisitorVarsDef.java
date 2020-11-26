@@ -1,16 +1,15 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import org.eclipse.jdt.core.dom.*;
-
-import eu.synectique.verveine.core.Dictionary;
-import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
+import fr.inria.verveine.extractor.core.Dictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
+import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.moosetechnology.model.famix.famix.*;
+import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famix.Enum;
+import org.moosetechnology.model.famix.famix.*;
 
 import java.util.List;
 
@@ -29,7 +28,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	/**
 	 * what sourceAnchors to create
 	 */
-	private anchorOptions anchors;
+	private final anchorOptions anchors;
 
 	/**
 	 * set in parent of structuralEntity declaration to indicate what kind of structuralentity it is
