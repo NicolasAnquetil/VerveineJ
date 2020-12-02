@@ -1,32 +1,16 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationInstanceAttribute;
+import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationType;
+import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationTypeAttribute;
+import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.IAnnotationBinding;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.IMemberValuePairBinding;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-
-import org.moosetechnology.model.famix.famix.AnnotationInstanceAttribute;
-import org.moosetechnology.model.famix.famix.AnnotationType;
-import org.moosetechnology.model.famix.famix.AnnotationTypeAttribute;
-import org.moosetechnology.model.famix.famix.NamedEntity;
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 
 /**
  * <p>Recovers annotations from the IBinding of various kind of entities:

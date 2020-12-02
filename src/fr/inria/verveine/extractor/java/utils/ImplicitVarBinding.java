@@ -4,7 +4,7 @@ import fr.inria.verveine.extractor.core.Dictionary;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
-import org.moosetechnology.model.famix.famix.Method;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
 
 import java.util.Hashtable;
 import java.util.Map;

@@ -1,18 +1,19 @@
 package fr.inria.verveine.extractor.java;
 
+import ch.akuhn.fame.Repository;
+import fr.inria.verveine.extractor.java.utils.Util;
+import org.junit.Assume;
+import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+
 import java.lang.Class;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
-
-import org.junit.Assume;
-import org.junit.Test;
-
-import ch.akuhn.fame.Repository;
-import org.moosetechnology.model.famix.famix.*;
-import org.moosetechnology.model.famix.famixtraits.TAssociation;
-import org.moosetechnology.model.famix.famixtraits.TAttribute;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import static org.junit.Assert.*;
 
@@ -25,7 +26,7 @@ public abstract class VerveineJTest_Basic {
 	 * A crude way for the subclasses to select which tests they want to run
 	 * Each test method should have an indice in this array
 	 */
-    private boolean[] testsToRun;
+	private final boolean[] testsToRun;
 
 	public VerveineJTest_Basic() {
 		this(true);
@@ -129,32 +130,32 @@ public abstract class VerveineJTest_Basic {
 
 	@Test // number 1
 	public void testBelongsTo() {
-    	Assume.assumeTrue(testsToRun[1]);
+		Assume.assumeTrue(testsToRun[1]);
 
-    	boolean found = false;
-		for ( Type e : repo.all(Type.class) ) {
-			if (! e.getIsStub() ) {
-				assertNotNull("a Type '"+e.getName()+"' does not belong to anything", e.getBelongsTo());
+		boolean found = false;
+		for (Type e : repo.all(Type.class)) {
+			if (!e.getIsStub()) {
+				assertNotNull("a Type '" + e.getName() + "' does not belong to anything", Util.belongsToOf(e));
 				found = true;
 			}
 		}
 		assertTrue("All `Types' are stubs", found);
 
-    	found = false;
-		for ( BehaviouralEntity e : repo.all(BehaviouralEntity.class) ) {
-            if (! e.getIsStub() ) {
-                assertNotNull("a BehaviouralEntity '" + e.getName() + "' does not belong to anything", e.getBelongsTo());
- 				found = true;
-           }
+		found = false;
+		for (Method e : repo.all(Method.class)) {
+			if (!e.getIsStub()) {
+				assertNotNull("a BehaviouralEntity '" + e.getName() + "' does not belong to anything", Util.belongsToOf(e));
+				found = true;
+			}
 		}
 		assertTrue("All `BehaviouralEntities' are stubs", found);
 
-    	found = false;
-		for ( StructuralEntity e : repo.all(StructuralEntity.class) ) {
-            if (! e.getIsStub() ) {
-                assertNotNull("a StructuralEntity '" + e.getName() + "' does not belong to anything", e.getBelongsTo());
- 				found = true;
-           }
+		found = false;
+		for (TStructuralEntity e : repo.all(TStructuralEntity.class)) {
+			if (!((TSourceEntity) e).getIsStub()) {
+				assertNotNull("a StructuralEntity '" + ((TNamedEntity) e).getName() + "' does not belong to anything", Util.belongsToOf((Entity) e));
+				found = true;
+			}
 		}
 		assertTrue("All `StructuralEntities' are stubs", found);
 	}
@@ -165,14 +166,14 @@ public abstract class VerveineJTest_Basic {
 		// some methods were created without sourceAnchor whereas their parent did have one. This should not happen (or only in special cases)
     	boolean found = false;
     	Assume.assumeTrue(testsToRun[2]);
-		for ( Method m : repo.all(Method.class) ) {
+		for ( Method m : repo.all(Method.class)) {
 			Type parent = (Type) m.getParentType();
-			if ( (parent != null) &&
-					(! (parent instanceof org.moosetechnology.model.famix.famix.Enum)) &&   // for enums some methods are implicit
-					(! m.getName().equals(parent.getName())) &&   // for constructors are implicit
-					(! m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) &&
-					(parent.getSourceAnchor() != null) ) {
-				assertNotNull("Method '"+m.getName()+"' has no SourceAnchor, whereas its parent '"+parent.getName()+"' has one", m.getSourceAnchor());
+			if ((parent != null) &&
+					(!(parent instanceof org.moosetechnology.model.famixjava.famixjavaentities.Enum)) &&   // for enums some methods are implicit
+					(!m.getName().equals(parent.getName())) &&   // for constructors are implicit
+					(!m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) &&
+					(parent.getSourceAnchor() != null)) {
+				assertNotNull("Method '" + m.getName() + "' has no SourceAnchor, whereas its parent '" + parent.getName() + "' has one", m.getSourceAnchor());
 				found = true;
 			}
 		}
@@ -188,13 +189,13 @@ public abstract class VerveineJTest_Basic {
 		Assume.assumeTrue(testsToRun[3]);
 
 		// namespaces
-		Namespace java = detectFamixElement( Namespace.class, "java");
+		Namespace java = detectFamixElement(Namespace.class, "java");
 		assertNotNull(java);
 
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
-		Namespace javaLang = detectFamixElement( Namespace.class, javaLangName);
+		Namespace javaLang = detectFamixElement(Namespace.class, javaLangName);
 		assertNotNull(javaLang);
-		assertEquals(java, javaLang.getBelongsTo());
+		assertEquals(java, javaLang.getParentNamespace());
 		// Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence
 
 		/* java.io no longer created by default
@@ -204,14 +205,14 @@ public abstract class VerveineJTest_Basic {
 		*/
 
 		// Object
-		org.moosetechnology.model.famix.famix.Class obj = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, JavaDictionary.OBJECT_NAME);
+		org.moosetechnology.model.famixjava.famixjavaentities.Class obj = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(obj);
-		assertSame(javaLang, obj.getContainer());
+		assertSame(javaLang, obj.getTypeContainer());
 		assertEquals(0, obj.getSuperInheritances().size());
 
 		// String
 		/* CharSequence no longer created as superclass of String
-		org.moosetechnology.model.famix.famix.Class charSeq = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "CharSequence");
+		org.moosetechnology.model.famixjava.famixjavaentities.Class charSeq = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "CharSequence");
 		assertNotNull(charSeq);
 		assertSame(javaLang, charSeq.getContainer());
 		assertTrue(charSeq.getIsInterface());
@@ -219,16 +220,16 @@ public abstract class VerveineJTest_Basic {
 		*/
 
 		/* Serializable no longer created
-		org.moosetechnology.model.famix.famix.Class serial = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Serializable");
+		org.moosetechnology.model.famixjava.famixjavaentities.Class serial = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Serializable");
 		assertNotNull(serial);
 		assertSame(javaIO, serial.getContainer());
 		assertTrue(serial.getIsInterface());
 		assertEquals(0, serial.getSuperInheritances().size());
 		*/
 
-		org.moosetechnology.model.famix.famix.Class str = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "String");
+		org.moosetechnology.model.famixjava.famixjavaentities.Class str = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "String");
 		assertNotNull(str);
-		assertSame(javaLang, str.getContainer());
+		assertSame(javaLang, str.getTypeContainer());
 		/*stubs no longer have inheritance
 		assertEquals(4, str.getSuperInheritances().size());
 		for (Inheritance inh : str.getSuperInheritances()) {
@@ -245,18 +246,17 @@ public abstract class VerveineJTest_Basic {
 	public void testSystemClass() {
 		Assume.assumeTrue(testsToRun[4]);
 
-		org.moosetechnology.model.famix.famix.Class syst = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "System");
+		org.moosetechnology.model.famixjava.famixjavaentities.Class syst = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "System");
 		assertNotNull(syst);
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
-		Namespace javaLang = detectFamixElement( Namespace.class, javaLangName);
-		assertSame(javaLang, syst.getContainer());
+		Namespace javaLang = detectFamixElement(Namespace.class, javaLangName);
+		assertSame(javaLang, syst.getTypeContainer());
 		boolean found = false;
 		for (TAttribute att : syst.getAttributes()) {
 			if (((TNamedEntity) att).getName().equals("out")) {
 				found = true;
-			}
-			else {
-				assertTrue( "Unexpected System attribute: "+((TNamedEntity)att).getName(), ((TNamedEntity) att).getName().equals("err") );
+			} else {
+				assertTrue("Unexpected System attribute: " + ((TNamedEntity) att).getName(), ((TNamedEntity) att).getName().equals("err"));
 			}
 		}
 		assertTrue("No `out' attribute in class `System'", found);
@@ -264,13 +264,13 @@ public abstract class VerveineJTest_Basic {
 	
 	@Test // number 5
 	public void testSourceLanguage() {
-    	Assume.assumeTrue(testsToRun[5]);
+		Assume.assumeTrue(testsToRun[5]);
 
-    	Collection<SourceLanguage> sl = entitiesOfType( SourceLanguage.class);
-    	assertNotNull(sl);
-    	assertEquals(1, sl.size());
-    	SourceLanguage jsl = firstElt(sl);
-    	assertEquals(JavaSourceLanguage.class, jsl.getClass());
+		Collection<SourceLanguage> sl = entitiesOfType(SourceLanguage.class);
+		assertNotNull(sl);
+		assertEquals(1, sl.size());
+		SourceLanguage jsl = firstElt(sl);
+		assertEquals(SourceLanguage.class, jsl.getClass());
 	}
 
 	/**

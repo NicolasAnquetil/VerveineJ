@@ -1,16 +1,10 @@
 package fr.inria.verveine.extractor.java;
 
-import org.moosetechnology.model.famix.famix.*;
-import org.moosetechnology.model.famix.famix.Class;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Class;
 
 import java.io.File;
-import java.lang.Exception;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 

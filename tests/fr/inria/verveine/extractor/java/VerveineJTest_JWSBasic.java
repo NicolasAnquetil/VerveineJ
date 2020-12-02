@@ -4,21 +4,18 @@
 package fr.inria.verveine.extractor.java;
 
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstance;
+import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 
 import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import org.moosetechnology.model.famix.famix.*;
-import org.moosetechnology.model.famix.famixtraits.TAnnotationInstance;
-import org.moosetechnology.model.famix.famixtraits.TAttribute;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import static org.junit.Assert.*;
 
 
 /**
@@ -60,25 +57,22 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 		assertEquals(3, ann.getAttributes().size());
 		for (TAttribute ta : ann.getAttributes()) {
-			Attribute a = (Attribute) ta;
-			assertEquals(AnnotationTypeAttribute.class, a.getClass());
-			assertTrue(a.getName().equals("name") || a.getName().equals("serviceName") || a.getName().equals("targetNamespace"));
+			assertEquals(AnnotationTypeAttribute.class, ta.getClass());
+			assertTrue(((TNamedEntity) ta).getName().equals("name") || (((TNamedEntity) ta).getName().equals("serviceName") || ((TNamedEntity) ta).getName().equals("targetNamespace")));
 		}
 
 		// Class annotation
-		org.moosetechnology.model.famix.famix.Class cl = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "SimpleBean");
+		org.moosetechnology.model.famixjava.famixjavaentities.Class cl = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "SimpleBean");
 		assertNotNull(cl);
 		assertEquals(2, cl.getAnnotationInstances().size());
-		for (TAnnotationInstance a :cl.getAnnotationInstances() ) {
+		for (TAnnotationInstance a : cl.getAnnotationInstances()) {
 			AnnotationInstance ai = (AnnotationInstance) a;
 			if (((TNamedEntity) ai.getAnnotationType()).getName().equals("WebService")) {
-				assertEquals(detectFamixElement(Namespace.class, "jws"), ((AnnotationType) ai.getAnnotationType()).getBelongsTo());
-			}
-			else if (((TNamedEntity)ai.getAnnotationType()).getName().equals("SOAPBinding")) {
-				assertEquals(detectFamixElement(Namespace.class, "soap"), ((AnnotationType) ai.getAnnotationType()).getBelongsTo());
-			}
-			else {
-				assertTrue("Unexpected AnnotationInstance for SimpleBean: "+ ((AnnotationType)ai.getAnnotationType()).getName(), false);
+				assertEquals(detectFamixElement(Namespace.class, "jws"), (ai.getAnnotationType()).getAnnotationTypesContainer());
+			} else if (((TNamedEntity) ai.getAnnotationType()).getName().equals("SOAPBinding")) {
+				assertEquals(detectFamixElement(Namespace.class, "soap"), (ai.getAnnotationType()).getAnnotationTypesContainer());
+			} else {
+				assertTrue("Unexpected AnnotationInstance for SimpleBean: " + ((AnnotationType) ai.getAnnotationType()).getName(), false);
 			}
 		}
 

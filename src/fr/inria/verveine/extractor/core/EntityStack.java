@@ -1,15 +1,9 @@
 package fr.inria.verveine.extractor.core;
 
-import org.moosetechnology.model.famix.famix.Access;
-import org.moosetechnology.model.famix.famix.AnnotationTypeAttribute;
-import org.moosetechnology.model.famix.famix.BehaviouralEntity;
-import org.moosetechnology.model.famix.famix.Invocation;
-import org.moosetechnology.model.famix.famix.Method;
-import org.moosetechnology.model.famix.famix.NamedEntity;
-import org.moosetechnology.model.famix.famix.Namespace;
-import org.moosetechnology.model.famix.famix.Package;
-import org.moosetechnology.model.famix.famix.Reference;
-import org.moosetechnology.model.famix.famix.Type;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+
+import java.lang.Class;
 import java.util.Stack;
 
 public class EntityStack {
@@ -70,7 +64,7 @@ public class EntityStack {
         this.push(new fr.inria.verveine.extractor.core.EntityStack.MetricHolder(var1));
     }
 
-    public void pushBehaviouralEntity(BehaviouralEntity var1) {
+    public void pushBehaviouralEntity(Method var1) {
         this.push(var1);
         this.push(new fr.inria.verveine.extractor.core.EntityStack.MetricHolder(var1));
     }
@@ -110,84 +104,84 @@ public class EntityStack {
         if (this.stack.isEmpty()) {
             return null;
         } else {
-            NamedEntity var1 = (NamedEntity)this.stack.pop();
-            return var1 instanceof fr.inria.verveine.extractor.core.EntityStack.MetricHolder ? (NamedEntity)this.stack.pop() : var1;
+            NamedEntity var1 = this.stack.pop();
+            return var1 instanceof fr.inria.verveine.extractor.core.EntityStack.MetricHolder ? this.stack.pop() : var1;
         }
     }
 
     public Package popPckg() {
-        return (Package)this.popUpto(Package.class);
+        return this.popUpto(Package.class);
     }
 
     public Type popType() {
-        return (Type)this.popUpto(Type.class);
+        return this.popUpto(Type.class);
     }
 
     public Namespace popNamespace() {
-        return (Namespace)this.popUpto(Namespace.class);
+        return this.popUpto(Namespace.class);
     }
 
     public Method popMethod() {
-        return (Method)this.popUpto(Method.class);
+        return this.popUpto(Method.class);
     }
 
     public AnnotationTypeAttribute popAnnotationMember() {
-        return (AnnotationTypeAttribute)this.popUpto(AnnotationTypeAttribute.class);
+        return this.popUpto(AnnotationTypeAttribute.class);
     }
 
     public NamedEntity top() {
         if (this.stack.isEmpty()) {
             return null;
         } else {
-            NamedEntity var1 = (NamedEntity)this.stack.peek();
-            return (NamedEntity)(var1 instanceof fr.inria.verveine.extractor.core.EntityStack.MetricHolder ? ((fr.inria.verveine.extractor.core.EntityStack.MetricHolder)var1).getEntity() : var1);
+            NamedEntity var1 = this.stack.peek();
+            return var1 instanceof MetricHolder ? ((MetricHolder) var1).getEntity() : var1;
         }
     }
 
     public Package topPckg() {
-        return (Package)this.lookUpto(Package.class);
+        return this.lookUpto(Package.class);
     }
 
     public Type topType() {
-        return (Type)this.lookUpto(Type.class);
+        return this.lookUpto(Type.class);
     }
 
     public Namespace topNamespace() {
-        return (Namespace)this.lookUpto(Namespace.class);
+        return this.lookUpto(Namespace.class);
     }
 
-    public BehaviouralEntity topBehaviouralEntity() {
-        return (BehaviouralEntity)this.lookUpto(BehaviouralEntity.class);
+    public Method topBehaviouralEntity() {
+        return this.lookUpto(Method.class);
     }
 
     public Method topMethod() {
-        return (Method)this.lookUpto(Method.class);
+        return this.lookUpto(Method.class);
     }
 
     public AnnotationTypeAttribute topAnnotationMember() {
-        return (AnnotationTypeAttribute)this.lookUpto(AnnotationTypeAttribute.class);
+        return this.lookUpto(AnnotationTypeAttribute.class);
     }
 
     public int getTopMethodCyclo() {
-        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var1 = (fr.inria.verveine.extractor.core.EntityStack.MetricHolder)this.lookUpto(fr.inria.verveine.extractor.core.EntityStack.MetricHolder.class);
+        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var1 = this.lookUpto(MetricHolder.class);
         return var1 != null ? var1.getCyclo() : 0;
     }
 
-    public int getTopMethodNOS() {
-        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var1 = (fr.inria.verveine.extractor.core.EntityStack.MetricHolder)this.lookUpto(fr.inria.verveine.extractor.core.EntityStack.MetricHolder.class);
-        return var1 != null ? var1.getNos() : 0;
-    }
-
     public void setTopMethodCyclo(int var1) {
-        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var2 = (fr.inria.verveine.extractor.core.EntityStack.MetricHolder)this.lookUpto(fr.inria.verveine.extractor.core.EntityStack.MetricHolder.class);
+        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var2 = this.lookUpto(MetricHolder.class);
         if (var2 != null) {
             var2.setCyclo(var1);
         }
 
     }
 
+    public int getTopMethodNOS() {
+        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var1 = this.lookUpto(MetricHolder.class);
+        return var1 != null ? var1.getNos() : 0;
+    }
+
     public void setTopMethodNOS(int var1) {
-        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var2 = (fr.inria.verveine.extractor.core.EntityStack.MetricHolder)this.lookUpto(fr.inria.verveine.extractor.core.EntityStack.MetricHolder.class);
+        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var2 = this.lookUpto(MetricHolder.class);
         if (var2 != null) {
             var2.setNos(var1);
         }
@@ -195,7 +189,7 @@ public class EntityStack {
     }
 
     public void addTopMethodCyclo(int var1) {
-        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var2 = (fr.inria.verveine.extractor.core.EntityStack.MetricHolder)this.lookUpto(fr.inria.verveine.extractor.core.EntityStack.MetricHolder.class);
+        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var2 = this.lookUpto(MetricHolder.class);
         if (var2 != null) {
             var2.setCyclo(var2.getCyclo() + var1);
         }
@@ -203,7 +197,7 @@ public class EntityStack {
     }
 
     public void addTopMethodNOS(int var1) {
-        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var2 = (fr.inria.verveine.extractor.core.EntityStack.MetricHolder)this.lookUpto(fr.inria.verveine.extractor.core.EntityStack.MetricHolder.class);
+        fr.inria.verveine.extractor.core.EntityStack.MetricHolder var2 = this.lookUpto(MetricHolder.class);
         if (var2 != null) {
             var2.setNos(var2.getNos() + var1);
         }
@@ -213,9 +207,9 @@ public class EntityStack {
     private class MetricHolder extends NamedEntity {
         private int metric_cyclo = 0;
         private int metric_nos = 0;
-        private BehaviouralEntity ent;
+        private final Method ent;
 
-        protected MetricHolder(BehaviouralEntity var2) {
+        protected MetricHolder(Method var2) {
             this.ent = var2;
         }
 
@@ -235,7 +229,7 @@ public class EntityStack {
             this.metric_nos = var1;
         }
 
-        protected BehaviouralEntity getEntity() {
+        protected Method getEntity() {
             return this.ent;
         }
     }

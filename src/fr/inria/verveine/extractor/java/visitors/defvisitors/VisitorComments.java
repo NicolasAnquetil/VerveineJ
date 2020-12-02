@@ -1,35 +1,15 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.AnnotationTypeDeclaration;
-import org.eclipse.jdt.core.dom.AnnotationTypeMemberDeclaration;
-import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
-import org.eclipse.jdt.core.dom.Block;
-import org.eclipse.jdt.core.dom.ClassInstanceCreation;
-import org.eclipse.jdt.core.dom.Comment;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.FieldDeclaration;
-import org.eclipse.jdt.core.dom.IVariableBinding;
-import org.eclipse.jdt.core.dom.Initializer;
-import org.eclipse.jdt.core.dom.Javadoc;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclaration;
-import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
-import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
-
-import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
-import org.moosetechnology.model.famix.famix.AnnotationTypeAttribute;
-import org.moosetechnology.model.famix.famix.Method;
-import org.moosetechnology.model.famix.famix.NamedEntity;
-import org.moosetechnology.model.famix.famix.StructuralEntity;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
+import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationTypeAttribute;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -92,7 +72,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		org.moosetechnology.model.famix.famix.Class fmx = visitTypeDeclaration( node);
+		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = visitTypeDeclaration(node);
 		if (fmx != null) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
@@ -296,7 +276,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
     }
 
 	protected void commentOnStructuralEntity(VariableDeclaration node, StructuralEntityKinds structuralKind) {
-		StructuralEntity fmx = null;
+		TStructuralEntity fmx = null;
 		Comment cmt = null;
 
 		if (classSummary) {
@@ -328,12 +308,12 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 					break;
 			}
 
-			if (! fmx.getIsStub()) {
-			    // if it is a stub, it might have been created by the getFamixXXX just above
-                // or something very strange happened
-                // Anyway we cannot have a comment on a stub
-			    dico.createFamixComment(cmt, fmx);
-            }
+			if (!((TSourceEntity) fmx).getIsStub()) {
+				// if it is a stub, it might have been created by the getFamixXXX just above
+				// or something very strange happened
+				// Anyway we cannot have a comment on a stub
+				dico.createFamixComment(cmt, (NamedEntity) fmx);
+			}
 		}
 	}
 

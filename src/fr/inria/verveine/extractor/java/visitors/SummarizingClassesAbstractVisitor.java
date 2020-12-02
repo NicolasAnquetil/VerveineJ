@@ -2,11 +2,9 @@ package fr.inria.verveine.extractor.java.visitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJParser;
-import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-
-import org.moosetechnology.model.famix.famix.NamedEntity;
-import org.moosetechnology.model.famix.famix.ParameterType;
+import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
 
 /**
  * A conveniency class to introduce the {@link #classSummary} flag and a method that uses it.

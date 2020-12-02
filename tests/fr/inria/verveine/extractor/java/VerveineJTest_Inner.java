@@ -1,21 +1,20 @@
 package fr.inria.verveine.extractor.java;
 
 
-import org.moosetechnology.model.famix.famix.*;
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famix.famix.Class;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixjavaentities.Class;
+import org.moosetechnology.model.famixjava.famixjavaentities.Invocation;
+import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 
 import java.io.File;
-import java.lang.Exception;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class VerveineJTest_Inner extends VerveineJTest_Basic {
 
@@ -60,7 +59,7 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
     public void testInvocationsOfPatateAndCanardConstructor() {
         parse(new String[] {"test_src/inner"});
         List<Invocation> invocations = entitiesOfType(Invocation.class).stream()
-                .sorted(Comparator.comparing(anInvocation2 -> ((TNamedEntity) ((Invocation)anInvocation2).getSender()).getName()))
+                .sorted(Comparator.comparing(anInvocation2 -> ((TNamedEntity) anInvocation2.getSender()).getName()))
                 .collect(Collectors.toList());
         assertEquals(invocations.size(), 3);
         assert(invocations.get(0).getSignature().startsWith("Canard("));

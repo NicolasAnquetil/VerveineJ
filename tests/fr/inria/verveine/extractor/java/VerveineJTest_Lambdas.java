@@ -1,11 +1,11 @@
 package fr.inria.verveine.extractor.java;
 
-import org.moosetechnology.model.famix.famix.Access;
-import org.moosetechnology.model.famix.famix.LocalVariable;
-import org.moosetechnology.model.famix.famix.Method;
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famix.famixtraits.TLocalVariable;
+import org.moosetechnology.model.famixjava.famixjavaentities.Access;
+import org.moosetechnology.model.famixjava.famixjavaentities.LocalVariable;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixtraits.TLocalVariable;
 
 import java.io.File;
 import java.util.Collection;

@@ -1,15 +1,15 @@
 package fr.inria.verveine.extractor.java;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Class;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAccess;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+
 import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
-
-import org.moosetechnology.model.famix.famix.*;
-import org.moosetechnology.model.famix.famix.Class;
-import org.junit.Before;
-import org.junit.Test;
-import org.moosetechnology.model.famix.famixtraits.TAccess;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import static org.junit.Assert.*;
 
@@ -172,34 +172,32 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 			if (isWindows()){
 				assertTrue("wrong startPos for Access: " + sp, (sp == 618) || (sp == 1032));
 				assertTrue("wrong endPos for Access: " + ep, (ep == 629) || (ep == 1043));
-			}
-			else {
+			} else {
 				assertTrue("wrong startPos for Access: " + sp, (sp == 584) || (sp == 980));
 				assertTrue("wrong endPos for Access: " + ep, (ep == 595) || (ep == 991));
 			}
-        }
-
-        // testing invocation
-        org.moosetechnology.model.famix.famix.Class clazz = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "IPrinter");
-        assertNotNull(clazz);
-        Method mth = (Method) firstElt(clazz.getMethods());  // first (and sole) method
-        assertNotNull(mth);
-        assertEquals("print", mth.getName());
-        assertEquals(1, mth.getIncomingInvocations().size());
-        Invocation invok = (Invocation) firstElt(mth.getIncomingInvocations());
-        anc = (SourceAnchor) invok.getSourceAnchor();
-        assertNotNull(anc);
-        assertEquals(IndexedFileAnchor.class, anc.getClass());
-		if (isWindows()){
-			assertEquals((Integer)1032,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
-			assertEquals((Integer)1113, (Integer) ((IndexedFileAnchor)anc).getEndPos());
-		}
-		else {
-			assertEquals((Integer)980,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
-			assertEquals((Integer)1061, (Integer) ((IndexedFileAnchor)anc).getEndPos());
 		}
 
-    }
+		// testing invocation
+		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IPrinter");
+		assertNotNull(clazz);
+		Method mth = (Method) firstElt(clazz.getMethods());  // first (and sole) method
+		assertNotNull(mth);
+		assertEquals("print", mth.getName());
+		assertEquals(1, mth.getIncomingInvocations().size());
+		Invocation invok = (Invocation) firstElt(mth.getIncomingInvocations());
+		anc = (SourceAnchor) invok.getSourceAnchor();
+		assertNotNull(anc);
+		assertEquals(IndexedFileAnchor.class, anc.getClass());
+		if (isWindows()) {
+			assertEquals(1032, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(1113, ((IndexedFileAnchor) anc).getEndPos());
+		} else {
+			assertEquals(980, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(1061, ((IndexedFileAnchor) anc).getEndPos());
+		}
+
+	}
 
     @Test
     public void testExcludepath()

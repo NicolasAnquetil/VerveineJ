@@ -6,13 +6,11 @@ import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famix.famix.Class;
-import org.moosetechnology.model.famix.famix.*;
-import org.moosetechnology.model.famix.famixtraits.TInheritance;
-import org.moosetechnology.model.famix.famixtraits.TType;
+import org.moosetechnology.model.famixjava.famixjavaentities.Class;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.*;
 
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	/**
 	 * Useful to keep the FamixType created in the specific case of "new SomeClass().someMethod()"
 	 */
-	private final org.moosetechnology.model.famix.famix.Type classInstanceCreated = null;
+	private final org.moosetechnology.model.famixjava.famixjavaentities.Type classInstanceCreated = null;
 
 	/**
 	 * The source code of the visited AST.
@@ -88,14 +86,13 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		if ((!classSummary)) {
 
 			String typName;
-			org.moosetechnology.model.famix.famix.Type fmx;
+			org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
 
 			if (node.getAnonymousClassDeclaration() != null) {
 				ITypeBinding bnd = node.resolveTypeBinding();
-				fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity)context.top());
+				fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity) context.top());
 				typName = fmx.getName();
-			}
-			else {
+			} else {
 
 				Type clazz = node.getType();
 				fmx = referedType(clazz, (ContainerEntity) context.top(), true);
@@ -267,11 +264,11 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		String calledName = node.getName().getFullyQualifiedName();
 
 		if (bnd == null) {
-			Iterator<TInheritance> iter = this.context.topType().getSuperInheritances().iterator();
-			org.moosetechnology.model.famix.famixtraits.TType superClass = (TType) iter.next().getSuperclass();
+			Iterator<TInheritance> iter = ((TWithInheritances) this.context.topType()).getSuperInheritances().iterator();
+			org.moosetechnology.model.famixjava.famixtraits.TType superClass = (TType) iter.next().getSuperclass();
 			/* This code does not seem to do anything worthwhile
-			  while ((superClass instanceof org.moosetechnology.model.famix.famix.Class)
-					&& (((org.moosetechnology.model.famix.famix.Class) superClass).getIsInterface())
+			  while ((superClass instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class)
+					&& (((org.moosetechnology.model.famixjava.famixjavaentities.Class) superClass).getIsInterface())
 					&& iter.hasNext()) {
 				iter.next().getSuperclass();
 			}*/
@@ -361,16 +358,17 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 	/**
 	 * Handles an invocation of a method by creating the corresponding Famix Entity.
-	 * @param calledBnd -- a binding for the method invoked
+	 *
+	 * @param calledBnd  -- a binding for the method invoked
 	 * @param calledName of the method invoked
-	 * @param receiver of the call, i.e. the object to which the message is sent
-	 * @param methOwner -- owner of the method invoked. Might be a subtype of the receiver's type
-	 * @param l_args -- list of the method's parameters
-	 * TODO Why are Invocations, Accesses and References not created through a method in JavaDictionnary ?
+	 * @param receiver   of the call, i.e. the object to which the message is sent
+	 * @param methOwner  -- owner of the method invoked. Might be a subtype of the receiver's type
+	 * @param l_args     -- list of the method's parameters
+	 *                   TODO Why are Invocations, Accesses and References not created through a method in JavaDictionnary ?
 	 */
 	private Invocation methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver,
-			org.moosetechnology.model.famix.famixtraits.TType methOwner, Collection<Expression> l_args) {
-		BehaviouralEntity sender = this.context.topMethod();
+										org.moosetechnology.model.famixjava.famixtraits.TType methOwner, Collection<Expression> l_args) {
+		Method sender = this.context.topMethod();
 		Method invoked = null;
 		Invocation invok = null;
 
@@ -396,14 +394,14 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 			if (sender != null) {
 				int modifiers = (calledBnd != null) ? calledBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-				if ((receiver != null) && (receiver instanceof StructuralEntity)) {
+				if ((receiver != null) && (receiver instanceof TStructuralEntity)) {
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner,
 							modifiers, /*persistIt*/!classSummary);
 				} else {
-					org.moosetechnology.model.famix.famixtraits.TType owner;
+					org.moosetechnology.model.famixjava.famixtraits.TType owner;
 
 					if (receiver != null)
-						owner = (org.moosetechnology.model.famix.famix.Type) receiver;
+						owner = (org.moosetechnology.model.famixjava.famixjavaentities.Type) receiver;
 					else
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
@@ -485,16 +483,16 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 
 		// field.msg()
-		if ( NodeTypeChecker.isFieldAccess(expr)) {
+		if (NodeTypeChecker.isFieldAccess(expr)) {
 			IVariableBinding bnd = ((FieldAccess) expr).resolveFieldBinding();
-			StructuralEntity fld = (StructuralEntity) dico.getEntityByKey(bnd);
+			NamedEntity fld = dico.getEntityByKey(bnd);
 			/*StructuralEntity fld = ensureAccessedStructEntity(bnd, ((FieldAccess) expr).getName().getIdentifier(),
 					/*type* /null, /*owner* /null, /*accessor* /null);*/
 			return fld;
 		}
 
 		// (left-expr oper right-expr).msg()
-		if ( NodeTypeChecker.isInfixExpression(expr)) {
+		if (NodeTypeChecker.isInfixExpression(expr)) {
 			// anonymous receiver
 			return null;
 		}
@@ -566,24 +564,25 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	/**
 	 * Tries its best to find the type of a receiver without using the bindings.
 	 * Most of the time, the type is that of the receiver, but not always (if there is a cast or if receiver is null)
-	 * @param expr -- the Java expression describing the receiver
+	 *
+	 * @param expr     -- the Java expression describing the receiver
 	 * @param receiver -- the FAMIX Entity describing the receiver
 	 * @return the Famix Entity or null if could not find it
 	 */
-	private org.moosetechnology.model.famix.famixtraits.TType getInvokedMethodOwner(Expression expr, NamedEntity receiver) {
+	private org.moosetechnology.model.famixjava.famixtraits.TType getInvokedMethodOwner(Expression expr, NamedEntity receiver) {
 		// ((type)expr).msg()
-		if ( NodeTypeChecker.isCastExpression(expr)) {
+		if (NodeTypeChecker.isCastExpression(expr)) {
 			Type tcast = ((CastExpression) expr).getType();
 			return referedType(tcast, (ContainerEntity) this.context.top(), true);
 		}
 
 		// new Class().msg()
-		else if ( NodeTypeChecker.isClassInstanceCreation(expr)) {
+		else if (NodeTypeChecker.isClassInstanceCreation(expr)) {
 			return this.classInstanceCreated;
 		}
 
 		// msg1().msg()
-		else if ( NodeTypeChecker.isMethodInvocation(expr)) {
+		else if (NodeTypeChecker.isMethodInvocation(expr)) {
 			IMethodBinding callerBnd = ((MethodInvocation) expr).resolveMethodBinding();
 			if (callerBnd != null) {
 				return referedType(callerBnd.getReturnType(), (ContainerEntity) this.context.top(), true);
@@ -626,10 +625,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 								return context.topType().getSuperInheritances().iterator().next().getSuperclass();
 							}
 						}*/
-			else if (receiver instanceof StructuralEntity) {
-				return ((StructuralEntity) receiver).getDeclaredType();
-			} else if (receiver instanceof org.moosetechnology.model.famix.famix.Type) {
-				return (org.moosetechnology.model.famix.famix.Type) receiver;
+			else if (receiver instanceof TTypedEntity) {
+				return ((TTypedEntity) receiver).getDeclaredType();
+			} else if (receiver instanceof org.moosetechnology.model.famixjava.famixjavaentities.Type) {
+				return (org.moosetechnology.model.famixjava.famixjavaentities.Type) receiver;
 			}
 			// ... what else ?
 			else {
@@ -638,14 +637,15 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		}
 	}
 
-    /**
-     * Finds the super class of the current class
-     * @return
-     */
-    private Class superClass() {
-        org.moosetechnology.model.famix.famix.Type clazz = context.topType();
-        Class superC = null;
-        for (TInheritance inh : clazz.getSuperInheritances()) {
+	/**
+	 * Finds the super class of the current class
+	 *
+	 * @return
+	 */
+	private Class superClass() {
+		org.moosetechnology.model.famixjava.famixjavaentities.Type clazz = context.topType();
+		Class superC = null;
+		for (TInheritance inh : ((TWithInheritances) clazz).getSuperInheritances()) {
 			if (inh.getSuperclass() instanceof Class) {
 				Class superclass = (Class) inh.getSuperclass();
 				if (superclass.getIsInterface() == null || !superclass.getIsInterface()) {

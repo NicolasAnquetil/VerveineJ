@@ -1,12 +1,12 @@
 package fr.inria.verveine.extractor.core;
 
 import ch.akuhn.fame.Repository;
-import org.moosetechnology.model.famix.famix.Entity;
-import org.moosetechnology.model.famix.famix.FAMIXModel;
-import org.moosetechnology.model.famix.famix.SourceLanguage;
-import org.moosetechnology.model.famix.famixreplication.FamixReplicationModel;
+import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
+import org.moosetechnology.model.famixjava.famixjavaentities.FamixJavaEntitiesModel;
+import org.moosetechnology.model.famixjava.famixjavaentities.SourceLanguage;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
 public abstract class VerveineParser {
@@ -18,7 +18,7 @@ public abstract class VerveineParser {
 
     public VerveineParser() {
         this.setOutputFileName("output.mse");
-        this.setFamixRepo(new Repository(FAMIXModel.metamodel()));
+        this.setFamixRepo(new Repository(FamixJavaEntitiesModel.metamodel()));
     }
 
     public void setOutputFileName(String var1) {
@@ -43,7 +43,7 @@ public abstract class VerveineParser {
 
     public void emitMSE(String var1) {
         try {
-            this.emitMSE((OutputStream)(new FileOutputStream(var1)));
+            this.emitMSE(new FileOutputStream(var1));
         } catch (FileNotFoundException var3) {
             var3.printStackTrace();
         }
@@ -55,11 +55,7 @@ public abstract class VerveineParser {
             this.getFamixRepo().add(this.getMyLgge());
         }
 
-        try {
-            this.famixRepo.exportMSE(new BufferedWriter(new OutputStreamWriter(var1, "UTF8")));
-        } catch (IOException var3) {
-            var3.printStackTrace();
-        }
+        this.famixRepo.exportMSE(new BufferedWriter(new OutputStreamWriter(var1, StandardCharsets.UTF_8)));
 
     }
 

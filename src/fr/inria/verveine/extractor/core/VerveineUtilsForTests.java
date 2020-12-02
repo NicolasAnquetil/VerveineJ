@@ -1,8 +1,8 @@
 package fr.inria.verveine.extractor.core;
 
 import ch.akuhn.fame.Repository;
-import org.moosetechnology.model.famix.famix.Entity;
-import org.moosetechnology.model.famix.famix.NamedEntity;
+import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
+import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
 
 import java.util.Collection;
 import java.util.Iterator;

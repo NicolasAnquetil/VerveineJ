@@ -2,8 +2,8 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famix.famix.*;
-import org.moosetechnology.model.famix.famixtraits.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.*;
 
 import java.io.File;
 import java.lang.Exception;
@@ -35,16 +35,16 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationSubClass() {
-        org.moosetechnology.model.famix.famix.Class cl = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "SubAnnotation");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class cl = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "SubAnnotation");
         assertNotNull(cl);
 
         AnnotationType getProp = detectFamixElement(AnnotationType.class, "GetProperty");
-        assertEquals(getProp, cl.getContainer());
+        assertEquals(getProp, cl.getTypeContainer());
     }
 
     @Test
     public void testClassAnnotation() {
-        org.moosetechnology.model.famix.famix.Class cl = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Serializer");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class cl = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Serializer");
         assertEquals(1, cl.getAnnotationInstances().size());
         AnnotationInstance sw = (AnnotationInstance) firstElt(cl.getAnnotationInstances());
         assertNotNull(sw);
@@ -60,9 +60,8 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testMethodAnnotation() {
-        org.moosetechnology.model.famix.famix.Class book = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Book");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class book = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Book");
         Collection<TMethod> bookMethods = book.getMethods();
-
        AnnotationType getProp = detectFamixElement(AnnotationType.class, "GetProperty");
        assertNotNull(getProp);
        AnnotationTypeAttribute getAtt = (AnnotationTypeAttribute) firstElt(getProp.getAttributes());
@@ -93,7 +92,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAttributeAnnotation() {
-        org.moosetechnology.model.famix.famix.Class book = detectFamixElement(org.moosetechnology.model.famix.famix.Class.class, "Book");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class book = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Book");
         Collection<TAttribute> bookAttributes = book.getAttributes();
         assertEquals(6, bookAttributes.size());
         for (TAttribute att : bookAttributes) {
@@ -234,7 +233,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationInstanceAttribute() {
-        org.moosetechnology.model.famix.famix.Class clss = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "AnnotatedClass");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class clss = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "AnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
@@ -252,7 +251,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationInstanceArrayOfOne() {
-        org.moosetechnology.model.famix.famix.Class clss = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "AThirdAnnotatedClass");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class clss = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "AThirdAnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
@@ -271,7 +270,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationInstanceEmptyArrayForValue() {
-        org.moosetechnology.model.famix.famix.Class clss = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "AnotherInterceptorClass");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class clss = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "AnotherInterceptorClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());
@@ -286,7 +285,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
     @Test
     public void testAnnotationInstanceArray() {
-        org.moosetechnology.model.famix.famix.Class clss = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "AnotherAnnotatedClass");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class clss = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "AnotherAnnotatedClass");
         assertNotNull(clss);
 
         assertEquals(1, clss.numberOfAnnotationInstances());

@@ -1,34 +1,31 @@
 package fr.inria.verveine.extractor.java;
 
-import static org.junit.Assert.*;
-
-import ch.akuhn.fame.Repository;
 import fr.inria.verveine.extractor.core.Dictionary;
+import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.ImplicitVariable;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 
-import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
-import org.moosetechnology.model.famix.famix.ImplicitVariable;
-import org.moosetechnology.model.famix.famix.Method;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
-
-import java.io.File;
 import java.util.Collection;
+
+import static org.junit.Assert.*;
 
 public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
 
-	private Method mth1;
-	private Method mth2;
+    private Method mth1;
+    private Method mth2;
 
-	@Before
-	public void setup() {
-		mth1 = new Method();
-		mth2 = new Method();
-	}
+    @Before
+    public void setup() {
+        mth1 = new Method();
+        mth2 = new Method();
+    }
 
-	public VerveineJTest_ImplicitVarBinding() throws IllegalAccessException {
-		super(false);
-	}
+    public VerveineJTest_ImplicitVarBinding() throws IllegalAccessException {
+        super(false);
+    }
 
     /**
      * Returns an ImplicitVariable instance for the given owner with the given name

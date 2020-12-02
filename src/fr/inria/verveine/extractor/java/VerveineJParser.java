@@ -1,32 +1,21 @@
 package fr.inria.verveine.extractor.java;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
+import fr.inria.verveine.extractor.core.VerveineParser;
+import fr.inria.verveine.extractor.java.utils.Util;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.moosetechnology.model.famixjava.famixjavaentities.Namespace;
+import org.moosetechnology.model.famixjava.famixjavaentities.SourceLanguage;
+import org.moosetechnology.model.famixjava.famixreplication.FamixReplicationModel;
+import org.moosetechnology.model.famixjava.famixtraits.FamixTraitsModel;
+import org.moosetechnology.model.famixjava.moose.MooseModel;
+import org.moosetechnology.model.famixjava.moosequery.MooseQueryModel;
+import org.moosetechnology.model.famixjava.tagging.TaggingModel;
 
-import fr.inria.verveine.extractor.core.VerveineParser;
-import org.moosetechnology.model.famix.famix.JavaSourceLanguage;
-import org.moosetechnology.model.famix.famix.Namespace;
-import org.moosetechnology.model.famix.famix.SourceLanguage;
-import org.moosetechnology.model.famix.famixreplication.FamixReplicationModel;
-import org.moosetechnology.model.famix.famixtraits.FamixModel;
-import org.moosetechnology.model.famix.famixtraits.FamixTraitsModel;
-import org.moosetechnology.model.famix.moose.MooseModel;
-import org.moosetechnology.model.famix.moosequery.MooseQueryModel;
-import org.moosetechnology.model.famix.smalltalk.SmalltalkModel;
-import org.moosetechnology.model.famix.tagging.TaggingModel;
+import java.io.*;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -115,14 +104,13 @@ public class VerveineJParser extends VerveineParser {
 		FamixTraitsModel.importInto(this.getFamixRepo().getMetamodel());
 		MooseModel.importInto(this.getFamixRepo().getMetamodel());
 		MooseQueryModel.importInto(this.getFamixRepo().getMetamodel());
-		SmalltalkModel.importInto(this.getFamixRepo().getMetamodel());
 		TaggingModel.importInto(this.getFamixRepo().getMetamodel());
 
 		jdtParser = ASTParser.newParser(AST.JLS8);
 	}
 
 	protected SourceLanguage getMyLgge() {
-		return new JavaSourceLanguage();
+		return new SourceLanguage();
 	}
 
 	public static void printFnames(String sDir) {
@@ -490,11 +478,10 @@ public class VerveineJParser extends VerveineParser {
 
 		sourceFiles.addAll(argFiles);
 		collectJavaFiles(argPath, sourceFiles);
-
+		Util.metamodel = this.getFamixRepo().getMetamodel();
 		try {
 			jdtParser.createASTs(sourceFiles.toArray(new String[0]), /*encodings*/null, /*bindingKeys*/new String[0], /*requestor*/req, /*monitor*/null);
-		}
-		catch (java.lang.IllegalStateException e) {
+		} catch (java.lang.IllegalStateException e) {
 			System.out.println("VerveineJ could not launch parser, received error: " + e.getMessage());
 		}
 
@@ -529,7 +516,7 @@ public class VerveineJParser extends VerveineParser {
 		if (name.indexOf('.') > 0) {
 			return;
 		} else {
-			Namespace parent = (Namespace) ns.getParentScope();
+			Namespace parent = ns.getParentNamespace();
 			if (parent == null) {
 				return;
 			} else {

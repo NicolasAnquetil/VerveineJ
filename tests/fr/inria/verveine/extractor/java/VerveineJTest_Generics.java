@@ -3,11 +3,11 @@ package fr.inria.verveine.extractor.java;
 import fr.inria.verveine.extractor.core.Dictionary;
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famix.famix.*;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famix.famixtraits.TParameter;
-import org.moosetechnology.model.famix.famixtraits.TParameterizedType;
-import org.moosetechnology.model.famix.famixtraits.TType;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TParameter;
+import org.moosetechnology.model.famixjava.famixtraits.TParameterizedType;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
 
 import java.io.File;
 import java.lang.Exception;
@@ -43,7 +43,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
         ParameterizableClass generic = null;
         for (ParameterizableClass g : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
-            if (g.getBelongsTo().getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
+            if (((TNamedEntity) g.getTypeContainer()).getName().equals(Dictionary.DEFAULT_PCKG_NAME)) {
                 // note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
                 generic = g;
                 break;
@@ -63,7 +63,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(dicoParam);
         assertEquals("B", dicoParam.getName());
 
-        assertSame(generic, dicoParam.getContainer());
+        assertSame(generic, dicoParam.getTypeContainer());
         assertSame(dicoParam, firstElt(generic.getParameters()));
 
         /* Collection<Object> is not seen as parameterizable by JDT */
@@ -81,7 +81,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(refedArrList);
         assertEquals("ArrayList", refedArrList.getName());
 
-        org.moosetechnology.model.famix.famix.Class arrList = detectFamixElement( org.moosetechnology.model.famix.famix.Class.class, "ArrayList");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class arrList = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ArrayList");
         assertNotNull(arrList);
         assertEquals(arrList, refedArrList.getParameterizableClass());
         assertEquals(arrList.getContainer(), refedArrList.getContainer());
@@ -127,7 +127,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertEquals("B", b.getName());
         assertSame(ParameterType.class, b.getClass());
 
-        ContainerEntity cont = b.getContainer();
+        ContainerEntity cont = (ContainerEntity) b.getTypeContainer();
         assertNotNull(cont);
         assertEquals("Dictionary", cont.getName());
         assertSame(ParameterizableClass.class, cont.getClass());
@@ -147,13 +147,13 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
                 assertEquals(1, ((ParameterizedType)classT).getArguments().size());
                 Type t = (Type) firstElt(((ParameterizedType)classT).getArguments());
                 assertEquals("T", t.getName());
-                assertSame(meth, t.getBelongsTo());
+                assertSame(meth, t.getTypeContainer());
             }
             else if (param.getName().equals("bnd")) {
                 Type b = (Type) param.getDeclaredType();
                 assertNotNull(b);
                 assertEquals("B", b.getName());
-                assertSame(meth.getBelongsTo(), b.getBelongsTo());  // b defined in Dictionary class just as the method
+                assertSame(meth.getParentType(), b.getTypeContainer());  // b defined in Dictionary class just as the method
             }
             else {
                 assertEquals("name", param.getName());
