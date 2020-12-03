@@ -27,8 +27,8 @@ import java.util.List;
  */
 public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 
-	public VisitorAnnotationRef(JavaDictionary dico, boolean classSummary) {
-		super(dico, classSummary);
+	public VisitorAnnotationRef(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 	}
 
 	// VISITOR METHODS
@@ -137,7 +137,7 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 		if (bnd != null) {
 			for (IAnnotationBinding annBnd : bnd.getAnnotations()) {
 				// create type of the annotation
-				AnnotationType annType = dico.ensureFamixAnnotationType(annBnd.getAnnotationType(), /*name*/null, /*owner*/null, ! classSummary);
+				AnnotationType annType = dico.ensureFamixAnnotationType(annBnd.getAnnotationType(), /*name*/null, /*owner*/null, ! summarizeClasses());
 
 				// create all parameters of the annotation instance
 				Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>();
@@ -149,7 +149,7 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 
 				// add the annotation instance to the Famix entity, may be if fmx==null we should not even create the AnnotationInstanceType ?
 				fmx = dico.getEntityByKey(bnd);
-				if ( (fmx != null) && (! classSummary) ) {
+				if ( (fmx != null) && (! summarizeClasses()) ) {
 					dico.addFamixAnnotationInstance(fmx, annType, annAtts);
 				}
 			}
@@ -182,7 +182,11 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 		else {
 			attFamixVal = annInstAttValAsString(attVal);
 		}
-		AnnotationTypeAttribute annoAtt = dico.ensureFamixAnnotationTypeAttribute(annPV.getMethodBinding(), /*name*/annPV.getName(), /*owner*/annType, /*persistIt*/!classSummary);
+		AnnotationTypeAttribute annoAtt = dico.ensureFamixAnnotationTypeAttribute(
+				annPV.getMethodBinding(), 
+				/*name*/annPV.getName(), 
+				/*owner*/annType, 
+				/*persistIt*/!summarizeClasses());
 		return( dico.createFamixAnnotationInstanceAttribute(annoAtt, attFamixVal) );
 	}
 

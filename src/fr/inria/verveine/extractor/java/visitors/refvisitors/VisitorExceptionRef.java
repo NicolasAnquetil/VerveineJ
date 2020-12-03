@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Class;
@@ -16,8 +17,8 @@ import java.util.List;
  */
 public class VisitorExceptionRef extends AbstractRefVisitor {
 
-	public VisitorExceptionRef(JavaDictionary dico, boolean classSummary) {
-		super(dico, classSummary);
+	public VisitorExceptionRef(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 	}
 
 
@@ -59,7 +60,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 		    for (Type excep : (List<Type>)node.thrownExceptionTypes()) {
                 org.moosetechnology.model.famixjava.famixjavaentities.Type excepFmx = this.referedType(excep.resolveBinding(), context.topType(), true);
                 if (excepFmx != null) {
-                    if (!classSummary) {
+					if (! summarizeClasses()) {
                         // not instanceof because we test the exact type and not subclasses
                         if ((excepFmx.getClass() == org.moosetechnology.model.famixjava.famixjavaentities.Type.class) || (excepFmx.getClass() == ParameterType.class)) {
                             excepFmx = dico.asClass(excepFmx);
@@ -89,7 +90,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
                 excepFmx = (Class) referedType(excepClass, meth, true);
             }
             if (excepFmx != null) {
-                if (! classSummary) {
+                if (! summarizeClasses()) {
                     dico.createFamixCaughtException(meth, excepFmx);
                 }
             }
@@ -104,7 +105,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
         org.moosetechnology.model.famixjava.famixjavaentities.Class excepFmx = (Class) this
                 .referedType(node.getExpression().resolveTypeBinding(), context.topType(), true);
         if (excepFmx != null) {
-            if (! classSummary) {
+            if (! summarizeClasses()) {
                 dico.createFamixThrownException(meth, excepFmx);
             }
         }

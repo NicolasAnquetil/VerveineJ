@@ -23,16 +23,16 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJParser.OUTPUT_FILE).delete();
+        new File(VerveineJOptions.OUTPUT_FILE).delete();
         parser = new VerveineJParser();
         repo = parser.getFamixRepo();
     }
 
-    private void parse(String[] sources) {
-        parser.setOptions(sources);
-        parser.parse();
-        parser.emitMSE(VerveineJParser.OUTPUT_FILE);
-    }
+	private void parse(String[] sources) {
+		parser.configure( sources);
+		parser.parse();
+		parser.emitMSE(VerveineJOptions.OUTPUT_FILE);
+	}
 
     @Test
     public void testLambdaTypedParameter() {

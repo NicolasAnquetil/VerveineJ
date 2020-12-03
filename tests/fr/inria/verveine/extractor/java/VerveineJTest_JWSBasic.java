@@ -34,10 +34,10 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
+		new File(VerveineJOptions.OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(new String[] {"test_src/jws_basic"});
+		parser.configure( new String[] {"test_src/jws_basic"});
 		parser.parse();
 	//	parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
@@ -45,7 +45,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 	@Test
 	public void testEntitiesNumber() {
 		assertEquals(3, entitiesOfType( AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
-		// JDT no longer returns not resolved anotations: @Session, @WLHttpTransport,
+		// JDT no longer returns unresolved annotations: @Session, @WLHttpTransport,
 	}
 
 	@Test
@@ -83,8 +83,6 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		assertEquals(1, annInstances.size());
 		TAnnotationInstance annInst = firstElt(annInstances);
 		assertEquals("WebMethod", ((TNamedEntity)((AnnotationInstance)annInst).getAnnotationType()).getName());
-
-		
 	}
 
 }

@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java.visitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.VerveineJParser;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
@@ -12,15 +13,8 @@ import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
  */
 public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntityAbstractVisitor {
 
-	/**
-	 * Whether to summarize collected information at the level of classes or produce everything
-	 * (see {@link VerveineJParser}).
-	 */
-	protected boolean classSummary = false;
-
-	public SummarizingClassesAbstractVisitor(JavaDictionary dico, boolean classSummary) {
-		super(dico);
-		this.classSummary = classSummary;
+	public SummarizingClassesAbstractVisitor(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 	}
 
 	/**
@@ -41,12 +35,18 @@ public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntity
 					return false;
 				}
 				// finally, the "normal" case
-				return (!classSummary) || (bnd.getDeclaringMethod() == null);
+				return (! summarizeClasses()) || (bnd.getDeclaringMethod() == null);
 			}
 		} else {
-			return (!classSummary) || (context.topMethod() == null);
+			return (! summarizeClasses()) || (context.topMethod() == null);
 		}
 	
 	}
 
+	/**
+	 * Syntactic sugar: whether to summarize classes or not
+	 */
+	protected boolean summarizeClasses() {
+		return options.summarizeClasses();
+	}
 }

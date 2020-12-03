@@ -6,6 +6,7 @@ import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
 
+import fr.inria.verveine.extractor.java.AbstractDictionary;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -42,12 +43,12 @@ public class ImplicitVarBinding implements IBinding {
 			allImplicitVarBnd.put(owner, vars);
 		}
 		else {
-			bnd = (name.equals(Dictionary.SELF_NAME) ? vars.self_iv : vars.super_iv);
+			bnd = (name.equals(AbstractDictionary.SELF_NAME) ? vars.self_iv : vars.super_iv);
 		}
 
 		if (bnd == null) {
 			bnd = new ImplicitVarBinding(owner,name);
-			if (name.equals(Dictionary.SELF_NAME)) {
+			if (name.equals(AbstractDictionary.SELF_NAME)) {
 				vars.self_iv = bnd;
 			}
 			else {

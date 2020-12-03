@@ -12,6 +12,7 @@ import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.Assert.*;
 
@@ -33,7 +34,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
+		new File(VerveineJOptions.OUTPUT_FILE).delete();
 
 		String[] files = new String[] {
 				"AbstractDestinationAddress.java",
@@ -70,16 +71,17 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(args);
+		parser.configure( args);
 		parser.parse();
 		
-		new File(VerveineJParser.OUTPUT_FILE).delete();  // delete old MSE file
+		new File(VerveineJOptions.OUTPUT_FILE).delete();  // delete old MSE file
 		System.gc(); // In Windows free the link to the file. Must be used for incremental parsing tests
-		parser.emitMSE(VerveineJParser.OUTPUT_FILE);  // to create a new one
+		parser.emitMSE(VerveineJOptions.OUTPUT_FILE);  // to create a new one
 	}
 
 	@Test
 	public void testEntitiesNumber() {
+
 		int nbClasses = 11 + 14 + 1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
 		int nbInherit = 9 + 21 + 1;
 
@@ -104,6 +106,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(2, entitiesOfType(AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
 		assertEquals(32, entitiesOfType(Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);// PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
 		assertEquals(1, entitiesOfType(ParameterizableClass.class).size()); //Comparable
+
 	}
 
 	@Test

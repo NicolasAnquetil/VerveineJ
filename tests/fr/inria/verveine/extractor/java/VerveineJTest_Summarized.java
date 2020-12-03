@@ -90,7 +90,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJParser.OUTPUT_FILE).delete();
+		new File(VerveineJOptions.OUTPUT_FILE).delete();
 
 		String[] files = new String[] {
 				"AbstractDestinationAddress.java",
@@ -128,12 +128,12 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.setOptions(args);
+		parser.configure( args);
 		parser.parse();
 		
-		new File(VerveineJParser.OUTPUT_FILE).delete();  // delete old MSE file
+		new File(VerveineJOptions.OUTPUT_FILE).delete();  // delete old MSE file
 		System.gc(); // In Windows free the link to the file. Must be used for incremental parsing tests
-		parser.emitMSE(VerveineJParser.OUTPUT_FILE);  // to create a new one
+		parser.emitMSE(VerveineJOptions.OUTPUT_FILE);  // to create a new one
 	}
 
 	@Test(timeout=100)

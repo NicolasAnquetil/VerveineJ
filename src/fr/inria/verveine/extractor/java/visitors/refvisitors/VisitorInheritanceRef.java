@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
@@ -17,8 +18,8 @@ import java.util.LinkedList;
  */
 public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
-	public VisitorInheritanceRef(JavaDictionary dico, boolean classSummary) {
-		super(dico, classSummary);
+	public VisitorInheritanceRef(JavaDictionary dico, VerveineJOptions options) {
+		super(dico, options);
 	}
 
 	public boolean visit(TypeDeclaration node) {
@@ -49,7 +50,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 		ITypeBinding bnd = node.resolveBinding();
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity) context.top());
 
-		if ((fmx != null) && (bnd != null) && (!classSummary)) {
+		if ( (fmx != null) && (bnd != null) && (! summarizeClasses()) ){
 			ensureInheritances(bnd, fmx);
 
 			this.context.pushType(fmx);

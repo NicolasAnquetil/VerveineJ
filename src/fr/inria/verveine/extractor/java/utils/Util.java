@@ -15,6 +15,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.stream.Collectors;
+import fr.inria.verveine.extractor.java.JavaDictionary;
 
 public class Util {
 

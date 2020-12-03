@@ -1,6 +1,5 @@
 package fr.inria.verveine.extractor.java;
 
-import fr.inria.verveine.extractor.core.Dictionary;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,26 +35,26 @@ public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
 
 	@Test
 	public void testUniqForMethod() {
-		assertEquals(getImplicitVar(mth1, Dictionary.SELF_NAME), getImplicitVar(mth1, Dictionary.SELF_NAME));
-		assertEquals(getImplicitVar(mth1, Dictionary.SUPER_NAME), getImplicitVar(mth1, Dictionary.SUPER_NAME));
+		assertEquals(getImplicitVar(mth1, AbstractDictionary.SELF_NAME), getImplicitVar(mth1, AbstractDictionary.SELF_NAME));
+		assertEquals(getImplicitVar(mth1, AbstractDictionary.SUPER_NAME), getImplicitVar(mth1, AbstractDictionary.SUPER_NAME));
 	}
 
     @Test
 	public void testDiffForMethods() {
-		assertNotEquals(getImplicitVar(mth1, Dictionary.SELF_NAME), getImplicitVar(mth2, Dictionary.SELF_NAME));
-		assertNotEquals(getImplicitVar(mth1, Dictionary.SUPER_NAME), getImplicitVar(mth2, Dictionary.SUPER_NAME));
+		assertNotEquals(getImplicitVar(mth1, AbstractDictionary.SELF_NAME), getImplicitVar(mth2, AbstractDictionary.SELF_NAME));
+		assertNotEquals(getImplicitVar(mth1, AbstractDictionary.SUPER_NAME), getImplicitVar(mth2, AbstractDictionary.SUPER_NAME));
 	}
 
 	@Test
 	public void testSefDiffSuper() {
-		assertNotEquals(getImplicitVar(mth1, Dictionary.SELF_NAME), getImplicitVar(mth1, Dictionary.SUPER_NAME));
+		assertNotEquals(getImplicitVar(mth1, AbstractDictionary.SELF_NAME), getImplicitVar(mth1, AbstractDictionary.SUPER_NAME));
 	}
 
 	@Test
     public void testAccessesInvocationsFromParse() {
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
-        parser.setOptions(new String[] {"-anchor" , "assoc", "test_src/generics/Dictionary.java"});
+        parser.configure( new String[] {"-anchor" , "assoc", "test_src/generics/Dictionary.java"});
         parser.parse();
 
         Collection<ImplicitVariable> implicits = entitiesOfType( ImplicitVariable.class);

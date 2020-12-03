@@ -1,10 +1,11 @@
 package fr.inria.verveine.extractor.java;
 
-import fr.inria.verveine.extractor.core.VerveineParser;
+import ch.akuhn.fame.Repository;
 import fr.inria.verveine.extractor.java.utils.Util;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
+import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
+import org.moosetechnology.model.famixjava.famixjavaentities.FamixJavaEntitiesModel;
 import org.moosetechnology.model.famixjava.famixjavaentities.Namespace;
 import org.moosetechnology.model.famixjava.famixjavaentities.SourceLanguage;
 import org.moosetechnology.model.famixjava.famixreplication.FamixReplicationModel;
@@ -15,7 +16,6 @@ import org.moosetechnology.model.famixjava.tagging.TaggingModel;
 
 import java.io.*;
 import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -23,465 +23,60 @@ import java.util.regex.Pattern;
  * java -cp lib/org.eclipse.jdt.core_3.6.0.v_A48.jar:../Fame:/usr/local/share/eclipse/plugins/org.eclipse.equinox.common_3.5.1.R35x_v20090807-1100.jar:/usr/local/share/eclipse/plugins/org.eclipse.equinox.preferences_3.2.301.R35x_v20091117.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.jobs_3.4.100.v20090429-1800.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.contenttype_3.4.1.R35x_v20090826-0451.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.resources_3.5.2.R35x_v20091203-1235.jar:/usr/local/share/eclipse/plugins/org.eclipse.core.runtime_3.5.0.v20090525.jar:/usr/local/share/eclipse/plugins/org.eclipse.osgi_3.5.2.R35x_v20100126.jar:../Fame/lib/akuhn-util-r28011.jar:lib/fame.jar:bin eu.synectique.verveine.extractor.java.VerveineJParser [files|directory]_to_parse
  */
 
-public class VerveineJParser extends VerveineParser {
+public class VerveineJParser {
 
-	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
-
-	/**
-	 * Possible options for SourceAnchors: no source anchor, only entities [default], entities and associations
-	 */
-	public enum anchorOptions {
-		none, entity, assoc;
-
-		public static anchorOptions getValue(String option) {
-			switch (option) {
-				case "none": return none;
-				case "default":
-				case "entity": return entity;
-				case "assoc": return assoc;
-				default: return null;
-			}
-		}
-	}
-
-	/**
-	 * TODO remove ?
-	 * Whether to summarize collected information at the level of classes or produce everything.
-	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation.<br>
-	 * Note: classSummary => not allLocals
-	 * <p>The general idea is that we create entities (Attribute, Method) "normally", but we don't persist them in the repository.
-	 * Then all associations to these entities need to be uplifted as references between their respective classes
-	 * e.g. "A.m1() invokes B.m2()" is uplifted to "A references B".</p>
-	 * <p>This is actually a dangerous business, because creating entities outside the repository (e.g. an attribute) that have links
-	 * to entities inside (e.g. the Type of the attribute) the repository can lead to errors.
-	 * More exactly, the problems occur when the entity inside links back to the entity outside.
-	 * And since all association are bidirectional, it can happen very easily.</p>
-	 */
-	private boolean classSummary = false;
-
-	/**
-	 * Whether to output all local variables (even those with primitive type) or not (default is not).<br>
-	 * Note: allLocals => not classSummary
-	 */
-	private boolean allLocals = false;
-
-	/**
-	 * Option: The version of Java expected by the parser
-	 */
-	protected String codeVers = null;
-
-	/**
-	 * Option: Whether to put Sourceanchor in the entities and/or associations
-	 */
-	protected anchorOptions anchors = null;
-
-	/**
-	 * The arguments that were passed to the parser
-	 * Needed to relativize the source file names
-	 */
-	protected Collection<String> argPath;
-	protected Collection<String> argFiles;
-
-	/**
-	 * pathnames to exclude from parsing.<br>
-	 * Accepts globbing expressions
-	 */
-	protected Collection<String> excludePaths;
-
-	/**
-	 * collection of matchers of file name to process excluding expr (see
-	 */
-	private Collection<Pattern> excludeMatchers;
+	public VerveineJOptions options;
 
 	/**
 	 * Java parser, provided by JDT
 	 */
 	protected ASTParser jdtParser = null;
 
+	/**
+	 * Famix repository where the entities are stored
+	 */
+	protected Repository famixRepo;
+
 	public VerveineJParser() {
-		super();
+		this.setFamixRepo(new Repository(FamixJavaEntitiesModel.metamodel()));
 		FamixReplicationModel.importInto(this.getFamixRepo().getMetamodel());
 		FamixTraitsModel.importInto(this.getFamixRepo().getMetamodel());
 		MooseModel.importInto(this.getFamixRepo().getMetamodel());
 		MooseQueryModel.importInto(this.getFamixRepo().getMetamodel());
 		TaggingModel.importInto(this.getFamixRepo().getMetamodel());
 
+
+		options = new VerveineJOptions();
 		jdtParser = ASTParser.newParser(AST.JLS8);
+	}
+
+	public void configure(String[] args) {
+		options.setOptions(args);
+		options.configureJDTParser(jdtParser);
 	}
 
 	protected SourceLanguage getMyLgge() {
 		return new SourceLanguage();
 	}
 
-	public static void printFnames(String sDir) {
-		File[] faFiles = new File(sDir).listFiles();
-		for (File file : faFiles) {
-			if (file.getName().matches("^(.*jar)")) {
-				System.out.println(file.getAbsolutePath());
-			}
-			if (file.isDirectory()) {
-				printFnames(file.getAbsolutePath());
-			}
-		}
-	}
-
-	public static List<String> collectAllJars(String sDir) {
-		File[] faFiles = new File(sDir).listFiles();
-		List<String> tmpPath = new ArrayList<String>();
-		for (File file : faFiles) {
-			if (file.getName().endsWith("jar")) {
-				tmpPath.add(file.getAbsolutePath());
-			}
-			if (file.isDirectory()) {
-				tmpPath.addAll(collectAllJars(file.getAbsolutePath()));
-			}
-		}
-		return tmpPath;
-	}
-
-	/** Reads all jar in classpath from a file, one per line
-	 * @param filename of the file containing the jars of the classpath
-	 * @return the collection of jar paths
-	 */
-	private List<String> readAllJars(String filename) {
-		List<String> tmpPath = new ArrayList<String>();
-		try {
-			BufferedReader fcp = new BufferedReader(new FileReader(filename));
-			String jarname = fcp.readLine();
-			while (jarname != null) {
-				tmpPath.add(jarname);
-				jarname = fcp.readLine();
-			}
-			fcp.close();
-		} catch (FileNotFoundException e) {
-			System.err.println("** Error classpath file " + filename + " not found");
-			e.printStackTrace();
-		} catch (IOException e) {
-			System.err.println("** Error reading classpath file: " + filename);
-			e.printStackTrace();
-		}
-		return tmpPath;
-	}
-
-	public void setOptions(String[] args) {
-		String[] classPath = new String[] {};
-		argPath = new ArrayList<String>();
-		argFiles = new ArrayList<String>();
-		excludePaths = new ArrayList<String>();
-
-		int i = 0;
-		while (i < args.length && args[i].trim().startsWith("-")) {
-		    String arg = args[i++].trim();
-
-			if (arg.equals("-h")) {
-				usage();
-			}
-			else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
-				setCodeVersion(arg);
-			}
-			else if (arg.equals("-summary")) {
-				this.classSummary = true;
-				this.allLocals = false;
-			}
-			else if (arg.equals("-alllocals")) {
-				this.classSummary = false;
-				this.allLocals = true;
-			}
-			else if (arg.equals("-autocp")) {
-				if (i < args.length) {
-					classPath = addToClassPath(classPath,collectAllJars(args[i++]) );
-				} else {
-					System.err.println("-autocp requires a root folder");
-				}
-			}
-			else if (arg.equals("-filecp")) {
-				if (i < args.length) {
-					classPath = addToClassPath(classPath, readAllJars(args[i++]));
-				} else {
-					System.err.println("-filecp requires a filename");
-				}
-			}
-			else if (arg.equals("-cp")) {
-				if (i < args.length) {
-					classPath = addToClassPath(classPath,  Arrays.asList(args[i++].split(System.getProperty("path.separator"))));
-				}
-				else {
-					System.err.println("-cp requires a classPath");
-				}	
-			}
-			else if (arg.equals("-anchor")) {
-				if (i < args.length) {
-					String anchor = args[i++];
-					this.anchors = anchorOptions.getValue(anchor);
-					if (this.anchors == null) {
-						System.err.println("unknown option to -anchor: "+anchor+", assuming default");
-						this.anchors = anchorOptions.entity;
-					}
-				} else {
-					System.err.println("-anchor requires an option (none|default|assoc)");
-				}
-			}
-			else if (arg.equals("-excludepath")) {
-				if (i < args.length) {
-					excludePaths.add(args[i++]);
-				} else {
-					System.err.println("-excludepath requires a globbing expression");
-				}
-			}
-			else {
-				int j = super.setOption(i - 1, args);
-				if (j > 0) {     // j is the number of args consumed by super.setOption()
-					i += j;      // advance by that number of args
-					i--;         // 1 will be added at the beginning of the loop ("args[i++]")
-				}
-				else {
-					System.err.println("** Unrecognized option: " + arg);
-					usage();
-				}
-			}
-		}
-		while (i < args.length) {
-			String arg;
-			arg = args[i++];
-			if (arg.endsWith(".java") && new File(arg).isFile()) {
-				argFiles.add(arg);
-			} else {
-				argPath.add(arg);
-			}
-		}
-
-//for (int j =0; j<classPath.length; j++) { System.out.println("CLASSPATH:"+classPath[j]);}
-		
-		jdtParser.setEnvironment(classPath, /*sourcepathEntries*/argPath.toArray(new String[0]), /*encodings*/null, /*includeRunningVMBootclasspath*/true);
-		jdtParser.setResolveBindings(true);
-		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
-
-		Map<String, String> options = JavaCore.getOptions();
-
-		if (codeVers == null) {
-			codeVers = DEFAULT_CODE_VERSION;
-		}
-		if (anchors == null) {
-			anchors = anchorOptions.getValue("default");
-		}
-		options.put(JavaCore.COMPILER_COMPLIANCE, codeVers);
-		options.put(JavaCore.COMPILER_CODEGEN_TARGET_PLATFORM, codeVers);
-		options.put(JavaCore.COMPILER_SOURCE, codeVers);
-
-		jdtParser.setCompilerOptions(options);
-	}
-
-
-	/**
-	 * @param classPath
-	 * @param tmpPath
-	 * @return
-	 */
-	private String[] addToClassPath(String[] classPath, List<String> tmpPath) {
-		int oldlength = classPath.length;
-		int newlength = oldlength + tmpPath.size();
-		classPath = Arrays.copyOf(classPath, newlength);
-		for (int p = oldlength; p < newlength; p++) {
-			classPath[p] = tmpPath.get(p - oldlength);
-		}
-		return classPath;
-	}
-
-	protected void usage() {
-		/* possible enhancements:
-		 * (1) allow to not generate some info
-		 * -nodep = do not create dependencies (access, reference, invocation)
-		 * -novar (or -noleaf) = do not create "variables", including attributes. Implies not creating accesses
-		 * -nobehavior = do not create methods. Implies not creating invocations
-		 * (2) allow to summarize some info
-		 * -classdep = generate dependencies between classes not between their members. Implies not creating accesses, reference, invocation but instead
-		 *   some new relation: classdep
-		 */
-		
-		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
-		System.err.println("      [-h] prints this message");
-		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
-		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: "+VerveineParser.OUTPUT_FILE+")");
-		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
-		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
-		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
-		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\")");
-		System.err.println("      [-anchor (none|entity|default|assoc)] options for source anchor information:\n" +
-				   "                                     - no entity\n" +
-				   "                                     - only named entities [default]\n" +
-				   "                                     - named entities+associations (i.e. accesses, invocations, references)");
-		System.err.println("      [-cp CLASSPATH] classpath where to look for stubs");
-		System.err.println("      [-autocp DIR] gather all jars in DIR and put them in the classpath");
-		System.err.println("      [-filecp FILE] gather all jars listed in FILE (absolute paths) and put them in the classpath");
-		System.err.println("      [-excludepath GLOBBINGEXPR] A globbing expression of file path to exclude from parsing");
-		System.err.println("      [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] specifies version of Java");
-		System.err.println("      <files-to-parse>|<dirs-to-parse> list of source files to parse or directories to search for source files");
-		System.exit(0);
-
-	}
-
-	protected void setCodeVersion(String arg) {
-		if (codeVers != null) {
-			System.err.println("Trying to set twice code versions: " + codeVers + " and " + arg);
-			usage();
-		} else if (arg.equals("-1.1") || arg.equals("-1")) {
-			codeVers = JavaCore.VERSION_1_1;
-		} else if (arg.equals("-1.2") || arg.equals("-2")) {
-			codeVers = JavaCore.VERSION_1_2;
-		} else if (arg.equals("-1.3") || arg.equals("-3")) {
-			codeVers = JavaCore.VERSION_1_3;
-		} else if (arg.equals("-1.4") || arg.equals("-4")) {
-			codeVers = JavaCore.VERSION_1_4;
-		} else if (arg.equals("-1.5") || arg.equals("-5")) {
-			codeVers = JavaCore.VERSION_1_5;
-		} else if (arg.equals("-1.6") || arg.equals("-6")) {
-			codeVers = JavaCore.VERSION_1_6;
-		} else if (arg.equals("-1.7") || arg.equals("-7")) {
-			codeVers = JavaCore.VERSION_1_7;
-		}
-
-	}
-
-	protected void collectJavaFiles(Collection<String> paths, Collection<String> files) {
-		excludeMatchers = new ArrayList<>(excludePaths.size());
-		for (String expr : excludePaths) {
-			excludeMatchers.add(createMatcher(expr));
-		}
-		for (String p : paths) {
-			collectJavaFiles(new File(p), files);
-		}
-	}
-
-	protected void collectJavaFiles(File f, Collection<String> files) {
-		for (Pattern filter : excludeMatchers) {
-			if (filter.matcher(f.getName()).matches()) {
-				return;
-			}
-		}
-		if (f.isFile() && f.getName().endsWith(".java")) {
-			files.add(f.getAbsolutePath());
-		} else if (f.isDirectory()) {
-			for (File child : f.listFiles()) {
-				collectJavaFiles(child, files);
-			}
-		}
-	}
-
-	/**
-	 * Creates a regexp matcher form a globbing expression<br>
-	 * Glob to Regexp algorithm from <a href="https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns">https://stackoverflow.com/questions/1247772/is-there-an-equivalent-of-java-util-regex-for-glob-type-patterns</a>
-	 */
-	private Pattern createMatcher(String expr) {
-		expr = expr.trim();
-		int strLen = expr.length();
-		StringBuilder sb = new StringBuilder(strLen);
-		sb.append('^');
-		if (! expr.startsWith("/")) {
-			// not absolute path, start with ".*"
-			if (! expr.startsWith("*")) {
-				sb.append(".*");
-			}
-		}
-		boolean escaping = false;
-		int inCurlies = 0;
-		for (char currentChar : expr.toCharArray()) {
-			switch (currentChar) {
-				case '*':
-					if (escaping)
-						sb.append("\\*");
-					else
-						sb.append(".*");
-					escaping = false;
-					break;
-				case '?':
-					if (escaping)
-						sb.append("\\?");
-					else
-						sb.append('.');
-					escaping = false;
-					break;
-				case '.':
-				case '(':
-				case ')':
-				case '+':
-				case '|':
-				case '^':
-				case '$':
-				case '@':
-				case '%':
-					sb.append('\\');
-					sb.append(currentChar);
-					escaping = false;
-					break;
-				case '\\':
-					if (escaping) {
-						sb.append("\\\\");
-						escaping = false;
-					}
-					else
-						escaping = true;
-					break;
-				case '{':
-					if (escaping) {
-						sb.append("\\{");
-					}
-					else {
-						sb.append('(');
-						inCurlies++;
-					}
-					escaping = false;
-					break;
-				case '}':
-					if (inCurlies > 0 && !escaping) {
-						sb.append(')');
-						inCurlies--;
-					}
-					else if (escaping)
-						sb.append("\\}");
-					else
-						sb.append("}");
-					escaping = false;
-					break;
-				case ',':
-					if (inCurlies > 0 && !escaping) {
-						sb.append('|');
-					}
-					else if (escaping)
-						sb.append("\\,");
-					else
-						sb.append(",");
-					break;
-				default:
-					escaping = false;
-					sb.append(currentChar);
-			}
-		}
-
-		if (! expr.endsWith("*")) {
-			sb.append(".*$");
-		}
-		else {
-			sb.append('$');
-		}
-		return Pattern.compile(sb.toString());
-	}
-
-
 	public void parse() {
-		ArrayList<String> sourceFiles = new ArrayList<String>();
 
 		if (this.linkToExisting()) {
 			this.expandNamespacesNames();
 		}
 
-		FamixRequestor req = new FamixRequestor(getFamixRepo(), argPath, argFiles, classSummary, allLocals, anchors);
+		FamixRequestor req = new FamixRequestor(getFamixRepo(), options);
 
-		sourceFiles.addAll(argFiles);
-		collectJavaFiles(argPath, sourceFiles);
 		Util.metamodel = this.getFamixRepo().getMetamodel();
 		try {
-			jdtParser.createASTs(sourceFiles.toArray(new String[0]), /*encodings*/null, /*bindingKeys*/new String[0], /*requestor*/req, /*monitor*/null);
-		} catch (java.lang.IllegalStateException e) {
+			jdtParser.createASTs(
+					options.sourceFilesToParse(),
+					/*encodings*/null,
+					/*bindingKeys*/new String[0],
+					/*requestor*/req,
+					/*monitor*/null);
+		}
+		catch (java.lang.IllegalStateException e) {
 			System.out.println("VerveineJ could not launch parser, received error: " + e.getMessage());
 		}
 
@@ -492,7 +87,7 @@ public class VerveineJParser extends VerveineParser {
 	 * As explained in JavaDictionary, Namespaces are created with their fully qualified name.
 	 * We need now to give them their simple name
 	 */
-	private void compressNamespacesNames() {
+	protected void compressNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
 			String name = ns.getName();
 			int last = name.lastIndexOf('.');
@@ -505,13 +100,13 @@ public class VerveineJParser extends VerveineParser {
 	/**
 	 * @see VerveineJParser#compressNamespacesNames()
 	 */
-	private void expandNamespacesNames() {
+	protected void expandNamespacesNames() {
 		for (Namespace ns : listAll(Namespace.class)) {
 			expandNamespaceName(ns);
 		}
 	}
 
-	private void expandNamespaceName(Namespace ns) {
+	protected void expandNamespaceName(Namespace ns) {
 		String name = ns.getName();
 		if (name.indexOf('.') > 0) {
 			return;
@@ -526,20 +121,62 @@ public class VerveineJParser extends VerveineParser {
 		}
 	}
 
-	public static void main(String[] args) {
-		/*LicenceChecker checker = new LicenceChecker();
-		int licenceCheck = checker.checkLicence();
+	protected boolean linkToExisting() {
+		File existingMSE = new File(options.getOutputFileName());
+		if (existingMSE.exists() && this.options.incrementalParsing) {
+			this.getFamixRepo().importMSEFile(options.getOutputFileName());
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
 
-		if (licenceCheck != LicenceChecker.OK) {
-			cannotContinue(checker, licenceCheck);
-		}*/
-		
+	/**
+	 * "closes" the repository, by adding to it a SourceLanguage entity if their is none.
+	 * The SourceLanguage entity is the one returned by getMyLgge().
+	 * Also outputs repository to a MSE file
+	 */
+	public void emitMSE() {
+		this.emitMSE(this.options.outputFileName);
+	}
 
-		VerveineJParser parser = new VerveineJParser();
-		parser.setOptions(args);
-		parser.parse();
-		// parser.debug();
-		parser.emitMSE();
+	public void emitMSE(String outputFile) {
+		try {
+			emitMSE(new FileOutputStream(outputFile));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void emitMSE(OutputStream output) {
+		// Adds default SourceLanguage for the repository
+		if ( (listAll(SourceLanguage.class).size() == 0) && (getMyLgge() != null) ) {
+			getFamixRepo().add( getMyLgge());
+		}
+	
+		// Outputting to a file
+		try {
+			//famixRepo.exportMSE(new FileWriter(OUTPUT_FILE));
+			famixRepo.exportMSE(new BufferedWriter(new OutputStreamWriter(output,"UTF8")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Returns a Collection of all FAMIXEntities in the repository of the given fmxClass
+	 */
+	public <T extends Entity> Collection<T> listAll(Class<T> fmxClass) {
+		return getFamixRepo().all(fmxClass);
+	}
+
+	public Repository getFamixRepo() {
+		return famixRepo;
+	}
+
+	public void setFamixRepo(Repository famixRepo) {
+		this.famixRepo = famixRepo;
 	}
 
 }
