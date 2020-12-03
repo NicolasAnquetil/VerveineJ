@@ -3,7 +3,6 @@ package fr.inria.verveine.extractor.java.utils;
 import ch.akuhn.fame.MetaRepository;
 import ch.akuhn.fame.fm3.MetaDescription;
 import ch.akuhn.fame.fm3.PropertyDescription;
-import fr.inria.verveine.extractor.core.EntityStack;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.LambdaExpression;

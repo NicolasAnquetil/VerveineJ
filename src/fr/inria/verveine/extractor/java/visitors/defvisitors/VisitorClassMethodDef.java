@@ -1,7 +1,7 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;

@@ -161,7 +161,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 		}
 
 		for (Type sup : sups) {
-			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) sup, fmx, lastInheritance);
+			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) sup, (TWithInheritances) fmx, lastInheritance);
 			// create FileAnchor for each inheritance link ???
 		}
 	}

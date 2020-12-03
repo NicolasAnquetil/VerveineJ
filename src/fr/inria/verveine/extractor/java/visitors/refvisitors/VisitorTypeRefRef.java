@@ -2,7 +2,6 @@ package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
-import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;

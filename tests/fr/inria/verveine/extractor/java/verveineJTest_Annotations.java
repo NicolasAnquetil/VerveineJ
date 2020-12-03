@@ -12,20 +12,12 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.File;
+import java.lang.Exception;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Parameter;
 
 public class verveineJTest_Annotations extends VerveineJTest_Basic {
 

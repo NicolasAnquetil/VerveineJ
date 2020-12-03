@@ -1,6 +1,5 @@
 package fr.inria.verveine.extractor.java.utils;
 
-import fr.inria.verveine.extractor.core.Dictionary;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;

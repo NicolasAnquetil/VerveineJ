@@ -1,13 +1,11 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import fr.inria.verveine.extractor.core.Dictionary;
+import fr.inria.verveine.extractor.java.AbstractDictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
-import fr.inria.verveine.extractor.java.VerveineJParser.anchorOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;

@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationInstanceAttribute;

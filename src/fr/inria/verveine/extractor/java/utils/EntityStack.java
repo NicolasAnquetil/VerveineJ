@@ -1,15 +1,10 @@
 package fr.inria.verveine.extractor.java.utils;
 
-import java.util.Stack;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
 
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.Reference;
+import java.lang.Class;
+import java.util.Stack;
 
 /** A stack of FAMIX Entities so that we know in what container each new Entity is declared
  * @author anquetil
@@ -23,9 +18,9 @@ public class EntityStack {
 	private class MetricHolder extends NamedEntity {
 		private int metric_cyclo = EMPTY_CYCLO;  // Cyclomatic Complexity
 		private int metric_nos = EMPTY_NOS;      // Number Of Statements
-		private BehaviouralEntity ent;
+		private Method ent;
 
-		protected MetricHolder(BehaviouralEntity ent) {
+		protected MetricHolder(Method ent) {
 			this.ent = ent;
 		}
 		protected int getCyclo() {
@@ -40,7 +35,7 @@ public class EntityStack {
 		protected void setNos(int metric_nos) {
 			this.metric_nos = metric_nos;
 		}
-		protected BehaviouralEntity getEntity() {
+		protected Method getEntity() {
 			return ent;
 		}
 	}
@@ -102,7 +97,7 @@ public class EntityStack {
 	 * Sets the Famix Package on top of the "context stack"
 	 * @param e -- the Famix Package
 	 */
-	public void pushPckg(eu.synectique.verveine.core.gen.famix.Package e) {
+	public void pushPckg(Package e) {
 		push(e);
 	}
 
@@ -118,7 +113,7 @@ public class EntityStack {
 	 * Pushes a Famix Type on top of the "context type stack"
 	 * @param t -- the FamixType
 	 */
-	public void pushType(eu.synectique.verveine.core.gen.famix.Type t) {
+	public void pushType(Type t) {
 		push(t);
 	}
 
@@ -137,7 +132,7 @@ public class EntityStack {
 	 * Adds also a special entity to hold the metrics for the BehaviouralEntity
 	 * @param e -- the Famix BehaviouralEntity
 	 */
-	public void pushBehaviouralEntity(BehaviouralEntity e) {
+	public void pushBehaviouralEntity(Method e) {
 		push(e);
 		push( new MetricHolder(e) );
 	}
@@ -158,7 +153,7 @@ public class EntityStack {
 	 */
 	public void clearTypes() {
 		while (! (this.top() instanceof Namespace)) {
-			this.popUpto(eu.synectique.verveine.core.gen.famix.Type.class);			
+			this.popUpto(Type.class);			
 		}
 	}
 	
@@ -216,8 +211,8 @@ public class EntityStack {
 	 * Note: does not check that there is such a namespace
 	 * @return the Famix method
 	 */
-	public eu.synectique.verveine.core.gen.famix.Package popPckg() {
-		return this.popUpto(eu.synectique.verveine.core.gen.famix.Package.class);
+	public Package popPckg() {
+		return this.popUpto(Package.class);
 	}
 
 	/**
@@ -225,8 +220,8 @@ public class EntityStack {
 	 * Note: does not check that there is such a type, so could possibly throw an EmptyStackException
 	 * @return the Famix class
 	 */
-	public eu.synectique.verveine.core.gen.famix.Type popType() {
-		return this.popUpto(eu.synectique.verveine.core.gen.famix.Type.class);
+	public Type popType() {
+		return this.popUpto(Type.class);
 	}
 
 	/**
@@ -276,8 +271,8 @@ public class EntityStack {
 	 * Note: does not check that there is such a package
 	 * @return the Famix namespace
 	 */
-	public eu.synectique.verveine.core.gen.famix.Package topPckg() {
-		return this.lookUpto(eu.synectique.verveine.core.gen.famix.Package.class);
+	public Package topPckg() {
+		return this.lookUpto(Package.class);
 	}
 
 	/**
@@ -285,8 +280,8 @@ public class EntityStack {
 	 * Note: does not check that there is such a class, so could possibly throw an EmptyStackException
 	 * @return the Famix class
 	 */
-	public eu.synectique.verveine.core.gen.famix.Type topType() {
-		return this.lookUpto(eu.synectique.verveine.core.gen.famix.Type.class);
+	public Type topType() {
+		return this.lookUpto(Type.class);
 	}
 
 	/**
@@ -303,8 +298,8 @@ public class EntityStack {
 	 * Note: does not check that there is such a BehaviouralEntity, so could possibly throw an EmptyStackException
 	 * @return the Famix BehaviouralEntity
 	 */
-	public BehaviouralEntity topBehaviouralEntity() {
-		return this.lookUpto(BehaviouralEntity.class);
+	public Method topBehaviouralEntity() {
+		return this.lookUpto(Method.class);
 	}
 
 	/**

@@ -1,6 +1,5 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import fr.inria.verveine.extractor.core.EntityStack;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Namespace;

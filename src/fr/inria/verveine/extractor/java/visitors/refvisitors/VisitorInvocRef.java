@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.core.Dictionary;
+import fr.inria.verveine.extractor.java.AbstractDictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
@@ -254,7 +254,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	public boolean visit(SuperMethodInvocation node) {
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(
-				AbstractDictionary.SUPER_NAME, 
+				AbstractDictionary.SUPER_NAME,
 				this.context.topType(), 
 				context.topMethod(), 
 				/*persistIt*/!summarizeClasses());

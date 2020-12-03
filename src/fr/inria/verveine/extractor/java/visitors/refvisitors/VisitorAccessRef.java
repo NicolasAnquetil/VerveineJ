@@ -497,7 +497,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			}
 		} else if (bnd.isParameter() && (! inLambda)) {
 			if (! summarizeClasses()) {
-				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, classSummary);
+				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, summarizeClasses());
 			}
 		} else {
 			// it seems it is a variable.
@@ -524,7 +524,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
 			} else if (options.withLocals() || (! localVariable(accessed, accessor)) ) {
 				context.setLastAccess(
-						dico.addFamixAccess(accessor, (TAccessible) accessed, /*isWrite*/isLHS, context.getLastAccess()));
+						dico.addFamixAccess(accessor, (TStructuralEntity) accessed, /*isWrite*/isLHS, context.getLastAccess()));
 			}
 		}
 	}
