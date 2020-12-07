@@ -8,17 +8,18 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Moose")
 @FameDescription("AbstractGroup")
-public class AbstractGroup extends Object {
+public class AbstractGroup extends Object  {
 
     private Number numberOfAssociations;
-
-    private Number numberOfItems;
-
-    private Number numberOfLinesOfCode;
-
+    
     private Number numberOfEntities;
-
+    
+    private Number numberOfItems;
+    
+    private Number numberOfLinesOfCode;
+    
     private Number numberOfPackages;
+    
 
 
     @FameProperty(name = "numberOfAssociations")
@@ -29,25 +30,7 @@ public class AbstractGroup extends Object {
     public void setNumberOfAssociations(Number numberOfAssociations) {
         this.numberOfAssociations = numberOfAssociations;
     }
-
-    @FameProperty(name = "numberOfItems")
-    public Number getNumberOfItems() {
-        return numberOfItems;
-    }
-
-    public void setNumberOfItems(Number numberOfItems) {
-        this.numberOfItems = numberOfItems;
-    }
-
-    @FameProperty(name = "numberOfLinesOfCode")
-    public Number getNumberOfLinesOfCode() {
-        return numberOfLinesOfCode;
-    }
-
-    public void setNumberOfLinesOfCode(Number numberOfLinesOfCode) {
-        this.numberOfLinesOfCode = numberOfLinesOfCode;
-    }
-
+    
     @FameProperty(name = "numberOfEntities")
     public Number getNumberOfEntities() {
         return numberOfEntities;
@@ -56,7 +39,25 @@ public class AbstractGroup extends Object {
     public void setNumberOfEntities(Number numberOfEntities) {
         this.numberOfEntities = numberOfEntities;
     }
+    
+    @FameProperty(name = "numberOfItems")
+    public Number getNumberOfItems() {
+        return numberOfItems;
+    }
 
+    public void setNumberOfItems(Number numberOfItems) {
+        this.numberOfItems = numberOfItems;
+    }
+    
+    @FameProperty(name = "numberOfLinesOfCode")
+    public Number getNumberOfLinesOfCode() {
+        return numberOfLinesOfCode;
+    }
+
+    public void setNumberOfLinesOfCode(Number numberOfLinesOfCode) {
+        this.numberOfLinesOfCode = numberOfLinesOfCode;
+    }
+    
     @FameProperty(name = "numberOfPackages")
     public Number getNumberOfPackages() {
         return numberOfPackages;
@@ -65,6 +66,7 @@ public class AbstractGroup extends Object {
     public void setNumberOfPackages(Number numberOfPackages) {
         this.numberOfPackages = numberOfPackages;
     }
+    
 
 
 }

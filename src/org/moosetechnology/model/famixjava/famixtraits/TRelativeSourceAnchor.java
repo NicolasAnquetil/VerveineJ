@@ -6,24 +6,25 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TRelativeSourceAnchor")
-public interface TRelativeSourceAnchor {
+public interface TRelativeSourceAnchor  {
 
-    @FameProperty(name = "relatedAnchor")
-    TSourceAnchor getRelatedAnchor();
+        @FameProperty(name = "relatedAnchor")
+    public TSourceAnchor getRelatedAnchor();
 
-    void setRelatedAnchor(TSourceAnchor relatedAnchor);
+    public void setRelatedAnchor(TSourceAnchor relatedAnchor);
 
     @FameProperty(name = "startPos")
-    Number getStartPos();
+    public Number getStartPos();
 
-    void setStartPos(Number startPos);
+    public void setStartPos(Number startPos);
 
     @FameProperty(name = "endPos")
-    Number getEndPos();
+    public Number getEndPos();
 
-    void setEndPos(Number endPos);
+    public void setEndPos(Number endPos);
+
 
 
 }

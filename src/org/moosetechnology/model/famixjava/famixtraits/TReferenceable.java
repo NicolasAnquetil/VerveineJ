@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TReferenceable")
-public interface TReferenceable {
+public interface TReferenceable  {
 
-    @FameProperty(name = "incomingReferences", opposite = "referredType", derived = true)
-    Collection<TReference> getIncomingReferences();
+        @FameProperty(name = "incomingReferences", opposite = "referredType", derived = true)
+    public Collection<TReference> getIncomingReferences();
 
-    void setIncomingReferences(Collection<? extends TReference> incomingReferences);
+    public void setIncomingReferences(Collection<? extends TReference> incomingReferences);
 
-    void addIncomingReferences(TReference one);
+    public void addIncomingReferences(TReference one);
 
-    void addIncomingReferences(TReference one, TReference... many);
+    public void addIncomingReferences(TReference one, TReference... many);
 
-    void addIncomingReferences(Iterable<? extends TReference> many);
+    public void addIncomingReferences(Iterable<? extends TReference> many);
 
-    void addIncomingReferences(TReference[] many);
+    public void addIncomingReferences(TReference[] many);
 
-    int numberOfIncomingReferences();
+    public int numberOfIncomingReferences();
 
-    boolean hasIncomingReferences();
+    public boolean hasIncomingReferences();
+
 
 
 }

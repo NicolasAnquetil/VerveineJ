@@ -4,16 +4,18 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TNamedEntity")
-public interface TNamedEntity {
+public interface TNamedEntity  {
 
-    @FameProperty(name = "name")
-    String getName();
+        @FameProperty(name = "name")
+    public String getName();
 
-    void setName(String name);
+    public void setName(String name);
+
 
 
 }

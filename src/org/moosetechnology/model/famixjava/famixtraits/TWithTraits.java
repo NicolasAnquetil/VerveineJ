@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithTraits")
-public interface TWithTraits {
+public interface TWithTraits  {
 
-    @FameProperty(name = "traits", opposite = "traitOwner", derived = true)
-    Collection<TTrait> getTraits();
+        @FameProperty(name = "traits", opposite = "traitOwner", derived = true)
+    public Collection<TTrait> getTraits();
 
-    void setTraits(Collection<? extends TTrait> traits);
+    public void setTraits(Collection<? extends TTrait> traits);
 
-    void addTraits(TTrait one);
+    public void addTraits(TTrait one);
 
-    void addTraits(TTrait one, TTrait... many);
+    public void addTraits(TTrait one, TTrait... many);
 
-    void addTraits(Iterable<? extends TTrait> many);
+    public void addTraits(Iterable<? extends TTrait> many);
 
-    void addTraits(TTrait[] many);
+    public void addTraits(TTrait[] many);
 
-    int numberOfTraits();
+    public int numberOfTraits();
 
-    boolean hasTraits();
+    public boolean hasTraits();
+
 
 
 }

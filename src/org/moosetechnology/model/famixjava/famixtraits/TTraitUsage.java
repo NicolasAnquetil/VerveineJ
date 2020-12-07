@@ -4,21 +4,23 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TTraitUsage")
-public interface TTraitUsage {
+public interface TTraitUsage  {
 
-    @FameProperty(name = "trait", opposite = "incomingTraitUsages")
-    TTrait getTrait();
+        @FameProperty(name = "trait", opposite = "incomingTraitUsages")
+    public TTrait getTrait();
 
-    void setTrait(TTrait trait);
+    public void setTrait(TTrait trait);
 
     @FameProperty(name = "user", opposite = "outgoingTraitUsages")
-    TTraitUser getUser();
+    public TTraitUser getUser();
 
-    void setUser(TTraitUser user);
+    public void setUser(TTraitUser user);
+
 
 
 }

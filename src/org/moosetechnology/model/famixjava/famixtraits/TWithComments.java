@@ -4,36 +4,36 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithComments")
-public interface TWithComments {
+public interface TWithComments  {
 
-    @FameProperty(name = "hasComments", derived = true)
-    Boolean getHasComments();
+        @FameProperty(name = "hasComments", derived = true)
+    public Boolean getHasComments();
 
     @FameProperty(name = "comments", opposite = "container", derived = true)
-    Collection<TComment> getComments();
+    public Collection<TComment> getComments();
 
-    void setComments(Collection<? extends TComment> comments);
+    public void setComments(Collection<? extends TComment> comments);
 
-    void addComments(TComment one);
+    public void addComments(TComment one);
 
-    void addComments(TComment one, TComment... many);
+    public void addComments(TComment one, TComment... many);
 
-    void addComments(Iterable<? extends TComment> many);
+    public void addComments(Iterable<? extends TComment> many);
 
-    void addComments(TComment[] many);
+    public void addComments(TComment[] many);
 
-    int numberOfComments();
+    public int numberOfComments();
 
-    boolean hasComments();
+    public boolean hasComments();
 
     @FameProperty(name = "numberOfComments", derived = true)
-    Number getNumberOfComments();
+    public Number getNumberOfComments();
+
 
 
 }

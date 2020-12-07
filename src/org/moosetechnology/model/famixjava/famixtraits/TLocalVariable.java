@@ -4,16 +4,18 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TLocalVariable")
-public interface TLocalVariable {
+public interface TLocalVariable  {
 
-    @FameProperty(name = "parentBehaviouralEntity", opposite = "localVariables", container = true)
-    TWithLocalVariables getParentBehaviouralEntity();
+        @FameProperty(name = "parentBehaviouralEntity", opposite = "localVariables", container = true)
+    public TWithLocalVariables getParentBehaviouralEntity();
 
-    void setParentBehaviouralEntity(TWithLocalVariables parentBehaviouralEntity);
+    public void setParentBehaviouralEntity(TWithLocalVariables parentBehaviouralEntity);
+
 
 
 }

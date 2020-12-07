@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TException")
-public interface TException {
+public interface TException  {
 
-    @FameProperty(name = "exceptionClass", opposite = "exceptions")
-    TWithExceptions getExceptionClass();
+        @FameProperty(name = "exceptionClass", opposite = "exceptions")
+    public TWithExceptions getExceptionClass();
 
-    void setExceptionClass(TWithExceptions exceptionClass);
+    public void setExceptionClass(TWithExceptions exceptionClass);
+
 
 
 }

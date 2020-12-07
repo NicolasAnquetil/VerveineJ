@@ -4,29 +4,31 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TCohesionCouplingMetrics")
-public interface TCohesionCouplingMetrics {
+public interface TCohesionCouplingMetrics  {
 
-    @FameProperty(name = "efferentCoupling", derived = true)
-    Number getEfferentCoupling();
+        @FameProperty(name = "efferentCoupling", derived = true)
+    public Number getEfferentCoupling();
 
     @FameProperty(name = "distance", derived = true)
-    Number getDistance();
+    public Number getDistance();
 
     @FameProperty(name = "afferentCoupling", derived = true)
-    Number getAfferentCoupling();
+    public Number getAfferentCoupling();
 
     @FameProperty(name = "instability", derived = true)
-    Number getInstability();
+    public Number getInstability();
 
     @FameProperty(name = "abstractness", derived = true)
-    Number getAbstractness();
+    public Number getAbstractness();
 
     @FameProperty(name = "martinCohesion", derived = true)
-    Number getMartinCohesion();
+    public Number getMartinCohesion();
+
 
 
 }

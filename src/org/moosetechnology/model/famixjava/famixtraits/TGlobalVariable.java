@@ -4,16 +4,18 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TGlobalVariable")
-public interface TGlobalVariable {
+public interface TGlobalVariable  {
 
-    @FameProperty(name = "parentScope", opposite = "globalVariables", container = true)
-    TWithGlobalVariables getParentScope();
+        @FameProperty(name = "parentScope", opposite = "globalVariables", container = true)
+    public TWithGlobalVariables getParentScope();
 
-    void setParentScope(TWithGlobalVariables parentScope);
+    public void setParentScope(TWithGlobalVariables parentScope);
+
 
 
 }

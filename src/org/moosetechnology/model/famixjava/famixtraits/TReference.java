@@ -4,21 +4,23 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TReference")
-public interface TReference {
+public interface TReference  {
 
-    @FameProperty(name = "referredType", opposite = "incomingReferences")
-    TReferenceable getReferredType();
+        @FameProperty(name = "referredType", opposite = "incomingReferences")
+    public TReferenceable getReferredType();
 
-    void setReferredType(TReferenceable referredType);
+    public void setReferredType(TReferenceable referredType);
 
     @FameProperty(name = "referencer", opposite = "outgoingReferences")
-    TWithReferences getReferencer();
+    public TWithReferences getReferencer();
 
-    void setReferencer(TWithReferences referencer);
+    public void setReferencer(TWithReferences referencer);
+
 
 
 }

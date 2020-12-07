@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithFiles")
-public interface TWithFiles {
+public interface TWithFiles  {
 
-    @FameProperty(name = "containerFiles", opposite = "entities")
-    Collection<TFile> getContainerFiles();
+        @FameProperty(name = "containerFiles", opposite = "entities")
+    public Collection<TFile> getContainerFiles();
 
-    void setContainerFiles(Collection<? extends TFile> containerFiles);
+    public void setContainerFiles(Collection<? extends TFile> containerFiles);
 
-    void addContainerFiles(TFile one);
+    public void addContainerFiles(TFile one);
 
-    void addContainerFiles(TFile one, TFile... many);
+    public void addContainerFiles(TFile one, TFile... many);
 
-    void addContainerFiles(Iterable<? extends TFile> many);
+    public void addContainerFiles(Iterable<? extends TFile> many);
 
-    void addContainerFiles(TFile[] many);
+    public void addContainerFiles(TFile[] many);
 
-    int numberOfContainerFiles();
+    public int numberOfContainerFiles();
 
-    boolean hasContainerFiles();
+    public boolean hasContainerFiles();
+
 
 
 }

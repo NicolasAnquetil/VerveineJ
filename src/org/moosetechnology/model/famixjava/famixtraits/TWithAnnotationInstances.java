@@ -4,33 +4,33 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithAnnotationInstances")
-public interface TWithAnnotationInstances {
+public interface TWithAnnotationInstances  {
 
-    @FameProperty(name = "numberOfAnnotationInstances", derived = true)
-    Number getNumberOfAnnotationInstances();
+        @FameProperty(name = "numberOfAnnotationInstances", derived = true)
+    public Number getNumberOfAnnotationInstances();
 
     @FameProperty(name = "annotationInstances", opposite = "annotatedEntity", derived = true)
-    Collection<TAnnotationInstance> getAnnotationInstances();
+    public Collection<TAnnotationInstance> getAnnotationInstances();
 
-    void setAnnotationInstances(Collection<? extends TAnnotationInstance> annotationInstances);
+    public void setAnnotationInstances(Collection<? extends TAnnotationInstance> annotationInstances);
 
-    void addAnnotationInstances(TAnnotationInstance one);
+    public void addAnnotationInstances(TAnnotationInstance one);
 
-    void addAnnotationInstances(TAnnotationInstance one, TAnnotationInstance... many);
+    public void addAnnotationInstances(TAnnotationInstance one, TAnnotationInstance... many);
 
-    void addAnnotationInstances(Iterable<? extends TAnnotationInstance> many);
+    public void addAnnotationInstances(Iterable<? extends TAnnotationInstance> many);
 
-    void addAnnotationInstances(TAnnotationInstance[] many);
+    public void addAnnotationInstances(TAnnotationInstance[] many);
 
-    int numberOfAnnotationInstances();
+    public int numberOfAnnotationInstances();
 
-    boolean hasAnnotationInstances();
+    public boolean hasAnnotationInstances();
+
 
 
 }

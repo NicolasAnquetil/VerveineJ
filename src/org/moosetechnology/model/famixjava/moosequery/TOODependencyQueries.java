@@ -5,10 +5,11 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 
 
-@FamePackage("MooseQuery")
+@FamePackage("Moose-Query")
 @FameDescription("TOODependencyQueries")
-public interface TOODependencyQueries {
+public interface TOODependencyQueries  {
 
+    
 
 }
 

@@ -4,21 +4,23 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TInheritance")
-public interface TInheritance {
+public interface TInheritance  {
 
-    @FameProperty(name = "superclass", opposite = "subInheritances")
-    TWithInheritances getSuperclass();
+        @FameProperty(name = "superclass", opposite = "subInheritances")
+    public TWithInheritances getSuperclass();
 
-    void setSuperclass(TWithInheritances superclass);
+    public void setSuperclass(TWithInheritances superclass);
 
     @FameProperty(name = "subclass", opposite = "superInheritances")
-    TWithInheritances getSubclass();
+    public TWithInheritances getSubclass();
 
-    void setSubclass(TWithInheritances subclass);
+    public void setSubclass(TWithInheritances subclass);
+
 
 
 }

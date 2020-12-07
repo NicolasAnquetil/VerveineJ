@@ -10,14 +10,14 @@ public class TaggingModel {
         importInto(metamodel);
         return metamodel;
     }
-
+    
     public static void importInto(MetaRepository metamodel) {
-        metamodel.with(org.moosetechnology.model.famixjava.tagging.Tag.class);
-        metamodel.with(org.moosetechnology.model.famixjava.tagging.IntervalAssociation.class);
-        metamodel.with(org.moosetechnology.model.famixjava.tagging.TagModel.class);
-        metamodel.with(org.moosetechnology.model.famixjava.tagging.Association.class);
-        metamodel.with(org.moosetechnology.model.famixjava.tagging.EntityAssociation.class);
-        metamodel.with(org.moosetechnology.model.famixjava.tagging.Category.class);
+		metamodel.with(org.moosetechnology.model.famixjava.tagging.TagModel.class);
+		metamodel.with(org.moosetechnology.model.famixjava.tagging.Category.class);
+		metamodel.with(org.moosetechnology.model.famixjava.tagging.EntityAssociation.class);
+		metamodel.with(org.moosetechnology.model.famixjava.tagging.Association.class);
+		metamodel.with(org.moosetechnology.model.famixjava.tagging.Tag.class);
+		metamodel.with(org.moosetechnology.model.famixjava.tagging.IntervalAssociation.class);
 
     }
 

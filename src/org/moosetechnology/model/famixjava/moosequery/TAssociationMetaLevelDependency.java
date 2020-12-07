@@ -5,10 +5,11 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 
 
-@FamePackage("MooseQuery")
+@FamePackage("Moose-Query")
 @FameDescription("TAssociationMetaLevelDependency")
-public interface TAssociationMetaLevelDependency {
+public interface TAssociationMetaLevelDependency  {
 
+    
 
 }
 

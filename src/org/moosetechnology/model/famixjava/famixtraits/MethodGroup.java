@@ -7,25 +7,17 @@ import ch.akuhn.fame.FameProperty;
 import org.moosetechnology.model.famixjava.moose.SpecializedGroup;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("MethodGroup")
-public class MethodGroup extends SpecializedGroup {
-
-    private Number averageNumberOfLinesOfCode;
+public class MethodGroup extends SpecializedGroup  {
 
     private Number averageNumberOfInvocations;
-
+    
+    private Number averageNumberOfLinesOfCode;
+    
     private Number averageNumberOfParameters;
+    
 
-
-    @FameProperty(name = "averageNumberOfLinesOfCode")
-    public Number getAverageNumberOfLinesOfCode() {
-        return averageNumberOfLinesOfCode;
-    }
-
-    public void setAverageNumberOfLinesOfCode(Number averageNumberOfLinesOfCode) {
-        this.averageNumberOfLinesOfCode = averageNumberOfLinesOfCode;
-    }
 
     @FameProperty(name = "averageNumberOfInvocations")
     public Number getAverageNumberOfInvocations() {
@@ -35,7 +27,16 @@ public class MethodGroup extends SpecializedGroup {
     public void setAverageNumberOfInvocations(Number averageNumberOfInvocations) {
         this.averageNumberOfInvocations = averageNumberOfInvocations;
     }
+    
+    @FameProperty(name = "averageNumberOfLinesOfCode")
+    public Number getAverageNumberOfLinesOfCode() {
+        return averageNumberOfLinesOfCode;
+    }
 
+    public void setAverageNumberOfLinesOfCode(Number averageNumberOfLinesOfCode) {
+        this.averageNumberOfLinesOfCode = averageNumberOfLinesOfCode;
+    }
+    
     @FameProperty(name = "averageNumberOfParameters")
     public Number getAverageNumberOfParameters() {
         return averageNumberOfParameters;
@@ -44,6 +45,7 @@ public class MethodGroup extends SpecializedGroup {
     public void setAverageNumberOfParameters(Number averageNumberOfParameters) {
         this.averageNumberOfParameters = averageNumberOfParameters;
     }
+    
 
 
 }

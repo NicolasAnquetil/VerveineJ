@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TPackageable")
-public interface TPackageable {
+public interface TPackageable  {
 
-    @FameProperty(name = "parentPackage", opposite = "childEntities", container = true)
-    TPackage getParentPackage();
+        @FameProperty(name = "parentPackage", opposite = "childEntities", container = true)
+    public TPackage getParentPackage();
 
-    void setParentPackage(TPackage parentPackage);
+    public void setParentPackage(TPackage parentPackage);
+
 
 
 }

@@ -8,13 +8,14 @@ import org.moosetechnology.model.famixjava.famixtraits.TComment;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 
 
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("Comment")
 public class Comment extends SourcedEntity implements TComment {
 
     private TWithComments container;
-
+    
     private String content;
+    
 
 
     @FameProperty(name = "container", opposite = "comments")
@@ -31,7 +32,7 @@ public class Comment extends SourcedEntity implements TComment {
         if (container == null) return;
         container.getComments().add(this);
     }
-
+    
     @FameProperty(name = "content")
     public String getContent() {
         return content;
@@ -40,6 +41,7 @@ public class Comment extends SourcedEntity implements TComment {
     public void setContent(String content) {
         this.content = content;
     }
+    
 
 
 }

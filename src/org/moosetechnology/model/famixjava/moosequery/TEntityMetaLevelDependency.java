@@ -6,24 +6,25 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("MooseQuery")
+@FamePackage("Moose-Query")
 @FameDescription("TEntityMetaLevelDependency")
-public interface TEntityMetaLevelDependency {
+public interface TEntityMetaLevelDependency  {
 
-    @FameProperty(name = "numberOfDeadChildren", derived = true)
-    Number getNumberOfDeadChildren();
+        @FameProperty(name = "numberOfDeadChildren", derived = true)
+    public Number getNumberOfDeadChildren();
 
     @FameProperty(name = "fanOut", derived = true)
-    Number getFanOut();
+    public Number getFanOut();
 
     @FameProperty(name = "numberOfChildren", derived = true)
-    Number getNumberOfChildren();
+    public Number getNumberOfChildren();
 
     @FameProperty(name = "fanIn", derived = true)
-    Number getFanIn();
+    public Number getFanIn();
 
     @FameProperty(name = "isDead", derived = true)
-    Boolean getIsDead();
+    public Boolean getIsDead();
+
 
 
 }

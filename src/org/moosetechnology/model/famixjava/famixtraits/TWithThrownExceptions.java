@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithThrownExceptions")
-public interface TWithThrownExceptions {
+public interface TWithThrownExceptions  {
 
-    @FameProperty(name = "thrownExceptions", opposite = "definingEntity", derived = true)
-    Collection<TThrownException> getThrownExceptions();
+        @FameProperty(name = "thrownExceptions", opposite = "definingEntity", derived = true)
+    public Collection<TThrownException> getThrownExceptions();
 
-    void setThrownExceptions(Collection<? extends TThrownException> thrownExceptions);
+    public void setThrownExceptions(Collection<? extends TThrownException> thrownExceptions);
 
-    void addThrownExceptions(TThrownException one);
+    public void addThrownExceptions(TThrownException one);
 
-    void addThrownExceptions(TThrownException one, TThrownException... many);
+    public void addThrownExceptions(TThrownException one, TThrownException... many);
 
-    void addThrownExceptions(Iterable<? extends TThrownException> many);
+    public void addThrownExceptions(Iterable<? extends TThrownException> many);
 
-    void addThrownExceptions(TThrownException[] many);
+    public void addThrownExceptions(TThrownException[] many);
 
-    int numberOfThrownExceptions();
+    public int numberOfThrownExceptions();
 
-    boolean hasThrownExceptions();
+    public boolean hasThrownExceptions();
+
 
 
 }

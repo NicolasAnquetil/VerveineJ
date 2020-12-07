@@ -5,10 +5,11 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithClassScope")
-public interface TWithClassScope {
+public interface TWithClassScope  {
 
+    
 
 }
 

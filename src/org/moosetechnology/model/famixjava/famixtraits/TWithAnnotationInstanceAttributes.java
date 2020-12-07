@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithAnnotationInstanceAttributes")
-public interface TWithAnnotationInstanceAttributes {
+public interface TWithAnnotationInstanceAttributes  {
 
-    @FameProperty(name = "attributes", opposite = "parentAnnotationInstance", derived = true)
-    Collection<TAnnotationInstanceAttribute> getAttributes();
+        @FameProperty(name = "attributes", opposite = "parentAnnotationInstance", derived = true)
+    public Collection<TAnnotationInstanceAttribute> getAttributes();
 
-    void setAttributes(Collection<? extends TAnnotationInstanceAttribute> attributes);
+    public void setAttributes(Collection<? extends TAnnotationInstanceAttribute> attributes);
 
-    void addAttributes(TAnnotationInstanceAttribute one);
+    public void addAttributes(TAnnotationInstanceAttribute one);
 
-    void addAttributes(TAnnotationInstanceAttribute one, TAnnotationInstanceAttribute... many);
+    public void addAttributes(TAnnotationInstanceAttribute one, TAnnotationInstanceAttribute... many);
 
-    void addAttributes(Iterable<? extends TAnnotationInstanceAttribute> many);
+    public void addAttributes(Iterable<? extends TAnnotationInstanceAttribute> many);
 
-    void addAttributes(TAnnotationInstanceAttribute[] many);
+    public void addAttributes(TAnnotationInstanceAttribute[] many);
 
-    int numberOfAttributes();
+    public int numberOfAttributes();
 
-    boolean hasAttributes();
+    public boolean hasAttributes();
+
 
 
 }

@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TEnumValue")
-public interface TEnumValue {
+public interface TEnumValue  {
 
-    @FameProperty(name = "parentEnum", opposite = "enumValues", container = true)
-    TWithEnumValues getParentEnum();
+        @FameProperty(name = "parentEnum", opposite = "enumValues", container = true)
+    public TWithEnumValues getParentEnum();
 
-    void setParentEnum(TWithEnumValues parentEnum);
+    public void setParentEnum(TWithEnumValues parentEnum);
+
 
 
 }

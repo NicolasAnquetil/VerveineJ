@@ -7,7 +7,10 @@ import ch.akuhn.fame.FamePackage;
 
 @FamePackage("Tagging")
 @FameDescription("EntityAssociation")
-public class EntityAssociation extends Association {
+public class EntityAssociation extends Association  {
+
+
+
 
 
 }

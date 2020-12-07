@@ -4,48 +4,48 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("THasModifiers")
-public interface THasModifiers {
+public interface THasModifiers  {
 
-    @FameProperty(name = "isProtected", derived = true)
-    Boolean getIsProtected();
+        @FameProperty(name = "isProtected", derived = true)
+    public Boolean getIsProtected();
 
     @FameProperty(name = "isPublic", derived = true)
-    Boolean getIsPublic();
+    public Boolean getIsPublic();
 
     @FameProperty(name = "isPackage", derived = true)
-    Boolean getIsPackage();
+    public Boolean getIsPackage();
 
     @FameProperty(name = "isPrivate", derived = true)
-    Boolean getIsPrivate();
+    public Boolean getIsPrivate();
 
     @FameProperty(name = "isFinal", derived = true)
-    Boolean getIsFinal();
+    public Boolean getIsFinal();
 
     @FameProperty(name = "modifiers")
-    Collection<String> getModifiers();
+    public Collection<String> getModifiers();
 
-    void setModifiers(Collection<? extends String> modifiers);
+    public void setModifiers(Collection<? extends String> modifiers);
 
-    void addModifiers(String one);
+    public void addModifiers(String one);
 
-    void addModifiers(String one, String... many);
+    public void addModifiers(String one, String... many);
 
-    void addModifiers(Iterable<? extends String> many);
+    public void addModifiers(Iterable<? extends String> many);
 
-    void addModifiers(String[] many);
+    public void addModifiers(String[] many);
 
-    int numberOfModifiers();
+    public int numberOfModifiers();
 
-    boolean hasModifiers();
+    public boolean hasModifiers();
 
     @FameProperty(name = "isAbstract", derived = true)
-    Boolean getIsAbstract();
+    public Boolean getIsAbstract();
+
 
 
 }

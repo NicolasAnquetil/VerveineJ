@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TTemplateUser")
-public interface TTemplateUser {
+public interface TTemplateUser  {
 
-    @FameProperty(name = "template", opposite = "templateUsers")
-    TTemplate getTemplate();
+        @FameProperty(name = "template", opposite = "templateUsers")
+    public TTemplate getTemplate();
 
-    void setTemplate(TTemplate template);
+    public void setTemplate(TTemplate template);
+
 
 
 }

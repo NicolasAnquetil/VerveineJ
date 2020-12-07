@@ -4,16 +4,18 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TImplicitVariable")
-public interface TImplicitVariable {
+public interface TImplicitVariable  {
 
-    @FameProperty(name = "parentBehaviouralEntity", opposite = "implicitVariables", container = true)
-    TWithImplicitVariables getParentBehaviouralEntity();
+        @FameProperty(name = "parentBehaviouralEntity", opposite = "implicitVariables", container = true)
+    public TWithImplicitVariables getParentBehaviouralEntity();
 
-    void setParentBehaviouralEntity(TWithImplicitVariables parentBehaviouralEntity);
+    public void setParentBehaviouralEntity(TWithImplicitVariables parentBehaviouralEntity);
+
 
 
 }

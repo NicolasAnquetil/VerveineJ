@@ -6,29 +6,30 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TFileNavigation")
-public interface TFileNavigation {
+public interface TFileNavigation  {
 
-    @FameProperty(name = "endLine")
-    Number getEndLine();
+        @FameProperty(name = "endLine")
+    public Number getEndLine();
 
-    void setEndLine(Number endLine);
+    public void setEndLine(Number endLine);
 
     @FameProperty(name = "endColumn")
-    Number getEndColumn();
+    public Number getEndColumn();
 
-    void setEndColumn(Number endColumn);
+    public void setEndColumn(Number endColumn);
 
     @FameProperty(name = "startColumn")
-    Number getStartColumn();
+    public Number getStartColumn();
 
-    void setStartColumn(Number startColumn);
+    public void setStartColumn(Number startColumn);
 
     @FameProperty(name = "startLine")
-    Number getStartLine();
+    public Number getStartLine();
 
-    void setStartLine(Number startLine);
+    public void setStartLine(Number startLine);
+
 
 
 }

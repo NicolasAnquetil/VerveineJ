@@ -4,16 +4,18 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TParameter")
-public interface TParameter {
+public interface TParameter  {
 
-    @FameProperty(name = "parentBehaviouralEntity", opposite = "parameters", container = true)
-    TWithParameters getParentBehaviouralEntity();
+        @FameProperty(name = "parentBehaviouralEntity", opposite = "parameters", container = true)
+    public TWithParameters getParentBehaviouralEntity();
 
-    void setParentBehaviouralEntity(TWithParameters parentBehaviouralEntity);
+    public void setParentBehaviouralEntity(TWithParameters parentBehaviouralEntity);
+
 
 
 }

@@ -10,15 +10,15 @@ public class MooseModel {
         importInto(metamodel);
         return metamodel;
     }
-
+    
     public static void importInto(MetaRepository metamodel) {
-        metamodel.with(org.moosetechnology.model.famixjava.moose.Object.class);
-        metamodel.with(org.moosetechnology.model.famixjava.moose.Group.class);
-        metamodel.with(org.moosetechnology.model.famixjava.moose.Model.class);
-        metamodel.with(org.moosetechnology.model.famixjava.moose.PropertyGroup.class);
-        metamodel.with(org.moosetechnology.model.famixjava.moose.SpecializedGroup.class);
-        metamodel.with(org.moosetechnology.model.famixjava.moose.AbstractGroup.class);
-        metamodel.with(org.moosetechnology.model.famixjava.moose.Entity.class);
+		metamodel.with(org.moosetechnology.model.famixjava.moose.PropertyGroup.class);
+		metamodel.with(org.moosetechnology.model.famixjava.moose.Model.class);
+		metamodel.with(org.moosetechnology.model.famixjava.moose.AbstractGroup.class);
+		metamodel.with(org.moosetechnology.model.famixjava.moose.Entity.class);
+		metamodel.with(org.moosetechnology.model.famixjava.moose.SpecializedGroup.class);
+		metamodel.with(org.moosetechnology.model.famixjava.moose.Object.class);
+		metamodel.with(org.moosetechnology.model.famixjava.moose.Group.class);
 
     }
 

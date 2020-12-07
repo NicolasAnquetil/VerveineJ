@@ -5,10 +5,11 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TPreprocessorDefine")
-public interface TPreprocessorDefine {
+public interface TPreprocessorDefine  {
 
+    
 
 }
 

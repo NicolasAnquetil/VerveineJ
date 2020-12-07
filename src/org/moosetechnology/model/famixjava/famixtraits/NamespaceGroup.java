@@ -6,9 +6,12 @@ import ch.akuhn.fame.FamePackage;
 import org.moosetechnology.model.famixjava.moose.SpecializedGroup;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("NamespaceGroup")
-public class NamespaceGroup extends SpecializedGroup {
+public class NamespaceGroup extends SpecializedGroup  {
+
+
+
 
 
 }

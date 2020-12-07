@@ -3,12 +3,15 @@ package org.moosetechnology.model.famixjava.famixtraits;
 
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TNamespace")
-public interface TNamespace {
+public interface TNamespace  {
 
+    
 
 }
 

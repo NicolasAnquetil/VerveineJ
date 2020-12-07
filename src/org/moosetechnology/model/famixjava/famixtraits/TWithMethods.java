@@ -4,60 +4,60 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithMethods")
-public interface TWithMethods {
+public interface TWithMethods  {
 
-    @FameProperty(name = "tightClassCohesion", derived = true)
-    Number getTightClassCohesion();
+        @FameProperty(name = "tightClassCohesion", derived = true)
+    public Number getTightClassCohesion();
 
     @FameProperty(name = "numberOfProtectedMethods", derived = true)
-    Number getNumberOfProtectedMethods();
+    public Number getNumberOfProtectedMethods();
 
     @FameProperty(name = "numberOfMethods", derived = true)
-    Number getNumberOfMethods();
+    public Number getNumberOfMethods();
 
     @FameProperty(name = "numberOfPrivateMethods", derived = true)
-    Number getNumberOfPrivateMethods();
+    public Number getNumberOfPrivateMethods();
 
     @FameProperty(name = "weightedMethodCount", derived = true)
-    Number getWeightedMethodCount();
+    public Number getWeightedMethodCount();
 
     @FameProperty(name = "numberOfPublicMethods", derived = true)
-    Number getNumberOfPublicMethods();
+    public Number getNumberOfPublicMethods();
 
     @FameProperty(name = "methods", opposite = "parentType", derived = true)
-    Collection<TMethod> getMethods();
+    public Collection<TMethod> getMethods();
 
-    void setMethods(Collection<? extends TMethod> methods);
+    public void setMethods(Collection<? extends TMethod> methods);
 
-    void addMethods(TMethod one);
+    public void addMethods(TMethod one);
 
-    void addMethods(TMethod one, TMethod... many);
+    public void addMethods(TMethod one, TMethod... many);
 
-    void addMethods(Iterable<? extends TMethod> many);
+    public void addMethods(Iterable<? extends TMethod> many);
 
-    void addMethods(TMethod[] many);
+    public void addMethods(TMethod[] many);
 
-    int numberOfMethods();
+    public int numberOfMethods();
 
-    boolean hasMethods();
+    public boolean hasMethods();
 
     @FameProperty(name = "numberOfAccessorMethods", derived = true)
-    Number getNumberOfAccessorMethods();
+    public Number getNumberOfAccessorMethods();
 
     @FameProperty(name = "numberOfConstructorMethods", derived = true)
-    Number getNumberOfConstructorMethods();
+    public Number getNumberOfConstructorMethods();
 
     @FameProperty(name = "numberOfAbstractMethods", derived = true)
-    Number getNumberOfAbstractMethods();
+    public Number getNumberOfAbstractMethods();
 
     @FameProperty(name = "numberOfMessageSends", derived = true)
-    Number getNumberOfMessageSends();
+    public Number getNumberOfMessageSends();
+
 
 
 }

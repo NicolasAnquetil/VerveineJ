@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithEnumValues")
-public interface TWithEnumValues {
+public interface TWithEnumValues  {
 
-    @FameProperty(name = "enumValues", opposite = "parentEnum", derived = true)
-    Collection<TEnumValue> getEnumValues();
+        @FameProperty(name = "enumValues", opposite = "parentEnum", derived = true)
+    public Collection<TEnumValue> getEnumValues();
 
-    void setEnumValues(Collection<? extends TEnumValue> enumValues);
+    public void setEnumValues(Collection<? extends TEnumValue> enumValues);
 
-    void addEnumValues(TEnumValue one);
+    public void addEnumValues(TEnumValue one);
 
-    void addEnumValues(TEnumValue one, TEnumValue... many);
+    public void addEnumValues(TEnumValue one, TEnumValue... many);
 
-    void addEnumValues(Iterable<? extends TEnumValue> many);
+    public void addEnumValues(Iterable<? extends TEnumValue> many);
 
-    void addEnumValues(TEnumValue[] many);
+    public void addEnumValues(TEnumValue[] many);
 
-    int numberOfEnumValues();
+    public int numberOfEnumValues();
 
-    boolean hasEnumValues();
+    public boolean hasEnumValues();
+
 
 
 }

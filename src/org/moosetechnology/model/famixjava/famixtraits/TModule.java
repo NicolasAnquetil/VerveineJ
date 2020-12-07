@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TModule")
-public interface TModule {
+public interface TModule  {
 
-    @FameProperty(name = "moduleEntities", opposite = "parentModule", derived = true)
-    Collection<TDefinedInModule> getModuleEntities();
+        @FameProperty(name = "moduleEntities", opposite = "parentModule", derived = true)
+    public Collection<TDefinedInModule> getModuleEntities();
 
-    void setModuleEntities(Collection<? extends TDefinedInModule> moduleEntities);
+    public void setModuleEntities(Collection<? extends TDefinedInModule> moduleEntities);
 
-    void addModuleEntities(TDefinedInModule one);
+    public void addModuleEntities(TDefinedInModule one);
 
-    void addModuleEntities(TDefinedInModule one, TDefinedInModule... many);
+    public void addModuleEntities(TDefinedInModule one, TDefinedInModule... many);
 
-    void addModuleEntities(Iterable<? extends TDefinedInModule> many);
+    public void addModuleEntities(Iterable<? extends TDefinedInModule> many);
 
-    void addModuleEntities(TDefinedInModule[] many);
+    public void addModuleEntities(TDefinedInModule[] many);
 
-    int numberOfModuleEntities();
+    public int numberOfModuleEntities();
 
-    boolean hasModuleEntities();
+    public boolean hasModuleEntities();
+
 
 
 }

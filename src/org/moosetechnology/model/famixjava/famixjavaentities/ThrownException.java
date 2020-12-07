@@ -8,11 +8,12 @@ import org.moosetechnology.model.famixjava.famixtraits.TThrownException;
 import org.moosetechnology.model.famixjava.famixtraits.TWithThrownExceptions;
 
 
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("ThrownException")
 public class ThrownException extends Exception implements TThrownException {
 
     private TWithThrownExceptions definingEntity;
+    
 
 
     @FameProperty(name = "definingEntity", opposite = "thrownExceptions")
@@ -29,6 +30,7 @@ public class ThrownException extends Exception implements TThrownException {
         if (definingEntity == null) return;
         definingEntity.getThrownExceptions().add(this);
     }
+    
 
 
 }

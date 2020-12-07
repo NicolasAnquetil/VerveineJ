@@ -6,17 +6,18 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TSourceAnchor")
-public interface TSourceAnchor {
+public interface TSourceAnchor  {
 
-    @FameProperty(name = "lineCount", derived = true)
-    Number getLineCount();
+        @FameProperty(name = "lineCount", derived = true)
+    public Number getLineCount();
 
     @FameProperty(name = "element", opposite = "sourceAnchor")
-    TSourceEntity getElement();
+    public TSourceEntity getElement();
 
-    void setElement(TSourceEntity element);
+    public void setElement(TSourceEntity element);
+
 
 
 }

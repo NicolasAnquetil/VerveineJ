@@ -6,9 +6,12 @@ import ch.akuhn.fame.FamePackage;
 import org.moosetechnology.model.famixjava.moose.Model;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("FamixModel")
-public class FamixModel extends Model {
+public class FamixModel extends Model  {
+
+
+
 
 
 }

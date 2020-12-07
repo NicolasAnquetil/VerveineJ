@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithExceptions")
-public interface TWithExceptions {
+public interface TWithExceptions  {
 
-    @FameProperty(name = "exceptions", opposite = "exceptionClass", derived = true)
-    Collection<TException> getExceptions();
+        @FameProperty(name = "exceptions", opposite = "exceptionClass", derived = true)
+    public Collection<TException> getExceptions();
 
-    void setExceptions(Collection<? extends TException> exceptions);
+    public void setExceptions(Collection<? extends TException> exceptions);
 
-    void addExceptions(TException one);
+    public void addExceptions(TException one);
 
-    void addExceptions(TException one, TException... many);
+    public void addExceptions(TException one, TException... many);
 
-    void addExceptions(Iterable<? extends TException> many);
+    public void addExceptions(Iterable<? extends TException> many);
 
-    void addExceptions(TException[] many);
+    public void addExceptions(TException[] many);
 
-    int numberOfExceptions();
+    public int numberOfExceptions();
 
-    boolean hasExceptions();
+    public boolean hasExceptions();
+
 
 
 }

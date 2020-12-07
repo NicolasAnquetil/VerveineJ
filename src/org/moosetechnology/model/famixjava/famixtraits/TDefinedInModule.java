@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TDefinedInModule")
-public interface TDefinedInModule {
+public interface TDefinedInModule  {
 
-    @FameProperty(name = "parentModule", opposite = "moduleEntities")
-    TModule getParentModule();
+        @FameProperty(name = "parentModule", opposite = "moduleEntities")
+    public TModule getParentModule();
 
-    void setParentModule(TModule parentModule);
+    public void setParentModule(TModule parentModule);
+
 
 
 }

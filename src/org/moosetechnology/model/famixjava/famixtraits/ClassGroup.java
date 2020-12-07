@@ -5,9 +5,12 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("ClassGroup")
-public class ClassGroup extends TypeGroup {
+public class ClassGroup extends TypeGroup  {
+
+
+
 
 
 }

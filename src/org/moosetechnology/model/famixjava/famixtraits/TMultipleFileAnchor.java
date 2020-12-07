@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TMultipleFileAnchor")
-public interface TMultipleFileAnchor {
+public interface TMultipleFileAnchor  {
 
-    @FameProperty(name = "fileAnchors")
-    Collection<TFileAnchor> getFileAnchors();
+        @FameProperty(name = "fileAnchors")
+    public Collection<TFileAnchor> getFileAnchors();
 
-    void setFileAnchors(Collection<? extends TFileAnchor> fileAnchors);
+    public void setFileAnchors(Collection<? extends TFileAnchor> fileAnchors);
 
-    void addFileAnchors(TFileAnchor one);
+    public void addFileAnchors(TFileAnchor one);
 
-    void addFileAnchors(TFileAnchor one, TFileAnchor... many);
+    public void addFileAnchors(TFileAnchor one, TFileAnchor... many);
 
-    void addFileAnchors(Iterable<? extends TFileAnchor> many);
+    public void addFileAnchors(Iterable<? extends TFileAnchor> many);
 
-    void addFileAnchors(TFileAnchor[] many);
+    public void addFileAnchors(TFileAnchor[] many);
 
-    int numberOfFileAnchors();
+    public int numberOfFileAnchors();
 
-    boolean hasFileAnchors();
+    public boolean hasFileAnchors();
+
 
 
 }

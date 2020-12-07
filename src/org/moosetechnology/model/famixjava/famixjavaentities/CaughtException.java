@@ -8,11 +8,12 @@ import org.moosetechnology.model.famixjava.famixtraits.TCaughtException;
 import org.moosetechnology.model.famixjava.famixtraits.TWithCaughtExceptions;
 
 
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("CaughtException")
 public class CaughtException extends Exception implements TCaughtException {
 
     private TWithCaughtExceptions definingEntity;
+    
 
 
     @FameProperty(name = "definingEntity", opposite = "caughtExceptions")
@@ -29,6 +30,7 @@ public class CaughtException extends Exception implements TCaughtException {
         if (definingEntity == null) return;
         definingEntity.getCaughtExceptions().add(this);
     }
+    
 
 
 }

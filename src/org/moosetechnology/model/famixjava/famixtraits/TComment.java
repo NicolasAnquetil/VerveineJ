@@ -6,19 +6,20 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TComment")
-public interface TComment {
+public interface TComment  {
 
-    @FameProperty(name = "container", opposite = "comments")
-    TWithComments getContainer();
+        @FameProperty(name = "container", opposite = "comments")
+    public TWithComments getContainer();
 
-    void setContainer(TWithComments container);
+    public void setContainer(TWithComments container);
 
     @FameProperty(name = "content")
-    String getContent();
+    public String getContent();
 
-    void setContent(String content);
+    public void setContent(String content);
+
 
 
 }

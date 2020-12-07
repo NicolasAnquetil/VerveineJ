@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TTypedEntity")
-public interface TTypedEntity {
+public interface TTypedEntity  {
 
-    @FameProperty(name = "declaredType", opposite = "typedEntities")
-    TType getDeclaredType();
+        @FameProperty(name = "declaredType", opposite = "typedEntities")
+    public TType getDeclaredType();
 
-    void setDeclaredType(TType declaredType);
+    public void setDeclaredType(TType declaredType);
+
 
 
 }

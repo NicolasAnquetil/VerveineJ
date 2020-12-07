@@ -6,17 +6,18 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TFileSystemEntity")
-public interface TFileSystemEntity {
+public interface TFileSystemEntity  {
 
-    @FameProperty(name = "parentFolder", opposite = "childrenFileSystemEntities", container = true)
-    TFolder getParentFolder();
+        @FameProperty(name = "parentFolder", opposite = "childrenFileSystemEntities", container = true)
+    public TFolder getParentFolder();
 
-    void setParentFolder(TFolder parentFolder);
+    public void setParentFolder(TFolder parentFolder);
 
     @FameProperty(name = "numberOfLinesOfText", derived = true)
-    Number getNumberOfLinesOfText();
+    public Number getNumberOfLinesOfText();
+
 
 
 }

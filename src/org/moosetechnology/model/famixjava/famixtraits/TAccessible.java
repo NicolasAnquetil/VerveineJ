@@ -4,48 +4,48 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TAccessible")
-public interface TAccessible {
+public interface TAccessible  {
 
-    @FameProperty(name = "numberOfAccesses", derived = true)
-    Number getNumberOfAccesses();
+        @FameProperty(name = "numberOfAccesses", derived = true)
+    public Number getNumberOfAccesses();
 
     @FameProperty(name = "numberOfLocalAccesses", derived = true)
-    Number getNumberOfLocalAccesses();
+    public Number getNumberOfLocalAccesses();
 
     @FameProperty(name = "accessors", derived = true)
-    Collection<TWithAccesses> getAccessors();
+    public Collection<TWithAccesses> getAccessors();
 
     @FameProperty(name = "numberOfAccessingMethods", derived = true)
-    Number getNumberOfAccessingMethods();
+    public Number getNumberOfAccessingMethods();
 
     @FameProperty(name = "numberOfAccessingClasses", derived = true)
-    Number getNumberOfAccessingClasses();
+    public Number getNumberOfAccessingClasses();
 
     @FameProperty(name = "numberOfGlobalAccesses", derived = true)
-    Number getNumberOfGlobalAccesses();
+    public Number getNumberOfGlobalAccesses();
 
     @FameProperty(name = "incomingAccesses", opposite = "variable", derived = true)
-    Collection<TAccess> getIncomingAccesses();
+    public Collection<TAccess> getIncomingAccesses();
 
-    void setIncomingAccesses(Collection<? extends TAccess> incomingAccesses);
+    public void setIncomingAccesses(Collection<? extends TAccess> incomingAccesses);
 
-    void addIncomingAccesses(TAccess one);
+    public void addIncomingAccesses(TAccess one);
 
-    void addIncomingAccesses(TAccess one, TAccess... many);
+    public void addIncomingAccesses(TAccess one, TAccess... many);
 
-    void addIncomingAccesses(Iterable<? extends TAccess> many);
+    public void addIncomingAccesses(Iterable<? extends TAccess> many);
 
-    void addIncomingAccesses(TAccess[] many);
+    public void addIncomingAccesses(TAccess[] many);
 
-    int numberOfIncomingAccesses();
+    public int numberOfIncomingAccesses();
 
-    boolean hasIncomingAccesses();
+    public boolean hasIncomingAccesses();
+
 
 
 }

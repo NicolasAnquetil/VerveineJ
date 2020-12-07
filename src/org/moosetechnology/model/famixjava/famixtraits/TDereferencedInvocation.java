@@ -4,16 +4,18 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TDereferencedInvocation")
-public interface TDereferencedInvocation {
+public interface TDereferencedInvocation  {
 
-    @FameProperty(name = "referencer", opposite = "dereferencedInvocations")
-    TWithDereferencedInvocations getReferencer();
+        @FameProperty(name = "referencer", opposite = "dereferencedInvocations")
+    public TWithDereferencedInvocations getReferencer();
 
-    void setReferencer(TWithDereferencedInvocations referencer);
+    public void setReferencer(TWithDereferencedInvocations referencer);
+
 
 
 }

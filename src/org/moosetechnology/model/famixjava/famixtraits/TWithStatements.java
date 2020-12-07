@@ -6,20 +6,21 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithStatements")
-public interface TWithStatements {
+public interface TWithStatements  {
 
-    @FameProperty(name = "numberOfStatements", derived = true)
-    Number getNumberOfStatements();
+        @FameProperty(name = "numberOfStatements", derived = true)
+    public Number getNumberOfStatements();
 
     @FameProperty(name = "numberOflinesOfDeadCode", derived = true)
-    Number getNumberOflinesOfDeadCode();
+    public Number getNumberOflinesOfDeadCode();
 
     @FameProperty(name = "cyclomaticComplexity")
-    Number getCyclomaticComplexity();
+    public Number getCyclomaticComplexity();
 
-    void setCyclomaticComplexity(Number cyclomaticComplexity);
+    public void setCyclomaticComplexity(Number cyclomaticComplexity);
+
 
 
 }

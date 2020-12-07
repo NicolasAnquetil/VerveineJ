@@ -4,16 +4,18 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TFunction")
-public interface TFunction {
+public interface TFunction  {
 
-    @FameProperty(name = "functionOwner", opposite = "functions", container = true)
-    TWithFunctions getFunctionOwner();
+        @FameProperty(name = "functionOwner", opposite = "functions", container = true)
+    public TWithFunctions getFunctionOwner();
 
-    void setFunctionOwner(TWithFunctions functionOwner);
+    public void setFunctionOwner(TWithFunctions functionOwner);
+
 
 
 }

@@ -7,7 +7,10 @@ import ch.akuhn.fame.FamePackage;
 
 @FamePackage("Moose")
 @FameDescription("Object")
-public class Object {
+public class Object   {
+
+
+
 
 
 }

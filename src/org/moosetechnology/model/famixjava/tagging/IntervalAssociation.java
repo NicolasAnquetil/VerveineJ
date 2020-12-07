@@ -9,13 +9,14 @@ import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 
 @FamePackage("Tagging")
 @FameDescription("IntervalAssociation")
-public class IntervalAssociation extends Association {
+public class IntervalAssociation extends Association  {
 
     private TSourceAnchor sourceAnchor;
-
-    private Number stop;
-
+    
     private Number start;
+    
+    private Number stop;
+    
 
 
     @FameProperty(name = "sourceAnchor")
@@ -26,16 +27,7 @@ public class IntervalAssociation extends Association {
     public void setSourceAnchor(TSourceAnchor sourceAnchor) {
         this.sourceAnchor = sourceAnchor;
     }
-
-    @FameProperty(name = "stop")
-    public Number getStop() {
-        return stop;
-    }
-
-    public void setStop(Number stop) {
-        this.stop = stop;
-    }
-
+    
     @FameProperty(name = "start")
     public Number getStart() {
         return start;
@@ -44,6 +36,16 @@ public class IntervalAssociation extends Association {
     public void setStart(Number start) {
         this.start = start;
     }
+    
+    @FameProperty(name = "stop")
+    public Number getStop() {
+        return stop;
+    }
+
+    public void setStop(Number stop) {
+        this.stop = stop;
+    }
+    
 
 
 }

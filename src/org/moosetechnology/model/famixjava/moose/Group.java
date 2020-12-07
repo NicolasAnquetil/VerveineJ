@@ -7,7 +7,10 @@ import ch.akuhn.fame.FamePackage;
 
 @FamePackage("Moose")
 @FameDescription("Group")
-public class Group extends AbstractGroup {
+public class Group extends AbstractGroup  {
+
+
+
 
 
 }

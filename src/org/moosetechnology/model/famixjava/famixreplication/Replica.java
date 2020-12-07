@@ -8,7 +8,10 @@ import org.moosetechnology.model.famixjava.moose.Entity;
 
 @FamePackage("FamixReplication")
 @FameDescription("Replica")
-public class Replica extends Entity {
+public class Replica extends Entity  {
+
+
+
 
 
 }

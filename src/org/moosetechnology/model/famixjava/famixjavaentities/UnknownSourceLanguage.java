@@ -7,16 +7,18 @@ import ch.akuhn.fame.FameProperty;
 import org.moosetechnology.model.famixjava.famixtraits.TUnknownSourceLanguage;
 
 
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("UnknownSourceLanguage")
 public class UnknownSourceLanguage extends SourceLanguage implements TUnknownSourceLanguage {
+
 
 
     @FameProperty(name = "name", derived = true)
     public String getName() {
         // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
+    
 
 
 }

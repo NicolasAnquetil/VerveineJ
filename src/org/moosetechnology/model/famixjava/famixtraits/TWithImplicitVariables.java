@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithImplicitVariables")
-public interface TWithImplicitVariables {
+public interface TWithImplicitVariables  {
 
-    @FameProperty(name = "implicitVariables", opposite = "parentBehaviouralEntity", derived = true)
-    Collection<TImplicitVariable> getImplicitVariables();
+        @FameProperty(name = "implicitVariables", opposite = "parentBehaviouralEntity", derived = true)
+    public Collection<TImplicitVariable> getImplicitVariables();
 
-    void setImplicitVariables(Collection<? extends TImplicitVariable> implicitVariables);
+    public void setImplicitVariables(Collection<? extends TImplicitVariable> implicitVariables);
 
-    void addImplicitVariables(TImplicitVariable one);
+    public void addImplicitVariables(TImplicitVariable one);
 
-    void addImplicitVariables(TImplicitVariable one, TImplicitVariable... many);
+    public void addImplicitVariables(TImplicitVariable one, TImplicitVariable... many);
 
-    void addImplicitVariables(Iterable<? extends TImplicitVariable> many);
+    public void addImplicitVariables(Iterable<? extends TImplicitVariable> many);
 
-    void addImplicitVariables(TImplicitVariable[] many);
+    public void addImplicitVariables(TImplicitVariable[] many);
 
-    int numberOfImplicitVariables();
+    public int numberOfImplicitVariables();
 
-    boolean hasImplicitVariables();
+    public boolean hasImplicitVariables();
+
 
 
 }

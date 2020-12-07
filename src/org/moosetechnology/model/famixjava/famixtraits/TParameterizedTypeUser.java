@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TParameterizedTypeUser")
-public interface TParameterizedTypeUser {
+public interface TParameterizedTypeUser  {
 
-    @FameProperty(name = "argumentsInParameterizedTypes", opposite = "arguments", derived = true)
-    Collection<TWithParameterizedTypeUsers> getArgumentsInParameterizedTypes();
+        @FameProperty(name = "argumentsInParameterizedTypes", opposite = "arguments", derived = true)
+    public Collection<TWithParameterizedTypeUsers> getArgumentsInParameterizedTypes();
 
-    void setArgumentsInParameterizedTypes(Collection<? extends TWithParameterizedTypeUsers> argumentsInParameterizedTypes);
+    public void setArgumentsInParameterizedTypes(Collection<? extends TWithParameterizedTypeUsers> argumentsInParameterizedTypes);
 
-    void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers one);
+    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers one);
 
-    void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers one, TWithParameterizedTypeUsers... many);
+    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers one, TWithParameterizedTypeUsers... many);
 
-    void addArgumentsInParameterizedTypes(Iterable<? extends TWithParameterizedTypeUsers> many);
+    public void addArgumentsInParameterizedTypes(Iterable<? extends TWithParameterizedTypeUsers> many);
 
-    void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers[] many);
+    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers[] many);
 
-    int numberOfArgumentsInParameterizedTypes();
+    public int numberOfArgumentsInParameterizedTypes();
 
-    boolean hasArgumentsInParameterizedTypes();
+    public boolean hasArgumentsInParameterizedTypes();
+
 
 
 }

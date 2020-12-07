@@ -8,7 +8,10 @@ import org.moosetechnology.model.famixjava.moose.AbstractGroup;
 
 @FamePackage("Tagging")
 @FameDescription("TagModel")
-public class TagModel extends AbstractGroup {
+public class TagModel extends AbstractGroup  {
+
+
+
 
 
 }

@@ -6,15 +6,16 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TLCOMMetrics")
-public interface TLCOMMetrics {
+public interface TLCOMMetrics  {
 
-    @FameProperty(name = "lcom2", derived = true)
-    Number getLcom2();
+        @FameProperty(name = "lcom2", derived = true)
+    public Number getLcom2();
 
     @FameProperty(name = "lcom3", derived = true)
-    Number getLcom3();
+    public Number getLcom3();
+
 
 
 }

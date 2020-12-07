@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TTypedAnnotationInstanceAttribute")
-public interface TTypedAnnotationInstanceAttribute {
+public interface TTypedAnnotationInstanceAttribute  {
 
-    @FameProperty(name = "annotationTypeAttribute", opposite = "annotationAttributeInstances")
-    TAnnotationTypeAttribute getAnnotationTypeAttribute();
+        @FameProperty(name = "annotationTypeAttribute", opposite = "annotationAttributeInstances")
+    public TAnnotationTypeAttribute getAnnotationTypeAttribute();
 
-    void setAnnotationTypeAttribute(TAnnotationTypeAttribute annotationTypeAttribute);
+    public void setAnnotationTypeAttribute(TAnnotationTypeAttribute annotationTypeAttribute);
+
 
 
 }

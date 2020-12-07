@@ -4,10 +4,13 @@ package org.moosetechnology.model.famixjava.famixjavaentities;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 
-
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("Entity")
 public class Entity {
+
+
+
+
 
 }
 

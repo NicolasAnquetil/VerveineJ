@@ -4,52 +4,55 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TMethod")
-public interface TMethod {
+public interface TMethod  {
 
-    @FameProperty(name = "isGetter", derived = true)
-    Boolean getIsGetter();
+        @FameProperty(name = "isGetter", derived = true)
+    public Boolean getIsGetter();
 
     @FameProperty(name = "isConstant", derived = true)
-    Boolean getIsConstant();
+    public Boolean getIsConstant();
 
     @FameProperty(name = "hierarchyNestingLevel", derived = true)
-    Number getHierarchyNestingLevel();
+    public Number getHierarchyNestingLevel();
 
     @FameProperty(name = "kind")
-    String getKind();
+    public String getKind();
 
-    void setKind(String kind);
+    public void setKind(String kind);
 
     @FameProperty(name = "isConstructor", derived = true)
-    Boolean getIsConstructor();
+    public Boolean getIsConstructor();
 
     @FameProperty(name = "isSetter", derived = true)
-    Boolean getIsSetter();
+    public Boolean getIsSetter();
 
     @FameProperty(name = "numberOfMessageSends", derived = true)
-    Number getNumberOfMessageSends();
+    public Number getNumberOfMessageSends();
 
     @FameProperty(name = "hasClassScope", derived = true)
-    Boolean getHasClassScope();
+    public Boolean getHasClassScope();
 
     @FameProperty(name = "isClassSide")
-    Boolean getIsClassSide();
+    public Boolean getIsClassSide();
 
-    void setIsClassSide(Boolean isClassSide);
+    public void setIsClassSide(Boolean isClassSide);
 
     @FameProperty(name = "isAbstract")
-    Boolean getIsAbstract();
+    public Boolean getIsAbstract();
 
-    void setIsAbstract(Boolean isAbstract);
+    public void setIsAbstract(Boolean isAbstract);
 
     @FameProperty(name = "parentType", opposite = "methods", container = true)
-    TWithMethods getParentType();
+    public TWithMethods getParentType();
 
-    void setParentType(TWithMethods parentType);
+    public void setParentType(TWithMethods parentType);
+
 
 
 }

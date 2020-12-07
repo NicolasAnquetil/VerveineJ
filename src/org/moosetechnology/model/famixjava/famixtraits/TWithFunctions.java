@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithFunctions")
-public interface TWithFunctions {
+public interface TWithFunctions  {
 
-    @FameProperty(name = "functions", opposite = "functionOwner", derived = true)
-    Collection<TFunction> getFunctions();
+        @FameProperty(name = "functions", opposite = "functionOwner", derived = true)
+    public Collection<TFunction> getFunctions();
 
-    void setFunctions(Collection<? extends TFunction> functions);
+    public void setFunctions(Collection<? extends TFunction> functions);
 
-    void addFunctions(TFunction one);
+    public void addFunctions(TFunction one);
 
-    void addFunctions(TFunction one, TFunction... many);
+    public void addFunctions(TFunction one, TFunction... many);
 
-    void addFunctions(Iterable<? extends TFunction> many);
+    public void addFunctions(Iterable<? extends TFunction> many);
 
-    void addFunctions(TFunction[] many);
+    public void addFunctions(TFunction[] many);
 
-    int numberOfFunctions();
+    public int numberOfFunctions();
 
-    boolean hasFunctions();
+    public boolean hasFunctions();
+
 
 
 }

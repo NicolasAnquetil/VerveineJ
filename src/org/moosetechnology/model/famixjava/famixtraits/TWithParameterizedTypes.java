@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithParameterizedTypes")
-public interface TWithParameterizedTypes {
+public interface TWithParameterizedTypes  {
 
-    @FameProperty(name = "parameterizedTypes", opposite = "parameterizableClass", derived = true)
-    Collection<TParameterizedType> getParameterizedTypes();
+        @FameProperty(name = "parameterizedTypes", opposite = "parameterizableClass", derived = true)
+    public Collection<TParameterizedType> getParameterizedTypes();
 
-    void setParameterizedTypes(Collection<? extends TParameterizedType> parameterizedTypes);
+    public void setParameterizedTypes(Collection<? extends TParameterizedType> parameterizedTypes);
 
-    void addParameterizedTypes(TParameterizedType one);
+    public void addParameterizedTypes(TParameterizedType one);
 
-    void addParameterizedTypes(TParameterizedType one, TParameterizedType... many);
+    public void addParameterizedTypes(TParameterizedType one, TParameterizedType... many);
 
-    void addParameterizedTypes(Iterable<? extends TParameterizedType> many);
+    public void addParameterizedTypes(Iterable<? extends TParameterizedType> many);
 
-    void addParameterizedTypes(TParameterizedType[] many);
+    public void addParameterizedTypes(TParameterizedType[] many);
 
-    int numberOfParameterizedTypes();
+    public int numberOfParameterizedTypes();
 
-    boolean hasParameterizedTypes();
+    public boolean hasParameterizedTypes();
+
 
 
 }

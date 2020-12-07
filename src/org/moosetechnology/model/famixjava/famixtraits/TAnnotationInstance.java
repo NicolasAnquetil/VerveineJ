@@ -4,16 +4,18 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TAnnotationInstance")
-public interface TAnnotationInstance {
+public interface TAnnotationInstance  {
 
-    @FameProperty(name = "annotatedEntity", opposite = "annotationInstances", container = true)
-    TWithAnnotationInstances getAnnotatedEntity();
+        @FameProperty(name = "annotatedEntity", opposite = "annotationInstances", container = true)
+    public TWithAnnotationInstances getAnnotatedEntity();
 
-    void setAnnotatedEntity(TWithAnnotationInstances annotatedEntity);
+    public void setAnnotatedEntity(TWithAnnotationInstances annotatedEntity);
+
 
 
 }

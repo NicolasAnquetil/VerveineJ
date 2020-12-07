@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("THasImmediateSource")
-public interface THasImmediateSource {
+public interface THasImmediateSource  {
 
-    @FameProperty(name = "source")
-    String getSource();
+        @FameProperty(name = "source")
+    public String getSource();
 
-    void setSource(String source);
+    public void setSource(String source);
+
 
 
 }

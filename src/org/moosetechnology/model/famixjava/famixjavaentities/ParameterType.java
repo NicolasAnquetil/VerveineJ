@@ -6,9 +6,12 @@ import ch.akuhn.fame.FamePackage;
 import org.moosetechnology.model.famixjava.famixtraits.TParameterType;
 
 
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("ParameterType")
 public class ParameterType extends Type implements TParameterType {
+
+
+
 
 
 }

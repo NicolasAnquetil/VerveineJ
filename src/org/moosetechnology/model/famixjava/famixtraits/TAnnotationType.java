@@ -4,35 +4,35 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TAnnotationType")
-public interface TAnnotationType {
+public interface TAnnotationType  {
 
-    @FameProperty(name = "instances", opposite = "annotationType", derived = true)
-    Collection<TTypedAnnotationInstance> getInstances();
+        @FameProperty(name = "instances", opposite = "annotationType", derived = true)
+    public Collection<TTypedAnnotationInstance> getInstances();
 
-    void setInstances(Collection<? extends TTypedAnnotationInstance> instances);
+    public void setInstances(Collection<? extends TTypedAnnotationInstance> instances);
 
-    void addInstances(TTypedAnnotationInstance one);
+    public void addInstances(TTypedAnnotationInstance one);
 
-    void addInstances(TTypedAnnotationInstance one, TTypedAnnotationInstance... many);
+    public void addInstances(TTypedAnnotationInstance one, TTypedAnnotationInstance... many);
 
-    void addInstances(Iterable<? extends TTypedAnnotationInstance> many);
+    public void addInstances(Iterable<? extends TTypedAnnotationInstance> many);
 
-    void addInstances(TTypedAnnotationInstance[] many);
+    public void addInstances(TTypedAnnotationInstance[] many);
 
-    int numberOfInstances();
+    public int numberOfInstances();
 
-    boolean hasInstances();
+    public boolean hasInstances();
 
     @FameProperty(name = "annotationTypesContainer", opposite = "definedAnnotationTypes", container = true)
-    TWithAnnotationTypes getAnnotationTypesContainer();
+    public TWithAnnotationTypes getAnnotationTypesContainer();
 
-    void setAnnotationTypesContainer(TWithAnnotationTypes annotationTypesContainer);
+    public void setAnnotationTypesContainer(TWithAnnotationTypes annotationTypesContainer);
+
 
 
 }

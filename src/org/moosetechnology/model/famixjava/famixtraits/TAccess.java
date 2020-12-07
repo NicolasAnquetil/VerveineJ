@@ -4,32 +4,34 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TAccess")
-public interface TAccess {
+public interface TAccess  {
 
-    @FameProperty(name = "variable", opposite = "incomingAccesses")
-    TAccessible getVariable();
+        @FameProperty(name = "variable", opposite = "incomingAccesses")
+    public TAccessible getVariable();
 
-    void setVariable(TAccessible variable);
+    public void setVariable(TAccessible variable);
 
     @FameProperty(name = "accessor", opposite = "accesses")
-    TWithAccesses getAccessor();
+    public TWithAccesses getAccessor();
 
-    void setAccessor(TWithAccesses accessor);
+    public void setAccessor(TWithAccesses accessor);
 
     @FameProperty(name = "isReadWriteUnknown", derived = true)
-    Boolean getIsReadWriteUnknown();
+    public Boolean getIsReadWriteUnknown();
 
     @FameProperty(name = "isRead", derived = true)
-    Boolean getIsRead();
+    public Boolean getIsRead();
 
     @FameProperty(name = "isWrite")
-    Boolean getIsWrite();
+    public Boolean getIsWrite();
 
-    void setIsWrite(Boolean isWrite);
+    public void setIsWrite(Boolean isWrite);
+
 
 
 }

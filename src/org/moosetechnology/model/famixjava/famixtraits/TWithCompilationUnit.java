@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithCompilationUnit")
-public interface TWithCompilationUnit {
+public interface TWithCompilationUnit  {
 
-    @FameProperty(name = "compilationUnit", opposite = "compilationUnitOwner", derived = true)
-    TCompilationUnit getCompilationUnit();
+        @FameProperty(name = "compilationUnit", opposite = "compilationUnitOwner", derived = true)
+    public TCompilationUnit getCompilationUnit();
 
-    void setCompilationUnit(TCompilationUnit compilationUnit);
+    public void setCompilationUnit(TCompilationUnit compilationUnit);
+
 
 
 }

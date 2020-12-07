@@ -4,30 +4,31 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TAnnotationTypeAttribute")
-public interface TAnnotationTypeAttribute {
+public interface TAnnotationTypeAttribute  {
 
-    @FameProperty(name = "annotationAttributeInstances", opposite = "annotationTypeAttribute", derived = true)
-    Collection<TTypedAnnotationInstanceAttribute> getAnnotationAttributeInstances();
+        @FameProperty(name = "annotationAttributeInstances", opposite = "annotationTypeAttribute", derived = true)
+    public Collection<TTypedAnnotationInstanceAttribute> getAnnotationAttributeInstances();
 
-    void setAnnotationAttributeInstances(Collection<? extends TTypedAnnotationInstanceAttribute> annotationAttributeInstances);
+    public void setAnnotationAttributeInstances(Collection<? extends TTypedAnnotationInstanceAttribute> annotationAttributeInstances);
 
-    void addAnnotationAttributeInstances(TTypedAnnotationInstanceAttribute one);
+    public void addAnnotationAttributeInstances(TTypedAnnotationInstanceAttribute one);
 
-    void addAnnotationAttributeInstances(TTypedAnnotationInstanceAttribute one, TTypedAnnotationInstanceAttribute... many);
+    public void addAnnotationAttributeInstances(TTypedAnnotationInstanceAttribute one, TTypedAnnotationInstanceAttribute... many);
 
-    void addAnnotationAttributeInstances(Iterable<? extends TTypedAnnotationInstanceAttribute> many);
+    public void addAnnotationAttributeInstances(Iterable<? extends TTypedAnnotationInstanceAttribute> many);
 
-    void addAnnotationAttributeInstances(TTypedAnnotationInstanceAttribute[] many);
+    public void addAnnotationAttributeInstances(TTypedAnnotationInstanceAttribute[] many);
 
-    int numberOfAnnotationAttributeInstances();
+    public int numberOfAnnotationAttributeInstances();
 
-    boolean hasAnnotationAttributeInstances();
+    public boolean hasAnnotationAttributeInstances();
+
 
 
 }

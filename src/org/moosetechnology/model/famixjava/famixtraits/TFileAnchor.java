@@ -6,24 +6,25 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TFileAnchor")
-public interface TFileAnchor {
+public interface TFileAnchor  {
 
-    @FameProperty(name = "fileName")
-    String getFileName();
+        @FameProperty(name = "fileName")
+    public String getFileName();
 
-    void setFileName(String fileName);
+    public void setFileName(String fileName);
 
     @FameProperty(name = "correspondingFile")
-    TFile getCorrespondingFile();
+    public TFile getCorrespondingFile();
 
-    void setCorrespondingFile(TFile correspondingFile);
+    public void setCorrespondingFile(TFile correspondingFile);
 
     @FameProperty(name = "encoding")
-    String getEncoding();
+    public String getEncoding();
 
-    void setEncoding(String encoding);
+    public void setEncoding(String encoding);
+
 
 
 }

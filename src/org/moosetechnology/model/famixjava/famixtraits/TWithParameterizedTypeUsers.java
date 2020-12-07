@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithParameterizedTypeUsers")
-public interface TWithParameterizedTypeUsers {
+public interface TWithParameterizedTypeUsers  {
 
-    @FameProperty(name = "arguments", opposite = "argumentsInParameterizedTypes")
-    Collection<TParameterizedTypeUser> getArguments();
+        @FameProperty(name = "arguments", opposite = "argumentsInParameterizedTypes")
+    public Collection<TParameterizedTypeUser> getArguments();
 
-    void setArguments(Collection<? extends TParameterizedTypeUser> arguments);
+    public void setArguments(Collection<? extends TParameterizedTypeUser> arguments);
 
-    void addArguments(TParameterizedTypeUser one);
+    public void addArguments(TParameterizedTypeUser one);
 
-    void addArguments(TParameterizedTypeUser one, TParameterizedTypeUser... many);
+    public void addArguments(TParameterizedTypeUser one, TParameterizedTypeUser... many);
 
-    void addArguments(Iterable<? extends TParameterizedTypeUser> many);
+    public void addArguments(Iterable<? extends TParameterizedTypeUser> many);
 
-    void addArguments(TParameterizedTypeUser[] many);
+    public void addArguments(TParameterizedTypeUser[] many);
 
-    int numberOfArguments();
+    public int numberOfArguments();
 
-    boolean hasArguments();
+    public boolean hasArguments();
+
 
 
 }

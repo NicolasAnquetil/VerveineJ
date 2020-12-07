@@ -4,41 +4,42 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TType")
-public interface TType {
+public interface TType  {
 
-    @FameProperty(name = "numberOfAccessesToForeignData", derived = true)
-    Number getNumberOfAccessesToForeignData();
+        @FameProperty(name = "numberOfAccessesToForeignData", derived = true)
+    public Number getNumberOfAccessesToForeignData();
 
     @FameProperty(name = "typeContainer", opposite = "types", container = true)
-    TWithTypes getTypeContainer();
+    public TWithTypes getTypeContainer();
 
-    void setTypeContainer(TWithTypes typeContainer);
+    public void setTypeContainer(TWithTypes typeContainer);
 
     @FameProperty(name = "typedEntities", opposite = "declaredType", derived = true)
-    Collection<TTypedEntity> getTypedEntities();
+    public Collection<TTypedEntity> getTypedEntities();
 
-    void setTypedEntities(Collection<? extends TTypedEntity> typedEntities);
+    public void setTypedEntities(Collection<? extends TTypedEntity> typedEntities);
 
-    void addTypedEntities(TTypedEntity one);
+    public void addTypedEntities(TTypedEntity one);
 
-    void addTypedEntities(TTypedEntity one, TTypedEntity... many);
+    public void addTypedEntities(TTypedEntity one, TTypedEntity... many);
 
-    void addTypedEntities(Iterable<? extends TTypedEntity> many);
+    public void addTypedEntities(Iterable<? extends TTypedEntity> many);
 
-    void addTypedEntities(TTypedEntity[] many);
+    public void addTypedEntities(TTypedEntity[] many);
 
-    int numberOfTypedEntities();
+    public int numberOfTypedEntities();
 
-    boolean hasTypedEntities();
+    public boolean hasTypedEntities();
 
     @FameProperty(name = "numberOfDuplicatedLinesOfCodeInternally", derived = true)
-    Number getNumberOfDuplicatedLinesOfCodeInternally();
+    public Number getNumberOfDuplicatedLinesOfCodeInternally();
+
 
 
 }

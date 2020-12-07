@@ -9,23 +9,15 @@ import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 
 
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("SourceTextAnchor")
 public class SourceTextAnchor extends SourceAnchor implements TSourceAnchor, THasImmediateSource {
 
-    private String source;
-
     private TSourceEntity element;
+    
+    private String source;
+    
 
-
-    @FameProperty(name = "source")
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
 
     @FameProperty(name = "element", opposite = "sourceAnchor")
     public TSourceEntity getElement() {
@@ -40,12 +32,22 @@ public class SourceTextAnchor extends SourceAnchor implements TSourceAnchor, THa
             if (element != null) element.setSourceAnchor(this);
         }
     }
-
+    
     @FameProperty(name = "lineCount", derived = true)
     public Number getLineCount() {
         // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
+    
+    @FameProperty(name = "source")
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+    
 
 
 }

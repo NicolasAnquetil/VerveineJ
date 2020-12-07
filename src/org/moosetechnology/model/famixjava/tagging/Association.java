@@ -9,27 +9,13 @@ import org.moosetechnology.model.famixjava.moose.Entity;
 
 @FamePackage("Tagging")
 @FameDescription("Association")
-public class Association extends Entity {
-
-    private Number tagId;
+public class Association extends Entity  {
 
     private Entity entity;
+    
+    private Number tagId;
+    
 
-
-    @FameProperty(name = "tagId")
-    public Number getTagId() {
-        return tagId;
-    }
-
-    public void setTagId(Number tagId) {
-        this.tagId = tagId;
-    }
-
-    @FameProperty(name = "tag", derived = true)
-    public Tag getTag() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");
-    }
 
     @FameProperty(name = "entity", opposite = "allTagAssociations")
     public Entity getEntity() {
@@ -45,6 +31,22 @@ public class Association extends Entity {
         if (entity == null) return;
         entity.getAllTagAssociations().add(this);
     }
+    
+    @FameProperty(name = "tag", derived = true)
+    public Tag getTag() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "tagId")
+    public Number getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(Number tagId) {
+        this.tagId = tagId;
+    }
+    
 
 
 }

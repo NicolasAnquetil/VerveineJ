@@ -6,9 +6,12 @@ import ch.akuhn.fame.FamePackage;
 import org.moosetechnology.model.famixjava.moose.SpecializedGroup;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("AnnotationTypeGroup")
-public class AnnotationTypeGroup extends SpecializedGroup {
+public class AnnotationTypeGroup extends SpecializedGroup  {
+
+
+
 
 
 }

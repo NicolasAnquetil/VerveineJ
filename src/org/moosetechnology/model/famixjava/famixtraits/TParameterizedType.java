@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TParameterizedType")
-public interface TParameterizedType {
+public interface TParameterizedType  {
 
-    @FameProperty(name = "parameterizableClass", opposite = "parameterizedTypes")
-    TWithParameterizedTypes getParameterizableClass();
+        @FameProperty(name = "parameterizableClass", opposite = "parameterizedTypes")
+    public TWithParameterizedTypes getParameterizableClass();
 
-    void setParameterizableClass(TWithParameterizedTypes parameterizableClass);
+    public void setParameterizableClass(TWithParameterizedTypes parameterizableClass);
+
 
 
 }

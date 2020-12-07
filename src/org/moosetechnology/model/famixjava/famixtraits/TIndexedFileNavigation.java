@@ -6,19 +6,20 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TIndexedFileNavigation")
-public interface TIndexedFileNavigation {
+public interface TIndexedFileNavigation  {
 
-    @FameProperty(name = "startPos")
-    Number getStartPos();
+        @FameProperty(name = "startPos")
+    public Number getStartPos();
 
-    void setStartPos(Number startPos);
+    public void setStartPos(Number startPos);
 
     @FameProperty(name = "endPos")
-    Number getEndPos();
+    public Number getEndPos();
 
-    void setEndPos(Number endPos);
+    public void setEndPos(Number endPos);
+
 
 
 }

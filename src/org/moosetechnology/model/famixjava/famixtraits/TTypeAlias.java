@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TTypeAlias")
-public interface TTypeAlias {
+public interface TTypeAlias  {
 
-    @FameProperty(name = "aliasedType", opposite = "typeAliases")
-    TWithTypeAliases getAliasedType();
+        @FameProperty(name = "aliasedType", opposite = "typeAliases")
+    public TWithTypeAliases getAliasedType();
 
-    void setAliasedType(TWithTypeAliases aliasedType);
+    public void setAliasedType(TWithTypeAliases aliasedType);
+
 
 
 }

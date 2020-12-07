@@ -6,12 +6,13 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithClasses")
-public interface TWithClasses {
+public interface TWithClasses  {
 
-    @FameProperty(name = "numberOfClasses", derived = true)
-    Number getNumberOfClasses();
+        @FameProperty(name = "numberOfClasses", derived = true)
+    public Number getNumberOfClasses();
+
 
 
 }

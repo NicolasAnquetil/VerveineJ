@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TThrownException")
-public interface TThrownException {
+public interface TThrownException  {
 
-    @FameProperty(name = "definingEntity", opposite = "thrownExceptions")
-    TWithThrownExceptions getDefiningEntity();
+        @FameProperty(name = "definingEntity", opposite = "thrownExceptions")
+    public TWithThrownExceptions getDefiningEntity();
 
-    void setDefiningEntity(TWithThrownExceptions definingEntity);
+    public void setDefiningEntity(TWithThrownExceptions definingEntity);
+
 
 
 }

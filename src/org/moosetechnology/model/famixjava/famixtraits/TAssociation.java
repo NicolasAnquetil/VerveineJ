@@ -4,21 +4,23 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TAssociation")
-public interface TAssociation {
+public interface TAssociation  {
 
-    @FameProperty(name = "next", opposite = "previous", derived = true)
-    TAssociation getNext();
+        @FameProperty(name = "next", opposite = "previous", derived = true)
+    public TAssociation getNext();
 
-    void setNext(TAssociation next);
+    public void setNext(TAssociation next);
 
     @FameProperty(name = "previous", opposite = "next")
-    TAssociation getPrevious();
+    public TAssociation getPrevious();
 
-    void setPrevious(TAssociation previous);
+    public void setPrevious(TAssociation previous);
+
 
 
 }

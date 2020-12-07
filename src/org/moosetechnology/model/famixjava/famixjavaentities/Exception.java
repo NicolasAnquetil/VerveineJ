@@ -8,11 +8,12 @@ import org.moosetechnology.model.famixjava.famixtraits.TException;
 import org.moosetechnology.model.famixjava.famixtraits.TWithExceptions;
 
 
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("Exception")
 public class Exception extends Entity implements TException {
 
     private TWithExceptions exceptionClass;
+    
 
 
     @FameProperty(name = "exceptionClass", opposite = "exceptions")
@@ -29,6 +30,7 @@ public class Exception extends Entity implements TException {
         if (exceptionClass == null) return;
         exceptionClass.getExceptions().add(this);
     }
+    
 
 
 }

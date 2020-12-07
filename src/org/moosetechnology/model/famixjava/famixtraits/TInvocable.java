@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TInvocable")
-public interface TInvocable {
+public interface TInvocable  {
 
-    @FameProperty(name = "incomingInvocations", opposite = "candidates", derived = true)
-    Collection<TInvocation> getIncomingInvocations();
+        @FameProperty(name = "incomingInvocations", opposite = "candidates", derived = true)
+    public Collection<TInvocation> getIncomingInvocations();
 
-    void setIncomingInvocations(Collection<? extends TInvocation> incomingInvocations);
+    public void setIncomingInvocations(Collection<? extends TInvocation> incomingInvocations);
 
-    void addIncomingInvocations(TInvocation one);
+    public void addIncomingInvocations(TInvocation one);
 
-    void addIncomingInvocations(TInvocation one, TInvocation... many);
+    public void addIncomingInvocations(TInvocation one, TInvocation... many);
 
-    void addIncomingInvocations(Iterable<? extends TInvocation> many);
+    public void addIncomingInvocations(Iterable<? extends TInvocation> many);
 
-    void addIncomingInvocations(TInvocation[] many);
+    public void addIncomingInvocations(TInvocation[] many);
 
-    int numberOfIncomingInvocations();
+    public int numberOfIncomingInvocations();
 
-    boolean hasIncomingInvocations();
+    public boolean hasIncomingInvocations();
+
 
 
 }

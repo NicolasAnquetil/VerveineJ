@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithCaughtExceptions")
-public interface TWithCaughtExceptions {
+public interface TWithCaughtExceptions  {
 
-    @FameProperty(name = "caughtExceptions", opposite = "definingEntity", derived = true)
-    Collection<TCaughtException> getCaughtExceptions();
+        @FameProperty(name = "caughtExceptions", opposite = "definingEntity", derived = true)
+    public Collection<TCaughtException> getCaughtExceptions();
 
-    void setCaughtExceptions(Collection<? extends TCaughtException> caughtExceptions);
+    public void setCaughtExceptions(Collection<? extends TCaughtException> caughtExceptions);
 
-    void addCaughtExceptions(TCaughtException one);
+    public void addCaughtExceptions(TCaughtException one);
 
-    void addCaughtExceptions(TCaughtException one, TCaughtException... many);
+    public void addCaughtExceptions(TCaughtException one, TCaughtException... many);
 
-    void addCaughtExceptions(Iterable<? extends TCaughtException> many);
+    public void addCaughtExceptions(Iterable<? extends TCaughtException> many);
 
-    void addCaughtExceptions(TCaughtException[] many);
+    public void addCaughtExceptions(TCaughtException[] many);
 
-    int numberOfCaughtExceptions();
+    public int numberOfCaughtExceptions();
 
-    boolean hasCaughtExceptions();
+    public boolean hasCaughtExceptions();
+
 
 
 }

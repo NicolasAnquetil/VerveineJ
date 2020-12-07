@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TTraitUser")
-public interface TTraitUser {
+public interface TTraitUser  {
 
-    @FameProperty(name = "outgoingTraitUsages", opposite = "user", derived = true)
-    Collection<TTraitUsage> getOutgoingTraitUsages();
+        @FameProperty(name = "outgoingTraitUsages", opposite = "user", derived = true)
+    public Collection<TTraitUsage> getOutgoingTraitUsages();
 
-    void setOutgoingTraitUsages(Collection<? extends TTraitUsage> outgoingTraitUsages);
+    public void setOutgoingTraitUsages(Collection<? extends TTraitUsage> outgoingTraitUsages);
 
-    void addOutgoingTraitUsages(TTraitUsage one);
+    public void addOutgoingTraitUsages(TTraitUsage one);
 
-    void addOutgoingTraitUsages(TTraitUsage one, TTraitUsage... many);
+    public void addOutgoingTraitUsages(TTraitUsage one, TTraitUsage... many);
 
-    void addOutgoingTraitUsages(Iterable<? extends TTraitUsage> many);
+    public void addOutgoingTraitUsages(Iterable<? extends TTraitUsage> many);
 
-    void addOutgoingTraitUsages(TTraitUsage[] many);
+    public void addOutgoingTraitUsages(TTraitUsage[] many);
 
-    int numberOfOutgoingTraitUsages();
+    public int numberOfOutgoingTraitUsages();
 
-    boolean hasOutgoingTraitUsages();
+    public boolean hasOutgoingTraitUsages();
+
 
 
 }

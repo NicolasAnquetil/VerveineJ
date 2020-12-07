@@ -7,39 +7,40 @@ import ch.akuhn.fame.FameProperty;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TSourceEntity")
-public interface TSourceEntity {
+public interface TSourceEntity  {
 
-    @FameProperty(name = "isStub")
-    Boolean getIsStub();
+        @FameProperty(name = "isStub")
+    public Boolean getIsStub();
 
-    void setIsStub(Boolean isStub);
+    public void setIsStub(Boolean isStub);
 
     @FameProperty(name = "duplicationRate", derived = true)
-    Number getDuplicationRate();
+    public Number getDuplicationRate();
 
     @FameProperty(name = "sourceAnchor", opposite = "element", derived = true)
-    TSourceAnchor getSourceAnchor();
+    public TSourceAnchor getSourceAnchor();
 
-    void setSourceAnchor(TSourceAnchor sourceAnchor);
+    public void setSourceAnchor(TSourceAnchor sourceAnchor);
 
     @FameProperty(name = "containsReplicas", derived = true)
-    Boolean getContainsReplicas();
+    public Boolean getContainsReplicas();
 
     @FameProperty(name = "numberOfLinesOfCodeWithMoreThanOneCharacter", derived = true)
-    Number getNumberOfLinesOfCodeWithMoreThanOneCharacter();
+    public Number getNumberOfLinesOfCodeWithMoreThanOneCharacter();
 
     @FameProperty(name = "replicas", derived = true)
-    Replica getReplicas();
+    public Replica getReplicas();
 
     @FameProperty(name = "numberOfLinesOfCode")
-    Number getNumberOfLinesOfCode();
+    public Number getNumberOfLinesOfCode();
 
-    void setNumberOfLinesOfCode(Number numberOfLinesOfCode);
+    public void setNumberOfLinesOfCode(Number numberOfLinesOfCode);
 
     @FameProperty(name = "sourceText", derived = true)
-    String getSourceText();
+    public String getSourceText();
+
 
 
 }

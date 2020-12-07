@@ -4,30 +4,30 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithAccesses")
-public interface TWithAccesses {
+public interface TWithAccesses  {
 
-    @FameProperty(name = "accesses", opposite = "accessor", derived = true)
-    Collection<TAccess> getAccesses();
+        @FameProperty(name = "accesses", opposite = "accessor", derived = true)
+    public Collection<TAccess> getAccesses();
 
-    void setAccesses(Collection<? extends TAccess> accesses);
+    public void setAccesses(Collection<? extends TAccess> accesses);
 
-    void addAccesses(TAccess one);
+    public void addAccesses(TAccess one);
 
-    void addAccesses(TAccess one, TAccess... many);
+    public void addAccesses(TAccess one, TAccess... many);
 
-    void addAccesses(Iterable<? extends TAccess> many);
+    public void addAccesses(Iterable<? extends TAccess> many);
 
-    void addAccesses(TAccess[] many);
+    public void addAccesses(TAccess[] many);
 
-    int numberOfAccesses();
+    public int numberOfAccesses();
 
-    boolean hasAccesses();
+    public boolean hasAccesses();
+
 
 
 }

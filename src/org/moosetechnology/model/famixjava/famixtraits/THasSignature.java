@@ -6,14 +6,15 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("THasSignature")
-public interface THasSignature {
+public interface THasSignature  {
 
-    @FameProperty(name = "signature")
-    String getSignature();
+        @FameProperty(name = "signature")
+    public String getSignature();
 
-    void setSignature(String signature);
+    public void setSignature(String signature);
+
 
 
 }

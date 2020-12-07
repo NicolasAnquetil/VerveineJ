@@ -4,21 +4,23 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TFileInclude")
-public interface TFileInclude {
+public interface TFileInclude  {
 
-    @FameProperty(name = "source", opposite = "outgoingIncludeRelations")
-    TWithFileIncludes getSource();
+        @FameProperty(name = "source", opposite = "outgoingIncludeRelations")
+    public TWithFileIncludes getSource();
 
-    void setSource(TWithFileIncludes source);
+    public void setSource(TWithFileIncludes source);
 
     @FameProperty(name = "target", opposite = "incomingIncludeRelations")
-    TWithFileIncludes getTarget();
+    public TWithFileIncludes getTarget();
 
-    void setTarget(TWithFileIncludes target);
+    public void setTarget(TWithFileIncludes target);
+
 
 
 }

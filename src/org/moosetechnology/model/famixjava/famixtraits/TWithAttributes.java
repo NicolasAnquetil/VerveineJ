@@ -4,45 +4,45 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import java.util.*;
 
-import java.util.Collection;
 
-
-@FamePackage("FamixTraits")
+@FamePackage("Famix-Traits")
 @FameDescription("TWithAttributes")
-public interface TWithAttributes {
+public interface TWithAttributes  {
 
-    @FameProperty(name = "numberOfProtectedAttributes", derived = true)
-    Number getNumberOfProtectedAttributes();
+        @FameProperty(name = "numberOfProtectedAttributes", derived = true)
+    public Number getNumberOfProtectedAttributes();
 
     @FameProperty(name = "numberOfAttributes", derived = true)
-    Number getNumberOfAttributes();
+    public Number getNumberOfAttributes();
 
     @FameProperty(name = "numberOfRevealedAttributes", derived = true)
-    Number getNumberOfRevealedAttributes();
+    public Number getNumberOfRevealedAttributes();
 
     @FameProperty(name = "numberOfPublicAttributes", derived = true)
-    Number getNumberOfPublicAttributes();
+    public Number getNumberOfPublicAttributes();
 
     @FameProperty(name = "attributes", opposite = "parentType", derived = true)
-    Collection<TAttribute> getAttributes();
+    public Collection<TAttribute> getAttributes();
 
-    void setAttributes(Collection<? extends TAttribute> attributes);
+    public void setAttributes(Collection<? extends TAttribute> attributes);
 
-    void addAttributes(TAttribute one);
+    public void addAttributes(TAttribute one);
 
-    void addAttributes(TAttribute one, TAttribute... many);
+    public void addAttributes(TAttribute one, TAttribute... many);
 
-    void addAttributes(Iterable<? extends TAttribute> many);
+    public void addAttributes(Iterable<? extends TAttribute> many);
 
-    void addAttributes(TAttribute[] many);
+    public void addAttributes(TAttribute[] many);
 
-    int numberOfAttributes();
+    public int numberOfAttributes();
 
-    boolean hasAttributes();
+    public boolean hasAttributes();
 
     @FameProperty(name = "numberOfPrivateAttributes", derived = true)
-    Number getNumberOfPrivateAttributes();
+    public Number getNumberOfPrivateAttributes();
+
 
 
 }

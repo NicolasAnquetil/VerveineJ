@@ -8,11 +8,12 @@ import org.moosetechnology.model.famixjava.famixtraits.TDeclaredException;
 import org.moosetechnology.model.famixjava.famixtraits.TWithDeclaredExceptions;
 
 
-@FamePackage("FamixJavaEntities")
+@FamePackage("Famix-Java-Entities")
 @FameDescription("DeclaredException")
 public class DeclaredException extends Exception implements TDeclaredException {
 
     private TWithDeclaredExceptions definingEntity;
+    
 
 
     @FameProperty(name = "definingEntity", opposite = "declaredExceptions")
@@ -29,6 +30,7 @@ public class DeclaredException extends Exception implements TDeclaredException {
         if (definingEntity == null) return;
         definingEntity.getDeclaredExceptions().add(this);
     }
+    
 
 
 }
