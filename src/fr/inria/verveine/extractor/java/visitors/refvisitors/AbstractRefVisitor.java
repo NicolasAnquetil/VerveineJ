@@ -1,16 +1,11 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import org.eclipse.jdt.core.dom.ArrayType;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.QualifiedType;
-import org.eclipse.jdt.core.dom.SimpleType;
-import org.eclipse.jdt.core.dom.Type;
-
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
 
 /**
  * A collection of useful utility methods that are needed in various ref visitors
@@ -55,10 +50,11 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	/**
 	 * Ensures the proper creation of a FamixType for JDT typ in the given context.
 	 * Useful for parameterizedTypes, or classInstance.
+	 *
 	 * @param isClass we are sure that the type is actually a class
 	 * @return a famix type or null
 	 */
-	protected eu.synectique.verveine.core.gen.famix.Type referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
+	protected org.moosetechnology.model.famixjava.famixjavaentities.Type referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
 		if (typ == null) {
 			return null;
 		} else if (typ.resolveBinding() != null) {
@@ -66,7 +62,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 		}
 		// from here, we assume the owner is the context
 		else if (isClass) {
-			return dico.ensureFamixClass((ITypeBinding) null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false,
+			return dico.ensureFamixClass(null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false,
 					JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 		} else {
 			while (typ.isArrayType()) {
@@ -74,9 +70,9 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 
 			if (typ.isPrimitiveType()) {
-				return dico.ensureFamixPrimitiveType((ITypeBinding) null, findTypeName(typ));
+				return dico.ensureFamixPrimitiveType(null, findTypeName(typ));
 			} else {
-				return dico.ensureFamixType((ITypeBinding) null, findTypeName(typ), /*owner*/ctxt, /*container*/ctxt,
+				return dico.ensureFamixType(null, findTypeName(typ), /*owner*/ctxt, /*container*/ctxt,
 						JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 			}
 		}
@@ -85,8 +81,8 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	/**
 	 * Same as {@link AbstractRefVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
-	protected eu.synectique.verveine.core.gen.famix.Type referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
-		eu.synectique.verveine.core.gen.famix.Type fmxTyp = null;
+	protected org.moosetechnology.model.famixjava.famixjavaentities.Type referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
+		org.moosetechnology.model.famixjava.famixjavaentities.Type fmxTyp = null;
 
 		if (bnd == null) {
 			return null;
@@ -114,9 +110,9 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
-				eu.synectique.verveine.core.gen.famix.Type fmxTArg = this.referedType(targ, ctxt, false);
+				org.moosetechnology.model.famixjava.famixjavaentities.Type fmxTArg = this.referedType(targ, ctxt, false);
 				if ((fmxTArg != null) && persistClass(targ)) {
-					((eu.synectique.verveine.core.gen.famix.ParameterizedType) fmxTyp).addArguments(fmxTArg);
+					((org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType) fmxTyp).addArguments(fmxTArg);
 				}
 			}
 		} else {

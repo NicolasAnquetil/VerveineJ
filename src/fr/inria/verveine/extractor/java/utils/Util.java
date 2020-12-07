@@ -1,15 +1,24 @@
 package fr.inria.verveine.extractor.java.utils;
 
+import ch.akuhn.fame.MetaRepository;
+import ch.akuhn.fame.fm3.MetaDescription;
+import ch.akuhn.fame.fm3.PropertyDescription;
+import fr.inria.verveine.extractor.java.JavaDictionary;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleType;
+import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
 
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
+import java.util.stream.Collectors;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 
 public class Util {
 
+	public static MetaRepository metamodel;
 
 	/**
 	 * helper to "normalize" lambda names
@@ -57,10 +66,37 @@ public class Util {
 	public static void recursivelySetIsStub(ContainerEntity fmx, boolean b) {
 		ContainerEntity owner;
 		fmx.setIsStub(b);
-		owner = fmx.getBelongsTo();
-		if ( (owner != null) && (owner.getIsStub() != b)) {
+		owner = belongsToOf(fmx);
+		if ((owner != null) && (owner.getIsStub() != b)) {
 			recursivelySetIsStub(owner, b);
 		}
-		
+
+	}
+
+	public static ContainerEntity belongsToOf(Entity entity) {
+		Collection<PropertyDescription> propertyDescriptions = ((MetaDescription) metamodel.getDescription(entity.getClass())).allProperties()
+				.stream().filter(PropertyDescription::isContainer).collect(Collectors.toList());
+		for (PropertyDescription propertyDescription : propertyDescriptions) {
+			try {
+				java.lang.reflect.Method method = entity.getClass().getMethod("get" + capitalizeString(propertyDescription.getName()));
+				ContainerEntity containerEntity = (ContainerEntity) method.invoke(entity);
+				if (containerEntity != null) {
+					return containerEntity;
+				}
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	public static String capitalizeString(String str) {
+		String retStr = str;
+		try {
+			retStr = str.substring(0, 1).toUpperCase() + str.substring(1);
+		} catch (Exception e) {
+		}
+		return retStr;
 	}
 }
+

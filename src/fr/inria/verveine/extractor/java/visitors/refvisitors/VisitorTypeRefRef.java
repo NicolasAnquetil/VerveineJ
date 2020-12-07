@@ -1,16 +1,14 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import java.util.List;
-
-import org.eclipse.jdt.core.dom.*;
-
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Reference;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixjavaentities.Reference;
+import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
+
+import java.util.List;
 
 public class VisitorTypeRefRef extends AbstractRefVisitor {
 
@@ -64,10 +62,10 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		visitClassInstanceCreation(node);
 		if (node.getAnonymousClassDeclaration() == null) {
 			Type clazz = node.getType();
-			eu.synectique.verveine.core.gen.famix.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+			org.moosetechnology.model.famixjava.famixjavaentities.Type fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
 			if (! summarizeClasses()) {
-				ref = dico.addFamixReference( (BehaviouralEntity) context.top(), fmx, context.getLastReference());
+				ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
 				context.setLastReference(ref);
 			}
 
@@ -154,9 +152,9 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			}
 
 			for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
-				StructuralEntity fmxParam = (StructuralEntity) dico.getEntityByKey(param.resolveBinding());
+				TTypedEntity fmxParam = (TTypedEntity) dico.getEntityByKey(param.resolveBinding());
 				if (fmxParam != null) {
-					fmxParam.setDeclaredType( referedType(param.getType(), fmx, false) );
+					fmxParam.setDeclaredType(referedType(param.getType(), fmx, false));
 				}
 			}
 
@@ -194,16 +192,15 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	}
 
 	public boolean visit(InstanceofExpression node) {
-		eu.synectique.verveine.core.gen.famix.Type fmx = null;
+		org.moosetechnology.model.famixjava.famixjavaentities.Type fmx = null;
 		Type clazz = node.getRightOperand();
 		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 		Reference ref = null;
 		if (summarizeClasses()) {
 			//ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
-		}
-		else {
-			ref = dico.addFamixReference((BehaviouralEntity) context.top(), fmx, context.getLastReference());
+		} else {
+			ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
 			context.setLastReference(ref);
     		if (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) {
 	    		dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
@@ -284,13 +281,13 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
     @Override
     public boolean visit(SimpleName node) {
 	    if (this.searchTypeRef) {
-            IBinding bnd = node.resolveBinding();
-            if ( (bnd != null) && (bnd.getKind() == IBinding.TYPE) ) {
-                eu.synectique.verveine.core.gen.famix.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
-                Reference ref = dico.addFamixReference((BehaviouralEntity) context.top(), referred, context.getLastReference());
-                context.setLastReference(ref);
-            }
-        }
+			IBinding bnd = node.resolveBinding();
+			if ((bnd != null) && (bnd.getKind() == IBinding.TYPE)) {
+				org.moosetechnology.model.famixjava.famixjavaentities.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+				Reference ref = dico.addFamixReference((Method) context.top(), referred, context.getLastReference());
+				context.setLastReference(ref);
+			}
+		}
 
         return false;
     }
@@ -302,7 +299,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      *     SingleVariableDeclaration VariableDeclarationFragment
 	 */
 	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
-		setVariablesDeclaredType((List<VariableDeclaration>)fragments, referedType(declType, context.topType(), false));
+		setVariablesDeclaredType(fragments, referedType(declType, context.topType(), false));
 		for (VariableDeclaration varDecl : fragments) {
 			varDecl.accept(this);
 		}
@@ -314,9 +311,9 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 //		if ( (bnd != null) && (bnd instanceof ITypeBinding) ) {
 //			referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
 
-	private void setVariablesDeclaredType(List<VariableDeclaration> vars, eu.synectique.verveine.core.gen.famix.Type varTyp) {
+	private void setVariablesDeclaredType(List<VariableDeclaration> vars, org.moosetechnology.model.famixjava.famixjavaentities.Type varTyp) {
 		for (VariableDeclaration var : vars) {
-			StructuralEntity fmx = (StructuralEntity) dico.getEntityByKey(var.resolveBinding());
+			TTypedEntity fmx = (TTypedEntity) dico.getEntityByKey(var.resolveBinding());
 			if (fmx != null) {
 				fmx.setDeclaredType(varTyp);
 			}

@@ -1,6 +1,10 @@
 package fr.inria.verveine.extractor.java;
 
 
+import org.junit.Before;
+import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.IndexedFileAnchor;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
 import static org.junit.Assert.assertEquals;
 
 import java.io.File;
@@ -8,11 +12,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-import eu.synectique.verveine.core.gen.famix.IndexedFileAnchor;
-import eu.synectique.verveine.core.gen.famix.Method;
 
 public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
 
@@ -41,7 +44,7 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
         parse(new String[] {"test_src/comments"});
         List<Method> methods  = new ArrayList<>();
         methods.addAll(entitiesOfType(Method.class));
-        methods.sort((o1, o2) -> ((Integer)((IndexedFileAnchor) o1.getSourceAnchor()).getStartPos().intValue()).compareTo ((Integer)((IndexedFileAnchor) o2.getSourceAnchor()).getStartPos().intValue()));
+        methods.sort((o1, o2) -> ((Integer) ((IndexedFileAnchor) o1.getSourceAnchor()).getStartPos().intValue()).compareTo(((IndexedFileAnchor) o2.getSourceAnchor()).getStartPos().intValue()));
         assertEquals(10, methods.size());
         if(isWindows()){
             assertEquals(58, ((IndexedFileAnchor) methods.get(0).getSourceAnchor()).getStartPos().intValue());
@@ -71,7 +74,7 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
         parse(new String[] {"test_src/comments"});
         List<Method> methods  = new ArrayList<>();
         methods.addAll(entitiesOfType(Method.class));
-        methods.sort(Comparator.comparing(o -> ((Integer) ((IndexedFileAnchor) o.getSourceAnchor()).getEndPos().intValue())));
+        methods.sort(Comparator.comparing(o -> ((IndexedFileAnchor) o.getSourceAnchor()).getEndPos().intValue()));
         assertEquals(10, methods.size());
         if(isWindows()){
             assertEquals(110, ((IndexedFileAnchor) methods.get(0).getSourceAnchor()).getEndPos().intValue());

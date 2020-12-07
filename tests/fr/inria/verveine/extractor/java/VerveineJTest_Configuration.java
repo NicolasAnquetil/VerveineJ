@@ -1,13 +1,15 @@
 package fr.inria.verveine.extractor.java;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Class;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAccess;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+
 import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
-
-import eu.synectique.verveine.core.gen.famix.*;
-import eu.synectique.verveine.core.gen.famix.Class;
-import org.junit.Before;
-import org.junit.Test;
 
 import static org.junit.Assert.*;
 
@@ -71,14 +73,14 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
         int accessSetNom = 0;
         int accessGetNom = 0;
         for (Access acc : entitiesOfType( Access.class)) {
-            switch (acc.getAccessor().getName()) {
+            switch (((TNamedEntity)acc.getAccessor()).getName()) {
                 case "ReadClient": accessReadClient++; break;
                 case "lire": accessLire++; break;
                 case "getNum": accessGetNum++; break;
                 case "setNum": accessSetNum++; break;
                 case "getNom": accessGetNom++; break;
                 case "setNom": accessSetNom++; break;
-                default: fail("Unknown accessor name: " + acc.getAccessor().getName()); break;
+                default: fail("Unknown accessor name: " + ((TNamedEntity)acc.getAccessor()).getName()); break;
             }
         }
         assertEquals(4, accessReadClient);
@@ -161,8 +163,8 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
         Attribute prtr = detectFamixElement( Attribute.class, "printer");
         assertNotNull(prtr);
         assertEquals(2, prtr.getIncomingAccesses().size());
-        for (Access acc : prtr.getIncomingAccesses()) {
-            anc = acc.getSourceAnchor();
+        for (TAccess tacc : prtr.getIncomingAccesses()) {
+            anc = (SourceAnchor) ((Access) tacc).getSourceAnchor();
             assertNotNull(anc);
             assertEquals(IndexedFileAnchor.class, anc.getClass());
             int sp = (Integer) ((IndexedFileAnchor)anc).getStartPos();
@@ -170,34 +172,32 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 			if (isWindows()){
 				assertTrue("wrong startPos for Access: " + sp, (sp == 618) || (sp == 1032));
 				assertTrue("wrong endPos for Access: " + ep, (ep == 629) || (ep == 1043));
-			}
-			else {
+			} else {
 				assertTrue("wrong startPos for Access: " + sp, (sp == 584) || (sp == 980));
 				assertTrue("wrong endPos for Access: " + ep, (ep == 595) || (ep == 991));
 			}
-        }
-
-        // testing invocation
-        eu.synectique.verveine.core.gen.famix.Class clazz = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "IPrinter");
-        assertNotNull(clazz);
-        Method mth = firstElt(clazz.getMethods());  // first (and sole) method
-        assertNotNull(mth);
-        assertEquals("print", mth.getName());
-        assertEquals(1, mth.getIncomingInvocations().size());
-        Invocation invok = firstElt(mth.getIncomingInvocations());
-        anc = invok.getSourceAnchor();
-        assertNotNull(anc);
-        assertEquals(IndexedFileAnchor.class, anc.getClass());
-		if (isWindows()){
-			assertEquals((Integer)1032,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
-			assertEquals((Integer)1113, (Integer) ((IndexedFileAnchor)anc).getEndPos());
-		}
-		else {
-			assertEquals((Integer)980,  (Integer) ((IndexedFileAnchor)anc).getStartPos());
-			assertEquals((Integer)1061, (Integer) ((IndexedFileAnchor)anc).getEndPos());
 		}
 
-    }
+		// testing invocation
+		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IPrinter");
+		assertNotNull(clazz);
+		Method mth = (Method) firstElt(clazz.getMethods());  // first (and sole) method
+		assertNotNull(mth);
+		assertEquals("print", mth.getName());
+		assertEquals(1, mth.getIncomingInvocations().size());
+		Invocation invok = (Invocation) firstElt(mth.getIncomingInvocations());
+		anc = (SourceAnchor) invok.getSourceAnchor();
+		assertNotNull(anc);
+		assertEquals(IndexedFileAnchor.class, anc.getClass());
+		if (isWindows()) {
+			assertEquals(1032, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(1113, ((IndexedFileAnchor) anc).getEndPos());
+		} else {
+			assertEquals(980, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(1061, ((IndexedFileAnchor) anc).getEndPos());
+		}
+
+	}
 
     @Test
     public void testExcludepath()

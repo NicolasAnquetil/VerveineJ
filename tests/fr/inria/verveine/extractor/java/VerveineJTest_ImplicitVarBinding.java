@@ -1,33 +1,30 @@
 package fr.inria.verveine.extractor.java;
 
-import static org.junit.Assert.*;
-
-import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
+import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.ImplicitVariable;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 
-import eu.synectique.verveine.core.gen.famix.Method;
-import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
-
-import java.io.File;
 import java.util.Collection;
+
+import static org.junit.Assert.*;
 
 public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
 
-	private Method mth1;
-	private Method mth2;
+    private Method mth1;
+    private Method mth2;
 
-	@Before
-	public void setup() {
-		mth1 = new Method();
-		mth2 = new Method();
-	}
+    @Before
+    public void setup() {
+        mth1 = new Method();
+        mth2 = new Method();
+    }
 
-	public VerveineJTest_ImplicitVarBinding() throws IllegalAccessException {
-		super(false);
-	}
+    public VerveineJTest_ImplicitVarBinding() throws IllegalAccessException {
+        super(false);
+    }
 
     /**
      * Returns an ImplicitVariable instance for the given owner with the given name
@@ -64,7 +61,7 @@ public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
         assertEquals(4,   implicits.size());
 
         for (ImplicitVariable var : implicits) {
-            switch (var.getParentBehaviouralEntity().getName()) {
+            switch (((TNamedEntity)var.getParentBehaviouralEntity()).getName()) {
                 case "Dictionary" :
                     assertEquals(5, var.getIncomingAccesses().size());
 // actually generates 6 accesses:
@@ -90,7 +87,7 @@ public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
                     assertEquals(1, var.getReceivingInvocations().size());
                     break;
                 default :
-                    fail("Unknown ImplicitVariable owner: " + var.getParentBehaviouralEntity().getName());
+                    fail("Unknown ImplicitVariable owner: " + ((TNamedEntity)var.getParentBehaviouralEntity()).getName());
             }
         }
     }

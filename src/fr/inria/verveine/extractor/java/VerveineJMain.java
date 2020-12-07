@@ -4,7 +4,7 @@ public class VerveineJMain {
 
 	public static void main(String[] args) {
 		VerveineJParser parser = new VerveineJParser();
-		parser.configure( args);
+		parser.configure(args);
 		parser.parse();
 		parser.emitMSE();
 	}

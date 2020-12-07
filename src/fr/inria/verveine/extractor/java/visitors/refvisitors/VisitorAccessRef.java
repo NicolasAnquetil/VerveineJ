@@ -1,21 +1,18 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import java.util.List;
-
-import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
-import org.eclipse.jdt.core.dom.*;
-
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.Enum;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
+import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+
+import java.util.List;
 
 /**
  * A visitor that extracts accesses to variables.
@@ -243,7 +240,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc))
 				// check that lastAccess corresponds to current one
 				&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
-				&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
+				&& ((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getName().getIdentifier())) {
 			dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
 		}
 		return false;
@@ -263,7 +260,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc))
 					// check that lastAccess corresponds to current one
 					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
-					&& (lastAccess.getVariable().getName().equals(node.getName().getIdentifier()))) {
+					&& (((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getName().getIdentifier()))) {
 				dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
 			}
 		}
@@ -446,32 +443,32 @@ public class VisitorAccessRef extends AbstractRefVisitor {
             if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
                     // check that lastAccess corresponds to current one
                     && (lastAccess != null) && (lastAccess.getAccessor() == accessor)
-                    && (lastAccess.getVariable().getName().equals(node.getIdentifier()))) {
+                    && (((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getIdentifier()))) {
                 dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
             }
         }
-      return false;
+		return false;
 	}
 
 	// UTILITY METHODS
 
-  	private void visitIfNotNull(ASTNode node) {
-        if (node != null) {
-            node.accept(this);
-        }
-    }
+	private void visitIfNotNull(ASTNode node) {
+		if (node != null) {
+			node.accept(this);
+		}
+	}
 
-    private void visitAssignment(Expression lhs, Expression rhs) {
-        inAssignmentLHS = true;
-        visitIfNotNull(lhs);
-        inAssignmentLHS = false;
+	private void visitAssignment(Expression lhs, Expression rhs) {
+		inAssignmentLHS = true;
+		visitIfNotNull(lhs);
+		inAssignmentLHS = false;
 
-        visitIfNotNull( rhs);
-    }
+		visitIfNotNull(rhs);
+	}
 
-	private StructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name,
-			eu.synectique.verveine.core.gen.famix.Type typ, ContainerEntity owner, Method accessor) {
-		StructuralEntity accessed = null;
+	private TStructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name,
+														 org.moosetechnology.model.famixjava.famixjavaentities.Type typ, ContainerEntity owner, Method accessor) {
+		TStructuralEntity accessed = null;
 
 		if (bnd == null) {
 			// no way to know if it should be an attribute, EnumValue, variable, ...
@@ -484,28 +481,28 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if (bnd.isEnumConstant()) {
 			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/! summarizeClasses());
 		} else if (bnd.isField()) {
-			accessed = dico.ensureFamixAttribute(bnd, name, typ, (eu.synectique.verveine.core.gen.famix.Type) owner,
+			accessed = dico.ensureFamixAttribute(bnd, name, typ, (org.moosetechnology.model.famixjava.famixjavaentities.Type) owner,
 					/*persistIt*/! summarizeClasses());
 			if (summarizeClasses()) {
-				if (!(accessed.getDeclaredType() instanceof PrimitiveType)) {
+				if (!(((Attribute) accessed).getDeclaredType() instanceof PrimitiveType)) {
 					//dico.addFamixReference(findHighestType(accessed.getBelongsTo()),
 					//		findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
 				}
 			}
 
 			if ((accessed != null) && (((Attribute) accessed).getParentType() == null)
-					&& (accessed.getName().equals("length"))) {
+					&& (((Attribute) accessed).getName().equals("length"))) {
 				// special case: length attribute of arrays in Java
 				((Attribute) accessed).setParentType(dico.ensureFamixClassArray());
 			}
 		} else if (bnd.isParameter() && (! inLambda)) {
 			if (! summarizeClasses()) {
-				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, /*persistIt*/! summarizeClasses());
+				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, summarizeClasses());
 			}
 		} else {
 			// it seems it is a variable.
 			// if it is not already defined, we assume we are not interested
-			accessed = (StructuralEntity) dico.getEntityByKey(bnd);
+			accessed = (TStructuralEntity) dico.getEntityByKey(bnd);
 		}
 
 		createAccess(accessor, accessed, inAssignmentLHS);
@@ -515,32 +512,44 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 
 	/**
 	 * Creates a FamixAccess between an accessor and an accessed. Checks before that we are not in a local access to ignore.
+	 *
 	 * @param accessor -- the method accessing
 	 * @param accessed -- the variable accessed
-	 * @param isLHS -- whether the access occurs on the LeftHandSide of an assignement (and therefore is a write access)
+	 * @param isLHS    -- whether the access occurs on the LeftHandSide of an assignement (and therefore is a write access)
 	 */
-	private void createAccess(Method accessor, StructuralEntity accessed, boolean isLHS) {
+	private void createAccess(Method accessor, TStructuralEntity accessed, boolean isLHS) {
 		// create local accesses?
 		if ((accessed != null) && (accessor != null)) {
 			if (summarizeClasses()) {
 				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
 			} else if (options.withLocals() || (! localVariable(accessed, accessor)) ) {
 				context.setLastAccess(
-						dico.addFamixAccess(accessor, accessed, /*isWrite*/isLHS, context.getLastAccess()));
+						dico.addFamixAccess(accessor, (TStructuralEntity) accessed, /*isWrite*/isLHS, context.getLastAccess()));
 			}
 		}
 	}
 
-	private boolean localVariable(StructuralEntity accessed, Method accessor) {
+	private boolean localVariable(TStructuralEntity accessed, Method accessor) {
 		// TODO see issue 11 (https://github.com/NicolasAnquetil/VerveineJ/issues/11)
+
+		// This is ugly.. but it allows us to not rewrite method in generated code
 		if (accessed instanceof ImplicitVariable) {
 			return false;
-		}
-		if (accessed.getBelongsTo() == accessor) {
+		} else if (accessed instanceof Attribute && ((Attribute) accessed).getParentType() == accessor) {
+			return true;
+		} else if (accessed instanceof EnumValue && ((EnumValue) accessed).getParentEnum() == accessor) {
+			return true;
+		} else if (accessed instanceof GlobalVariable && ((GlobalVariable) accessed).getParentScope() == accessor) {
+			return true;
+		} else if (accessed instanceof ImplicitVariable && ((ImplicitVariable) accessed).getParentBehaviouralEntity() == accessor) {
+			return true;
+		} else if (accessed instanceof LocalVariable && ((LocalVariable) accessed).getParentBehaviouralEntity() == accessor) {
+			return true;
+		} else if (accessed instanceof Parameter && ((Parameter) accessed).getParentBehaviouralEntity() == accessor) {
 			return true;
 		}
-		if (accessor.getParentType().getName().startsWith(JavaDictionary.ANONYMOUS_NAME_PREFIX)) {
-			return localVariable(accessed, (Method)accessor.getParentType().getContainer());
+		if (((TNamedEntity) accessor.getParentType()).getName().startsWith(JavaDictionary.ANONYMOUS_NAME_PREFIX)) {
+			return localVariable(accessed, ((Method) ((org.moosetechnology.model.famixjava.famixjavaentities.Type) accessor.getParentType()).getTypeContainer()));
 		}
 		return false;
 	}

@@ -1,5 +1,8 @@
 package fr.inria.verveine.extractor.java;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Class;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,8 +10,6 @@ import java.io.File;
 
 import org.junit.Before;
 import org.junit.Test;
-
-import eu.synectique.verveine.core.gen.famix.Class;
 
 public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
 

@@ -1,20 +1,18 @@
 package fr.inria.verveine.extractor.java;
 
-import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.gen.famix.CaughtException;
-import eu.synectique.verveine.core.gen.famix.DeclaredException;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.ThrownException;
 import fr.inria.verveine.extractor.java.utils.VerveineUtilsForTests;
-
+import ch.akuhn.fame.Repository;
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.CaughtException;
+import org.moosetechnology.model.famixjava.famixjavaentities.DeclaredException;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixjavaentities.ThrownException;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 
 public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 
@@ -40,12 +38,12 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         Method meth = detectFamixElement( Method.class, "lire");
         assertNotNull(meth);
 
-        eu.synectique.verveine.core.gen.famix.Class excepClass = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ReadException");
         assertNotNull(excepClass);
 
         assertEquals(1, meth.getDeclaredExceptions().size());
-        DeclaredException exD = firstElt(meth.getDeclaredExceptions());
-        assertSame(meth, exD.getDefiningMethod());
+        DeclaredException exD = (DeclaredException) firstElt(meth.getDeclaredExceptions());
+        assertSame(meth, exD.getDefiningEntity());
         assertSame(excepClass, exD.getExceptionClass());
     }
 
@@ -55,10 +53,10 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         assertNotNull(meth);
 
         assertEquals(1, meth.getThrownExceptions().size());
-        ThrownException exT = firstElt(meth.getThrownExceptions());
-        assertSame(meth, exT.getDefiningMethod());
+        ThrownException exT = (ThrownException) firstElt(meth.getThrownExceptions());
+        assertSame(meth, exT.getDefiningEntity());
 
-        eu.synectique.verveine.core.gen.famix.Class excepClass = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "ReadException");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ReadException");
         assertSame(excepClass, exT.getExceptionClass());
     }
 
@@ -68,10 +66,10 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         assertNotNull(meth);
 
         assertEquals(1,meth.getCaughtExceptions().size());
-        CaughtException exC = firstElt(meth.getCaughtExceptions());
-        assertSame(meth, exC.getDefiningMethod());
+        CaughtException exC = (CaughtException) firstElt(meth.getCaughtExceptions());
+        assertSame(meth, exC.getDefiningEntity());
 
-        eu.synectique.verveine.core.gen.famix.Class excepClass = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "IOException");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IOException");
         assertSame(excepClass, exC.getExceptionClass());
     }
 
@@ -82,9 +80,9 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 
 //        assertEquals(0, meth.getParentType().getTypes().size());
         assertEquals(1, meth.getDeclaredExceptions().size());
-        DeclaredException exD = firstElt(meth.getDeclaredExceptions());
-        assertSame(meth, exD.getDefiningMethod());
-        assertEquals("T", exD.getExceptionClass().getName());
+        DeclaredException exD = (DeclaredException) firstElt(meth.getDeclaredExceptions());
+        assertSame(meth, exD.getDefiningEntity());
+        assertEquals("T", ((TNamedEntity) exD.getExceptionClass()).getName());
     }
 
 }

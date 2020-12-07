@@ -1,20 +1,16 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import org.eclipse.jdt.core.dom.*;
-
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.Enum;
-import eu.synectique.verveine.core.gen.famix.EnumValue;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
-import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.AbstractDictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
 
 import java.util.List;
 
@@ -292,7 +288,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	// "SomeClass.class"
 	public boolean visit(TypeLiteral node) {
-		eu.synectique.verveine.core.gen.famix.Type javaMetaClass = dico.getFamixMetaClass(null);
+		org.moosetechnology.model.famixjava.famixjavaentities.Type javaMetaClass = dico.getFamixMetaClass(null);
 		dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass,	/*persistIt*/! summarizeClasses());
 
 		return super.visit(node);
@@ -300,22 +296,22 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	// UTILITY METHODS
 
-	private StructuralEntity createStructuralEntity(StructuralEntityKinds structKind, VariableDeclaration varDecl, NamedEntity owner) {
-		StructuralEntity fmx;
+	private TStructuralEntity createStructuralEntity(StructuralEntityKinds structKind, VariableDeclaration varDecl, NamedEntity owner) {
+		TStructuralEntity fmx;
 		IVariableBinding bnd = varDecl.resolveBinding();
 		String name = varDecl.getName().getIdentifier();
 
 		switch (structKind) {
 		case PARAMETER:	fmx = dico.ensureFamixParameter(bnd, name, (Method) owner, /*persistIt*/! summarizeClasses());										break;
-		case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (eu.synectique.verveine.core.gen.famix.Type) owner, /*persistIt*/! summarizeClasses());	break;
+		case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (org.moosetechnology.model.famixjava.famixjavaentities.Type) owner, /*persistIt*/! summarizeClasses());	break;
 		case LOCALVAR: 	fmx = dico.ensureFamixLocalVariable(bnd, name, (Method) owner, /*persistIt*/! summarizeClasses());									break;
 		default:		fmx = null;
 		}
 
 		if (fmx != null) {
-			fmx.setIsStub(false);
+			((TSourceEntity) fmx).setIsStub(false);
 			if ((! summarizeClasses()) && (options.withAnchors())) {
-				dico.addSourceAnchor(fmx, varDecl, /*oneLineAnchor*/true);
+				dico.addSourceAnchor((TSourceEntity) fmx, varDecl, /*oneLineAnchor*/true);
 			}
 		}
 

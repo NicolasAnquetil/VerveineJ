@@ -271,6 +271,7 @@ public class StubBinding implements IBinding, ITypeBinding, IMethodBinding {
         return false;
     }
 
+
     @Override
     public boolean isFromSource() {
         return false;

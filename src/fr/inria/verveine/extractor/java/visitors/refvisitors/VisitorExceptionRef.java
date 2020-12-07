@@ -1,14 +1,13 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import eu.synectique.verveine.core.gen.famix.Class;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.ParameterType;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
-
+import org.moosetechnology.model.famixjava.famixjavaentities.Class;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixjavaentities.Namespace;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
 
 import java.util.List;
 
@@ -59,17 +58,17 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 		Method fmx = visitMethodDeclaration( node);
 		if (fmx != null) {
 		    for (Type excep : (List<Type>)node.thrownExceptionTypes()) {
-				eu.synectique.verveine.core.gen.famix.Type excepFmx = this.referedType(excep.resolveBinding(), context.topType(), true);
-				if (excepFmx != null) {
+                org.moosetechnology.model.famixjava.famixjavaentities.Type excepFmx = this.referedType(excep.resolveBinding(), context.topType(), true);
+                if (excepFmx != null) {
 					if (! summarizeClasses()) {
-					    // not instanceof because we test the exact type and not subclasses
-					    if ( (excepFmx.getClass() == eu.synectique.verveine.core.gen.famix.Type.class) || (excepFmx.getClass() == ParameterType.class) ) {
-					        excepFmx = dico.asClass(excepFmx);
+                        // not instanceof because we test the exact type and not subclasses
+                        if ((excepFmx.getClass() == org.moosetechnology.model.famixjava.famixjavaentities.Type.class) || (excepFmx.getClass() == ParameterType.class)) {
+                            excepFmx = dico.asClass(excepFmx);
                         }
-						dico.createFamixDeclaredException(fmx, (Class) excepFmx);
-					}
-				}
-			}
+                        dico.createFamixDeclaredException(fmx, (Class) excepFmx);
+                    }
+                }
+            }
 			return super.visit(node);
 		} else {
 			return false;
@@ -86,7 +85,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
         Method meth = this.context.topMethod();
         Type excepClass = node.getException().getType();
         if (meth != null) {
-            eu.synectique.verveine.core.gen.famix.Class excepFmx = null;
+            org.moosetechnology.model.famixjava.famixjavaentities.Class excepFmx = null;
             if ( NodeTypeChecker.isSimpleType(excepClass) || NodeTypeChecker.isQualifiedType(excepClass) ) {
                 excepFmx = (Class) referedType(excepClass, meth, true);
             }
@@ -103,7 +102,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
     @Override
     public boolean visit(ThrowStatement node) {
         Method meth = this.context.topMethod();
-        eu.synectique.verveine.core.gen.famix.Class excepFmx = (Class) this
+        org.moosetechnology.model.famixjava.famixjavaentities.Class excepFmx = (Class) this
                 .referedType(node.getExpression().resolveTypeBinding(), context.topType(), true);
         if (excepFmx != null) {
             if (! summarizeClasses()) {

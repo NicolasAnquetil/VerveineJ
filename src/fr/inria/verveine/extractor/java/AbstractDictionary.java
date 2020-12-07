@@ -1,44 +1,14 @@
 package fr.inria.verveine.extractor.java;
 
-import java.util.Collection;
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.Map;
-
 import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.gen.famix.Access;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstance;
-import eu.synectique.verveine.core.gen.famix.AnnotationInstanceAttribute;
-import eu.synectique.verveine.core.gen.famix.AnnotationType;
-import eu.synectique.verveine.core.gen.famix.AnnotationTypeAttribute;
-import eu.synectique.verveine.core.gen.famix.Association;
-import eu.synectique.verveine.core.gen.famix.Attribute;
-import eu.synectique.verveine.core.gen.famix.BehaviouralEntity;
-import eu.synectique.verveine.core.gen.famix.CaughtException;
-import eu.synectique.verveine.core.gen.famix.Comment;
-import eu.synectique.verveine.core.gen.famix.ContainerEntity;
-import eu.synectique.verveine.core.gen.famix.DeclaredException;
-import eu.synectique.verveine.core.gen.famix.Entity;
-import eu.synectique.verveine.core.gen.famix.Enum;
-import eu.synectique.verveine.core.gen.famix.EnumValue;
-import eu.synectique.verveine.core.gen.famix.Function;
-import eu.synectique.verveine.core.gen.famix.ImplicitVariable;
-import eu.synectique.verveine.core.gen.famix.Inheritance;
-import eu.synectique.verveine.core.gen.famix.Invocation;
-import eu.synectique.verveine.core.gen.famix.LocalVariable;
-import eu.synectique.verveine.core.gen.famix.Method;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-import eu.synectique.verveine.core.gen.famix.Namespace;
-import eu.synectique.verveine.core.gen.famix.Parameter;
-import eu.synectique.verveine.core.gen.famix.ParameterType;
-import eu.synectique.verveine.core.gen.famix.ParameterizableClass;
-import eu.synectique.verveine.core.gen.famix.ParameterizedType;
-import eu.synectique.verveine.core.gen.famix.PrimitiveType;
-import eu.synectique.verveine.core.gen.famix.Reference;
-import eu.synectique.verveine.core.gen.famix.SourcedEntity;
-import eu.synectique.verveine.core.gen.famix.StructuralEntity;
-import eu.synectique.verveine.core.gen.famix.ThrownException;
-import eu.synectique.verveine.core.gen.famix.Type;
+import fr.inria.verveine.extractor.java.utils.Util;
+import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.*;
+
+import java.lang.Class;
+import java.lang.Exception;
+import java.util.*;
 
 /**
  * A dictionnary of Famix entities to help create them and find them back
@@ -301,7 +271,7 @@ public class AbstractDictionary<B> {
 	 */
 	public Type ensureFamixType(B key, String name, ContainerEntity owner, boolean persistIt) {
 		Type fmx = ensureFamixEntity(Type.class, key, name, persistIt);
-		fmx.setContainer(owner);
+		fmx.setTypeContainer(owner);
 		return fmx;
 	}
 
@@ -313,9 +283,9 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Class should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClass(B key, String name, ContainerEntity owner, boolean persistIt) {
-		eu.synectique.verveine.core.gen.famix.Class fmx = ensureFamixEntity(eu.synectique.verveine.core.gen.famix.Class.class, key, name, persistIt);
-		fmx.setContainer(owner);
+	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClass(B key, String name, ContainerEntity owner, boolean persistIt) {
+		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, key, name, persistIt);
+		fmx.setTypeContainer(owner);
 		return fmx;
 	}
 
@@ -328,7 +298,7 @@ public class AbstractDictionary<B> {
 	 */
 	public ParameterizableClass ensureFamixParameterizableClass(B key, String name, ContainerEntity owner, boolean persistIt) {
 		ParameterizableClass fmx = ensureFamixEntity(ParameterizableClass.class, key, name, persistIt);
-		fmx.setContainer(owner);
+		fmx.setTypeContainer(owner);
 		return fmx;
 	}
 
@@ -340,7 +310,7 @@ public class AbstractDictionary<B> {
 	 */
 	public ParameterizedType ensureFamixParameterizedType(B key, String name, ParameterizableClass generic, ContainerEntity owner, boolean persistIt) {
 		ParameterizedType fmx = ensureFamixEntity(ParameterizedType.class, key, name, persistIt);
-		fmx.setContainer(owner);
+		fmx.setTypeContainer(owner);
 		fmx.setParameterizableClass(generic);
 		return fmx;
 	}
@@ -354,13 +324,13 @@ public class AbstractDictionary<B> {
 	 */
 	public ParameterType ensureFamixParameterType(B key, String name, ContainerEntity owner, boolean persistIt) {
 		ParameterType fmx = ensureFamixEntity(ParameterType.class, key, name, persistIt);
-		fmx.setContainer(owner);
+		fmx.setTypeContainer(owner);
 		return fmx;
 	}
 
 	public Enum ensureFamixEnum(B key, String name,	ContainerEntity owner, boolean persistIt) {
 		Enum fmx = ensureFamixEntity(Enum.class, key, name, persistIt);
-		fmx.setContainer(owner);
+		fmx.setTypeContainer(owner);
 		return fmx;
 	}
 
@@ -372,7 +342,7 @@ public class AbstractDictionary<B> {
 
 	public AnnotationType ensureFamixAnnotationType(B key, String name,	ContainerEntity owner, boolean persistIt) {
 		AnnotationType fmx = ensureFamixEntity(AnnotationType.class, key, name, persistIt);
-		fmx.setContainer(owner);
+		fmx.setAnnotationTypesContainer(owner);
 		return fmx;
 	}
 
@@ -432,24 +402,6 @@ public class AbstractDictionary<B> {
 		fmx.setParentType(owner);
 		return fmx;
 	}
-	
-	/**
-	 * Returns a FAMIX Function with the given <b>name</b>, creating it if it does not exist yet
-	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
-	 * @param name -- the name of the FAMIX Function (MUST NOT be null, but this is not checked)
-	 * @param sig -- method's signature, including type of parameters and return type (should not be null, but it will work if it is)
-	 * @param ret -- Famix Type returned by the method (ideally should only be null in case of a constructor, but will accept it in any case)
-	 * @param owner -- container defining the method (should not be null, but it will work if it is)
-	 * @param persistIt -- whether the Function should be persisted in the Famix repository
-	 * @return the FAMIX Method or null in case of a FAMIX error
-	 */
-	public Function ensureFamixFunction(B key, String name, String sig, Type ret, ContainerEntity owner, boolean persistIt) {
-		Function fmx = (Function) ensureFamixEntity(Function.class, key, name, persistIt);
-		fmx.setSignature(sig);
-		fmx.setDeclaredType(ret);
-		fmx.setContainer(owner);;
-		return fmx;
-	}
 
 	/**
 	 * Returns a FAMIX Attribute with the given <b>name</b>, creating it if it does not exist yet
@@ -462,7 +414,7 @@ public class AbstractDictionary<B> {
 	 */
 	public Attribute ensureFamixAttribute(B key, String name, Type type, Type owner, boolean persistIt) {
 		Attribute fmx = ensureFamixEntity(Attribute.class, key, name, persistIt);
-		fmx.setParentType(owner);
+		fmx.setParentType((TWithAttributes) owner);
 		fmx.setDeclaredType(type);
 		return fmx;
 	}
@@ -473,7 +425,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the LocalVariable should be persisted in the Famix repository
 	 * @return the FAMIX LocalVariable or null in case of a FAMIX error
 	 */
-	public LocalVariable ensureFamixLocalVariable(B key, String name, Type type, BehaviouralEntity owner, boolean persistIt) {
+	public LocalVariable ensureFamixLocalVariable(B key, String name, Type type, Method owner, boolean persistIt) {
 		LocalVariable fmx = ensureFamixEntity(LocalVariable.class, key, name, persistIt);
 		fmx.setParentBehaviouralEntity(owner);
 		fmx.setDeclaredType(type);
@@ -520,7 +472,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Parameter should be persisted in the Famix repository
 	 * @return the FAMIX parameter
 	 */
-	public Parameter createFamixParameter(B key, String name, Type type, BehaviouralEntity owner, boolean persistIt) {
+	public Parameter createFamixParameter(B key, String name, Type type, Method owner, boolean persistIt) {
 		Parameter fmx = ensureFamixEntity(Parameter.class, key, name, persistIt);
 		fmx.setParentBehaviouralEntity(owner);
 		fmx.setDeclaredType(type);
@@ -537,19 +489,19 @@ public class AbstractDictionary<B> {
 	 * @param prev -- previous inheritance relationship in the same context
 	 * @return the Inheritance relationship
 	 */
-	public Inheritance ensureFamixInheritance(Type sup, Type sub, Association prev) {
+	public Inheritance ensureFamixInheritance(TWithInheritances sup, TWithInheritances sub, TAssociation prev) {
 		if ( (sup == null) || (sub == null) ) {
 			return null;
 		}
 			
-		for (Inheritance i : sup.getSubInheritances()) {
+		for (TInheritance i : (sup).getSubInheritances()) {
 			if (i.getSubclass() == sub) {
-				return i;
+				return (Inheritance) i;
 			}
 		}
 		Inheritance inh = new Inheritance();
 		inh.setSuperclass(sup);
-		inh.setSubclass(sub);
+		inh.setSubclass((TWithInheritances) sub);
 		chainPrevNext(prev,inh);
 		famixRepoAdd(inh);
 		return inh;
@@ -563,22 +515,22 @@ public class AbstractDictionary<B> {
 	 * @param prev -- previous reference relationship in the same context
 	 * @return the FamixReference
 	 */
-	public Reference addFamixReference(BehaviouralEntity src, Type tgt, Association prev) {
+	public Reference addFamixReference(Method src, Type tgt, TAssociation prev) {
 		if ( (src == null) || (tgt == null) ) {
 			return null;
 		}
 
 		if (prev == null) {
-			for (Reference ref : src.getOutgoingReferences()) {
-				if (ref.getTarget() == tgt) {
-					return ref;
+			for (TReference ref : src.getOutgoingReferences()) {
+				if (ref.getReferredType() == tgt) {
+					return (Reference) ref;
 				}
 			}
 		}
 
 		Reference ref = new Reference();
-		ref.setTarget(tgt);
-		ref.setSource(src);
+		ref.setReferredType(tgt);
+		ref.setReferencer(src);
 		chainPrevNext(prev,ref);
 		famixRepoAdd(ref);
 
@@ -594,7 +546,7 @@ public class AbstractDictionary<B> {
 	 * @param prev -- previous invocation relationship in the same context
 	 * @return the FamixInvocation
 	 */
-	public Invocation addFamixInvocation(BehaviouralEntity sender, BehaviouralEntity invoked, NamedEntity receiver, String signature, Association prev) {
+	public Invocation addFamixInvocation(Method sender, Method invoked, NamedEntity receiver, String signature, TAssociation prev) {
 		if ( (sender == null) || (invoked == null) ) {
 			return null;
 		}
@@ -617,21 +569,21 @@ public class AbstractDictionary<B> {
 	 * @param prev -- previous access relationship in the same context
 	 * @return the FamixAccess
 	 */
-	public Access addFamixAccess(BehaviouralEntity accessor, StructuralEntity var, boolean isWrite, Association prev) {
+	public Access addFamixAccess(Method accessor, TStructuralEntity var, boolean isWrite, TAssociation prev) {
 		if ( (accessor == null) || (var == null) ) {
 			return null;
 		}
 		Access acc = new Access();
 		acc.setAccessor(accessor);
-		acc.setVariable(var);
-		acc.setIsWrite(new Boolean(isWrite));
+		acc.setVariable((TAccessible) var);
+		acc.setIsWrite(isWrite);
 		chainPrevNext(prev, acc);
 		famixRepoAdd(acc);
 		
 		return acc;
 	}
 
-	protected void chainPrevNext(Association prev, Association next) {
+	protected void chainPrevNext(TAssociation prev, TAssociation next) {
 		if (prev != null) {
 			next.setPrevious(prev);  // not yet implemented in importer
 		}
@@ -643,13 +595,13 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception declared to be thrown
 	 * @return the DeclaredException
 	 */
-	public DeclaredException createFamixDeclaredException(Method meth, eu.synectique.verveine.core.gen.famix.Class excep) {
+	public DeclaredException createFamixDeclaredException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
 		DeclaredException decl = new DeclaredException();
 		decl.setExceptionClass(excep);
-		decl.setDefiningMethod(meth);
+		decl.setDefiningEntity(meth);
 		famixRepoAdd(decl);
 		return decl;
 	}
@@ -660,13 +612,13 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception caught
 	 * @return the CaughtException
 	 */
-	public CaughtException createFamixCaughtException(Method meth, eu.synectique.verveine.core.gen.famix.Class excep) {
+	public CaughtException createFamixCaughtException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
 		CaughtException decl = new CaughtException();
 		decl.setExceptionClass(excep);
-		decl.setDefiningMethod(meth);
+		decl.setDefiningEntity(meth);
 		famixRepoAdd(decl);
 		return decl;
 	}
@@ -679,13 +631,13 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception thrown
 	 * @return the ThrownException
 	 */
-	public ThrownException createFamixThrownException(Method meth, eu.synectique.verveine.core.gen.famix.Class excep) {
+	public ThrownException createFamixThrownException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
 		ThrownException decl = new ThrownException();
 		decl.setExceptionClass(excep);
-		decl.setDefiningMethod(meth);
+		decl.setDefiningEntity(meth);
 		famixRepoAdd(decl);
 		return decl;
 	}
@@ -700,7 +652,7 @@ public class AbstractDictionary<B> {
 	 */
 	@Deprecated
 	public ImplicitVariable getImplicitVariableByBinding(B bnd, String iv_name) {
-		return getImplicitVariableByType((eu.synectique.verveine.core.gen.famix.Class)getEntityByKey(bnd), iv_name);
+		return getImplicitVariableByType((org.moosetechnology.model.famixjava.famixjavaentities.Class)getEntityByKey(bnd), iv_name);
 	}
 	
 	/**
@@ -812,10 +764,10 @@ public class AbstractDictionary<B> {
 	 * Creates or recovers a Famix Class to contain the methods stubs (for which we ignore the real owner).
 	 * @return a Famix class
 	 */
-	public eu.synectique.verveine.core.gen.famix.Class ensureFamixClassStubOwner() {
-		eu.synectique.verveine.core.gen.famix.Class fmx =  ensureFamixUniqEntity(eu.synectique.verveine.core.gen.famix.Class.class, null, STUB_METHOD_CONTAINER_NAME);
+	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClassStubOwner() {
+		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx =  ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, null, STUB_METHOD_CONTAINER_NAME);
 		if (fmx != null) {
-			fmx.setContainer( ensureFamixNamespaceDefault());
+			fmx.setTypeContainer( ensureFamixNamespaceDefault());
 		}
 
 		return fmx;
@@ -826,13 +778,13 @@ public class AbstractDictionary<B> {
 			return null;
 		}
 		
-		for (Type candidate : ctxt.getTypes()) {
-			if (candidate.getName().equals(name) ) {
-				return candidate;
+		for (TType candidate : ctxt.getTypes()) {
+			if (((TNamedEntity)candidate).getName().equals(name) ) {
+				return (Type) candidate;
 			}
 		}
 		
-		return searchTypeInContext(name, ctxt.getBelongsTo());
+		return searchTypeInContext(name, Util.belongsToOf(ctxt));
 	}
 
 }

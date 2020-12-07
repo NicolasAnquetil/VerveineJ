@@ -1,24 +1,20 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
+import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.VerveineJOptions;
+import fr.inria.verveine.extractor.java.utils.StubBinding;
+import fr.inria.verveine.extractor.java.utils.Util;
+import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import org.apache.commons.codec.digest.DigestUtils;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import java.security.MessageDigest;
-
-import eu.synectique.verveine.core.gen.famix.*;
-import eu.synectique.verveine.core.gen.famix.ParameterizedType;
-import fr.inria.verveine.extractor.java.utils.StubBinding;
-
-import org.apache.commons.codec.digest.DigestUtils;
-import org.eclipse.jdt.core.dom.*;
-
-import fr.inria.verveine.extractor.java.JavaDictionary;
-import fr.inria.verveine.extractor.java.VerveineJOptions;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
-import fr.inria.verveine.extractor.java.utils.Util;
-import org.eclipse.jdt.core.dom.CompilationUnit;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -64,7 +60,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
-		eu.synectique.verveine.core.gen.famix.Class fmx = dico.ensureFamixClass(
+		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = dico.ensureFamixClass(
 				bnd, 
 				/*name*/node.getName().getIdentifier(), 
 				(ContainerEntity) 
@@ -134,7 +130,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
-		eu.synectique.verveine.core.gen.famix.Class fmx = null;
+		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx;
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
@@ -175,7 +171,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 //		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		eu.synectique.verveine.core.gen.famix.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
+		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
@@ -184,8 +180,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 			return super.visit(node);
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
@@ -238,7 +233,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		IMethodBinding bnd = (IMethodBinding) StubBinding.getDeclarationBinding(node);
 
-        Collection<String> paramTypes = new ArrayList<String>();
+        Collection<String> paramTypes = new ArrayList<>();
         for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
             paramTypes.add( Util.jdtTypeName(param.getType()));
         }
@@ -253,7 +248,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
-			fmx.setBodyHash(this.computeHashForMethodBody(node));
+			// fmx.setBodyHash(this.computeHashForMethodBody(node));
 
 			this.context.pushMethod(fmx);
 

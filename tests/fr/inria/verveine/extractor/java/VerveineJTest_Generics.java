@@ -1,9 +1,12 @@
 package fr.inria.verveine.extractor.java;
 
-import eu.synectique.verveine.core.gen.famix.*;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TParameter;
+import org.moosetechnology.model.famixjava.famixtraits.TParameterizedType;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
 
 import java.io.File;
 import java.lang.Exception;
@@ -39,7 +42,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
         ParameterizableClass generic = null;
         for (ParameterizableClass g : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
-            if (g.getBelongsTo().getName().equals(AbstractDictionary.DEFAULT_PCKG_NAME)) {
+            if (((TNamedEntity) g.getTypeContainer()).getName().equals(AbstractDictionary.DEFAULT_PCKG_NAME)) {
                 // note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
                 generic = g;
                 break;
@@ -48,8 +51,8 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(generic);
         assertEquals("Dictionary", generic.getName());
         assertEquals(2, generic.getTypes().size());  // <B> , ImplicitVars
-        for (Type t : generic.getTypes()) {
-            String typName = t.getName();
+        for (TType t : generic.getTypes()) {
+            String typName = ((TNamedEntity)t).getName();
             assertTrue(typName.equals("B") || typName.equals("ImplicitVars"));
         }
 
@@ -59,7 +62,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(dicoParam);
         assertEquals("B", dicoParam.getName());
 
-        assertSame(generic, dicoParam.getContainer());
+        assertSame(generic, dicoParam.getTypeContainer());
         assertSame(dicoParam, firstElt(generic.getParameters()));
 
         /* Collection<Object> is not seen as parameterizable by JDT */
@@ -73,26 +76,27 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(getx);
 
         assertEquals(1, getx.getOutgoingReferences().size());
-        ParameterizedType refedArrList = (ParameterizedType) firstElt(getx.getOutgoingReferences()).getTarget();
+        ParameterizedType refedArrList = (ParameterizedType) (firstElt(getx.getOutgoingReferences())).getReferredType();
         assertNotNull(refedArrList);
         assertEquals("ArrayList", refedArrList.getName());
 
-        eu.synectique.verveine.core.gen.famix.Class arrList = detectFamixElement( eu.synectique.verveine.core.gen.famix.Class.class, "ArrayList");
+        org.moosetechnology.model.famixjava.famixjavaentities.Class arrList = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ArrayList");
         assertNotNull(arrList);
         assertEquals(arrList, refedArrList.getParameterizableClass());
         assertEquals(arrList.getContainer(), refedArrList.getContainer());
 
         assertEquals(1, refedArrList.getArguments().size());
-        assertEquals("ABC", firstElt(refedArrList.getArguments()).getName());
+        assertEquals("ABC", ((TNamedEntity)firstElt(refedArrList.getArguments())).getName());
     }
 
     @Test
     public void testUseOfParameterizedClass() {
         ParameterizableClass arrList = detectFamixElement( ParameterizableClass.class, "ArrayList");
         assertEquals(2, arrList.getParameterizedTypes().size()); // WrongInvocation.getX() ; Dictionnary.getEntityByName()
-        for (ParameterizedType paramed : arrList.getParameterizedTypes()) {
+        for (TParameterizedType tparamed : arrList.getParameterizedTypes()) {
+            ParameterizedType paramed = (ParameterizedType) tparamed;
             assertEquals(1, paramed.getIncomingReferences().size());
-            String refererName = firstElt(paramed.getIncomingReferences()).getFrom().getName();
+            String refererName = ((TNamedEntity)firstElt(paramed.getIncomingReferences()).getReferencer()).getName();
             assertTrue(refererName.equals("getEntityByName") || refererName.equals("getX") );
         }
     }
@@ -103,7 +107,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertEquals(26,ptypes.size());  // List*1, ArrayList*2, Map*3, Collection<NamedEntity>, Collection<T>, Hashtable*3, Class*3, Dictionary*1 + all stub superclasses
         //coll2
         for (ParameterizedType typ : ptypes) {
-            assertEquals(typ.getParameterizableClass().getIsStub(), typ.getIsStub());
+            assertEquals(((ParameterizableClass)typ.getParameterizableClass()).getIsStub(), typ.getIsStub());
         }
     }
 
@@ -113,16 +117,16 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(gebb);
         assertSame(1, gebb.getParameters().size());
 
-        Parameter bnd = firstElt(gebb.getParameters());
+        Parameter bnd = (Parameter) firstElt(gebb.getParameters());
         assertNotNull(bnd);
         assertEquals("bnd", bnd.getName());
 
-        Type b = bnd.getDeclaredType();
+        Type b = (Type) bnd.getDeclaredType();
         assertNotNull(b);
         assertEquals("B", b.getName());
         assertSame(ParameterType.class, b.getClass());
 
-        ContainerEntity cont = b.getContainer();
+        ContainerEntity cont = (ContainerEntity) b.getTypeContainer();
         assertNotNull(cont);
         assertEquals("Dictionary", cont.getName());
         assertSame(ParameterizableClass.class, cont.getClass());
@@ -132,22 +136,23 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
     public void testMethodParameterArgumentTypes() {
         Method meth = detectFamixElement( Method.class, "ensureFamixEntity");
         assertEquals(3, meth.getParameters().size());
-        for (Parameter param : meth.getParameters()) {
+        for (TParameter tparam : meth.getParameters()) {
+            Parameter param = (Parameter) tparam;
             if (param.getName().equals("fmxClass")) {
-                Type classT = param.getDeclaredType();
+                Type classT = (Type) param.getDeclaredType();
                 assertNotNull(classT);
                 assertEquals("Class", classT.getName());
                 assertEquals(ParameterizedType.class, classT.getClass());
                 assertEquals(1, ((ParameterizedType)classT).getArguments().size());
-                Type t = firstElt(((ParameterizedType)classT).getArguments());
+                Type t = (Type) firstElt(((ParameterizedType)classT).getArguments());
                 assertEquals("T", t.getName());
-                assertSame(meth, t.getBelongsTo());
+                assertSame(meth, t.getTypeContainer());
             }
             else if (param.getName().equals("bnd")) {
-                Type b = param.getDeclaredType();
+                Type b = (Type) param.getDeclaredType();
                 assertNotNull(b);
                 assertEquals("B", b.getName());
-                assertSame(meth.getBelongsTo(), b.getBelongsTo());  // b defined in Dictionary class just as the method
+                assertSame(meth.getParentType(), b.getTypeContainer());  // b defined in Dictionary class just as the method
             }
             else {
                 assertEquals("name", param.getName());

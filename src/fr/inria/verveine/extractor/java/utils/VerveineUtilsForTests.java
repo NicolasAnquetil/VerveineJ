@@ -1,71 +1,51 @@
 package fr.inria.verveine.extractor.java.utils;
 
+import ch.akuhn.fame.Repository;
+import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
+import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
+
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Vector;
 
-import ch.akuhn.fame.Repository;
-import eu.synectique.verveine.core.gen.famix.Entity;
-import eu.synectique.verveine.core.gen.famix.NamedEntity;
-
-/**
- * Some utilities to help test extractors derived from verveine.core
- * @author anquetil
- */
 public class VerveineUtilsForTests {
-
-	/**
-	 * Computes Java version as an int
-	 */
-	public static int javaVersion() {
-	    String version = System.getProperty("java.version");
-	    if(version.startsWith("1.")) {
-	        version = version.substring(2, 3);
-	    } else {
-	        int dot = version.indexOf(".");
-	        if(dot != -1) {
-	        	version = version.substring(0, dot);
-	        }
-	    }
-	    return Integer.parseInt(version);
-	}	
-
-	/**
-	 * Returns a Collection of all FAMIXEntities in repository of the given fmxClass.
-	 * Same method as listAll(Class<T extends Entity>) defined in VerveineParser
-	 */
-	public static <T extends Entity> Collection<T> selectElementsOfType(Repository repository, Class<T> fmxClass) {
-		return( repository.all(fmxClass));
+	public VerveineUtilsForTests() {
 	}
 
-	/** Returns the first FAMIXEntities in repository of the given fmxClass and with the given name
-	 */
-	public static <T extends NamedEntity> T detectFamixElement(Repository repository, Class<T> fmxClass, String name) {
-		for (T ent : selectElementsOfType(repository, fmxClass)) {
-			if (ent.getName().equals(name) ) {
-				return ent;
+	public static <T extends Entity> Collection<T> selectElementsOfType(Repository var0, Class<T> var1) {
+		return var0.all(var1);
+	}
+
+	public static <T extends NamedEntity> T detectFamixElement(Repository var0, Class<T> var1, String var2) {
+		Iterator var3 = selectElementsOfType(var0, var1).iterator();
+
+		NamedEntity var4;
+		do {
+			if (!var3.hasNext()) {
+				return null;
+			}
+
+			var4 = (NamedEntity)var3.next();
+		} while(!var4.getName().equals(var2));
+
+		return (T) var4;
+	}
+
+	public static Collection<NamedEntity> listFamixElements(Repository var0, String var1) {
+		return listFamixElements(var0, NamedEntity.class, var1);
+	}
+
+	public static <T extends NamedEntity> Collection<T> listFamixElements(Repository var0, Class<T> var1, String var2) {
+		Vector var3 = new Vector();
+		Iterator var4 = selectElementsOfType(var0, var1).iterator();
+
+		while(var4.hasNext()) {
+			NamedEntity var5 = (NamedEntity)var4.next();
+			if (var5.getName().equals(var2)) {
+				var3.add(var5);
 			}
 		}
-		return null;
-	}
 
-	/**
-	 * Returns a Collection of FAMIXEntities in repository with the given name
-	 */
-	public static Collection<NamedEntity> listFamixElements(Repository repository, String name) {
-		return listFamixElements(repository, NamedEntity.class, name);
+		return var3;
 	}
-
-	/**
-	 * Returns a Collection of FAMIXEntities in repository of the given fmxClass and with the given name
-	 */
-	public static <T extends NamedEntity> Collection<T> listFamixElements(Repository repository, Class<T> fmxClass, String name) {
-		Collection<T> selection = new Vector<T>();
-		for (T ent : selectElementsOfType(repository, fmxClass)) {
-			if ( ent.getName().equals(name) ) {
-				selection.add(ent);
-			}
-		}
-		return selection;
-	}
-
 }
