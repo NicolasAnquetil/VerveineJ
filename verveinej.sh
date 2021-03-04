@@ -30,7 +30,7 @@ CLASSPATH=`echo $CLASSPATH | cut -c2-`
 
 if [ $ddashloc != 0 ]
 then
-  java ${@:1:(($ddashloc-2))} -cp "$CLASSPATH" fr.inria.verveine.extractor.java.VerveineJParser "${@:$ddashloc}" #-o "$msefile" "$sourcepath"
+  java ${@:1:(($ddashloc-2))} -cp "$CLASSPATH" fr.inria.verveine.extractor.java.VerveineJMain "${@:$ddashloc}" #-o "$msefile" "$sourcepath"
 else
-  java -cp "$CLASSPATH" fr.inria.verveine.extractor.java.VerveineJParser "${@:1}" #-o "$msefile" "$sourcepath"
+  java -cp "$CLASSPATH" fr.inria.verveine.extractor.java.VerveineJMain "${@:1}" #-o "$msefile" "$sourcepath"
 fi
