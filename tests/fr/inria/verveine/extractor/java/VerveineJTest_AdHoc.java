@@ -49,9 +49,22 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@Test
 	public void testJunit5Bug1() {
-		parse(new String[]{"test_src/ad_hoc/Junit5Bugs.java"});
+		File generatedMSE = new File(VerveineJOptions.OUTPUT_FILE);
+		generatedMSE.deleteOnExit();
+
+		parse(new String[]{"test_src/ad_hoc/Junit5Bug1.java"});
 		
-		File generatedMSE = new File(VerveineJOptions.OUTPUT_FILE); 
+		assertTrue( generatedMSE.exists());
+		assertTrue( generatedMSE.length() > 0);
+	}
+
+	@Test
+	public void testJunit5Bug2() {
+		File generatedMSE = new File(VerveineJOptions.OUTPUT_FILE);
+		generatedMSE.deleteOnExit();
+
+		parse(new String[]{"test_src/ad_hoc/Junit5Bug2.java"});
+		
 		assertTrue( generatedMSE.exists());
 		assertTrue( generatedMSE.length() > 0);
 	}
