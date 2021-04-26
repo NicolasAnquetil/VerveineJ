@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java;
 
 import ch.akuhn.fame.Repository;
+import ch.akuhn.fame.internal.RepositoryVisitor.UnknownElementError;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -160,6 +161,9 @@ public class VerveineJParser {
 			//famixRepo.exportMSE(new FileWriter(OUTPUT_FILE));
 			famixRepo.exportMSE(new BufferedWriter(new OutputStreamWriter(output,"UTF8")));
 		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		catch (UnknownElementError e) {
 			e.printStackTrace();
 		}
 	}
