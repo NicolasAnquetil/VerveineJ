@@ -4,6 +4,7 @@ import fr.inria.verveine.extractor.java.AbstractDictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
+import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.Type;
@@ -83,7 +84,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
 
 			if (node.getAnonymousClassDeclaration() != null) {
-				ITypeBinding bnd = node.resolveTypeBinding();
+				ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node.getAnonymousClassDeclaration());
 				fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity) context.top());
 				typName = fmx.getName();
 			} else {
@@ -293,7 +294,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		String name = context.topMethod().getName();
 		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
-				/*paramTypes*/(Collection<String>) null, /*retType*/null, /*owner*/context.topType(), modifiers,
+				/*paramTypes*/null, /*retType*/null, /*owner*/context.topType(), modifiers,
 				/*persistIt*/!summarizeClasses());
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either

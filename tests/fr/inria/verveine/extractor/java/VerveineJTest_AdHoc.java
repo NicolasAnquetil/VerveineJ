@@ -48,6 +48,28 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 
 	@Test
+	public void testJunit5Bug1() {
+		File generatedMSE = new File(VerveineJOptions.OUTPUT_FILE);
+		generatedMSE.deleteOnExit();
+
+		parse(new String[]{"test_src/ad_hoc/Junit5Bug1.java"});
+		
+		assertTrue( generatedMSE.exists());
+		assertTrue( generatedMSE.length() > 0);
+	}
+
+	@Test
+	public void testJunit5Bug2() {
+		File generatedMSE = new File(VerveineJOptions.OUTPUT_FILE);
+		generatedMSE.deleteOnExit();
+
+		parse(new String[]{"test_src/ad_hoc/Junit5Bug2.java"});
+		
+		assertTrue( generatedMSE.exists());
+		assertTrue( generatedMSE.length() > 0);
+	}
+
+	@Test
 	public void testUnresolvedDeclaration() {
 		 // note: lire() method unresolved because it throws ReadException which is not parsed here
 		parse(new String[]{"test_src/exceptions/ReadClient.java"});
