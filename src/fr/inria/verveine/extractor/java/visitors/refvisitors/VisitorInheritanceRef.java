@@ -2,6 +2,7 @@ package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
+import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
@@ -47,10 +48,11 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
 	public boolean visit(AnonymousClassDeclaration node) {
 
-		ITypeBinding bnd = node.resolveBinding();
+		// ITypeBinding bnd = node.resolveBinding();
+		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity) context.top());
 
-		if ( (fmx != null) && (bnd != null) && (! summarizeClasses()) ){
+		if ((fmx != null) && (bnd != null) && (!summarizeClasses())) {
 			ensureInheritances(bnd, fmx);
 
 			this.context.pushType(fmx);
@@ -161,7 +163,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 		}
 
 		for (Type sup : sups) {
-			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) sup, (TWithInheritances) fmx, lastInheritance);
+			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) sup, fmx, lastInheritance);
 			// create FileAnchor for each inheritance link ???
 		}
 	}
