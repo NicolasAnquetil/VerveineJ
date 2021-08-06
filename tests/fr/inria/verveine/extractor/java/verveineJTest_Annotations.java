@@ -15,10 +15,6 @@ import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
-
 public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
 	public verveineJTest_Annotations() {
@@ -29,7 +25,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJOptions.OUTPUT_FILE).delete();
+        new File(DEFAULT_OUTPUT_FILE).delete();
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         if (isWindows()){

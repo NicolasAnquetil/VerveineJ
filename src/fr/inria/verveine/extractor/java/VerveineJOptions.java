@@ -36,9 +36,21 @@ public class VerveineJOptions {
 
 
 	/**
-	 * Name of the default file where to put the MSE model
+	 * Name (without extension) of the default file where to put the MSE model
+	 * 
+	 * By default, the extension is provided by the output format
 	 */
-	public final static String OUTPUT_FILE = "output.mse";
+	public final static String OUTPUT_FILE = "output";
+	
+	/**
+	 * Option for MSE output format
+	 */
+	public final static String MSE_OUTPUT_FORMAT = "MSE";
+	
+	/**
+	 * Option for JSON output format
+	 */
+	public final static String JSON_OUTPUT_FORMAT = "JSON";
 	
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
 
@@ -98,15 +110,27 @@ public class VerveineJOptions {
 	 */
 	protected String outputFileName;
 
-	protected boolean incrementalParsing;
+	/**
+	 * Format for saving the model in file: MSE or JSON
+	 */
+	public String outputFormat;
 
+	/**
+	 * Whether parsing is incremental
+	 * 
+	 * Incremental means an entire project is parsed by parts, verveineJ saving and reloading the model
+	 * respectively at the end of an execution and at the satrt of the next one  
+	 */
+	protected boolean incrementalParsing;
+	
 	public VerveineJOptions() {
 		this.classSummary = false;
 		this.allLocals = false;
 		this.codeVers = null;
 		this.anchors = null;
 		this.incrementalParsing = false;
-		this.outputFileName = OUTPUT_FILE;
+		this.outputFileName = null;
+		this.outputFormat = MSE_OUTPUT_FORMAT;
 	}
 
 	public void setOptions( String[] args) {
@@ -125,7 +149,10 @@ public class VerveineJOptions {
 				usage();
 			}
 		}
-		
+
+		if (outputFileName == null) {
+			outputFileName = VerveineJOptions.OUTPUT_FILE + "." + outputFormat.toLowerCase();
+		}
 		if (codeVers == null) {
 			codeVers = DEFAULT_CODE_VERSION;
 		}
@@ -174,6 +201,10 @@ public class VerveineJOptions {
 		}
 		else if (arg.equals("-anchor")) {
 			setOptionAnchor( args, i);
+			argumentsTreated++;
+		}
+		else if (arg.equals("-format")) {
+			setOptionFormat( args, i);
 			argumentsTreated++;
 		}
 		else if (arg.equals("-excludepath")) {
@@ -288,6 +319,17 @@ public class VerveineJOptions {
 		}
 	}
 
+	protected void setOptionFormat( String[] args, int i) {
+		if (i < args.length) {
+			outputFormat = args[i+1].trim();
+			if ( (! outputFormat.equalsIgnoreCase(MSE_OUTPUT_FORMAT)) && (! outputFormat.equalsIgnoreCase(JSON_OUTPUT_FORMAT)) ) {
+				throw new IllegalArgumentException("unknown option to -format: "+outputFormat);
+			}
+		} else {
+			throw new IllegalArgumentException("-format requires an option (mse|json)");
+		}
+	}
+
 	protected void usage() {
 		/* possible enhancements:
 		 * (1) allow to not generate some info
@@ -302,7 +344,8 @@ public class VerveineJOptions {
 		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
 		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
-		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default: "+OUTPUT_FILE+")");
+		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default:"+OUTPUT_FILE+")");
+		System.err.println("      [-format (mse|json)] specifies the output format (default:"+MSE_OUTPUT_FORMAT+")");
 		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
 		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
 		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	

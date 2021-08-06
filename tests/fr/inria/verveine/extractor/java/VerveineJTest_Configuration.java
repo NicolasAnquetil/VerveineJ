@@ -8,6 +8,8 @@ import org.moosetechnology.model.famixjava.famixtraits.TAccess;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.Exception;
 import java.util.Collection;
 
@@ -15,7 +17,9 @@ import static org.junit.Assert.*;
 
 public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
-	private static final String OTHER_OUTPUT_FILE= "other_output.mse";
+	private static final String OTHER_MSE_FILE = "other_output.mse";
+	private static final String JSON_OUTPUT_FILE = "output.json";
+	
 
 	public VerveineJTest_Configuration() {
 		super(false);
@@ -26,30 +30,79 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJOptions.OUTPUT_FILE).delete();
+		new File(DEFAULT_OUTPUT_FILE).delete();
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 	}
 
+
 	private void parse(String[] sources) {
 		parser.configure( sources);
 		parser.parse();
-		//parser.emitMSE(VerveineJOptions.OUTPUT_FILE);
 	}
 
 	@Test
 	public void testChangeOutputFilePath()
 	{
-		new File(VerveineJOptions.OUTPUT_FILE).delete();
+		File defaultMSE = new File(DEFAULT_OUTPUT_FILE);
+		File alternateMSE = new File(OTHER_MSE_FILE);
+		
+		defaultMSE.delete();
+		alternateMSE.delete();  // delete it now
+		alternateMSE.deleteOnExit();  // and delete it also after we are done
 
-		new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).delete();
-		assertFalse(new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).exists());
+		assertFalse(defaultMSE.exists());
+		assertFalse(alternateMSE.exists());
 	
-		parse( new String[] {"-o",VerveineJTest_Configuration.OTHER_OUTPUT_FILE, "test_src/LANModel/"});
-		parser.emitMSE();
+		parse( new String[] {"-o", OTHER_MSE_FILE, "test_src/LANModel/moose/lan/Node.java"});
+		parser.exportModel();
 
-		assertTrue(new File(VerveineJTest_Configuration.OTHER_OUTPUT_FILE).exists());
-		assertFalse(new File(VerveineJOptions.OUTPUT_FILE).exists());
+		assertFalse(defaultMSE.exists());
+		assertTrue(alternateMSE.exists());
+	}
+
+	/*
+	 * Well ... sort of validates the format
+	 * This is very crude, JSON files start with "[{" while MSE files start with "("
+	 */
+	@Test
+	public void testValidJSonFormat()
+	{
+		File defaultJSON = new File(JSON_OUTPUT_FILE);
+		defaultJSON.delete();
+		defaultJSON.deleteOnExit();
+
+		parse( new String[] {"-format","json", "test_src/LANModel/moose/lan/Node.java"});
+		parser.exportModel();
+
+		FileReader reader;
+		try {
+			reader = new FileReader(defaultJSON);
+			assertEquals('[', reader.read());
+			assertEquals('{', reader.read());
+		} catch (IOException e) {
+			fail("Input/Output error during the test");
+		}
+	}
+
+	@Test
+	public void testChangeOutputFormat()
+	{
+		File defaultMSE = new File(DEFAULT_OUTPUT_FILE);
+		File defaultJSON = new File(JSON_OUTPUT_FILE);
+
+		defaultMSE.delete();
+		defaultJSON.delete();  // delete it now
+		defaultJSON.deleteOnExit();  // and delete it also after we are done
+
+		assertFalse(defaultMSE.exists());
+		assertFalse(defaultJSON.exists());
+	
+		parse( new String[] {"-format","json", "test_src/LANModel/moose/lan/Node.java"});
+		parser.exportModel();
+
+		assertTrue(defaultJSON.exists());
+		assertFalse(defaultMSE.exists());
 	}
 
 	@Test

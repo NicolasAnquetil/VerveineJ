@@ -19,6 +19,8 @@ import static org.junit.Assert.*;
 
 public abstract class VerveineJTest_Basic {
 
+	protected static final String DEFAULT_OUTPUT_FILE = "output.mse";
+
 	protected Repository repo;
 	protected VerveineJParser parser;
 

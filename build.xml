@@ -26,7 +26,7 @@
 	</target>
 
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" source="1.9" target="1.9" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" source="11" target="11" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>

@@ -8,9 +8,6 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 
-import org.junit.Before;
-import org.junit.Test;
-
 public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
 
     public VerveineJTest_ReferenceInstanceOf() {
@@ -22,7 +19,7 @@ public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJOptions.OUTPUT_FILE).delete();
+        new File(DEFAULT_OUTPUT_FILE).delete();
         parser = new VerveineJParser();
         repo = parser.getFamixRepo();
     }
@@ -30,7 +27,7 @@ public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
     private void parse(String[] sources) {
         parser.configure( sources);
         parser.parse();
-        parser.emitMSE(VerveineJOptions.OUTPUT_FILE);
+        parser.exportModel();
     }
 
     @Test

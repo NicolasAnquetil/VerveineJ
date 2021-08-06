@@ -34,7 +34,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJOptions.OUTPUT_FILE).delete();
+		new File(DEFAULT_OUTPUT_FILE).delete();
 
 		String[] files = new String[] {
 				"AbstractDestinationAddress.java",
@@ -74,9 +74,9 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		parser.configure( args);
 		parser.parse();
 		
-		new File(VerveineJOptions.OUTPUT_FILE).delete();  // delete old MSE file
+		new File(DEFAULT_OUTPUT_FILE).delete();  // delete old MSE file
 		System.gc(); // In Windows free the link to the file. Must be used for incremental parsing tests
-		parser.emitMSE(VerveineJOptions.OUTPUT_FILE);  // to create a new one
+		parser.exportModel();  // to create a new one
 	}
 
 	@Test
@@ -87,6 +87,11 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		if (System.getProperty("java.version").startsWith("1.") &&
 				System.getProperty("java.version").charAt(2) >= '7') {
+			// class Autocloseable starting in Java 7
+			nbClasses++;
+			nbInherit++;
+		}
+		if (System.getProperty("java.version").startsWith("11")) {
 			// class Autocloseable starting in Java 7
 			nbClasses++;
 			nbInherit++;
