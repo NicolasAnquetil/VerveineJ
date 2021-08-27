@@ -4,7 +4,8 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import java.util.*;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Traits")
@@ -12,51 +13,36 @@ import java.util.*;
 public interface TWithMethods  {
 
         @FameProperty(name = "tightClassCohesion", derived = true)
-    public Number getTightClassCohesion();
-
-    @FameProperty(name = "numberOfProtectedMethods", derived = true)
-    public Number getNumberOfProtectedMethods();
+        Number getTightClassCohesion();
 
     @FameProperty(name = "numberOfMethods", derived = true)
-    public Number getNumberOfMethods();
-
-    @FameProperty(name = "numberOfPrivateMethods", derived = true)
-    public Number getNumberOfPrivateMethods();
+    Number getNumberOfMethods();
 
     @FameProperty(name = "weightedMethodCount", derived = true)
-    public Number getWeightedMethodCount();
-
-    @FameProperty(name = "numberOfPublicMethods", derived = true)
-    public Number getNumberOfPublicMethods();
+    Number getWeightedMethodCount();
 
     @FameProperty(name = "methods", opposite = "parentType", derived = true)
-    public Collection<TMethod> getMethods();
+    Collection<TMethod> getMethods();
 
-    public void setMethods(Collection<? extends TMethod> methods);
+    void setMethods(Collection<? extends TMethod> methods);
 
-    public void addMethods(TMethod one);
+    void addMethods(TMethod one);
 
-    public void addMethods(TMethod one, TMethod... many);
+    void addMethods(TMethod one, TMethod... many);
 
-    public void addMethods(Iterable<? extends TMethod> many);
+    void addMethods(Iterable<? extends TMethod> many);
 
-    public void addMethods(TMethod[] many);
+    void addMethods(TMethod[] many);
 
-    public int numberOfMethods();
+    int numberOfMethods();
 
-    public boolean hasMethods();
-
-    @FameProperty(name = "numberOfAccessorMethods", derived = true)
-    public Number getNumberOfAccessorMethods();
-
-    @FameProperty(name = "numberOfConstructorMethods", derived = true)
-    public Number getNumberOfConstructorMethods();
+    boolean hasMethods();
 
     @FameProperty(name = "numberOfAbstractMethods", derived = true)
-    public Number getNumberOfAbstractMethods();
+    Number getNumberOfAbstractMethods();
 
     @FameProperty(name = "numberOfMessageSends", derived = true)
-    public Number getNumberOfMessageSends();
+    Number getNumberOfMessageSends();
 
 
 

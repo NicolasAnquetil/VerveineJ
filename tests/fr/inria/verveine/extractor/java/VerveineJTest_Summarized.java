@@ -64,6 +64,7 @@ FileServer
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
@@ -144,7 +145,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());
 		assertEquals(6, entitiesOfType(Method.class).size());
 		assertEquals(0, entitiesOfType(Attribute.class).size());
-		assertEquals(2 + 4, entitiesOfType(Namespace.class).size());
+		assertEquals(2 + 4, entitiesOfType(Package.class).size());
 		assertEquals(6, entitiesOfType(Parameter.class).size());
 		assertEquals(0, entitiesOfType(LocalVariable.class).size());
 		assertEquals(1, entitiesOfType(AnnotationType.class).size());

@@ -4,7 +4,8 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import java.util.*;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Traits")
@@ -12,39 +13,39 @@ import java.util.*;
 public interface TFile  {
 
         @FameProperty(name = "averageNumberOfCharactersPerLine", derived = true)
-    public Number getAverageNumberOfCharactersPerLine();
+        Number getAverageNumberOfCharactersPerLine();
 
     @FameProperty(name = "entities", opposite = "containerFiles", derived = true)
-    public Collection<TWithFiles> getEntities();
+    Collection<TWithFiles> getEntities();
 
-    public void setEntities(Collection<? extends TWithFiles> entities);
+    void setEntities(Collection<? extends TWithFiles> entities);
 
-    public void addEntities(TWithFiles one);
+    void addEntities(TWithFiles one);
 
-    public void addEntities(TWithFiles one, TWithFiles... many);
+    void addEntities(TWithFiles one, TWithFiles... many);
 
-    public void addEntities(Iterable<? extends TWithFiles> many);
+    void addEntities(Iterable<? extends TWithFiles> many);
 
-    public void addEntities(TWithFiles[] many);
+    void addEntities(TWithFiles[] many);
 
-    public int numberOfEntities();
+    int numberOfEntities();
 
-    public boolean hasEntities();
+    boolean hasEntities();
 
     @FameProperty(name = "totalNumberOfLinesOfText", derived = true)
-    public Number getTotalNumberOfLinesOfText();
+    Number getTotalNumberOfLinesOfText();
 
     @FameProperty(name = "numberOfKiloBytes", derived = true)
-    public Number getNumberOfKiloBytes();
-
-    @FameProperty(name = "numberOfCharacters", derived = true)
-    public Number getNumberOfCharacters();
+    Number getNumberOfKiloBytes();
 
     @FameProperty(name = "numberOfEmptyLinesOfText", derived = true)
-    public Number getNumberOfEmptyLinesOfText();
+    Number getNumberOfEmptyLinesOfText();
+
+    @FameProperty(name = "numberOfCharacters", derived = true)
+    Number getNumberOfCharacters();
 
     @FameProperty(name = "numberOfBytes", derived = true)
-    public Number getNumberOfBytes();
+    Number getNumberOfBytes();
 
 
 

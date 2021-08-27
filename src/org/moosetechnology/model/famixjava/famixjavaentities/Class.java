@@ -5,54 +5,34 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
-import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
-import org.moosetechnology.model.famixjava.famixtraits.TClass;
-import org.moosetechnology.model.famixjava.famixtraits.TComment;
-import org.moosetechnology.model.famixjava.famixtraits.TException;
-import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
-import org.moosetechnology.model.famixjava.famixtraits.TLCOMMetrics;
-import org.moosetechnology.model.famixjava.famixtraits.TMethod;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TPackage;
-import org.moosetechnology.model.famixjava.famixtraits.TPackageable;
-import org.moosetechnology.model.famixjava.famixtraits.TReference;
-import org.moosetechnology.model.famixjava.famixtraits.TReferenceable;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
-import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
-import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
-import org.moosetechnology.model.famixjava.famixtraits.TWithExceptions;
-import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
-import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
-import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
+import org.moosetechnology.model.famixjava.famixtraits.*;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Class")
-public class Class extends Type implements TWithExceptions, TSourceEntity, TReferenceable, TOODependencyQueries, TLCOMMetrics, TType, TPackageable, TNamedEntity, TWithAttributes, TWithMethods, TEntityMetaLevelDependency, TInvocationsReceiver, TWithInheritances, TWithSourceLanguage, TClass, TWithComments {
+public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TClass, TEntityMetaLevelDependency, THasVisibility, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TOODependencyQueries, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithExceptions, TWithInheritances, TWithMethods, org.moosetechnology.model.famixjava.famixjavaentities.TClassMetrics, org.moosetechnology.model.famixjava.famixtraits.TClassMetrics {
 
-    private Boolean isInterface;
+    private Boolean isInterface = false;
     
     private Collection<TAttribute> attributes; 
 
     private Collection<TComment> comments; 
 
-    private TSourceLanguage declaredSourceLanguage;
-    
     private Collection<TException> exceptions; 
 
     private Collection<TReference> incomingReferences; 
 
+    private Boolean isAbstract = false;
+    
+    private Boolean isClassSide = false;
+    
+    private Boolean isFinal = false;
+    
     private Boolean isStub;
     
     private Collection<TMethod> methods; 
@@ -75,6 +55,8 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
     
     private Collection<TTypedEntity> typedEntities; 
 
+    private String visibility;
+    
 
 
     @FameProperty(name = "isIgnored", derived = true)
@@ -85,7 +67,7 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
         
     @FameProperty(name = "isInterface")
     public Boolean getIsInterface() {
-        return this.isInterface != null && this.isInterface;
+        return isInterface;
     }
 
     public void setIsInterface(Boolean isInterface) {
@@ -198,21 +180,6 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
     public Boolean getContainsReplicas() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
     }
     
     @FameProperty(name = "duplicationRate", derived = true)
@@ -347,12 +314,60 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
         return !getIncomingReferences().isEmpty();
     }
 
+    @FameProperty(name = "isAbstract")
+    public Boolean getIsAbstract() {
+        return isAbstract;
+    }
+
+    public void setIsAbstract(Boolean isAbstract) {
+        this.isAbstract = isAbstract;
+    }
+    
+    @FameProperty(name = "isClassSide")
+    public Boolean getIsClassSide() {
+        return isClassSide;
+    }
+
+    public void setIsClassSide(Boolean isClassSide) {
+        this.isClassSide = isClassSide;
+    }
+    
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "isFinal")
+    public Boolean getIsFinal() {
+        return isFinal;
+    }
+
+    public void setIsFinal(Boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+
+    @FameProperty(name = "isPackage", derived = true)
+    public Boolean getIsPackage() {
+        return this.visibility.equals("package");
+    }
+
+    @FameProperty(name = "isPrivate", derived = true)
+    public Boolean getIsPrivate() {
+        return this.visibility.equals("private");
+    }
+
+    @FameProperty(name = "isProtected", derived = true)
+    public Boolean getIsProtected() {
+        return this.visibility.equals("protected");
+    }
+
+    @FameProperty(name = "isPublic", derived = true)
+    public Boolean getIsPublic() {
+        return this.visibility.equals("public");
+    }
+
+
     @FameProperty(name = "isStub")
     public Boolean getIsStub() {
         return isStub;
@@ -446,12 +461,6 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfAccessesToForeignData", derived = true)
-    public Number getNumberOfAccessesToForeignData() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfAccessorMethods", derived = true)
     public Number getNumberOfAccessorMethods() {
         // TODO: this is a derived property, implement this method manually.
@@ -500,12 +509,6 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfDuplicatedLinesOfCodeInternally", derived = true)
-    public Number getNumberOfDuplicatedLinesOfCodeInternally() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfLinesOfCode")
     public Number getNumberOfLinesOfCode() {
         return numberOfLinesOfCode;
@@ -521,6 +524,12 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfLocallyDefinedMethods", derived = true)
+    public Number getNumberOfLocallyDefinedMethods() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfMessageSends", derived = true)
     public Number getNumberOfMessageSends() {
         // TODO: this is a derived property, implement this method manually.
@@ -529,12 +538,6 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
     
     @FameProperty(name = "numberOfMethods", derived = true)
     public Number getNumberOfMethods() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfMethodsAdded", derived = true)
-    public Number getNumberOfMethodsAdded() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -557,20 +560,8 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfPrivateAttributes", derived = true)
-    public Number getNumberOfPrivateAttributes() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfPrivateMethods", derived = true)
     public Number getNumberOfPrivateMethods() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfProtectedAttributes", derived = true)
-    public Number getNumberOfProtectedAttributes() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -581,20 +572,8 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfPublicAttributes", derived = true)
-    public Number getNumberOfPublicAttributes() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfPublicMethods", derived = true)
     public Number getNumberOfPublicMethods() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfRevealedAttributes", derived = true)
-    public Number getNumberOfRevealedAttributes() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -883,6 +862,15 @@ public class Class extends Type implements TWithExceptions, TSourceEntity, TRefe
         return !getTypedEntities().isEmpty();
     }
 
+    @FameProperty(name = "visibility")
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+    
     @FameProperty(name = "weightOfAClass", derived = true)
     public Number getWeightOfAClass() {
         // TODO: this is a derived property, implement this method manually.

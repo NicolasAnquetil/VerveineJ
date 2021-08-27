@@ -4,7 +4,8 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import java.util.*;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Traits")
@@ -12,53 +13,50 @@ import java.util.*;
 public interface TWithInheritances  {
 
         @FameProperty(name = "superInheritances", opposite = "subclass", derived = true)
-    public Collection<TInheritance> getSuperInheritances();
+        Collection<TInheritance> getSuperInheritances();
 
-    public void setSuperInheritances(Collection<? extends TInheritance> superInheritances);
+    void setSuperInheritances(Collection<? extends TInheritance> superInheritances);
 
-    public void addSuperInheritances(TInheritance one);
+    void addSuperInheritances(TInheritance one);
 
-    public void addSuperInheritances(TInheritance one, TInheritance... many);
+    void addSuperInheritances(TInheritance one, TInheritance... many);
 
-    public void addSuperInheritances(Iterable<? extends TInheritance> many);
+    void addSuperInheritances(Iterable<? extends TInheritance> many);
 
-    public void addSuperInheritances(TInheritance[] many);
+    void addSuperInheritances(TInheritance[] many);
 
-    public int numberOfSuperInheritances();
+    int numberOfSuperInheritances();
 
-    public boolean hasSuperInheritances();
+    boolean hasSuperInheritances();
 
     @FameProperty(name = "subInheritances", opposite = "superclass", derived = true)
-    public Collection<TInheritance> getSubInheritances();
+    Collection<TInheritance> getSubInheritances();
 
-    public void setSubInheritances(Collection<? extends TInheritance> subInheritances);
+    void setSubInheritances(Collection<? extends TInheritance> subInheritances);
 
-    public void addSubInheritances(TInheritance one);
+    void addSubInheritances(TInheritance one);
 
-    public void addSubInheritances(TInheritance one, TInheritance... many);
+    void addSubInheritances(TInheritance one, TInheritance... many);
 
-    public void addSubInheritances(Iterable<? extends TInheritance> many);
+    void addSubInheritances(Iterable<? extends TInheritance> many);
 
-    public void addSubInheritances(TInheritance[] many);
+    void addSubInheritances(TInheritance[] many);
 
-    public int numberOfSubInheritances();
+    int numberOfSubInheritances();
 
-    public boolean hasSubInheritances();
+    boolean hasSubInheritances();
 
     @FameProperty(name = "hierarchyNestingLevel", derived = true)
-    public Number getHierarchyNestingLevel();
+    Number getHierarchyNestingLevel();
 
     @FameProperty(name = "subclassHierarchyDepth", derived = true)
-    public Number getSubclassHierarchyDepth();
+    Number getSubclassHierarchyDepth();
 
     @FameProperty(name = "numberOfSubclasses", derived = true)
-    public Number getNumberOfSubclasses();
-
-    @FameProperty(name = "totalNumberOfSubclasses", derived = true)
-    public Number getTotalNumberOfSubclasses();
+    Number getNumberOfSubclasses();
 
     @FameProperty(name = "numberOfDirectSubclasses", derived = true)
-    public Number getNumberOfDirectSubclasses();
+    Number getNumberOfDirectSubclasses();
 
 
 

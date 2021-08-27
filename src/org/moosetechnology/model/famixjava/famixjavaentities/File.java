@@ -5,16 +5,17 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
-import java.util.*;
 import org.moosetechnology.model.famixjava.famixtraits.TFile;
 import org.moosetechnology.model.famixjava.famixtraits.TFileSystemEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TFolder;
 import org.moosetechnology.model.famixjava.famixtraits.TWithFiles;
 
+import java.util.Collection;
+
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("File")
-public class File extends NamedEntity implements TFileSystemEntity, TFile {
+public class File extends NamedEntity implements TFile, TFileSystemEntity {
 
     private Collection<TWithFiles> entities; 
 

@@ -8,6 +8,7 @@ import fr.inria.verveine.extractor.java.utils.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.*;
 
@@ -338,7 +339,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(ParameterizedType.class, stSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType) stSuper).getParameterizableClass());
 		assertEquals(4, st.getEnumValues().size());
-		assertSame(detectFamixElement(Namespace.class, "ad_hoc"), Util.belongsToOf(st));
+		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.belongsToOf(st));
 
 		EnumValue hrt = detectFamixElement(EnumValue.class, "HEARTS");
 		assertNotNull(hrt);
@@ -364,7 +365,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Type plSuper = (Type) firstElt(pl.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, plSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType) plSuper).getParameterizableClass());
-		assertSame(detectFamixElement(Namespace.class, "ad_hoc"), Util.belongsToOf(pl));
+		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.belongsToOf(pl));
 		assertEquals(8, pl.getEnumValues().size());
 		assertEquals(4, pl.getAttributes().size());
 		assertEquals(7 + 2, pl.getMethods().size()); // 7 methods + <initializer> + implicit used: values()
@@ -536,9 +537,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Attribute attribute = detectFamixElement( Attribute.class, "privateFinalAttribute");
 		assertNotNull(attribute);
 
-		assertEquals(2, attribute.getModifiers().size());
-		assertTrue(attribute.getModifiers().contains(JavaDictionary.MODIFIER_PRIVATE));
-		assertTrue(attribute.getModifiers().contains(JavaDictionary.MODIFIER_FINAL));
+		assertTrue(attribute.getIsPrivate());
+		assertTrue(attribute.getIsFinal());
+		assertFalse(attribute.getIsPublic());
+		assertFalse(attribute.getIsClassSide());
+		assertFalse(attribute.getIsTransient());
 	}
 
 	@Test
@@ -609,11 +612,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ThisIsTheStaticInnerClass");
 		assertNotNull(clazz);
 
-		// assertTrue(clazz.getIsPublic()); --- set as a modifier 
-		assertEquals(2, clazz.getModifiers().size());
-		for (String mod : clazz.getModifiers()) {
-			assertTrue(mod.equals(JavaDictionary.MODIFIER_PUBLIC) || mod.equals(JavaDictionary.MODIFIER_STATIC));
-		}
+		assertTrue(clazz.getIsPublic());
+		assertTrue(clazz.getIsClassSide());
+
 	}
 
     @Test
@@ -649,13 +650,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method method = firstElt(meths);
 
 		assertNotNull(method);
-		assertEquals(6, method.getModifiers().size());
-		assertTrue( method.getModifiers().contains("transient"));
-		assertTrue( method.getModifiers().contains("public"));
-		assertTrue( method.getModifiers().contains("static"));
-		assertTrue( method.getModifiers().contains("final"));
-		assertTrue( method.getModifiers().contains("volatile"));
-		assertTrue( method.getModifiers().contains("synchronized"));
+		assertTrue( method.getIsPublic());
+		assertTrue( method.getIsClassSide());
+		assertTrue( method.getIsFinal());
+		assertTrue( method.getIsSynchronized());
 	}
 
 	@Test
@@ -665,12 +663,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Attribute attribute = firstElt(entitiesNamed( Attribute.class, "attribute"));
 
 		assertNotNull(attribute);
-		assertEquals(5, attribute.getModifiers().size());
-		assertTrue( attribute.getModifiers().contains("public"));
-		assertTrue( attribute.getModifiers().contains("static"));
-		assertTrue( attribute.getModifiers().contains("transient"));
-		assertTrue( attribute.getModifiers().contains("volatile"));
-		assertTrue( attribute.getModifiers().contains("final"));
+		assertTrue( attribute.getIsPublic());
+		assertTrue( attribute.getIsClassSide());
+		assertTrue( attribute.getIsTransient());
+		assertTrue( attribute.getIsVolatile());
+		assertTrue( attribute.getIsFinal());
 	}
 
 }

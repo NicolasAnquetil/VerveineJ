@@ -5,36 +5,19 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
-import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.TAccess;
-import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
-import org.moosetechnology.model.famixjava.famixtraits.TComment;
-import org.moosetechnology.model.famixjava.famixtraits.TEnumValue;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
-import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
-import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
-import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
-import org.moosetechnology.model.famixjava.famixtraits.TWithEnumValues;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
+import org.moosetechnology.model.famixjava.famixtraits.*;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("EnumValue")
-public class EnumValue extends NamedEntity implements TNamedEntity, TEnumValue, TSourceEntity, TEntityMetaLevelDependency, TInvocationsReceiver, TStructuralEntity, TWithSourceLanguage, TTypedEntity, TAccessible, TWithComments {
+public class EnumValue extends NamedEntity implements TAccessible, TEntityMetaLevelDependency, TEnumValue, TNamedEntity, TSourceEntity, TStructuralEntity, TTypedEntity, TWithComments {
 
     private Collection<TComment> comments; 
 
-    private TSourceLanguage declaredSourceLanguage;
-    
     private TType declaredType;
     
     private Collection<TAccess> incomingAccesses; 
@@ -47,8 +30,6 @@ public class EnumValue extends NamedEntity implements TNamedEntity, TEnumValue, 
     
     private TWithEnumValues parentEnum;
     
-    private Collection<TInvocation> receivingInvocations; 
-
     private TSourceAnchor sourceAnchor;
     
 
@@ -114,21 +95,6 @@ public class EnumValue extends NamedEntity implements TNamedEntity, TEnumValue, 
     public Boolean getContainsReplicas() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
     }
     
     @FameProperty(name = "declaredType", opposite = "typedEntities")
@@ -323,57 +289,6 @@ public class EnumValue extends NamedEntity implements TNamedEntity, TEnumValue, 
         parentEnum.getEnumValues().add(this);
     }
     
-    @FameProperty(name = "receivingInvocations", opposite = "receiver", derived = true)
-    public Collection<TInvocation> getReceivingInvocations() {
-        if (receivingInvocations == null) {
-            receivingInvocations = new MultivalueSet<TInvocation>() {
-                @Override
-                protected void clearOpposite(TInvocation e) {
-                    e.setReceiver(null);
-                }
-                @Override
-                protected void setOpposite(TInvocation e) {
-                    e.setReceiver(EnumValue.this);
-                }
-            };
-        }
-        return receivingInvocations;
-    }
-    
-    public void setReceivingInvocations(Collection<? extends TInvocation> receivingInvocations) {
-        this.getReceivingInvocations().clear();
-        this.getReceivingInvocations().addAll(receivingInvocations);
-    }                    
-    
-        
-    public void addReceivingInvocations(TInvocation one) {
-        this.getReceivingInvocations().add(one);
-    }   
-    
-    public void addReceivingInvocations(TInvocation one, TInvocation... many) {
-        this.getReceivingInvocations().add(one);
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }   
-    
-    public void addReceivingInvocations(Iterable<? extends TInvocation> many) {
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }   
-                
-    public void addReceivingInvocations(TInvocation[] many) {
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }
-    
-    public int numberOfReceivingInvocations() {
-        return getReceivingInvocations().size();
-    }
-
-    public boolean hasReceivingInvocations() {
-        return !getReceivingInvocations().isEmpty();
-    }
-
     @FameProperty(name = "replicas", derived = true)
     public Replica getReplicas() {
         // TODO: this is a derived property, implement this method manually.

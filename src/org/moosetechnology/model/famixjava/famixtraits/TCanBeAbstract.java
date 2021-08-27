@@ -7,14 +7,13 @@ import ch.akuhn.fame.FameProperty;
 
 
 @FamePackage("Famix-Traits")
-@FameDescription("TWithHeader")
-public interface TWithHeader  {
+@FameDescription("TCanBeAbstract")
+public interface TCanBeAbstract {
 
-        @FameProperty(name = "header", opposite = "headerOwner", derived = true)
-    public THeader getHeader();
+    @FameProperty(name = "isAbstract")
+    Boolean getIsAbstract();
 
-    public void setHeader(THeader header);
-
+    void setIsAbstract(Boolean isAbstract);
 
 
 }

@@ -3,12 +3,16 @@ package fr.inria.verveine.extractor.java;
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.*;
 
 import java.lang.Class;
 import java.lang.Exception;
-import java.util.*;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * A dictionnary of Famix entities to help create them and find them back
@@ -198,7 +202,7 @@ public class AbstractDictionary<B> {
 		}
 		
 		try {
-			fmx = fmxClass.newInstance();
+			fmx = fmxClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			System.err.println("Unexpected error, could not create a FAMIX entity: "+e.getMessage());
 			e.printStackTrace();
@@ -396,7 +400,7 @@ public class AbstractDictionary<B> {
 	 * @return the FAMIX Method or null in case of a FAMIX error
 	 */
 	public Method ensureFamixMethod(B key, String name, String sig, Type ret, Type owner, boolean persistIt) {
-		Method fmx = (Method) ensureFamixEntity(Method.class, key, name, persistIt);
+		Method fmx = ensureFamixEntity(Method.class, key, name, persistIt);
 		fmx.setSignature(sig);
 		fmx.setDeclaredType(ret);
 		fmx.setParentType(owner);
@@ -459,7 +463,7 @@ public class AbstractDictionary<B> {
 		
 		if ( (cmt != null) && (owner != null) ) {
 			fmx = createFamixComment(cmt);
-			fmx.setContainer(owner);
+			fmx.setContainer((TWithComments) owner);
 		}
 		return fmx;
 	}
@@ -493,7 +497,7 @@ public class AbstractDictionary<B> {
 		if ( (sup == null) || (sub == null) ) {
 			return null;
 		}
-			
+
 		for (TInheritance i : (sup).getSubInheritances()) {
 			if (i.getSubclass() == sub) {
 				return (Inheritance) i;
@@ -501,8 +505,8 @@ public class AbstractDictionary<B> {
 		}
 		Inheritance inh = new Inheritance();
 		inh.setSuperclass(sup);
-		inh.setSubclass((TWithInheritances) sub);
-		chainPrevNext(prev,inh);
+		inh.setSubclass(sub);
+		chainPrevNext(prev, inh);
 		famixRepoAdd(inh);
 		return inh;
 	}
@@ -742,20 +746,22 @@ public class AbstractDictionary<B> {
 	/**
 	 * Returns a FAMIX Namespace with the given <b>name</b>, creating it if it does not exist yet
 	 * We assume that Namespaces must be uniq for a given name
+	 *
 	 * @param name -- the name of the FAMIX Namespace
 	 * @return the FAMIX Namespace or null in case of a FAMIX error
 	 */
-	public Namespace ensureFamixNamespace(B key, String name) {
-		return ensureFamixUniqEntity(Namespace.class, key, name);
+	public Package ensureFamixPackage(B key, String name) {
+		return ensureFamixUniqEntity(Package.class, key, name);
 	}
 
 	/**
 	 * Creates or recovers a default Famix Namespace.
 	 * Because this package does not really exist, it has no binding.
+	 *
 	 * @return a Famix Namespace
 	 */
-	public Namespace ensureFamixNamespaceDefault() {
-		Namespace fmx =  ensureFamixUniqEntity(Namespace.class, null, DEFAULT_PCKG_NAME);
+	public Package ensureFamixPackageDefault() {
+		Package fmx = ensureFamixUniqEntity(Package.class, null, DEFAULT_PCKG_NAME);
 
 		return fmx;
 	}
@@ -767,7 +773,7 @@ public class AbstractDictionary<B> {
 	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClassStubOwner() {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx =  ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, null, STUB_METHOD_CONTAINER_NAME);
 		if (fmx != null) {
-			fmx.setTypeContainer( ensureFamixNamespaceDefault());
+			fmx.setTypeContainer( ensureFamixPackageDefault());
 		}
 
 		return fmx;

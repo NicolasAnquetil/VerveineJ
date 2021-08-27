@@ -11,7 +11,7 @@ import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("SourceTextAnchor")
-public class SourceTextAnchor extends SourceAnchor implements TSourceAnchor, THasImmediateSource {
+public class SourceTextAnchor extends SourceAnchor implements THasImmediateSource, TSourceAnchor {
 
     private TSourceEntity element;
     

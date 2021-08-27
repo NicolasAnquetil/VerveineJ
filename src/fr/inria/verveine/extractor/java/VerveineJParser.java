@@ -7,7 +7,7 @@ import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
 import org.moosetechnology.model.famixjava.famixjavaentities.FamixJavaEntitiesModel;
-import org.moosetechnology.model.famixjava.famixjavaentities.Namespace;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.SourceLanguage;
 import org.moosetechnology.model.famixjava.famixreplication.FamixReplicationModel;
 import org.moosetechnology.model.famixjava.famixtraits.FamixTraitsModel;
@@ -16,7 +16,8 @@ import org.moosetechnology.model.famixjava.moosequery.MooseQueryModel;
 import org.moosetechnology.model.famixjava.tagging.TaggingModel;
 
 import java.io.*;
-import java.util.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 
 /**
  * A batch parser inspired from org.eclipse.jdt.internal.compiler.batch.Main (JDT-3.6)
@@ -63,7 +64,7 @@ public class VerveineJParser {
 	public void parse() {
 
 		if (this.linkToExisting()) {
-			this.expandNamespacesNames();
+			this.expandPackagesNames();
 		}
 
 		FamixRequestor req = new FamixRequestor(getFamixRepo(), options);
@@ -76,20 +77,19 @@ public class VerveineJParser {
 					/*bindingKeys*/new String[0],
 					/*requestor*/req,
 					/*monitor*/null);
-		}
-		catch (java.lang.IllegalStateException e) {
+		} catch (java.lang.IllegalStateException e) {
 			System.out.println("VerveineJ could not launch parser, received error: " + e.getMessage());
 		}
 
-		this.compressNamespacesNames();
+		this.compressPackagesNames();
 	}
 
 	/**
 	 * As explained in JavaDictionary, Namespaces are created with their fully qualified name.
 	 * We need now to give them their simple name
 	 */
-	protected void compressNamespacesNames() {
-		for (Namespace ns : listAll(Namespace.class)) {
+	protected void compressPackagesNames() {
+		for (Package ns : listAll(Package.class)) {
 			String name = ns.getName();
 			int last = name.lastIndexOf('.');
 			if (last >= 0) {
@@ -99,24 +99,24 @@ public class VerveineJParser {
 	}
 
 	/**
-	 * @see VerveineJParser#compressNamespacesNames()
+	 * @see VerveineJParser#compressPackagesNames()
 	 */
-	protected void expandNamespacesNames() {
-		for (Namespace ns : listAll(Namespace.class)) {
-			expandNamespaceName(ns);
+	protected void expandPackagesNames() {
+		for (Package ns : listAll(Package.class)) {
+			expandPackageName(ns);
 		}
 	}
 
-	protected void expandNamespaceName(Namespace ns) {
+	protected void expandPackageName(Package ns) {
 		String name = ns.getName();
 		if (name.indexOf('.') > 0) {
 			return;
 		} else {
-			Namespace parent = ns.getParentNamespace();
+			Package parent = (Package) ns.getParentPackage();
 			if (parent == null) {
 				return;
 			} else {
-				expandNamespaceName(parent);
+				expandPackageName(parent);
 				ns.setName(parent.getName() + "." + ns.getName());
 			}
 		}
@@ -159,11 +159,8 @@ public class VerveineJParser {
 		// Outputting to a file
 		try {
 			//famixRepo.exportMSE(new FileWriter(OUTPUT_FILE));
-			famixRepo.exportMSE(new BufferedWriter(new OutputStreamWriter(output,"UTF8")));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		catch (UnknownElementError e) {
+			famixRepo.exportMSE(new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8)));
+		} catch (UnknownElementError e) {
 			e.printStackTrace();
 		}
 	}

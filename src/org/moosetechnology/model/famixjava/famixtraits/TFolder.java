@@ -4,7 +4,8 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import java.util.*;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Traits")
@@ -12,33 +13,33 @@ import java.util.*;
 public interface TFolder  {
 
         @FameProperty(name = "numberOfFiles", derived = true)
-    public Number getNumberOfFiles();
+        Number getNumberOfFiles();
 
     @FameProperty(name = "childrenFileSystemEntities", opposite = "parentFolder", derived = true)
-    public Collection<TFileSystemEntity> getChildrenFileSystemEntities();
+    Collection<TFileSystemEntity> getChildrenFileSystemEntities();
 
-    public void setChildrenFileSystemEntities(Collection<? extends TFileSystemEntity> childrenFileSystemEntities);
+    void setChildrenFileSystemEntities(Collection<? extends TFileSystemEntity> childrenFileSystemEntities);
 
-    public void addChildrenFileSystemEntities(TFileSystemEntity one);
+    void addChildrenFileSystemEntities(TFileSystemEntity one);
 
-    public void addChildrenFileSystemEntities(TFileSystemEntity one, TFileSystemEntity... many);
+    void addChildrenFileSystemEntities(TFileSystemEntity one, TFileSystemEntity... many);
 
-    public void addChildrenFileSystemEntities(Iterable<? extends TFileSystemEntity> many);
+    void addChildrenFileSystemEntities(Iterable<? extends TFileSystemEntity> many);
 
-    public void addChildrenFileSystemEntities(TFileSystemEntity[] many);
+    void addChildrenFileSystemEntities(TFileSystemEntity[] many);
 
-    public int numberOfChildrenFileSystemEntities();
+    int numberOfChildrenFileSystemEntities();
 
-    public boolean hasChildrenFileSystemEntities();
-
-    @FameProperty(name = "totalNumberOfLinesOfText", derived = true)
-    public Number getTotalNumberOfLinesOfText();
+    boolean hasChildrenFileSystemEntities();
 
     @FameProperty(name = "numberOfFolders", derived = true)
-    public Number getNumberOfFolders();
+    Number getNumberOfFolders();
+
+    @FameProperty(name = "totalNumberOfLinesOfText", derived = true)
+    Number getTotalNumberOfLinesOfText();
 
     @FameProperty(name = "numberOfEmptyLinesOfText", derived = true)
-    public Number getNumberOfEmptyLinesOfText();
+    Number getNumberOfEmptyLinesOfText();
 
 
 

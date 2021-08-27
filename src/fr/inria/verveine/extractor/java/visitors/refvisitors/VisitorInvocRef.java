@@ -605,7 +605,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// "string".msg()
 		else if ( NodeTypeChecker.isStringLiteral(expr)) {
-			return dico.ensureFamixType(null, "String", dico.ensureFamixNamespaceJavaLang(null),
+			return dico.ensureFamixType(null, "String", dico.ensureFamixPackageJavaLang(null),
 					/*alwaysPersist?*/true); // creating FamixClass java.lang.String
 		}
 

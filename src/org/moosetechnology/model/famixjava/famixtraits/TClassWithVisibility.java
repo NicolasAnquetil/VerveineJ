@@ -6,10 +6,9 @@ import ch.akuhn.fame.FamePackage;
 
 
 @FamePackage("Famix-Traits")
-@FameDescription("TWithPackages")
-public interface TWithPackages  {
+@FameDescription("TClassWithVisibility")
+public interface TClassWithVisibility {
 
-    
 
 }
 

@@ -4,16 +4,12 @@ package org.moosetechnology.model.famixjava.famixjavaentities;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import org.moosetechnology.model.famixjava.famixtraits.TFile;
-import org.moosetechnology.model.famixjava.famixtraits.TFileAnchor;
-import org.moosetechnology.model.famixjava.famixtraits.TIndexedFileNavigation;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famixjava.famixtraits.*;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("IndexedFileAnchor")
-public class IndexedFileAnchor extends SourceAnchor implements TIndexedFileNavigation, TFileAnchor, TSourceAnchor {
+public class IndexedFileAnchor extends SourceAnchor implements TFileAnchor, TIndexedFileNavigation, TSourceAnchor {
 
     private TFile correspondingFile;
     

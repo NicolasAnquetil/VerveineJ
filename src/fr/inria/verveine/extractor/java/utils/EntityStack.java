@@ -6,7 +6,9 @@ import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import java.lang.Class;
 import java.util.Stack;
 
-/** A stack of FAMIX Entities so that we know in what container each new Entity is declared
+/**
+ * A stack of FAMIX Entities so that we know in what container each new Entity is declared
+ *
  * @author anquetil
  */
 public class EntityStack {
@@ -14,29 +16,13 @@ public class EntityStack {
 	public static final int EMPTY_NOS = 0;
 
 	private Stack<NamedEntity> stack;
-	
-	private class MetricHolder extends NamedEntity {
-		private int metric_cyclo = EMPTY_CYCLO;  // Cyclomatic Complexity
-		private int metric_nos = EMPTY_NOS;      // Number Of Statements
-		private Method ent;
 
-		protected MetricHolder(Method ent) {
-			this.ent = ent;
-		}
-		protected int getCyclo() {
-			return metric_cyclo;
-		}
-		protected void setCyclo(int metric_cyclo) {
-			this.metric_cyclo = metric_cyclo;
-		}
-		protected int getNos() {
-			return metric_nos;
-		}
-		protected void setNos(int metric_nos) {
-			this.metric_nos = metric_nos;
-		}
-		protected Method getEntity() {
-			return ent;
+	/**
+	 * Empties the context stack of Famix classes
+	 */
+	public void clearTypes() {
+		while (!(this.top() instanceof Package)) {
+			this.popUpto(Type.class);
 		}
 	}
 
@@ -44,7 +30,7 @@ public class EntityStack {
 	 * last Invocation registered to set the previous/next
 	 */
 	Invocation lastInvocation = null;
-	
+
 	/**
 	 * last Access registered to set the previous/next
 	 */
@@ -102,14 +88,6 @@ public class EntityStack {
 	}
 
 	/**
-	 * Sets the Famix namespace on top of the "context stack"
-	 * @param e -- the Famix namespace
-	 */
-	public void pushPckg(Namespace e) {
-		push(e);
-	}
-
-	/**
 	 * Pushes a Famix Type on top of the "context type stack"
 	 * @param t -- the FamixType
 	 */
@@ -138,9 +116,9 @@ public class EntityStack {
 	}
 
 	public void pushAnnotationMember(AnnotationTypeAttribute fmx) {
-		push(fmx);	
+		push(fmx);
 	}
-	
+
 	/**
 	 * Empties the context stack of package and associated classes
 	 */
@@ -148,21 +126,42 @@ public class EntityStack {
 		stack = new Stack<NamedEntity>();
 	}
 
-	/**
-	 * Empties the context stack of Famix classes
-	 */
-	public void clearTypes() {
-		while (! (this.top() instanceof Namespace)) {
-			this.popUpto(Type.class);			
+	private class MetricHolder extends NamedEntity {
+		private int metric_cyclo = EMPTY_CYCLO;  // Cyclomatic Complexity
+		private int metric_nos = EMPTY_NOS;      // Number Of Statements
+		private final Method ent;
+
+		protected MetricHolder(Method ent) {
+			this.ent = ent;
+		}
+
+		protected int getCyclo() {
+			return metric_cyclo;
+		}
+
+		protected void setCyclo(int metric_cyclo) {
+			this.metric_cyclo = metric_cyclo;
+		}
+
+		protected int getNos() {
+			return metric_nos;
+		}
+
+		protected void setNos(int metric_nos) {
+			this.metric_nos = metric_nos;
+		}
+
+		protected Method getEntity() {
+			return ent;
 		}
 	}
-	
+
 	// READ FROM THE STACK
 
 	@SuppressWarnings("unchecked")
 	private <T extends NamedEntity> T popUpto(Class<T> clazz) {
 		NamedEntity ent = null;
-		while ( (! stack.isEmpty()) && (! clazz.isInstance(ent)) ) {
+		while ((!stack.isEmpty()) && (!clazz.isInstance(ent))) {
 			ent = this.pop();
 		}
 
@@ -225,15 +224,6 @@ public class EntityStack {
 	}
 
 	/**
-	 * Pops the top Famix Namespace from the "context stack"<BR>
-	 * Note: does not check that there is such a namesapce, so could possibly throw an EmptyStackException
-	 * @return the Famix Namespace
-	 */
-	public Namespace popNamespace() {
-		return this.popUpto(Namespace.class);
-	}
-
-	/**
 	 * Pops the top Famix method of the current class on top of the "context stack"
 	 * Note: does not check that there is such a class or method, so could possibly throw an Exception
 	 * @return the Famix method
@@ -282,15 +272,6 @@ public class EntityStack {
 	 */
 	public Type topType() {
 		return this.lookUpto(Type.class);
-	}
-
-	/**
-	 * Returns the Famix Namespace on top of the "context stack"
-	 * Note: does not check that there is such a Namespace, so could possibly throw an EmptyStackException
-	 * @return the Famix Namespace
-	 */
-	public Namespace topNamespace() {
-		return this.lookUpto(Namespace.class);
 	}
 
 	/**

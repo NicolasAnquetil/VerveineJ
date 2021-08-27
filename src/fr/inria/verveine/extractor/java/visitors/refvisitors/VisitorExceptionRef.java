@@ -6,7 +6,7 @@ import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Class;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.Namespace;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
 
 import java.util.List;
@@ -17,18 +17,18 @@ import java.util.List;
  */
 public class VisitorExceptionRef extends AbstractRefVisitor {
 
-	public VisitorExceptionRef(JavaDictionary dico, VerveineJOptions options) {
-		super(dico, options);
-	}
+    public VisitorExceptionRef(JavaDictionary dico, VerveineJOptions options) {
+        super(dico, options);
+    }
 
 
-    protected Namespace visitCompilationUnit(CompilationUnit node) {
-        Namespace fmx = null;
+    protected Package visitCompilationUnit(CompilationUnit node) {
+        Package fmx = null;
         PackageDeclaration pckg = node.getPackage();
         if (pckg == null) {
-            fmx = dico.getFamixNamespaceDefault();
+            fmx = dico.getFamixPackageDefault();
         } else {
-            fmx = (Namespace) dico.getEntityByKey(pckg.resolveBinding());
+            fmx = (Package) dico.getEntityByKey(pckg.resolveBinding());
         }
         this.context.pushPckg(fmx);
 
