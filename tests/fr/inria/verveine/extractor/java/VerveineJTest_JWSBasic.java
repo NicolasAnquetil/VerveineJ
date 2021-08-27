@@ -6,6 +6,7 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstance;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
@@ -68,9 +69,9 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		for (TAnnotationInstance a : cl.getAnnotationInstances()) {
 			AnnotationInstance ai = (AnnotationInstance) a;
 			if (((TNamedEntity) ai.getAnnotationType()).getName().equals("WebService")) {
-				assertEquals(detectFamixElement(Namespace.class, "jws"), (ai.getAnnotationType()).getAnnotationTypesContainer());
+				assertEquals(detectFamixElement(Package.class, "jws"), (ai.getAnnotationType()).getAnnotationTypesContainer());
 			} else if (((TNamedEntity) ai.getAnnotationType()).getName().equals("SOAPBinding")) {
-				assertEquals(detectFamixElement(Namespace.class, "soap"), (ai.getAnnotationType()).getAnnotationTypesContainer());
+				assertEquals(detectFamixElement(Package.class, "soap"), (ai.getAnnotationType()).getAnnotationTypesContainer());
 			} else {
 				assertTrue("Unexpected AnnotationInstance for SimpleBean: " + ((AnnotationType) ai.getAnnotationType()).getName(), false);
 			}

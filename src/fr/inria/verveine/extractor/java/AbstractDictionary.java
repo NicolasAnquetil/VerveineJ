@@ -3,6 +3,7 @@ package fr.inria.verveine.extractor.java;
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.*;
 
@@ -745,20 +746,22 @@ public class AbstractDictionary<B> {
 	/**
 	 * Returns a FAMIX Namespace with the given <b>name</b>, creating it if it does not exist yet
 	 * We assume that Namespaces must be uniq for a given name
+	 *
 	 * @param name -- the name of the FAMIX Namespace
 	 * @return the FAMIX Namespace or null in case of a FAMIX error
 	 */
-	public Namespace ensureFamixNamespace(B key, String name) {
-		return ensureFamixUniqEntity(Namespace.class, key, name);
+	public Package ensureFamixPackage(B key, String name) {
+		return ensureFamixUniqEntity(Package.class, key, name);
 	}
 
 	/**
 	 * Creates or recovers a default Famix Namespace.
 	 * Because this package does not really exist, it has no binding.
+	 *
 	 * @return a Famix Namespace
 	 */
-	public Namespace ensureFamixNamespaceDefault() {
-		Namespace fmx =  ensureFamixUniqEntity(Namespace.class, null, DEFAULT_PCKG_NAME);
+	public Package ensureFamixPackageDefault() {
+		Package fmx = ensureFamixUniqEntity(Package.class, null, DEFAULT_PCKG_NAME);
 
 		return fmx;
 	}
@@ -770,7 +773,7 @@ public class AbstractDictionary<B> {
 	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClassStubOwner() {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx =  ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, null, STUB_METHOD_CONTAINER_NAME);
 		if (fmx != null) {
-			fmx.setTypeContainer( ensureFamixNamespaceDefault());
+			fmx.setTypeContainer( ensureFamixPackageDefault());
 		}
 
 		return fmx;

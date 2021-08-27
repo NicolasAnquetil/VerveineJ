@@ -42,7 +42,6 @@ public class FamixJavaEntitiesModel {
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.Parameter.class);
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.Reference.class);
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.TCanBeTransient.class);
-		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.Namespace.class);
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.SourceLanguage.class);
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.TCanBeClassSide.class);
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class);

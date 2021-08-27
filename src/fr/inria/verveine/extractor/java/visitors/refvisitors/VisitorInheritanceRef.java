@@ -6,6 +6,7 @@ import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
@@ -81,7 +82,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 			if (supbnd != null) {
 				sup = dico.ensureFamixType(supbnd, /*alwaysPersist*/true);
 			} else {
-				Namespace javaLang = dico.ensureFamixNamespaceJavaLang(null);
+				Package javaLang = dico.ensureFamixPackageJavaLang(null);
 				ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/javaLang, /*isGeneric*/true, /*modifiers*/Modifier.ABSTRACT & Modifier.PUBLIC, /*alwaysPersist*/true);
 				sup = dico.ensureFamixParameterizedType(/*bnd*/null, /*name*/"Enum", generic, /*ctxt*/(ContainerEntity) context.top(), /*alwaysPersist*/true);
 			}

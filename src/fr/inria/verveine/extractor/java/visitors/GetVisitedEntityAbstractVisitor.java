@@ -1,11 +1,12 @@
 package fr.inria.verveine.extractor.java.visitors;
 
+import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.EntityStack;
-import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 
@@ -73,13 +74,13 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 
 	// CompilationUnit --> FamixNamespace
 
-	protected Namespace visitCompilationUnit(CompilationUnit node) {
-		Namespace fmx;
+	protected Package visitCompilationUnit(CompilationUnit node) {
+		Package fmx;
 		PackageDeclaration pckg = node.getPackage();
 		if (pckg == null) {
-			fmx = dico.getFamixNamespaceDefault();
+			fmx = dico.getFamixPackageDefault();
 		} else {
-			fmx = (Namespace) dico.getEntityByKey(pckg.resolveBinding());
+			fmx = (Package) dico.getEntityByKey(pckg.resolveBinding());
 		}
 		this.context.pushPckg(fmx);
 

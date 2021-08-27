@@ -5,6 +5,7 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.*;
 
@@ -95,7 +96,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40 + 8 + 1, entitiesOfType(Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10 + 1, entitiesOfType(Attribute.class).size());//10+{System.out}
-		assertEquals(2 + 4, entitiesOfType(Namespace.class).size());//2+{moose,java.lang,java.io,java}
+		assertEquals(2 + 4, entitiesOfType(Package.class).size());//2+{moose,java.lang,java.io,java}
 		assertEquals(26, entitiesOfType(Parameter.class).size());
 		assertEquals(55, entitiesOfType(Invocation.class).size());
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());
@@ -112,7 +113,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testClassProperties() {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
 
-		Namespace pckg = detectFamixElement(Namespace.class, "lan");
+		Package pckg = detectFamixElement(Package.class, "lan");
 		assertNotNull(pckg);
 		assertEquals("lan", pckg.getName());
 
@@ -144,7 +145,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(1, outputServ.getAttributes().size());
 		assertFalse(outputServ.getIsInterface());
 
-		pckg = detectFamixElement(Namespace.class, "server");
+		pckg = detectFamixElement(Package.class, "server");
 		assertNotNull(pckg);
 		assertEquals("server", pckg.getName());
 
@@ -184,22 +185,22 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testStubPackages() {
-		Namespace pckg;
+		Package pckg;
 
-		pckg = detectFamixElement(Namespace.class, "java");
+		pckg = detectFamixElement(Package.class, "java");
 		assertNotNull(pckg);
 		assertTrue(pckg.getIsStub());
 
-		pckg = detectFamixElement(Namespace.class, "io");
+		pckg = detectFamixElement(Package.class, "io");
 		assertNotNull(pckg);
 		assertTrue(pckg.getIsStub());
 
-		pckg = detectFamixElement(Namespace.class, "lan");
+		pckg = detectFamixElement(Package.class, "lan");
 		assertNotNull(pckg);
 		assertFalse(pckg.getIsStub());
 
-		assertNotNull(pckg.getParentNamespace());
-		assertFalse(pckg.getParentNamespace().getIsStub());
+		assertNotNull(pckg.getParentPackage());
+		//TODO assertFalse(pckg.getParentPackage().getIsStub());
 	}
 
 	@Test
@@ -208,9 +209,9 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		assertNotSame(javaDictionary.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true), javaDictionary.ensureFamixClass(null, A_CLASS_NAME, null, /*persistIt*/true));
 
-		Namespace javaLang = javaDictionary.ensureFamixNamespaceJavaLang(null);
+		Package javaLang = javaDictionary.ensureFamixPackageJavaLang(null);
 		assertEquals(JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());
-		assertSame(javaLang, javaDictionary.ensureFamixNamespaceJavaLang(null));
+		assertSame(javaLang, javaDictionary.ensureFamixPackageJavaLang(null));
 		assertTrue(javaLang.getIsStub());
 
 		org.moosetechnology.model.famixjava.famixjavaentities.Class obj = javaDictionary.ensureFamixClassObject(null);
@@ -349,7 +350,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
         */
 
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
-		Namespace ns = detectFamixElement(Namespace.class, javaLangName);
+		Package ns = detectFamixElement(Package.class, javaLangName);
 		assertNotNull(ns);
 		assertTrue(ns.getIsStub());
 

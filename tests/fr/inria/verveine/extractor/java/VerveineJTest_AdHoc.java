@@ -8,6 +8,7 @@ import fr.inria.verveine.extractor.java.utils.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.*;
 
@@ -338,7 +339,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(ParameterizedType.class, stSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType) stSuper).getParameterizableClass());
 		assertEquals(4, st.getEnumValues().size());
-		assertSame(detectFamixElement(Namespace.class, "ad_hoc"), Util.belongsToOf(st));
+		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.belongsToOf(st));
 
 		EnumValue hrt = detectFamixElement(EnumValue.class, "HEARTS");
 		assertNotNull(hrt);
@@ -364,7 +365,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Type plSuper = (Type) firstElt(pl.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, plSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType) plSuper).getParameterizableClass());
-		assertSame(detectFamixElement(Namespace.class, "ad_hoc"), Util.belongsToOf(pl));
+		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.belongsToOf(pl));
 		assertEquals(8, pl.getEnumValues().size());
 		assertEquals(4, pl.getAttributes().size());
 		assertEquals(7 + 2, pl.getMethods().size()); // 7 methods + <initializer> + implicit used: values()

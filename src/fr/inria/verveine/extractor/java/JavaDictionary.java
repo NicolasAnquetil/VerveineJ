@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Class;
 import org.moosetechnology.model.famixjava.famixjavaentities.Comment;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
 import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
@@ -68,48 +69,47 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * Returns the namespace with {@link AbstractDictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
 	 */
-	public Namespace getFamixNamespaceDefault() {
-		Collection<Namespace> l = getEntityByName( Namespace.class, DEFAULT_PCKG_NAME);
+	public Package getFamixPackageDefault() {
+		Collection<Package> l = getEntityByName(Package.class, DEFAULT_PCKG_NAME);
 		if (l.size() > 0) {
 			return l.iterator().next();
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
 
 	/**
 	 * Returns a Famix Namespace associated with its IPackageBinding and/or fully qualified name.
-	 * The Entity is created if it does not exist (see also {@link AbstractDictionary#ensureFamixNamespace(Object, String)}).
+	 * The Entity is created if it does not exist (see also {@link AbstractDictionary#ensureFamixPackage(Object, String)}).
 	 * Also creates or recovers recusively it's parent namespaces.<br>
 	 * At least one of <b>bnd</b> and <b>name</b> must be non null.
-	 * @param bnd -- the JDT Binding that may be used as a uniq key to recover this namespace
+	 *
+	 * @param bnd  -- the JDT Binding that may be used as a uniq key to recover this namespace
 	 * @param name -- fully qualified name of the namespace (e.g. 'java.lang')
 	 * @return the Famix Namespace found or created. May return null in case of a Famix error
 	 */
-	public Namespace ensureFamixNamespace(IPackageBinding bnd, String name) {
-		Namespace fmx = null;
-		Namespace parent = null;
+	public Package ensureFamixPackage(IPackageBinding bnd, String name) {
+		Package fmx = null;
+		Package parent = null;
 
-		if ( (name == null) && (bnd != null) ) {
+		if ((name == null) && (bnd != null)) {
 			name = bnd.getName();
 		}
 
-		if ( (name == null)  || name.equals("") ) {
-			return ensureFamixNamespaceDefault();
-		}
-		else {
+		if ((name == null) || name.equals("")) {
+			return ensureFamixPackageDefault();
+		} else {
 			/* Note: Packages are created with their fully-qualified name to simplify recovering when we don't have a binding
 			 * (for example when creating parent packages of a package we have a binding for).
 			 * Because the preferred solution in Moose is to give their simple names to packages, they must be post-processed when
 			 * all is said and done. */
-			fmx = super.ensureFamixNamespace( bnd, name);
+			fmx = super.ensureFamixPackage(bnd, name);
 			String parentName = removeLastName(name);
 			if (parentName.length() > 0) {
-				parent = ensureFamixNamespace(null, parentName);
+				parent = ensureFamixPackage(null, parentName);
 				// set the parentscope relationship
-				if ((parent != null) && (fmx != null) && (fmx.getParentNamespace() == null)) {
-					parent.addChildNamespaces(fmx);
+				if ((parent != null) && (fmx != null) && (fmx.getParentPackage() == null)) {
+					parent.addChildEntities(fmx);
 				}
 			}
 		}
@@ -271,7 +271,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- owner
 		if (owner == null) {
 			if (bnd == null) {
-				owner = ensureFamixNamespaceDefault();
+				owner = ensureFamixPackageDefault();
 			} else {
 				owner = ensureOwner(bnd, alwaysPersist);
 			}
@@ -404,10 +404,9 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			else {
 				IPackageBinding parentPckg = bnd.getPackage();
 				if (parentPckg != null) {
-					owner = this.ensureFamixNamespace(parentPckg, null);
-				}
-				else {
-					owner = this.ensureFamixNamespaceDefault();
+					owner = this.ensureFamixPackage(parentPckg, null);
+				} else {
+					owner = this.ensureFamixPackageDefault();
 				}
 			}
 		}
@@ -515,7 +514,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- owner
 		if (owner == null) {
 			if (bnd == null) {
-				owner = ensureFamixNamespaceDefault();  // not really sure what to do here
+				owner = ensureFamixPackageDefault();  // not really sure what to do here
 			} else {
 				owner = ensureOwner(bnd, /*persistIt*/true); // owner should be a class or package so yes persist it
 			}
@@ -626,15 +625,14 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- owner
 		if (owner == null) {
 			if (bnd == null) {
-				owner = ensureFamixNamespaceDefault();
+				owner = ensureFamixPackageDefault();
 			}
 			else {
 				IPackageBinding parentPckg = bnd.getPackage();
 				if (parentPckg != null) {
-					owner = this.ensureFamixNamespace(parentPckg, null);
-				}
-				else {
-					owner = this.ensureFamixNamespaceDefault();
+					owner = this.ensureFamixPackage(parentPckg, null);
+				} else {
+					owner = this.ensureFamixPackageDefault();
 				}
 			}
 		}
@@ -803,14 +801,15 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * Checks whether the existing unmapped Famix Namespace matches the binding.
 	 * Checks that the candidate has the same name as the JDT bound package, and checks recursively that owners also match.
-	 * @param bnd -- a JDT binding that we are trying to match to the candidate
-	 * @param name of the package
-	 * @param owner of the package
+	 *
+	 * @param bnd       -- a JDT binding that we are trying to match to the candidate
+	 * @param name      of the package
+	 * @param owner     of the package
 	 * @param candidate -- a Famix Entity
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean matchAndMapNamespace(IPackageBinding bnd, String name, Namespace owner, NamedEntity candidate) {
-		if (! (candidate instanceof Namespace) ) {
+	private boolean matchAndMapPackage(IPackageBinding bnd, String name, Package owner, NamedEntity candidate) {
+		if (!(candidate instanceof Package)) {
 			return false;
 		}
 
@@ -818,8 +817,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		CheckResult res = checkKeyMatch(bnd, candidate);
 		if (res == CheckResult.MATCH) {
 			return true;
-		}
-		else if (res == CheckResult.FAIL) {
+		} else if (res == CheckResult.FAIL) {
 			return false;
 		}
 
@@ -892,7 +890,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// check owners with bnd
 		// type is an annotation
 		if (bnd.isAnnotation() && (candidate instanceof AnnotationType)) {
-			if (matchAndMapNamespace(bnd.getPackage(), owner.getName(), (Namespace) Util.belongsToOf(owner), Util.belongsToOf(candidate))) {
+			if (matchAndMapPackage(bnd.getPackage(), owner.getName(), (Package) Util.belongsToOf(owner), Util.belongsToOf(candidate))) {
 				conditionalMapToKey(bnd, candidate);
 				return true;
 			} else {
@@ -1192,15 +1190,15 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	}
 
 	private CheckResult matchAndMapOwnerAsNamespace(IPackageBinding pckgBnd, NamedEntity owner, ContainerEntity candidateOwner) {
-		if ((pckgBnd != null) || ((owner != null) && (owner instanceof Namespace))) {
-			if (!(candidateOwner instanceof Namespace)) {
+		if ((pckgBnd != null) || ((owner != null) && (owner instanceof Package))) {
+			if (!(candidateOwner instanceof Package)) {
 				return CheckResult.FAIL;
 			}
 
-			Namespace ownerOwner = (owner != null) ? (Namespace) Util.belongsToOf(owner) : null;
-			String ownerName = (owner != null) ? ((Namespace) owner).getName() : null;
+			Package ownerOwner = (owner != null) ? (Package) Util.belongsToOf(owner) : null;
+			String ownerName = (owner != null) ? ((Package) owner).getName() : null;
 
-			if (matchAndMapNamespace(pckgBnd, ownerName, ownerOwner, candidateOwner)) {
+			if (matchAndMapPackage(pckgBnd, ownerName, ownerOwner, candidateOwner)) {
 				return CheckResult.MATCH;
 			} else {
 				return CheckResult.FAIL;
@@ -1827,11 +1825,12 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * Creates or recovers a Famix Namespace for the package of Java class "Object" (i.e. "java.lang").
 	 * Because "Object" is the root of the inheritance tree, it needs to be treated differently.
+	 *
 	 * @param bnd -- a potential binding for the "java.lang" package
 	 * @return a Famix Namespace for "java.lang"
 	 */
-	public Namespace ensureFamixNamespaceJavaLang(IPackageBinding bnd) {
-		Namespace fmx = this.ensureFamixNamespace(bnd, OBJECT_PACKAGE_NAME);
+	public Package ensureFamixPackageJavaLang(IPackageBinding bnd) {
+		Package fmx = this.ensureFamixPackage(bnd, OBJECT_PACKAGE_NAME);
 
 		return fmx;
 	}
@@ -1847,7 +1846,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, bnd, OBJECT_NAME);
 
 		if (fmx != null) {
-			fmx.setTypeContainer(ensureFamixNamespaceJavaLang(null));
+			fmx.setTypeContainer(ensureFamixPackageJavaLang(null));
 		}
 		// Note: "Object" has no superclass
 
@@ -1858,7 +1857,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * Ensures the Java meta-class: Class<>
 	 */
 	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixMetaClass(ITypeBinding bnd) {
-		Namespace javaLang = ensureFamixNamespaceJavaLang((bnd == null) ? null : bnd.getPackage());
+		Package javaLang = ensureFamixPackageJavaLang((bnd == null) ? null : bnd.getPackage());
 		// always persist the MetaClass whatever the value of VerveineJParser.classSummary
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC & Modifier.FINAL, /*alwaysPersist?*/true);
 
@@ -1870,7 +1869,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	}
 
 	public org.moosetechnology.model.famixjava.famixjavaentities.Class getFamixMetaClass(ITypeBinding bnd) {
-		Namespace javaLang = ensureFamixNamespaceJavaLang((bnd == null) ? null : bnd.getPackage());
+		Package javaLang = ensureFamixPackageJavaLang((bnd == null) ? null : bnd.getPackage());
 		return this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, UNKNOWN_MODIFIERS, /*alwaysPersist?*/false);
 	}
 
@@ -1897,7 +1896,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, null, ARRAYS_NAME);
 		if (fmx != null) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
-			fmx.setContainer(ensureFamixNamespaceDefault());
+			fmx.setContainer(ensureFamixPackageDefault());
 
 			// may be not needed anymore now that we use modifiers
 			/*fmx.setIsAbstract(Boolean.FALSE);

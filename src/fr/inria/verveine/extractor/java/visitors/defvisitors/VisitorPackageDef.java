@@ -1,10 +1,10 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
-import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Namespace;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.EntityStack;
+import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -38,12 +38,12 @@ public class VisitorPackageDef extends ASTVisitor {
 	public boolean visit(CompilationUnit node) {
 		//System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
 
-		Namespace fmx;
+		Package fmx;
 		PackageDeclaration pckg = node.getPackage();
 		if (pckg == null) {
-			fmx = dico.ensureFamixNamespaceDefault();
+			fmx = dico.ensureFamixPackageDefault();
 		} else {
-			fmx = dico.ensureFamixNamespace(pckg.resolveBinding(), pckg.getName().getFullyQualifiedName());
+			fmx = dico.ensureFamixPackage(pckg.resolveBinding(), pckg.getName().getFullyQualifiedName());
 		}
 		this.context.pushPckg(fmx);
 
