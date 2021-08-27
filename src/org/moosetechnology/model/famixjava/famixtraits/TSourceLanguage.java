@@ -4,7 +4,8 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import java.util.*;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Traits")
@@ -12,21 +13,21 @@ import java.util.*;
 public interface TSourceLanguage  {
 
         @FameProperty(name = "sourcedEntities", opposite = "declaredSourceLanguage", derived = true)
-    public Collection<TWithSourceLanguage> getSourcedEntities();
+        Collection<TWithSourceLanguages> getSourcedEntities();
 
-    public void setSourcedEntities(Collection<? extends TWithSourceLanguage> sourcedEntities);
+    void setSourcedEntities(Collection<? extends TWithSourceLanguages> sourcedEntities);
 
-    public void addSourcedEntities(TWithSourceLanguage one);
+    void addSourcedEntities(TWithSourceLanguages one);
 
-    public void addSourcedEntities(TWithSourceLanguage one, TWithSourceLanguage... many);
+    void addSourcedEntities(TWithSourceLanguages one, TWithSourceLanguages... many);
 
-    public void addSourcedEntities(Iterable<? extends TWithSourceLanguage> many);
+    void addSourcedEntities(Iterable<? extends TWithSourceLanguages> many);
 
-    public void addSourcedEntities(TWithSourceLanguage[] many);
+    void addSourcedEntities(TWithSourceLanguages[] many);
 
-    public int numberOfSourcedEntities();
+    int numberOfSourcedEntities();
 
-    public boolean hasSourcedEntities();
+    boolean hasSourcedEntities();
 
 
 

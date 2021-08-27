@@ -4,38 +4,33 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import java.util.*;
-import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Traits")
 @FameDescription("TPackage")
 public interface TPackage  {
 
-        @FameProperty(name = "packageOwner", opposite = "packages")
-    public TWithPackages getPackageOwner();
-
-    public void setPackageOwner(TWithPackages packageOwner);
+        @FameProperty(name = "weightedMethodCount", derived = true)
+        Number getWeightedMethodCount();
 
     @FameProperty(name = "childEntities", opposite = "parentPackage", derived = true)
-    public Collection<TPackageable> getChildEntities();
+    Collection<TPackageable> getChildEntities();
 
-    public void setChildEntities(Collection<? extends TPackageable> childEntities);
+    void setChildEntities(Collection<? extends TPackageable> childEntities);
 
-    public void addChildEntities(TPackageable one);
+    void addChildEntities(TPackageable one);
 
-    public void addChildEntities(TPackageable one, TPackageable... many);
+    void addChildEntities(TPackageable one, TPackageable... many);
 
-    public void addChildEntities(Iterable<? extends TPackageable> many);
+    void addChildEntities(Iterable<? extends TPackageable> many);
 
-    public void addChildEntities(TPackageable[] many);
+    void addChildEntities(TPackageable[] many);
 
-    public int numberOfChildEntities();
+    int numberOfChildEntities();
 
-    public boolean hasChildEntities();
-
-    @FameProperty(name = "weightedMethodCount", derived = true)
-    public Number getWeightedMethodCount();
+    boolean hasChildEntities();
 
 
 

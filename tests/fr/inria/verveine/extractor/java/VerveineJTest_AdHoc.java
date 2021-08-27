@@ -536,9 +536,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Attribute attribute = detectFamixElement( Attribute.class, "privateFinalAttribute");
 		assertNotNull(attribute);
 
-		assertEquals(2, attribute.getModifiers().size());
-		assertTrue(attribute.getModifiers().contains(JavaDictionary.MODIFIER_PRIVATE));
-		assertTrue(attribute.getModifiers().contains(JavaDictionary.MODIFIER_FINAL));
+		assertTrue(attribute.getIsPrivate());
+		assertTrue(attribute.getIsFinal());
+		assertFalse(attribute.getIsPublic());
+		assertFalse(attribute.getIsClassSide());
+		assertFalse(attribute.getIsTransient());
 	}
 
 	@Test
@@ -609,11 +611,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ThisIsTheStaticInnerClass");
 		assertNotNull(clazz);
 
-		// assertTrue(clazz.getIsPublic()); --- set as a modifier 
-		assertEquals(2, clazz.getModifiers().size());
-		for (String mod : clazz.getModifiers()) {
-			assertTrue(mod.equals(JavaDictionary.MODIFIER_PUBLIC) || mod.equals(JavaDictionary.MODIFIER_STATIC));
-		}
+		assertTrue(clazz.getIsPublic());
+		assertTrue(clazz.getIsClassSide());
+
 	}
 
     @Test
@@ -649,13 +649,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method method = firstElt(meths);
 
 		assertNotNull(method);
-		assertEquals(6, method.getModifiers().size());
-		assertTrue( method.getModifiers().contains("transient"));
-		assertTrue( method.getModifiers().contains("public"));
-		assertTrue( method.getModifiers().contains("static"));
-		assertTrue( method.getModifiers().contains("final"));
-		assertTrue( method.getModifiers().contains("volatile"));
-		assertTrue( method.getModifiers().contains("synchronized"));
+		assertTrue( method.getIsPublic());
+		assertTrue( method.getIsClassSide());
+		assertTrue( method.getIsFinal());
+		assertTrue( method.getIsSynchronized());
 	}
 
 	@Test
@@ -665,12 +662,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Attribute attribute = firstElt(entitiesNamed( Attribute.class, "attribute"));
 
 		assertNotNull(attribute);
-		assertEquals(5, attribute.getModifiers().size());
-		assertTrue( attribute.getModifiers().contains("public"));
-		assertTrue( attribute.getModifiers().contains("static"));
-		assertTrue( attribute.getModifiers().contains("transient"));
-		assertTrue( attribute.getModifiers().contains("volatile"));
-		assertTrue( attribute.getModifiers().contains("final"));
+		assertTrue( attribute.getIsPublic());
+		assertTrue( attribute.getIsClassSide());
+		assertTrue( attribute.getIsTransient());
+		assertTrue( attribute.getIsVolatile());
+		assertTrue( attribute.getIsFinal());
 	}
 
 }

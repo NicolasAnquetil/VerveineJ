@@ -5,18 +5,14 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
-import java.util.*;
-import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
-import org.moosetechnology.model.famixjava.famixtraits.TParameterizedType;
-import org.moosetechnology.model.famixjava.famixtraits.TParameterizedTypeUser;
-import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
-import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypeUsers;
-import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
+import org.moosetechnology.model.famixjava.famixtraits.*;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("ParameterizedType")
-public class ParameterizedType extends Type implements TWithParameterizedTypeUsers, TWithInheritances, TParameterizedType {
+public class ParameterizedType extends Type implements TParameterizedType, TWithInheritances, TWithParameterizedTypeUsers {
 
     private Collection<TParameterizedTypeUser> arguments; 
 
@@ -219,12 +215,6 @@ public class ParameterizedType extends Type implements TWithParameterizedTypeUse
         return !getSuperInheritances().isEmpty();
     }
 
-    @FameProperty(name = "totalNumberOfSubclasses", derived = true)
-    public Number getTotalNumberOfSubclasses() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
 
 
 }

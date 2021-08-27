@@ -4,44 +4,33 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import java.util.*;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Traits")
 @FameDescription("TWithAttributes")
 public interface TWithAttributes  {
 
-        @FameProperty(name = "numberOfProtectedAttributes", derived = true)
-    public Number getNumberOfProtectedAttributes();
-
-    @FameProperty(name = "numberOfAttributes", derived = true)
-    public Number getNumberOfAttributes();
-
-    @FameProperty(name = "numberOfRevealedAttributes", derived = true)
-    public Number getNumberOfRevealedAttributes();
-
-    @FameProperty(name = "numberOfPublicAttributes", derived = true)
-    public Number getNumberOfPublicAttributes();
+        @FameProperty(name = "numberOfAttributes", derived = true)
+        Number getNumberOfAttributes();
 
     @FameProperty(name = "attributes", opposite = "parentType", derived = true)
-    public Collection<TAttribute> getAttributes();
+    Collection<TAttribute> getAttributes();
 
-    public void setAttributes(Collection<? extends TAttribute> attributes);
+    void setAttributes(Collection<? extends TAttribute> attributes);
 
-    public void addAttributes(TAttribute one);
+    void addAttributes(TAttribute one);
 
-    public void addAttributes(TAttribute one, TAttribute... many);
+    void addAttributes(TAttribute one, TAttribute... many);
 
-    public void addAttributes(Iterable<? extends TAttribute> many);
+    void addAttributes(Iterable<? extends TAttribute> many);
 
-    public void addAttributes(TAttribute[] many);
+    void addAttributes(TAttribute[] many);
 
-    public int numberOfAttributes();
+    int numberOfAttributes();
 
-    public boolean hasAttributes();
-
-    @FameProperty(name = "numberOfPrivateAttributes", derived = true)
-    public Number getNumberOfPrivateAttributes();
+    boolean hasAttributes();
 
 
 

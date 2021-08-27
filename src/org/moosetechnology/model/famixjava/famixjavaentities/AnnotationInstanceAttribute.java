@@ -13,7 +13,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("AnnotationInstanceAttribute")
-public class AnnotationInstanceAttribute extends SourcedEntity implements TTypedAnnotationInstanceAttribute, TEntityMetaLevelDependency, TAnnotationInstanceAttribute {
+public class AnnotationInstanceAttribute extends SourcedEntity implements TAnnotationInstanceAttribute, TEntityMetaLevelDependency, TTypedAnnotationInstanceAttribute {
 
     private TAnnotationTypeAttribute annotationTypeAttribute;
     

@@ -4,29 +4,33 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import java.util.*;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Traits")
 @FameDescription("TWithInvocations")
 public interface TWithInvocations  {
 
-        @FameProperty(name = "outgoingInvocations", opposite = "sender", derived = true)
-    public Collection<TInvocation> getOutgoingInvocations();
+        @FameProperty(name = "numberOfOutgoingInvocations", derived = true)
+        Number getNumberOfOutgoingInvocations();
 
-    public void setOutgoingInvocations(Collection<? extends TInvocation> outgoingInvocations);
+    @FameProperty(name = "outgoingInvocations", opposite = "sender", derived = true)
+    Collection<TInvocation> getOutgoingInvocations();
 
-    public void addOutgoingInvocations(TInvocation one);
+    void setOutgoingInvocations(Collection<? extends TInvocation> outgoingInvocations);
 
-    public void addOutgoingInvocations(TInvocation one, TInvocation... many);
+    void addOutgoingInvocations(TInvocation one);
 
-    public void addOutgoingInvocations(Iterable<? extends TInvocation> many);
+    void addOutgoingInvocations(TInvocation one, TInvocation... many);
 
-    public void addOutgoingInvocations(TInvocation[] many);
+    void addOutgoingInvocations(Iterable<? extends TInvocation> many);
 
-    public int numberOfOutgoingInvocations();
+    void addOutgoingInvocations(TInvocation[] many);
 
-    public boolean hasOutgoingInvocations();
+    int numberOfOutgoingInvocations();
+
+    boolean hasOutgoingInvocations();
 
 
 

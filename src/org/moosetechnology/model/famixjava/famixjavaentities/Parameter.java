@@ -5,40 +5,25 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
-import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.TAccess;
-import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
-import org.moosetechnology.model.famixjava.famixtraits.TComment;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TParameter;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
-import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
-import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
-import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
-import org.moosetechnology.model.famixjava.famixtraits.TWithParameters;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
+import org.moosetechnology.model.famixjava.famixtraits.*;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Parameter")
-public class Parameter extends NamedEntity implements TNamedEntity, TSourceEntity, TEntityMetaLevelDependency, TInvocationsReceiver, TStructuralEntity, TWithSourceLanguage, TParameter, TTypedEntity, TAccessible, TWithComments {
+public class Parameter extends NamedEntity implements TWithComments, TAccessible, TCanBeFinal, TEntityMetaLevelDependency, TNamedEntity, TParameter, TSourceEntity, TStructuralEntity, TTypedEntity {
 
-    private Collection<TComment> comments; 
+    private Collection<TComment> comments;
 
-    private TSourceLanguage declaredSourceLanguage;
-    
     private TType declaredType;
     
     private Collection<TAccess> incomingAccesses; 
 
+    private Boolean isFinal;
+    
     private Boolean isStub;
     
     private String name;
@@ -47,18 +32,8 @@ public class Parameter extends NamedEntity implements TNamedEntity, TSourceEntit
     
     private TWithParameters parentBehaviouralEntity;
     
-    private Collection<TInvocation> receivingInvocations; 
-
     private TSourceAnchor sourceAnchor;
-    
 
-
-    @FameProperty(name = "accessors", derived = true)
-    public Collection<TWithAccesses> getAccessors() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-        
     @FameProperty(name = "comments", opposite = "container", derived = true)
     public Collection<TComment> getComments() {
         if (comments == null) {
@@ -75,33 +50,45 @@ public class Parameter extends NamedEntity implements TNamedEntity, TSourceEntit
         }
         return comments;
     }
-    
+
+    @FameProperty(name = "numberOfComments", derived = true)
+    public Number getNumberOfComments() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
+    @FameProperty(name = "hasComments", derived = true)
+    public Boolean getHasComments() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");
+    }
+
     public void setComments(Collection<? extends TComment> comments) {
         this.getComments().clear();
         this.getComments().addAll(comments);
-    }                    
-    
-        
+    }
+
+
     public void addComments(TComment one) {
         this.getComments().add(one);
-    }   
-    
+    }
+
     public void addComments(TComment one, TComment... many) {
         this.getComments().add(one);
         for (TComment each : many)
             this.getComments().add(each);
-    }   
-    
+    }
+
     public void addComments(Iterable<? extends TComment> many) {
         for (TComment each : many)
             this.getComments().add(each);
-    }   
-                
+    }
+
     public void addComments(TComment[] many) {
         for (TComment each : many)
             this.getComments().add(each);
     }
-    
+
     public int numberOfComments() {
         return getComments().size();
     }
@@ -110,25 +97,16 @@ public class Parameter extends NamedEntity implements TNamedEntity, TSourceEntit
         return !getComments().isEmpty();
     }
 
+    @FameProperty(name = "accessors", derived = true)
+    public Collection<TWithAccesses> getAccessors() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+        
     @FameProperty(name = "containsReplicas", derived = true)
     public Boolean getContainsReplicas() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
     }
     
     @FameProperty(name = "declaredType", opposite = "typedEntities")
@@ -160,12 +138,6 @@ public class Parameter extends NamedEntity implements TNamedEntity, TSourceEntit
     
     @FameProperty(name = "fanOut", derived = true)
     public Number getFanOut() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "hasComments", derived = true)
-    public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -227,6 +199,15 @@ public class Parameter extends NamedEntity implements TNamedEntity, TSourceEntit
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "isFinal")
+    public Boolean getIsFinal() {
+        return isFinal;
+    }
+
+    public void setIsFinal(Boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+    
     @FameProperty(name = "isStub")
     public Boolean getIsStub() {
         return isStub;
@@ -265,12 +246,6 @@ public class Parameter extends NamedEntity implements TNamedEntity, TSourceEntit
     
     @FameProperty(name = "numberOfChildren", derived = true)
     public Number getNumberOfChildren() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfComments", derived = true)
-    public Number getNumberOfComments() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -323,57 +298,6 @@ public class Parameter extends NamedEntity implements TNamedEntity, TSourceEntit
         parentBehaviouralEntity.getParameters().add(this);
     }
     
-    @FameProperty(name = "receivingInvocations", opposite = "receiver", derived = true)
-    public Collection<TInvocation> getReceivingInvocations() {
-        if (receivingInvocations == null) {
-            receivingInvocations = new MultivalueSet<TInvocation>() {
-                @Override
-                protected void clearOpposite(TInvocation e) {
-                    e.setReceiver(null);
-                }
-                @Override
-                protected void setOpposite(TInvocation e) {
-                    e.setReceiver(Parameter.this);
-                }
-            };
-        }
-        return receivingInvocations;
-    }
-    
-    public void setReceivingInvocations(Collection<? extends TInvocation> receivingInvocations) {
-        this.getReceivingInvocations().clear();
-        this.getReceivingInvocations().addAll(receivingInvocations);
-    }                    
-    
-        
-    public void addReceivingInvocations(TInvocation one) {
-        this.getReceivingInvocations().add(one);
-    }   
-    
-    public void addReceivingInvocations(TInvocation one, TInvocation... many) {
-        this.getReceivingInvocations().add(one);
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }   
-    
-    public void addReceivingInvocations(Iterable<? extends TInvocation> many) {
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }   
-                
-    public void addReceivingInvocations(TInvocation[] many) {
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }
-    
-    public int numberOfReceivingInvocations() {
-        return getReceivingInvocations().size();
-    }
-
-    public boolean hasReceivingInvocations() {
-        return !getReceivingInvocations().isEmpty();
-    }
-
     @FameProperty(name = "replicas", derived = true)
     public Replica getReplicas() {
         // TODO: this is a derived property, implement this method manually.

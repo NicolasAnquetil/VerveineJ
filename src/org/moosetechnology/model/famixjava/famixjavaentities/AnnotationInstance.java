@@ -5,19 +5,15 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
-import java.util.*;
-import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstance;
-import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstanceAttribute;
-import org.moosetechnology.model.famixjava.famixtraits.TAnnotationType;
-import org.moosetechnology.model.famixjava.famixtraits.TTypedAnnotationInstance;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAnnotationInstanceAttributes;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAnnotationInstances;
+import org.moosetechnology.model.famixjava.famixtraits.*;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+
+import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("AnnotationInstance")
-public class AnnotationInstance extends SourcedEntity implements TTypedAnnotationInstance, TEntityMetaLevelDependency, TAnnotationInstance, TWithAnnotationInstanceAttributes {
+public class AnnotationInstance extends SourcedEntity implements TAnnotationInstance, TEntityMetaLevelDependency, TTypedAnnotationInstance, TWithAnnotationInstanceAttributes {
 
     private TWithAnnotationInstances annotatedEntity;
     
