@@ -8,7 +8,10 @@ import org.moosetechnology.model.famixjava.famixtraits.*;
 
 import java.lang.Class;
 import java.lang.Exception;
-import java.util.*;
+import java.util.Collection;
+import java.util.Hashtable;
+import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * A dictionnary of Famix entities to help create them and find them back
@@ -198,7 +201,7 @@ public class AbstractDictionary<B> {
 		}
 		
 		try {
-			fmx = fmxClass.newInstance();
+			fmx = fmxClass.getDeclaredConstructor().newInstance();
 		} catch (Exception e) {
 			System.err.println("Unexpected error, could not create a FAMIX entity: "+e.getMessage());
 			e.printStackTrace();
@@ -396,7 +399,7 @@ public class AbstractDictionary<B> {
 	 * @return the FAMIX Method or null in case of a FAMIX error
 	 */
 	public Method ensureFamixMethod(B key, String name, String sig, Type ret, Type owner, boolean persistIt) {
-		Method fmx = (Method) ensureFamixEntity(Method.class, key, name, persistIt);
+		Method fmx = ensureFamixEntity(Method.class, key, name, persistIt);
 		fmx.setSignature(sig);
 		fmx.setDeclaredType(ret);
 		fmx.setParentType(owner);
@@ -459,7 +462,7 @@ public class AbstractDictionary<B> {
 		
 		if ( (cmt != null) && (owner != null) ) {
 			fmx = createFamixComment(cmt);
-			fmx.setContainer(owner);
+			fmx.setContainer((TWithComments) owner);
 		}
 		return fmx;
 	}
@@ -493,7 +496,7 @@ public class AbstractDictionary<B> {
 		if ( (sup == null) || (sub == null) ) {
 			return null;
 		}
-			
+
 		for (TInheritance i : (sup).getSubInheritances()) {
 			if (i.getSubclass() == sub) {
 				return (Inheritance) i;
@@ -501,8 +504,8 @@ public class AbstractDictionary<B> {
 		}
 		Inheritance inh = new Inheritance();
 		inh.setSuperclass(sup);
-		inh.setSubclass((TWithInheritances) sub);
-		chainPrevNext(prev,inh);
+		inh.setSubclass(sub);
+		chainPrevNext(prev, inh);
 		famixRepoAdd(inh);
 		return inh;
 	}
