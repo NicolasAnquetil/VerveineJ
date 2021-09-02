@@ -1,7 +1,5 @@
 package fr.inria.verveine.extractor.java;
 
-import fr.inria.verveine.extractor.java.utils.VerveineUtilsForTests;
-import ch.akuhn.fame.Repository;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.CaughtException;
@@ -25,12 +23,11 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJOptions.OUTPUT_FILE).delete();
+        new File(DEFAULT_OUTPUT_FILE).delete();
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         parser.configure( new String[] {"test_src/exceptions"});
         parser.parse();
-        //parser.emitMSE(VerveineJParser.OUTPUT_FILE);
     }
 
     @Test
