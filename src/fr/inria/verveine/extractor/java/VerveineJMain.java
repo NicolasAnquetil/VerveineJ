@@ -6,7 +6,7 @@ public class VerveineJMain {
 		VerveineJParser parser = new VerveineJParser();
 		parser.configure(args);
 		parser.parse();
-		parser.emitMSE();
+		parser.exportModel();
 	}
 
 }

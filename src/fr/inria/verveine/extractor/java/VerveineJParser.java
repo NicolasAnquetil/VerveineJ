@@ -123,43 +123,58 @@ public class VerveineJParser {
 	}
 
 	protected boolean linkToExisting() {
+		if (!this.options.incrementalParsing) {
+			return false;
+		}
+
 		File existingMSE = new File(options.getOutputFileName());
-		if (existingMSE.exists() && this.options.incrementalParsing) {
+		if (existingMSE.exists()) {
 			this.getFamixRepo().importMSEFile(options.getOutputFileName());
 			return true;
-		}
-		else {
+		} else {
 			return false;
 		}
 	}
 
 	/**
-	 * "closes" the repository, by adding to it a SourceLanguage entity if their is none.
-	 * The SourceLanguage entity is the one returned by getMyLgge().
-	 * Also outputs repository to a MSE file
+	 * Outputs repository to a file
 	 */
-	public void emitMSE() {
-		this.emitMSE(this.options.outputFileName);
+	public void exportModel() {
+		this.exportModel(this.options.outputFileName);
 	}
 
-	public void emitMSE(String outputFile) {
+	public void exportModel(String outputFile) {
 		try {
-			emitMSE(new FileOutputStream(outputFile));
+			exportmodel(new FileOutputStream(outputFile));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
-	public void emitMSE(OutputStream output) {
+	/**
+	 * Outputs the repository to an opened Stream according to the format in options
+	 * also add to it a SourceLanguage entity if their is none.
+	 * The SourceLanguage entity is the one returned by getMyLgge().
+	 *
+	 * @param output
+	 */
+	public void exportmodel(OutputStream output) {
 		// Adds default SourceLanguage for the repository
-		if ( (listAll(SourceLanguage.class).size() == 0) && (getMyLgge() != null) ) {
-			getFamixRepo().add( getMyLgge());
+		if ((listAll(SourceLanguage.class).size() == 0) && (getMyLgge() != null)) {
+			getFamixRepo().add(getMyLgge());
 		}
-	
+
 		// Outputting to a file
 		try {
-			//famixRepo.exportMSE(new FileWriter(OUTPUT_FILE));
-			famixRepo.exportMSE(new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8)));
+			Writer writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
+			if (this.options.outputFormat.equalsIgnoreCase(VerveineJOptions.MSE_OUTPUT_FORMAT)) {
+				famixRepo.exportMSE(writer);
+			} else if (this.options.outputFormat.equalsIgnoreCase(VerveineJOptions.JSON_OUTPUT_FORMAT)) {
+				famixRepo.exportJSON(writer);
+			}
+			writer.close();
+		} catch (IOException e) {
+			e.printStackTrace();
 		} catch (UnknownElementError e) {
 			e.printStackTrace();
 		}

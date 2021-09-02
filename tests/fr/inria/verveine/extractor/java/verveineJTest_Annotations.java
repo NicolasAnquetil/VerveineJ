@@ -4,20 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.Test;
 
 public class verveineJTest_Annotations extends VerveineJTest_Basic {
 
@@ -29,7 +21,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJOptions.OUTPUT_FILE).delete();
+        new File(DEFAULT_OUTPUT_FILE).delete();
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         if (isWindows()){
