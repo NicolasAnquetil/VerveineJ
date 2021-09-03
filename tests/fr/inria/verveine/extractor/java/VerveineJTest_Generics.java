@@ -25,7 +25,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(VerveineJOptions.OUTPUT_FILE).delete();
+        new File(DEFAULT_OUTPUT_FILE).delete();
         VerveineJParser parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         parser.configure( new String[] {"test_src/generics"});

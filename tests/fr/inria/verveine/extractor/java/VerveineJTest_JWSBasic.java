@@ -35,12 +35,11 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(VerveineJOptions.OUTPUT_FILE).delete();
+		new File(DEFAULT_OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.configure( new String[] {"test_src/jws_basic"});
+		parser.configure(new String[]{"test_src/jws_basic"});
 		parser.parse();
-	//	parser.emitMSE(VerveineJParser.OUTPUT_FILE);
 	}
 
 	@Test
