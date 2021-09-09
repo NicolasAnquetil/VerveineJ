@@ -13,4 +13,5 @@ rem set VOPT="."
 FOR /R %BASELIB% %%G IN (*.jar) DO set LOCALCLASSPATH=%%G;!LOCALCLASSPATH!
 set CLASSPATH=%CLASSPATH%;%LOCALCLASSPATH%
 
-java %JOPT% fr.inria.verveine.extractor.java.VerveineJMain %*
+
+java -Dfile.encoding=UTF-8 %JOPT% fr.inria.verveine.extractor.java.VerveineJMain %*
