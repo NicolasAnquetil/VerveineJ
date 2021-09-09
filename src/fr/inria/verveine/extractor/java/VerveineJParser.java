@@ -170,7 +170,11 @@ public class VerveineJParser {
 			if (this.options.outputFormat.equalsIgnoreCase(VerveineJOptions.MSE_OUTPUT_FORMAT)) {
 				famixRepo.exportMSE(writer);
 			} else if (this.options.outputFormat.equalsIgnoreCase(VerveineJOptions.JSON_OUTPUT_FORMAT)) {
-				famixRepo.exportJSON(writer);
+				if (this.options.prettyPrint) {
+					famixRepo.exportPrettyJSON(writer);
+				} else {
+					famixRepo.exportJSON(writer);
+				}
 			}
 			writer.close();
 		} catch (IOException e) {

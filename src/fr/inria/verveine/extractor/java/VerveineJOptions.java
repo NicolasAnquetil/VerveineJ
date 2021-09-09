@@ -119,6 +119,11 @@ public class VerveineJOptions {
 	 */
 	protected boolean incrementalParsing;
 
+	/**
+	 * If possible, should I use a prettyPrinter
+	 */
+	protected boolean prettyPrint = false;
+
 	public VerveineJOptions() {
 		this.classSummary = false;
 		this.allLocals = false;
@@ -185,12 +190,12 @@ public class VerveineJOptions {
 		else if (arg.equals("-summary")) {
 			classSummary = true;
 			allLocals = false;
-		}
-		else if (arg.equals("-alllocals")) {
+		} else if (arg.equals("-alllocals")) {
 			classSummary = false;
 			allLocals = true;
-		}
-		else if ( (arg.charAt(0) == '-') && (arg.endsWith("cp")) ) {
+		} else if (arg.equals("-prettyPrint")) {
+			prettyPrint = true;
+		} else if ((arg.charAt(0) == '-') && (arg.endsWith("cp"))) {
 			classPathOptions = setOptionClassPath(classPathOptions, args, i);
 			argumentsTreated++;
 		} else if (arg.equals("-anchor")) {
@@ -330,11 +335,12 @@ public class VerveineJOptions {
 		 *   some new relation: classdep
 		 */
 
-		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-prettyPrint] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
 		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
 		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default:" + OUTPUT_FILE + ")");
 		System.err.println("      [-format (mse|json)] specifies the output format (default:" + MSE_OUTPUT_FORMAT + ")");
+		System.err.println("      [-prettyPrint] toggles the usage of the json pretty printer");
 		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
 		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
 		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");
