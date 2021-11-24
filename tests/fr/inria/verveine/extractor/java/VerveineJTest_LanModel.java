@@ -82,7 +82,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testEntitiesNumber() {
 
-		int nbClasses = 11 + 14 + 1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
+		int nbClasses = 11 + 14 + 1 + 2; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} + 1 Anonymous class IPrinter
 		int nbInherit = 9 + 21 + 1;
 
 		if (System.getProperty("java.version").startsWith("1.") &&
@@ -101,7 +101,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
 		assertEquals(40 + 8 + 1, entitiesOfType(Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10 + 1, entitiesOfType(Attribute.class).size());//10+{System.out}
-		assertEquals(2 + 4, entitiesOfType(Package.class).size());//2+{moose,java.lang,java.io,java}
+		assertEquals(2 + 4 + 1, entitiesOfType(Package.class).size());//2+{moose,java.lang,java.io,java} // +1 new package named java.lang.constant (java17?)
 		assertEquals(26, entitiesOfType(Parameter.class).size());
 		assertEquals(55, entitiesOfType(Invocation.class).size());
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());

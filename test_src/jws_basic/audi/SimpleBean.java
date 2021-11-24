@@ -62,6 +62,7 @@ import audi.client.OrderStruct;
  *
  * Copyright (c) 2005 by BEA Systems, Inc. All Rights Reserved.
  */
+@Annotation
 
 public class SimpleBean implements SessionBean {
 
