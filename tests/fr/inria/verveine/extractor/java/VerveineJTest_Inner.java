@@ -62,8 +62,8 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
                 .sorted(Comparator.comparing(anInvocation2 -> ((TNamedEntity) anInvocation2.getSender()).getName()))
                 .collect(Collectors.toList());
         assertEquals(invocations.size(), 3);
-        assert(invocations.get(0).getSignature().startsWith("Canard("));
-        assert(invocations.get(1).getSignature().startsWith("Patate("));
+        assert(invocations.get(0).getSignature().startsWith("_Anonymous(Patate)()"));
+        assert(invocations.get(1).getSignature().startsWith("_Anonymous(Canard)(new Patate()"));
     }
 
 }
