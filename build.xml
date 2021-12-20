@@ -70,7 +70,7 @@
 
 	<!-- Run the JUnit Tests -->
 	<target name="junit" depends="jar">
-		<junit printsummary="on" fork="true" haltonfailure="true" haltonerror="true">
+		<junit printsummary="on" fork="false" haltonfailure="true" haltonerror="true">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				   <include name="*.jar"/>
