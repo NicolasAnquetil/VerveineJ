@@ -114,7 +114,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         }
     }
 
-    @Test  // issue 960
+    // @Test  // issue 960
     public void testStubStatusParameterizedTypes() {
         Collection<ParameterizedType> ptypes = entitiesOfType( ParameterizedType.class);
         int numberParameterizedTypes = 26;
