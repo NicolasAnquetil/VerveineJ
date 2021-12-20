@@ -200,8 +200,18 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
 		Collection<TInheritance> inherits;
 		Inheritance inh, inh2 = null;
+		int nbInherit = 29;
+		try {
+			int version = Integer.parseInt(System.getProperty("java.version"));
+			if (version > 12) {
+				// ConstantDesc has one subclass (implementer)
+				// Constable has one subclass (implementer)
+				nbInherit +=2;
+			}
+		}
+		catch(Exception e) {};
 
-		assertEquals(29, entitiesOfType(Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
+		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
 		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "PrintServer");
 		assertNotNull(clazz);
