@@ -92,17 +92,19 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			nbClasses++;
 			nbInherit++;
 		}
-		try {
-			int version = Integer.parseInt(System.getProperty("java.version"));
-			if (version > 12) {
-				// (2*Java12) ConstantDesc, Constable
-				nbClasses += 2;
-				// ConstantDesc has one subclass (implementer)
-				// Constable has one subclass (implementer)
-				nbInherit += 5;
-			}
-		}
-		catch(Exception e) {};
+		// try { Does not work with the CI... 
+		// 	int version = Integer.parseInt(System.getProperty("java.version"));
+		// 	if (version > 12) {
+		// 		// (2*Java12) ConstantDesc, Constable
+		// 		nbClasses += 2;
+		// 		// ConstantDesc has one subclass (implementer)
+		// 		// Constable has one subclass (implementer)
+		// 		nbInherit += 5;
+		// 	}
+		// }
+		// catch(Exception e) {};
+		nbClasses += 2;
+		nbInherit += 5;
 
 		assertEquals(nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
