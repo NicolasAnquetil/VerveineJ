@@ -104,7 +104,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		// }
 		// catch(Exception e) {};
 		nbClasses += 2;
-		nbInherit += 5;
+		nbInherit += 4;
 
 		assertEquals(nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
