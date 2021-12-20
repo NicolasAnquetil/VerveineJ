@@ -30,15 +30,28 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         repo = parser.getFamixRepo();
         parser.configure( new String[] {"test_src/generics"});
         parser.parse();
-        //parser.emitMSE(VerveineJParser.OUTPUT_FILE);
     }
 
     @Test
     public void testParameterizableClass() {
-        assertEquals(12, entitiesOfType( ParameterizableClass.class).size());
+        assertEquals(13, entitiesOfType( ParameterizableClass.class).size());
         // WrongInvocation -> List<X>, ArrayList<X>
         // Dictionary -> Dictionary<X>, Map<X,Y>, Hashtable<X,Y>, Collection<X>, Class<X>, ArrayList<X>
 
+        /**
+         * - Map
+         * - Class
+         * - AbstractList
+         * - ArrayList
+         * - Iterable
+         * - List
+         * - Comparable
+         * - Hashtable
+         * - AsbtractCollection
+         * - OfField // Java 15
+         * - Collection
+         * - Dictionary * 2
+         */
 
         ParameterizableClass generic = null;
         for (ParameterizableClass g : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
@@ -104,7 +117,19 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
     @Test  // issue 960
     public void testStubStatusParameterizedTypes() {
         Collection<ParameterizedType> ptypes = entitiesOfType( ParameterizedType.class);
-        assertEquals(26,ptypes.size());  // List*1, ArrayList*2, Map*3, Collection<NamedEntity>, Collection<T>, Hashtable*3, Class*3, Dictionary*1 + all stub superclasses
+        int numberParameterizedTypes = 26;
+        // Does not wotk in the CI... 
+        //
+        //try {
+		// 	int version = Integer.parseInt(System.getProperty("java.version"));
+		// 	if (version > 15) {
+        //         // OfField // Java 15
+		// 		numberParameterizedTypes += 1;
+		// 	}
+		// }
+		// catch(Exception e) {};
+        numberParameterizedTypes += 1;
+        assertEquals(numberParameterizedTypes, ptypes.size());  // List*1, ArrayList*2, Map*3, Collection<NamedEntity>, Collection<T>, Hashtable*3, Class*3, Dictionary*1 + all stub superclasses
         //coll2
         for (ParameterizedType typ : ptypes) {
             assertEquals(((ParameterizableClass)typ.getParameterizableClass()).getIsStub(), typ.getIsStub());
