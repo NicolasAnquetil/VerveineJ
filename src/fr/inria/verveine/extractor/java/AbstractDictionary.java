@@ -557,7 +557,7 @@ public class AbstractDictionary<B> {
 		Invocation invok = new Invocation();
 		invok.setReceiver(receiver);
 		invok.setSender(sender);
-		invok.setSignature((signature== null) ? invoked.getSignature() : signature);
+		invok.setSignature((signature == null) ? invoked.getSignature() : signature);
 		invok.addCandidates(invoked);
 		chainPrevNext(prev,invok);
 		famixRepoAdd(invok);

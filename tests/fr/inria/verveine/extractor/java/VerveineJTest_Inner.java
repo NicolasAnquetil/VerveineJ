@@ -6,6 +6,7 @@ import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.Class;
 import org.moosetechnology.model.famixjava.famixjavaentities.Invocation;
 import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 
 import java.io.File;
@@ -42,7 +43,7 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
     public void testNumberOfClass() {
         parse(new String[] {"test_src/inner"});
         Collection<Class> classes = entitiesOfType(Class.class);
-        assertEquals(9, classes.size());
+        assertEquals(11, classes.size());
         assertEquals(3, classes.stream().filter(aClass -> !aClass.getIsStub()).toArray().length); // InnerClass, _Anonymous(Patate), _Anonymous(Canard)
         assertEquals(2, classes.stream().filter(aClass -> !aClass.getIsStub() && aClass.getName().contains("Anonymous")).toArray().length); // InnerClass, _Anonymous(Patate), _Anonymous(Canard)
     }
@@ -59,11 +60,11 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
     public void testInvocationsOfPatateAndCanardConstructor() {
         parse(new String[] {"test_src/inner"});
         List<Invocation> invocations = entitiesOfType(Invocation.class).stream()
-                .sorted(Comparator.comparing(anInvocation2 -> ((TNamedEntity) anInvocation2.getSender()).getName()))
+                .sorted(Comparator.comparing(anInvocation2 -> ((Invocation) anInvocation2).getSignature()))
                 .collect(Collectors.toList());
         assertEquals(invocations.size(), 3);
-        assert(invocations.get(0).getSignature().startsWith("Canard("));
-        assert(invocations.get(1).getSignature().startsWith("Patate("));
+        assert(invocations.get(0).getSignature().startsWith("_Anonymous(Canard)(new Patate()"));
+        assert(invocations.get(1).getSignature().startsWith("_Anonymous(Patate)()"));
     }
 
 }
