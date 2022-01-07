@@ -1,6 +1,6 @@
 # VerveineJ
 
-[![Use Java 17](https://img.shields.io/badge/Java-17-brightgreen)](https://jdk.java.net/17/) ![CI](https://github.com/moosetechnology/VerveineJ/workflows/CI/badge.svg?branch=master)
+[![Use Java 17](https://img.shields.io/badge/Java-17-brightgreen)](https://adoptium.net/) ![CI](https://github.com/moosetechnology/VerveineJ/workflows/CI/badge.svg?branch=master)
 
 A Java to JSON/MSE parser
 
