@@ -212,6 +212,8 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		// 	}
 		// }
 		// catch(Exception e) {};
+		
+		nbInherit += 5;
 
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
