@@ -213,12 +213,6 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		// }
 		// catch(Exception e) {};
 
-		nbInherit += 5;
-		int i = 0;
-		for (Inheritance inheritance : entitiesOfType(Inheritance.class)) {
-			System.out.println(i + " : " + ((TNamedEntity)inheritance.getSubclass()).getName() + " -> " + ((TNamedEntity)inheritance.getSuperclass()).getName());
-			++i;
-		}
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
 		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "PrintServer");
