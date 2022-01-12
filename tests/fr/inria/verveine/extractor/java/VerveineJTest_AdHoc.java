@@ -140,6 +140,27 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 
 	@ Test
+	public void testDeclaredTypeOfExternalEnum() {
+		parse(new String[] {"test_src/ad_hoc/ExternalEnum.java", "test_src/ad_hoc/AClassThatUseExternalEnum.java"});
+
+		org.moosetechnology.model.famixjava.famixjavaentities.Class aClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "AClassThatUseExternalEnum");
+		assertNotNull(aClass);
+
+		
+		org.moosetechnology.model.famixjava.famixjavaentities.Enum externalEnum = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "ExternalEnum");
+		assertNotNull(externalEnum);
+		assertEquals("ExternalEnum", externalEnum.getName());
+
+		assertEquals(1, aClass.getAttributes().size());
+		for (TAttribute ta : aClass.getAttributes()) {
+			Attribute a = (Attribute) ta;
+			assertEquals(a.getName(), "enumeration");
+			assertEquals(externalEnum, a.getDeclaredType());
+		}
+
+	}
+
+	@ Test
 	public void testStubConstructor() {
 		parse(new String[]{"test_src/ad_hoc/DefaultConstructor.java"});
 
