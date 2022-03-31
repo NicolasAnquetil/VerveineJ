@@ -4,8 +4,7 @@
 
 A Java to JSON/MSE parser
 
-Based on JDT, it parser java code to export it in the MSE format used by the Moose data analysis platform.
-(Similar to the https://github.com/feenkcom/jdt2famix project, but more complete in what it extracts)
+Based on JDT, it parser java code to export it in the MSE or JSON format used by the [Moose](https://modularmoose.org/) data analysis platform.
 
 ## Installation
 
@@ -21,9 +20,27 @@ git clone https://github.com/moosetechnology/VerveineJ.git
 git clone git@github.com:moosetechnology/VerveineJ.git
 ```
 
+## Running it
+
+The simplest command is
+```sh
+verveinej.sh <java-source-directory>
+```
+It will create an `output.mse` (JSON format also available) file with the model extracted from the \<java-source-directory\>
+
+To see what other options are available:
+```sh
+verveinej.sh -h
+```
+
+
 ## Developers
 
 To test the project, remember that you **must** disable the `assert` by removing (or not using) the -ea parameter.
 You also need to run tests one by one (fork method in IntelliJ).
 
-> You can also use Ant or the pre-created IntelliJ build
+You can also use Ant or the pre-created IntelliJ build
+
+```sh
+ant junit
+```
