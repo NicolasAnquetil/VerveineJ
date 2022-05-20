@@ -34,7 +34,8 @@ public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
     public void testReferenceToString() {
         parse(new String[]{"-alllocals", "-anchor", "assoc", "test_src/instanceOf"});
         Class stringClass = detectFamixElement( Class.class, "String");
-        assertEquals (stringClass.getIncomingReferences().size(), 1);
+        // From Calculated Expression "hello" and from TypeLiteral String.class
+        assertEquals (stringClass.getIncomingReferences().size(), 2);
     }
 
 }
