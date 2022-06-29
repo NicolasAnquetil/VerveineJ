@@ -538,6 +538,31 @@ public class AbstractDictionary<B> {
 		return inh;
 	}
 
+		/**
+	 * Returns a Famix Inheritance relationship between two Famix Classes creating it if needed
+	 * @param sup -- the super class
+	 * @param sub -- the sub class
+	 * @param prev -- previous inheritance relationship in the same context
+	 * @return the Inheritance relationship
+	 */
+	public Implementation ensureFamixImplementation(TImplementable myInterface, TCanImplement implementingClass, TAssociation prev) {
+		if ( (myInterface == null) || (implementingClass == null) ) {
+			return null;
+		}
+
+		for (TImplementation i : (myInterface).getImplementations()) {
+			if (i.getImplementingClass() == implementingClass) {
+				return (Implementation) i;
+			}
+		}
+		Implementation implementation = new Implementation();
+		implementation.setImplementingClass(implementingClass);
+		implementation.setMyInterface(myInterface);
+		chainPrevNext(prev, implementation);
+		famixRepoAdd(implementation);
+		return implementation;
+	}
+
 	/**
 	 * Returns a Famix Reference between two Famix Entities creating it if needed.<br>
 	 * If <code>prev == null</code> and a similar reference already exist (same <code>src</code>, same <code>tgt</code>), does not create a new one

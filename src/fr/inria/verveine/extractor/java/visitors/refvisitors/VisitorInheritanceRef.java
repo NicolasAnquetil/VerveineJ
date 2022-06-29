@@ -9,6 +9,8 @@ import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAssociation;
+import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 
 import java.util.Collection;
@@ -146,26 +148,24 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 	// UTILITY METHODS
 
 	protected void ensureInheritances(ITypeBinding bnd, TWithInheritances fmx) {
-		Inheritance lastInheritance = null;
+		TAssociation lastInheritance = null;
 
 		// --------------- superclass
 		Collection<Type> sups = new LinkedList<>();
 		if (!bnd.isInterface()) {
 			ITypeBinding supbnd = bnd.getSuperclass();
+			Type t;
 			if (supbnd != null) {
-				sups.add(dico.ensureFamixType(supbnd, /*persistIt)*/true));
+				t = dico.ensureFamixType(supbnd, /*persistIt)*/true);
 			} else {
-				sups.add(dico.ensureFamixClassObject(null));
+				t = dico.ensureFamixClassObject(null);
 			}
+			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) t, fmx, lastInheritance);
 		}
 		// --------------- interfaces implemented
 		for (ITypeBinding intbnd : bnd.getInterfaces()) {
-			sups.add(dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true));
-		}
-
-		for (Type sup : sups) {
-			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) sup, fmx, lastInheritance);
-			// create FileAnchor for each inheritance link ???
+			Interface interface1 = (Interface) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true)
+			dico.ensureFamixImplementation(interface1, (TCanImplement) fmx, lastInheritance);
 		}
 	}
 
