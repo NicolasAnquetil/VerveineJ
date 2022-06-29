@@ -174,8 +174,12 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			return this.ensureFamixEnum(bnd, name, owner);
 		}
 
-		if (bnd.isRawType() || bnd.isGenericType()) {
+		if ((bnd.isRawType() || bnd.isGenericType()) && !bnd.isInterface() ) {
 			return this.ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
+		}
+
+		if ((bnd.isRawType() || bnd.isGenericType()) && bnd.isInterface() ) {
+			return this.ensureFamixInterface(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
 		}
 
 		if (bnd.isParameterizedType()) {
@@ -412,7 +416,12 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// ---------------- create
 		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
-			fmx = super.ensureFamixInterface(bnd, name, owner, /*alwaysPersist?*/persistIt);
+			if (isGeneric) {
+				fmx = super.ensureFamixParameterizableInterface(bnd, name, owner, persistIt);
+			}
+			else {
+				fmx = super.ensureFamixInterface(bnd, name, owner, /*alwaysPersist?*/persistIt);
+			}
 		}
 
 		if (fmx!=null) {
@@ -523,7 +532,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * e.g. see {@link JavaDictionary#ensureFamixClass}
 	 */
-	public ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, ParameterizableClass generic, ContainerEntity owner, boolean alwaysPersist) {
+	public ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, TWithParameterizedTypes generic, ContainerEntity owner, boolean alwaysPersist) {
 		ParameterizedType fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -551,11 +560,15 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- generic
 		if ((generic == null) && (bnd != null)) {
 			int modifiers = (bnd.getErasure() != null) ? bnd.getErasure().getModifiers() : UNKNOWN_MODIFIERS;
-			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
+			if(bnd.isInterface()) {
+				generic = (ParameterizableInterface) ensureFamixInterface(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
+			} else {
+				generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
+			}
 		}
 
 		// --------------- owner
-		owner = (ContainerEntity) generic.getTypeContainer();
+		owner = (ContainerEntity) ((Type) generic).getTypeContainer();
 		/* Old behavior, see issue 868
 		   if (owner == null) {
 			if (bnd == null) {
@@ -582,7 +595,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 		// --------------- stub: same as ParameterizableClass
 		if ( (generic != null) && (fmx != null) ) {
-			fmx.setIsStub(generic.getIsStub());
+			fmx.setIsStub(((Type)generic).getIsStub());
 		}
 
 		return fmx;

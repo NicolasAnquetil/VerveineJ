@@ -66,6 +66,7 @@ public class FamixRequestor extends FileASTRequestor {
 			ast.accept(new VisitorExceptionRef(famixDictionnary, options));
 
 		} catch (Exception err) {
+			err.printStackTrace();
 			System.err.println("*** " + getVisitorName(err, path) + " got exception: '" + err + "' while processing file: " + path);
 		}
 	}

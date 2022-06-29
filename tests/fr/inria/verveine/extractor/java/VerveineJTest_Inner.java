@@ -44,8 +44,8 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
     public void testNumberOfClass() {
         parse(new String[] {"test_src/inner"});
         Collection<Class> classes = entitiesOfType(Class.class);
-        assertEquals(8, classes.size());
-        assertEquals(3, entitiesOfType(Interface.class).size());
+        assertEquals(7, classes.size());
+        assertEquals(4, entitiesOfType(Interface.class).size());
         assertEquals(3, classes.stream().filter(aClass -> !aClass.getIsStub()).toArray().length); // InnerClass, _Anonymous(Patate), _Anonymous(Canard)
         assertEquals(2, classes.stream().filter(aClass -> !aClass.getIsStub() && aClass.getName().contains("Anonymous")).toArray().length); // InnerClass, _Anonymous(Patate), _Anonymous(Canard)
     }

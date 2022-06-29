@@ -6,6 +6,8 @@ import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisit
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
 
 /**
  * A collection of useful utility methods that are needed in various ref visitors
@@ -101,7 +103,12 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 			ITypeBinding parameterizableBnd = bnd.getErasure();
 			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-			ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+			TWithParameterizedTypes generic;
+			if(parameterizableBnd.isInterface()) {
+				generic = (ParameterizableInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+			} else {
+				generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+			}
 			if (bnd == parameterizableBnd) {
 				// JDT bug?
 				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, /*owner*/ctxt, persistClass(null));

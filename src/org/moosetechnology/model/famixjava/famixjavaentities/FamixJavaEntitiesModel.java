@@ -60,6 +60,7 @@ public class FamixJavaEntitiesModel {
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.ImplicitVariable.class);
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.AnnotationTypeAttribute.class);
 		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.ParameterType.class);
+		metamodel.with(org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface.class);
 
     }
 

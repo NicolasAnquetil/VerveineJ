@@ -138,11 +138,12 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = 19; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} +  (2*Java12) ConstantDesc, Constable 
-		int nbInterfaces = 9; // Flushable + AutoCloseable + Serializable + Constable + Closeable + Appendable + CharSequence + ConstantDesc + IPrinter
+		int nbClasses = 18; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} +  (2*Java12) ConstantDesc, Constable 
+		int nbInterfaces = 10; // Flushable + AutoCloseable + Serializable + Constable + Closeable + Appendable + CharSequence + ConstantDesc + IPrinter
 
 		assertEquals(nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 		assertEquals(nbInterfaces, entitiesOfType(Interface.class).size());//IPrinter
+		assertEquals(1, entitiesOfType(ParameterizableInterface.class).size());//IPrinter
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());
 		assertEquals(6, entitiesOfType(Method.class).size());
 		assertEquals(0, entitiesOfType(Attribute.class).size());
@@ -151,7 +152,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(0, entitiesOfType(LocalVariable.class).size());
 		assertEquals(1, entitiesOfType(AnnotationType.class).size());
 		assertEquals(0, entitiesOfType(AnnotationInstance.class).size());    // Override annotations on methods
-		assertEquals(1, entitiesOfType(ParameterizableClass.class).size());
+		assertEquals(0, entitiesOfType(ParameterizableClass.class).size());
 	}
 
 	@Test
@@ -203,18 +204,6 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		Collection<TInheritance> inherits;
 		Inheritance inh, inh2 = null;
 		int nbInherit = 29;
-		// 
-		// Bug with CI
-		//try {
-		// 	int version = Integer.parseInt(System.getProperty("java.version"));
-		// 	if (version > 12) {
-		// 		// ConstantDesc has one subclass (implementer)
-		// 		// Constable has one subclass (implementer)
-		// 		nbInherit +=2;
-		// 	}
-		// }
-		// catch(Exception e) {};
-		
 		nbInherit += 5;
 
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created

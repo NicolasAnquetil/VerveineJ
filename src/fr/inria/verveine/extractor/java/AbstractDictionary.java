@@ -320,13 +320,26 @@ public class AbstractDictionary<B> {
 		return fmx;
 	}
 
+		/**
+	 * Returns a FAMIX ParameterizableInterface with the given <b>name</b>, creating it if it does not exist yet
+	 * In the second case, sets some default properties: not Abstract, not Final, not Private, not Protected, not Public, not Interface
+	 * @param name -- the name of the FAMIX Class
+	 * @param persistIt -- whether the ParameterizableInterface should be persisted in the Famix repository
+	 * @return the FAMIX Class or null in case of a FAMIX error
+	 */
+	public ParameterizableInterface ensureFamixParameterizableInterface(B key, String name, ContainerEntity owner, boolean persistIt) {
+		ParameterizableInterface fmx = ensureFamixEntity(ParameterizableInterface.class, key, name, persistIt);
+		fmx.setTypeContainer(owner);
+		return fmx;
+	}
+
 	/**
 	 * Returns a FAMIX ParameterizableType with the given <b>name</b>, creating it if it does not exist yet
 	 * @param name -- the name of the FAMIX Type
 	 * @param persistIt -- whether the ParameterizableClass should be persisted in the Famix repository
 	 * @return the FAMIX ParameterizableType or null in case of a FAMIX error
 	 */
-	public ParameterizedType ensureFamixParameterizedType(B key, String name, ParameterizableClass generic, ContainerEntity owner, boolean persistIt) {
+	public ParameterizedType ensureFamixParameterizedType(B key, String name, TWithParameterizedTypes generic, ContainerEntity owner, boolean persistIt) {
 		ParameterizedType fmx = ensureFamixEntity(ParameterizedType.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		fmx.setParameterizableClass(generic);

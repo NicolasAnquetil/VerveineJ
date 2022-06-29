@@ -102,7 +102,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	protected Type visitTypeDeclaration(TypeDeclaration node) {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 		Type fmx;
-		if(bnd.isInterface() && !bnd.isGenericType()) {
+		if(bnd.isInterface()) {
 			fmx = dico.getFamixInterface(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		} else {
 			fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());

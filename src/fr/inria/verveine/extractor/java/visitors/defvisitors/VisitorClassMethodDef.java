@@ -61,7 +61,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
 		org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
-		if (bnd.isInterface() && !bnd.isGenericType()) {
+		if (bnd.isInterface()) {
 			fmx = dico.ensureFamixInterface(
 				bnd, 
 				/*name*/node.getName().getIdentifier(), 
