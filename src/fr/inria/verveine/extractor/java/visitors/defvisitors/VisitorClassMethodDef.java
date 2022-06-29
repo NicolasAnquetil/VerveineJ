@@ -8,6 +8,7 @@ import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisit
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 
 import java.security.MessageDigest;
@@ -104,7 +105,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				// if there is a type parameter, then fmx will be a Famix ParameterizableClass
 				// note: owner of the ParameterType is the ParameterizableClass
 				ParameterType fmxParam = dico.ensureFamixParameterType(tp.resolveBinding(),
-						tp.getName().getIdentifier(), (ParameterizableClass) fmx, /*persistIt*/! summarizeClasses());
+						tp.getName().getIdentifier(), (TWithParameterizedTypes) fmx, /*persistIt*/! summarizeClasses());
 				if (fmxParam != null) {
 					fmxParam.setIsStub(false);
 				}

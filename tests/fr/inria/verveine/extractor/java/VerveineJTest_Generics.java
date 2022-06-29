@@ -34,7 +34,9 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
     @Test
     public void testParameterizableClass() {
-        assertEquals(13, entitiesOfType( ParameterizableClass.class).size());
+        assertEquals(7, entitiesOfType( ParameterizableClass.class).size());
+        assertEquals(6, entitiesOfType( ParameterizableInterface.class).size());
+
         // WrongInvocation -> List<X>, ArrayList<X>
         // Dictionary -> Dictionary<X>, Map<X,Y>, Hashtable<X,Y>, Collection<X>, Class<X>, ArrayList<X>
 
@@ -79,7 +81,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertSame(dicoParam, firstElt(generic.getParameters()));
 
         /* Collection<Object> is not seen as parameterizable by JDT */
-        ParameterizableClass collec = detectFamixElement( ParameterizableClass.class, "Collection");
+        ParameterizableInterface collec = detectFamixElement( ParameterizableInterface.class, "Collection");
         assertNotNull(collec);
     }
 
@@ -132,7 +134,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertEquals(numberParameterizedTypes, ptypes.size());  // List*1, ArrayList*2, Map*3, Collection<NamedEntity>, Collection<T>, Hashtable*3, Class*3, Dictionary*1 + all stub superclasses
         //coll2
         for (ParameterizedType typ : ptypes) {
-            assertEquals(((ParameterizableClass)typ.getParameterizableClass()).getIsStub(), typ.getIsStub());
+            assertEquals(((Type)typ.getParameterizableClass()).getIsStub(), typ.getIsStub());
         }
     }
 
