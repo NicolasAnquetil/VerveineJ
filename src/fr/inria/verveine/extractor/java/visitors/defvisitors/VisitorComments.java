@@ -10,6 +10,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationTypeAttri
 import org.moosetechnology.model.famixjava.famixjavaentities.Attribute;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
 import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
+import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
@@ -70,7 +71,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = visitTypeDeclaration(node);
+		TWithComments fmx = (TWithComments) visitTypeDeclaration(node);
 		if (fmx != null) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);

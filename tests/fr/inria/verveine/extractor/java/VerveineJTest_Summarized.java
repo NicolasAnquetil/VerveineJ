@@ -138,9 +138,11 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		int nbClasses = 11 + 14 + 1 + 2; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} +  (2*Java12) ConstantDesc, Constable 
+		int nbClasses = 19; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable, +(java7)AutoCloseable} +  (2*Java12) ConstantDesc, Constable 
+		int nbInterfaces = 9; // Flushable + AutoCloseable + Serializable + Constable + Closeable + Appendable + CharSequence + ConstantDesc + IPrinter
 
 		assertEquals(nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
+		assertEquals(nbInterfaces, entitiesOfType(Interface.class).size());//IPrinter
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());
 		assertEquals(6, entitiesOfType(Method.class).size());
 		assertEquals(0, entitiesOfType(Attribute.class).size());
@@ -243,7 +245,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 				inh2 = (Inheritance) inheritance;
 				assertNull(inh2.getNext());
 				assertSame(inheritance, inh2.getPrevious().getNext());
-				assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IPrinter"), inheritance.getSuperclass());
+				assertSame(detectFamixElement(Interface.class, "IPrinter"), inheritance.getSuperclass());
 			} else {
 				inh = (Inheritance) inheritance;
 				assertNull(inh.getPrevious());
@@ -254,9 +256,10 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertSame(inh.getNext(), inh2);
 		assertSame(inh2.getPrevious(), inh);
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IPrinter");
-		assertNotNull(clazz);
-		inherits = clazz.getSubInheritances();
+
+		Interface interfacePrinter = detectFamixElement(Interface.class, "IPrinter");
+		assertNotNull(interfacePrinter);
+		inherits = interfacePrinter.getSubInheritances();
 		assertEquals(1, inherits.size());
 
 	}

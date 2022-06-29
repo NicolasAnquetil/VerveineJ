@@ -229,9 +229,9 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		}
 
 		// testing invocation
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IPrinter");
-		assertNotNull(clazz);
-		Method mth = (Method) firstElt(clazz.getMethods());  // first (and sole) method
+		Interface interfacePrinter = detectFamixElement(Interface.class, "IPrinter");
+		assertNotNull(interfacePrinter);
+		Method mth = (Method) firstElt(interfacePrinter.getMethods());  // first (and sole) method
 		assertNotNull(mth);
 		assertEquals("print", mth.getName());
 		assertEquals(1, mth.getIncomingInvocations().size());

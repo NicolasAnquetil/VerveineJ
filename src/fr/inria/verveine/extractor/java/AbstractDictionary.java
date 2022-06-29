@@ -293,6 +293,20 @@ public class AbstractDictionary<B> {
 		return fmx;
 	}
 
+		/**
+	 * Returns a FAMIX Interface with the given <b>name</b>, creating it if it does not exist yet.
+	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
+	 * @param name -- the name of the FAMIX Method (MUST NOT be null, but this is not checked)
+	 * @param owner -- type defining the method (should not be null, but it will work if it is) 
+	 * @param persistIt -- whether the Class should be persisted in the Famix repository
+	 * @return the FAMIX Class or null in case of a FAMIX error
+	 */
+	public Interface ensureFamixInterface(B key, String name, ContainerEntity owner, boolean persistIt) {
+		Interface fmx = ensureFamixEntity(Interface.class, key, name, persistIt);
+		fmx.setTypeContainer(owner);
+		return fmx;
+	}
+
 	/**
 	 * Returns a FAMIX ParameterizableClass with the given <b>name</b>, creating it if it does not exist yet
 	 * In the second case, sets some default properties: not Abstract, not Final, not Private, not Protected, not Public, not Interface

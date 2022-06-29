@@ -83,31 +83,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testEntitiesNumber() {
 
-		int nbClasses = 11 + 14 + 1; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable} + 1 Anonymous class IPrinter 
-		int nbInherit = 9 + 21 + 1;
-
-		if (System.getProperty("java.version").startsWith("1.") &&
-				System.getProperty("java.version").charAt(2) >= '7') {
-			// class Autocloseable starting in Java 7
-			nbClasses++;
-			nbInherit++;
-		}
-		// try { Does not work with the CI... 
-		// 	int version = Integer.parseInt(System.getProperty("java.version"));
-		// 	if (version > 12) {
-		// 		// (2*Java12) ConstantDesc, Constable
-		// 		nbClasses += 2;
-		// 		// ConstantDesc has one subclass (implementer)
-		// 		// Constable has one subclass (implementer)
-		// 		nbInherit += 5;
-		// 	}
-		// }
-		// catch(Exception e) {};
-		nbClasses += 2;
-		nbInherit += 4;
+		int nbClasses = 19; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable} + 1 Anonymous class IPrinter 
+		int nbInterfaces = 9; // Flushable + AutoCloseable + Serializable + Constable + Closeable + Appendable + CharSequence + ConstantDesc + IPrinter
+		int nbInherit = 35;
 
 		assertEquals(nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
+		assertEquals(nbInterfaces, entitiesOfType(Interface.class).size());//IPrinter
 		assertEquals(40 + 8 + 1, entitiesOfType(Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10 + 1, entitiesOfType(Attribute.class).size());//10+{System.out}
 		assertEquals(2 + 4 + 1, entitiesOfType(Package.class).size());//2+{moose,java.lang,java.io,java} // +1 new package named java.lang.constant (java17?)
@@ -166,13 +148,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(pckg);
 		assertEquals("server", pckg.getName());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IPrinter");
-		assertNotNull(clazz);
-		assertEquals("IPrinter", clazz.getName());
-		assertEquals(1, clazz.numberOfMethods());
-		assertEquals(0, clazz.numberOfAttributes());
-		assertSame(pckg, clazz.getTypeContainer());
-		assertTrue(clazz.getIsInterface());
+		Interface interfacePrinter = detectFamixElement(Interface.class, "IPrinter");
+		assertNotNull(interfacePrinter);
+		assertEquals("IPrinter", interfacePrinter.getName());
+		assertEquals(1, interfacePrinter.numberOfMethods());
+		assertEquals(0, interfacePrinter.numberOfAttributes());
+		assertSame(pckg, interfacePrinter.getTypeContainer());
 
 		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "XPrinter");
 		assertNotNull(clazz);
@@ -282,7 +263,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				inh2 = inheritance;
 				assertNull(inheritance.getNext());
 				assertSame(inheritance, inheritance.getPrevious().getNext());
-				assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class,
+				assertSame(detectFamixElement(Interface.class,
 						"IPrinter"), inheritance.getSuperclass());
 			} else {
 				inh = inheritance;
@@ -442,8 +423,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				fail("Unknown method name: " + mNode.getName());
 			}
 		}
-		org.moosetechnology.model.famixjava.famixjavaentities.Class iprintClass = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IPrinter");
+		Interface iprintClass = detectFamixElement(Interface.class, "IPrinter");
 		assertNotNull(iprintClass);
 		Method mPrint = (Method) firstElt(iprintClass.getMethods());
 		assertEquals(2, mPrint.getParameters().size());

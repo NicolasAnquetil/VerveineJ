@@ -187,8 +187,11 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// it seems wise to test isClass after isGenericType, isParameterizedType, ... ?
-		if (bnd.isClass() || bnd.isInterface()) {
+		if (bnd.isClass()) {
 			return this.ensureFamixClass(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
+		}
+		if (bnd.isInterface()) {
+			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
 		}
 
 		if (name == null) {
@@ -316,7 +319,6 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		if (fmx!=null) {
 			// we just created it or it was not bound, so we make sure it has the right information in it
 			if (bnd != null) {
-				fmx.setIsInterface( bnd.isInterface());
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 			if (persistIt) {
@@ -328,6 +330,104 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			}
 		}
 
+		return fmx;
+	}
+
+	public Interface ensureFamixInterface(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+		Interface fmx = null;
+
+		// --------------- some special cases
+		if (bnd != null) {
+			if (bnd.isArray()) {
+				bnd = bnd.getElementType();
+			}
+
+			// for inner classes defined in generics !!! For others should not change anything
+			bnd = bnd.getErasure();
+		}
+
+		// ---------------- to avoid useless computations if we can
+		fmx = (Interface) getEntityByKey(bnd);
+		if (fmx != null) {
+			return fmx;
+		}
+
+		// --------------- name
+		if (name == null) {
+			if (bnd == null) {
+				return null;  // not much we can do
+			} else if (!bnd.isAnonymous()) {
+				name = bnd.getErasure().getName();  // for generics, will give the "core" type name, for normal type, won't change anything
+			} else { // anonymous class
+				if (bnd.getSuperclass() != null) {
+					name = bnd.getSuperclass().getName();
+				}
+				if ((name == null) || name.equals(OBJECT_NAME)) {
+					ITypeBinding[] intfcs = bnd.getInterfaces();
+					if ((intfcs != null) && (intfcs.length > 0)) {
+						name = bnd.getInterfaces()[0].getName();
+					}
+					else {
+						name = "???";
+					}
+				}
+				name = ANONYMOUS_NAME_PREFIX + "(" + name + ")";
+			}
+		}
+
+		// --------------- owner
+		if (owner == null) {
+			if (bnd == null) {
+				owner = ensureFamixPackageDefault();
+			} else {
+				owner = ensureOwner(bnd, alwaysPersist);
+			}
+		}
+
+		// --------------- recover from name ?
+		for (Interface candidate : this.getEntityByName(Interface.class, name)) {
+			if (matchAndMapInterface(bnd, name, owner, candidate)) {
+				fmx = candidate;
+				break;
+			}
+		}
+
+		// --------------- superclasses (including interfaces)
+		Collection<Type> sups = new LinkedList<Type>();
+		if (bnd != null) {
+			if (!bnd.isInterface()) {
+				ITypeBinding supbnd = bnd.getSuperclass();
+				if (supbnd != null) {
+					sups.add(ensureFamixType(supbnd, alwaysPersist));
+				}
+				else {
+					sups.add( ensureFamixClassObject(null));
+				}
+			}
+			for (ITypeBinding intbnd : bnd.getInterfaces()) {
+				sups.add( ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist));
+			}
+		}
+
+		// ---------------- create
+		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
+		if (fmx == null) {
+			fmx = super.ensureFamixInterface(bnd, name, owner, /*alwaysPersist?*/persistIt);
+		}
+
+		if (fmx!=null) {
+			// we just created it or it was not bound, so we make sure it has the right information in it
+			if (bnd != null) {
+				setClassModifiers(fmx, bnd.getDeclaredModifiers());
+			}
+			if (persistIt) {
+				Inheritance lastInheritance = null;
+				for (Type sup : sups) {
+					lastInheritance = ensureFamixInheritance((TWithInheritances) sup, fmx, lastInheritance);
+					// TODO create FileAnchor for each inheritance link ???
+				}
+			}
+		}
 		return fmx;
 	}
 
@@ -375,6 +475,13 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 */
 	public Class getFamixClass(ITypeBinding bnd, String name, ContainerEntity owner) {
 		return ensureFamixClass(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
+	}
+
+		/**
+	 * helper method, we know the type exists, ensureFamixClass will recover it
+	 */
+	public Interface getFamixInterface(ITypeBinding bnd, String name, ContainerEntity owner) {
+		return ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
 	}
 
 	/**
@@ -913,15 +1020,19 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// check owners with bnd
 		// type is something elae (a class or interface)
 		// Annotation are interfaces too, so we should check this one after isAnnotation
-		if ( bnd.isClass() || bnd.isInterface() ) {
+		if ( bnd.isClass()) {
 			return matchAndMapClass(bnd, name, owner, (Type) candidate);
+		}
+
+		if(bnd.isInterface()) {
+			return matchAndMapInterface(bnd, name, owner, (Type) candidate);
 		}
 
 		return false;
 	}
 
 	/**
-	 * Checks whether the existing unmapped Famix Class (or Interface or Enum) matches the binding.
+	 * Checks whether the existing unmapped Famix Class (or Interface) matches the binding.
 	 * Checks that the candidate has the same name as the JDT bound type, and checks recursively that owners also match.
 	 * @param bnd -- a JDT binding that we are trying to match to the candidate
 	 * @param name of the class
@@ -931,6 +1042,36 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 */
 	private boolean matchAndMapClass(ITypeBinding bnd, String name, ContainerEntity owner, Type candidate) {
 		if (!(candidate instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class)) {
+			return false;
+		}
+
+		// check whether bnd and candidate are already bound
+		CheckResult res = checkKeyMatch(bnd, candidate);
+		if (res == CheckResult.MATCH) {
+			return true;
+		} else if (res == CheckResult.FAIL) {
+			return false;
+		}
+
+		if (checkNameMatch(bnd, name, candidate) == CheckResult.FAIL) {
+			return false;
+		}
+
+		// checking owner
+		return matchAndMapTypeOwner(bnd, owner, candidate);
+	}
+
+	/**
+	 * Checks whether the existing unmapped Famix Class (or Interface) matches the binding.
+	 * Checks that the candidate has the same name as the JDT bound type, and checks recursively that owners also match.
+	 * @param bnd -- a JDT binding that we are trying to match to the candidate
+	 * @param name of the class
+	 * @param owner of the class
+	 * @param candidate -- a Famix Entity
+	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
+	 */
+	private boolean matchAndMapInterface(ITypeBinding bnd, String name, ContainerEntity owner, Type candidate) {
+		if (!(candidate instanceof Interface)) {
 			return false;
 		}
 
@@ -1439,6 +1580,12 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 	public void setClassModifiers(Class fmx, int mod) {
 		fmx.setIsAbstract(Modifier.isAbstract(mod));
+		fmx.setIsFinal(Modifier.isFinal(mod));
+		fmx.setIsClassSide(Modifier.isStatic(mod));
+		setVisibility(fmx, mod);
+	}
+
+	public void setClassModifiers(Interface fmx, int mod) {
 		fmx.setIsFinal(Modifier.isFinal(mod));
 		fmx.setIsClassSide(Modifier.isStatic(mod));
 		setVisibility(fmx, mod);

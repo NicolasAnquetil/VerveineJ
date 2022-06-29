@@ -4,6 +4,7 @@ package fr.inria.verveine.extractor.java;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.Class;
+import org.moosetechnology.model.famixjava.famixjavaentities.Interface;
 import org.moosetechnology.model.famixjava.famixjavaentities.Invocation;
 import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
@@ -43,7 +44,8 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
     public void testNumberOfClass() {
         parse(new String[] {"test_src/inner"});
         Collection<Class> classes = entitiesOfType(Class.class);
-        assertEquals(11, classes.size());
+        assertEquals(8, classes.size());
+        assertEquals(3, entitiesOfType(Interface.class).size());
         assertEquals(3, classes.stream().filter(aClass -> !aClass.getIsStub()).toArray().length); // InnerClass, _Anonymous(Patate), _Anonymous(Canard)
         assertEquals(2, classes.stream().filter(aClass -> !aClass.getIsStub() && aClass.getName().contains("Anonymous")).toArray().length); // InnerClass, _Anonymous(Patate), _Anonymous(Canard)
     }

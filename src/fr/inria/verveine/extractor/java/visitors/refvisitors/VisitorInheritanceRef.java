@@ -25,7 +25,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 	}
 
 	public boolean visit(TypeDeclaration node) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = visitTypeDeclaration(node);
+		TWithInheritances fmx = (TWithInheritances) visitTypeDeclaration(node);
 		ITypeBinding bnd = node.resolveBinding();
 		if ((fmx != null) && (bnd != null)) {
 			ensureInheritances(bnd, fmx);

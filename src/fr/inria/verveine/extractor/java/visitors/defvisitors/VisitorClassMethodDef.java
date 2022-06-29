@@ -60,7 +60,9 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = dico.ensureFamixClass(
+		org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
+		if (bnd.isInterface() && !bnd.isGenericType()) {
+			fmx = dico.ensureFamixInterface(
 				bnd, 
 				/*name*/node.getName().getIdentifier(), 
 				(ContainerEntity) 
@@ -68,6 +70,16 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				/*isGeneric*/tparams.size()>0, 
 				node.getModifiers(), 
 				/*alwaysPersist?*/persistIt);
+		} else {
+			fmx = dico.ensureFamixClass(
+					bnd, 
+					/*name*/node.getName().getIdentifier(), 
+					(ContainerEntity) 
+					/*owner*/context.top(), 
+					/*isGeneric*/tparams.size()>0, 
+					node.getModifiers(), 
+					/*alwaysPersist?*/persistIt);
+		}
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
@@ -130,17 +142,27 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx;
+		org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
-		fmx = this.dico.ensureFamixClass(
-				bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), 
-				(ContainerEntity) 
-				/*owner*/context.top(), 
-				/*isGeneric*/false, 
-				modifiers, 
-				/*alwaysPersist?*/!summarizeClasses());
+		if (bnd.isInterface()) {
+			fmx = this.dico.ensureFamixInterface(
+					bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), 
+					(ContainerEntity) 
+					/*owner*/context.top(), 
+					/*isGeneric*/false, 
+					modifiers, 
+					/*alwaysPersist?*/!summarizeClasses());
+		} else {
+			fmx = this.dico.ensureFamixClass(
+					bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), 
+					(ContainerEntity) 
+					/*owner*/context.top(), 
+					/*isGeneric*/false, 
+					modifiers, 
+					/*alwaysPersist?*/!summarizeClasses());
+		}
 
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
