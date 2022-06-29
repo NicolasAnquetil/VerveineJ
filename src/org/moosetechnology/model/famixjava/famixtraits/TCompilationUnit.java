@@ -11,9 +11,9 @@ import ch.akuhn.fame.FameProperty;
 public interface TCompilationUnit  {
 
         @FameProperty(name = "compilationUnitOwner", opposite = "compilationUnit")
-        TWithCompilationUnits getCompilationUnitOwner();
+    public TWithCompilationUnits getCompilationUnitOwner();
 
-    void setCompilationUnitOwner(TWithCompilationUnits compilationUnitOwner);
+    public void setCompilationUnitOwner(TWithCompilationUnits compilationUnitOwner);
 
 
 

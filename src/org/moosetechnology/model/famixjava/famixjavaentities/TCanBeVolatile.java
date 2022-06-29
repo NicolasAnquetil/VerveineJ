@@ -8,12 +8,13 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("TCanBeVolatile")
-public interface TCanBeVolatile {
+public interface TCanBeVolatile  {
 
-    @FameProperty(name = "isVolatile")
-    Boolean getIsVolatile();
+        @FameProperty(name = "isVolatile")
+    public Boolean getIsVolatile();
 
-    void setIsVolatile(Boolean isVolatile);
+    public void setIsVolatile(Boolean isVolatile);
+
 
 
 }

@@ -4,6 +4,8 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 
 
 @FamePackage("Famix-Traits")
@@ -11,10 +13,10 @@ import ch.akuhn.fame.FameProperty;
 public interface TClass  {
 
         @FameProperty(name = "isTestCase", derived = true)
-        Boolean getIsTestCase();
+    public Boolean getIsTestCase();
 
     @FameProperty(name = "weightOfAClass", derived = true)
-    Number getWeightOfAClass();
+    public Number getWeightOfAClass();
 
 
 

@@ -4,6 +4,7 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Traits")
@@ -11,15 +12,15 @@ import ch.akuhn.fame.FameProperty;
 public interface TAttribute  {
 
         @FameProperty(name = "hierarchyNestingLevel", derived = true)
-        Number getHierarchyNestingLevel();
+    public Number getHierarchyNestingLevel();
 
     @FameProperty(name = "hasClassScope", derived = true)
-    Boolean getHasClassScope();
+    public Boolean getHasClassScope();
 
     @FameProperty(name = "parentType", opposite = "attributes", container = true)
-    TWithAttributes getParentType();
+    public TWithAttributes getParentType();
 
-    void setParentType(TWithAttributes parentType);
+    public void setParentType(TWithAttributes parentType);
 
 
 

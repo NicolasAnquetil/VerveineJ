@@ -4,16 +4,16 @@ package org.moosetechnology.model.famixjava.famixjavaentities;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import org.moosetechnology.model.famixjava.famixtraits.TFile;
+import org.moosetechnology.model.famixjava.famixtraits.TFileAnchor;
+import org.moosetechnology.model.famixjava.famixtraits.TIndexedFileNavigation;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("IndexedFileAnchor")
-public class IndexedFileAnchor extends SourceAnchor implements TFileAnchor, TIndexedFileNavigation, TSourceAnchor {
+public class IndexedFileAnchor extends SourceAnchor implements TFileAnchor, TIndexedFileNavigation {
 
     private TFile correspondingFile;
-    
-    private TSourceEntity element;
     
     private String encoding;
     
@@ -32,20 +32,6 @@ public class IndexedFileAnchor extends SourceAnchor implements TFileAnchor, TInd
 
     public void setCorrespondingFile(TFile correspondingFile) {
         this.correspondingFile = correspondingFile;
-    }
-    
-    @FameProperty(name = "element", opposite = "sourceAnchor")
-    public TSourceEntity getElement() {
-        return element;
-    }
-
-    public void setElement(TSourceEntity element) {
-        if (this.element == null ? element != null : !this.element.equals(element)) {
-            TSourceEntity old_element = this.element;
-            this.element = element;
-            if (old_element != null) old_element.setSourceAnchor(null);
-            if (element != null) element.setSourceAnchor(this);
-        }
     }
     
     @FameProperty(name = "encoding")
@@ -73,12 +59,6 @@ public class IndexedFileAnchor extends SourceAnchor implements TFileAnchor, TInd
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
-    }
-    
-    @FameProperty(name = "lineCount", derived = true)
-    public Number getLineCount() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "startPos")

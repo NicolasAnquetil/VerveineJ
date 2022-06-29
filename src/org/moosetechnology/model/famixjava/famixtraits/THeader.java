@@ -11,9 +11,9 @@ import ch.akuhn.fame.FameProperty;
 public interface THeader  {
 
         @FameProperty(name = "headerOwner", opposite = "header")
-        TWithHeaders getHeaderOwner();
+    public TWithHeaders getHeaderOwner();
 
-    void setHeaderOwner(TWithHeaders headerOwner);
+    public void setHeaderOwner(TWithHeaders headerOwner);
 
 
 

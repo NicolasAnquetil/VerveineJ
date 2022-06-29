@@ -19,13 +19,13 @@ public interface TSourceEntity  {
     @FameProperty(name = "duplicationRate", derived = true)
     public Number getDuplicationRate();
 
+    @FameProperty(name = "containsReplicas", derived = true)
+    public Boolean getContainsReplicas();
+
     @FameProperty(name = "sourceAnchor", opposite = "element", derived = true)
     public TSourceAnchor getSourceAnchor();
 
     public void setSourceAnchor(TSourceAnchor sourceAnchor);
-
-    @FameProperty(name = "containsReplicas", derived = true)
-    public Boolean getContainsReplicas();
 
     @FameProperty(name = "numberOfLinesOfCodeWithMoreThanOneCharacter", derived = true)
     public Number getNumberOfLinesOfCodeWithMoreThanOneCharacter();

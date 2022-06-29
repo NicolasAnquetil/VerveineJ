@@ -5,7 +5,12 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAccess;
+import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
+import org.moosetechnology.model.famixjava.famixtraits.TAssociation;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
 import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 

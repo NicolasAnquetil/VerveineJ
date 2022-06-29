@@ -5,11 +5,10 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
+import java.util.*;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
 import org.moosetechnology.model.famixjava.famixtraits.TUnknownSourceLanguage;
 import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguages;
-
-import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")

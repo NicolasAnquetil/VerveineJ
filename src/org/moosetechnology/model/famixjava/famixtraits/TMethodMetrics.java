@@ -8,18 +8,19 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TMethodMetrics")
-public interface TMethodMetrics {
+public interface TMethodMetrics  {
 
-    @FameProperty(name = "hierarchyNestingLevel", derived = true)
-    Number getHierarchyNestingLevel();
+        @FameProperty(name = "hierarchyNestingLevel", derived = true)
+    public Number getHierarchyNestingLevel();
 
     @FameProperty(name = "numberOfAnnotationInstances", derived = true)
-    Number getNumberOfAnnotationInstances();
+    public Number getNumberOfAnnotationInstances();
 
     @FameProperty(name = "cyclomaticComplexity")
-    Number getCyclomaticComplexity();
+    public Number getCyclomaticComplexity();
 
-    void setCyclomaticComplexity(Number cyclomaticComplexity);
+    public void setCyclomaticComplexity(Number cyclomaticComplexity);
+
 
 
 }

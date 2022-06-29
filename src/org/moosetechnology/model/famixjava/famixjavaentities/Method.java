@@ -5,12 +5,46 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
+import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAccess;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeAbstract;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeClassSide;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeFinal;
+import org.moosetechnology.model.famixjava.famixtraits.TCaughtException;
+import org.moosetechnology.model.famixjava.famixtraits.TComment;
+import org.moosetechnology.model.famixjava.famixtraits.TDeclaredException;
+import org.moosetechnology.model.famixjava.famixtraits.THasKind;
+import org.moosetechnology.model.famixjava.famixtraits.THasSignature;
+import org.moosetechnology.model.famixjava.famixtraits.THasVisibility;
+import org.moosetechnology.model.famixjava.famixtraits.TImplicitVariable;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocable;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
+import org.moosetechnology.model.famixjava.famixtraits.TLocalVariable;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
+import org.moosetechnology.model.famixjava.famixtraits.TMethodMetrics;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TParameter;
+import org.moosetechnology.model.famixjava.famixtraits.TReference;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TThrownException;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
+import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
+import org.moosetechnology.model.famixjava.famixtraits.TWithCaughtExceptions;
+import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
+import org.moosetechnology.model.famixjava.famixtraits.TWithDeclaredExceptions;
+import org.moosetechnology.model.famixjava.famixtraits.TWithImplicitVariables;
+import org.moosetechnology.model.famixjava.famixtraits.TWithInvocations;
+import org.moosetechnology.model.famixjava.famixtraits.TWithLocalVariables;
+import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
+import org.moosetechnology.model.famixjava.famixtraits.TWithParameters;
+import org.moosetechnology.model.famixjava.famixtraits.TWithReferences;
+import org.moosetechnology.model.famixjava.famixtraits.TWithStatements;
+import org.moosetechnology.model.famixjava.famixtraits.TWithThrownExceptions;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
-
-import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")
@@ -685,6 +719,30 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfLinesOfCode")
     public Number getNumberOfLinesOfCode() {
         return numberOfLinesOfCode;
@@ -980,7 +1038,7 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     public void setVisibility(String visibility) {
         this.visibility = visibility;
     }
-
+    
     // Manually added
 
     private Number numberOfStatements;
@@ -1013,7 +1071,6 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     public Boolean getIsPublic() {
         return this.visibility.equals("public");
     }
-
 
 
 }

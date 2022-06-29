@@ -8,12 +8,13 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TWithSourceLanguages")
-public interface TWithSourceLanguages {
+public interface TWithSourceLanguages  {
 
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    TSourceLanguage getDeclaredSourceLanguage();
+        @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
+    public TSourceLanguage getDeclaredSourceLanguage();
 
-    void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage);
+    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage);
+
 
 
 }

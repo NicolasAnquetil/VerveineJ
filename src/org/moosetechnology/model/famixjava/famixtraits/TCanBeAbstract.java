@@ -8,12 +8,13 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TCanBeAbstract")
-public interface TCanBeAbstract {
+public interface TCanBeAbstract  {
 
-    @FameProperty(name = "isAbstract")
-    Boolean getIsAbstract();
+        @FameProperty(name = "isAbstract")
+    public Boolean getIsAbstract();
 
-    void setIsAbstract(Boolean isAbstract);
+    public void setIsAbstract(Boolean isAbstract);
+
 
 
 }

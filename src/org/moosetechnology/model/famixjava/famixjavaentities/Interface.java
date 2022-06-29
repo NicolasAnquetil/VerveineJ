@@ -6,34 +6,47 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-import org.moosetechnology.model.famixjava.famixtraits.TAnnotationType;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeClassSide;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famixjava.famixtraits.TComment;
 import org.moosetechnology.model.famixjava.famixtraits.THasVisibility;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementable;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
 import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 import org.moosetechnology.model.famixjava.famixtraits.TPackage;
 import org.moosetechnology.model.famixjava.famixtraits.TPackageable;
-import org.moosetechnology.model.famixjava.famixtraits.TTypedAnnotationInstance;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAnnotationTypes;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
+import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 
 
 @FamePackage("Famix-Java-Entities")
-@FameDescription("AnnotationType")
-public class AnnotationType extends Type implements TAnnotationType, THasVisibility, TPackageable, TWithAttributes, TWithComments, TWithInheritances {
+@FameDescription("Interface")
+public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, TEntityMetaLevelDependency, THasVisibility, TImplementable, TInvocationsReceiver, TOODependencyQueries, TPackageable, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
 
-    private TWithAnnotationTypes annotationTypesContainer;
-    
     private Collection<TAttribute> attributes; 
 
     private Collection<TComment> comments; 
 
-    private Collection<TTypedAnnotationInstance> instances; 
+    private Collection<TImplementation> implementations; 
+
+    private Boolean isClassSide;
+    
+    private Boolean isFinal;
+    
+    private Collection<TMethod> methods; 
 
     private TPackage parentPackage;
     
+    private Collection<TInvocation> receivingInvocations; 
+
     private Collection<TInheritance> subInheritances; 
 
     private Collection<TInheritance> superInheritances; 
@@ -42,21 +55,6 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
     
 
 
-    @FameProperty(name = "annotationTypesContainer", opposite = "definedAnnotationTypes", container = true)
-    public TWithAnnotationTypes getAnnotationTypesContainer() {
-        return annotationTypesContainer;
-    }
-
-    public void setAnnotationTypesContainer(TWithAnnotationTypes annotationTypesContainer) {
-        if (this.annotationTypesContainer != null) {
-            if (this.annotationTypesContainer.equals(annotationTypesContainer)) return;
-            this.annotationTypesContainer.getDefinedAnnotationTypes().remove(this);
-        }
-        this.annotationTypesContainer = annotationTypesContainer;
-        if (annotationTypesContainer == null) return;
-        annotationTypesContainer.getDefinedAnnotationTypes().add(this);
-    }
-    
     @FameProperty(name = "attributes", opposite = "parentType", derived = true)
     public Collection<TAttribute> getAttributes() {
         if (attributes == null) {
@@ -67,7 +65,7 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
                 }
                 @Override
                 protected void setOpposite(TAttribute e) {
-                    e.setParentType(AnnotationType.this);
+                    e.setParentType(Interface.this);
                 }
             };
         }
@@ -118,7 +116,7 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
                 }
                 @Override
                 protected void setOpposite(TComment e) {
-                    e.setContainer(AnnotationType.this);
+                    e.setContainer(Interface.this);
                 }
             };
         }
@@ -159,6 +157,18 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
         return !getComments().isEmpty();
     }
 
+    @FameProperty(name = "fanIn", derived = true)
+    public Number getFanIn() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "fanOut", derived = true)
+    public Number getFanOut() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "hasComments", derived = true)
     public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
@@ -171,57 +181,81 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "instances", opposite = "annotationType", derived = true)
-    public Collection<TTypedAnnotationInstance> getInstances() {
-        if (instances == null) {
-            instances = new MultivalueSet<TTypedAnnotationInstance>() {
+    @FameProperty(name = "implementations", opposite = "interface", derived = true)
+    public Collection<TImplementation> getImplementations() {
+        if (implementations == null) {
+            implementations = new MultivalueSet<TImplementation>() {
                 @Override
-                protected void clearOpposite(TTypedAnnotationInstance e) {
-                    e.setAnnotationType(null);
+                protected void clearOpposite(TImplementation e) {
+                    e.setMyInterface(null);
                 }
                 @Override
-                protected void setOpposite(TTypedAnnotationInstance e) {
-                    e.setAnnotationType(AnnotationType.this);
+                protected void setOpposite(TImplementation e) {
+                    e.setMyInterface(Interface.this);
                 }
             };
         }
-        return instances;
+        return implementations;
     }
     
-    public void setInstances(Collection<? extends TTypedAnnotationInstance> instances) {
-        this.getInstances().clear();
-        this.getInstances().addAll(instances);
+    public void setImplementations(Collection<? extends TImplementation> implementations) {
+        this.getImplementations().clear();
+        this.getImplementations().addAll(implementations);
     }                    
     
         
-    public void addInstances(TTypedAnnotationInstance one) {
-        this.getInstances().add(one);
+    public void addImplementations(TImplementation one) {
+        this.getImplementations().add(one);
     }   
     
-    public void addInstances(TTypedAnnotationInstance one, TTypedAnnotationInstance... many) {
-        this.getInstances().add(one);
-        for (TTypedAnnotationInstance each : many)
-            this.getInstances().add(each);
+    public void addImplementations(TImplementation one, TImplementation... many) {
+        this.getImplementations().add(one);
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
     }   
     
-    public void addInstances(Iterable<? extends TTypedAnnotationInstance> many) {
-        for (TTypedAnnotationInstance each : many)
-            this.getInstances().add(each);
+    public void addImplementations(Iterable<? extends TImplementation> many) {
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
     }   
                 
-    public void addInstances(TTypedAnnotationInstance[] many) {
-        for (TTypedAnnotationInstance each : many)
-            this.getInstances().add(each);
+    public void addImplementations(TImplementation[] many) {
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
     }
     
-    public int numberOfInstances() {
-        return getInstances().size();
+    public int numberOfImplementations() {
+        return getImplementations().size();
     }
 
-    public boolean hasInstances() {
-        return !getInstances().isEmpty();
+    public boolean hasImplementations() {
+        return !getImplementations().isEmpty();
     }
 
+    @FameProperty(name = "isClassSide")
+    public Boolean getIsClassSide() {
+        return isClassSide;
+    }
+
+    public void setIsClassSide(Boolean isClassSide) {
+        this.isClassSide = isClassSide;
+    }
+    
+    @FameProperty(name = "isDead", derived = true)
+    public Boolean getIsDead() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "isFinal")
+    public Boolean getIsFinal() {
+        return isFinal;
+    }
+
+    public void setIsFinal(Boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+    
     @FameProperty(name = "isPackage", derived = true)
     public Boolean getIsPackage() {
         // TODO: this is a derived property, implement this method manually.
@@ -246,8 +280,71 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "methods", opposite = "parentType", derived = true)
+    public Collection<TMethod> getMethods() {
+        if (methods == null) {
+            methods = new MultivalueSet<TMethod>() {
+                @Override
+                protected void clearOpposite(TMethod e) {
+                    e.setParentType(null);
+                }
+                @Override
+                protected void setOpposite(TMethod e) {
+                    e.setParentType(Interface.this);
+                }
+            };
+        }
+        return methods;
+    }
+    
+    public void setMethods(Collection<? extends TMethod> methods) {
+        this.getMethods().clear();
+        this.getMethods().addAll(methods);
+    }                    
+    
+        
+    public void addMethods(TMethod one) {
+        this.getMethods().add(one);
+    }   
+    
+    public void addMethods(TMethod one, TMethod... many) {
+        this.getMethods().add(one);
+        for (TMethod each : many)
+            this.getMethods().add(each);
+    }   
+    
+    public void addMethods(Iterable<? extends TMethod> many) {
+        for (TMethod each : many)
+            this.getMethods().add(each);
+    }   
+                
+    public void addMethods(TMethod[] many) {
+        for (TMethod each : many)
+            this.getMethods().add(each);
+    }
+    
+    public int numberOfMethods() {
+        return getMethods().size();
+    }
+
+    public boolean hasMethods() {
+        return !getMethods().isEmpty();
+    }
+
+    @FameProperty(name = "numberOfAbstractMethods", derived = true)
+    public Number getNumberOfAbstractMethods() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfAttributes", derived = true)
     public Number getNumberOfAttributes() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfChildren", derived = true)
+    public Number getNumberOfChildren() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -258,8 +355,50 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfDeadChildren", derived = true)
+    public Number getNumberOfDeadChildren() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfDirectSubclasses", derived = true)
     public Number getNumberOfDirectSubclasses() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfMessageSends", derived = true)
+    public Number getNumberOfMessageSends() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfMethods", derived = true)
+    public Number getNumberOfMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -285,6 +424,57 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
         parentPackage.getChildEntities().add(this);
     }
     
+    @FameProperty(name = "receivingInvocations", opposite = "receiver", derived = true)
+    public Collection<TInvocation> getReceivingInvocations() {
+        if (receivingInvocations == null) {
+            receivingInvocations = new MultivalueSet<TInvocation>() {
+                @Override
+                protected void clearOpposite(TInvocation e) {
+                    e.setReceiver(null);
+                }
+                @Override
+                protected void setOpposite(TInvocation e) {
+                    e.setReceiver(Interface.this);
+                }
+            };
+        }
+        return receivingInvocations;
+    }
+    
+    public void setReceivingInvocations(Collection<? extends TInvocation> receivingInvocations) {
+        this.getReceivingInvocations().clear();
+        this.getReceivingInvocations().addAll(receivingInvocations);
+    }                    
+    
+        
+    public void addReceivingInvocations(TInvocation one) {
+        this.getReceivingInvocations().add(one);
+    }   
+    
+    public void addReceivingInvocations(TInvocation one, TInvocation... many) {
+        this.getReceivingInvocations().add(one);
+        for (TInvocation each : many)
+            this.getReceivingInvocations().add(each);
+    }   
+    
+    public void addReceivingInvocations(Iterable<? extends TInvocation> many) {
+        for (TInvocation each : many)
+            this.getReceivingInvocations().add(each);
+    }   
+                
+    public void addReceivingInvocations(TInvocation[] many) {
+        for (TInvocation each : many)
+            this.getReceivingInvocations().add(each);
+    }
+    
+    public int numberOfReceivingInvocations() {
+        return getReceivingInvocations().size();
+    }
+
+    public boolean hasReceivingInvocations() {
+        return !getReceivingInvocations().isEmpty();
+    }
+
     @FameProperty(name = "subInheritances", opposite = "superclass", derived = true)
     public Collection<TInheritance> getSubInheritances() {
         if (subInheritances == null) {
@@ -295,7 +485,7 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
                 }
                 @Override
                 protected void setOpposite(TInheritance e) {
-                    e.setSuperclass(AnnotationType.this);
+                    e.setSuperclass(Interface.this);
                 }
             };
         }
@@ -352,7 +542,7 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
                 }
                 @Override
                 protected void setOpposite(TInheritance e) {
-                    e.setSubclass(AnnotationType.this);
+                    e.setSubclass(Interface.this);
                 }
             };
         }
@@ -393,6 +583,12 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
         return !getSuperInheritances().isEmpty();
     }
 
+    @FameProperty(name = "tightClassCohesion", derived = true)
+    public Number getTightClassCohesion() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "visibility")
     public String getVisibility() {
         return visibility;
@@ -400,6 +596,12 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
 
     public void setVisibility(String visibility) {
         this.visibility = visibility;
+    }
+    
+    @FameProperty(name = "weightedMethodCount", derived = true)
+    public Number getWeightedMethodCount() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
 

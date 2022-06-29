@@ -11,19 +11,31 @@ import ch.akuhn.fame.FameProperty;
 public interface TEntityMetaLevelDependency  {
 
         @FameProperty(name = "numberOfDeadChildren", derived = true)
-        Number getNumberOfDeadChildren();
-
-    @FameProperty(name = "fanOut", derived = true)
-    Number getFanOut();
+    public Number getNumberOfDeadChildren();
 
     @FameProperty(name = "fanIn", derived = true)
-    Number getFanIn();
+    public Number getFanIn();
+
+    @FameProperty(name = "fanOut", derived = true)
+    public Number getFanOut();
 
     @FameProperty(name = "numberOfChildren", derived = true)
-    Number getNumberOfChildren();
+    public Number getNumberOfChildren();
+
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders();
+
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders();
+
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients();
 
     @FameProperty(name = "isDead", derived = true)
-    Boolean getIsDead();
+    public Boolean getIsDead();
+
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients();
 
 
 

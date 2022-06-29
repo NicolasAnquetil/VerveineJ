@@ -3,18 +3,14 @@ package org.moosetechnology.model.famixjava.famixjavaentities;
 
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
-import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 
 
 @FamePackage("Famix-Java-Entities")
-@FameDescription("TCanBeClassSide")
-public interface TCanBeClassSide {
+@FameDescription("TWithInterfaces")
+public interface TWithInterfaces  {
 
-    @FameProperty(name = "isClassSide")
-    Boolean getIsClassSide();
-
-    void setIsClassSide(Boolean isClassSide);
-
+    
 
 }
 

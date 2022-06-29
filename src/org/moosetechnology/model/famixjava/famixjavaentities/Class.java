@@ -5,17 +5,46 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
+import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeAbstract;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeClassSide;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeFinal;
+import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
+import org.moosetechnology.model.famixjava.famixtraits.TClass;
+import org.moosetechnology.model.famixjava.famixtraits.TClassMetrics;
+import org.moosetechnology.model.famixjava.famixtraits.TComment;
+import org.moosetechnology.model.famixjava.famixtraits.TException;
+import org.moosetechnology.model.famixjava.famixtraits.THasVisibility;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
+import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
+import org.moosetechnology.model.famixjava.famixtraits.TLCOMMetrics;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TPackage;
+import org.moosetechnology.model.famixjava.famixtraits.TPackageable;
+import org.moosetechnology.model.famixjava.famixtraits.TReference;
+import org.moosetechnology.model.famixjava.famixtraits.TReferenceable;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
+import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
+import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
+import org.moosetechnology.model.famixjava.famixtraits.TWithExceptions;
+import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
+import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
+import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
-
-import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Class")
-public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TClass, TEntityMetaLevelDependency, THasVisibility, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TOODependencyQueries, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithExceptions, TWithInheritances, TWithMethods, org.moosetechnology.model.famixjava.famixjavaentities.TClassMetrics, org.moosetechnology.model.famixjava.famixtraits.TClassMetrics {
+public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanImplement, TClass, TEntityMetaLevelDependency, THasVisibility, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TOODependencyQueries, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithExceptions, TWithInheritances, TWithMethods, org.moosetechnology.model.famixjava.famixjavaentities.TClassMetrics, org.moosetechnology.model.famixjava.famixtraits.TClassMetrics {
 
     private Boolean isInterface = false;
     
@@ -26,6 +55,8 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     private Collection<TException> exceptions; 
 
     private Collection<TReference> incomingReferences; 
+
+    private Collection<TImplementation> interfaceImplementations; 
 
     private Boolean isAbstract = false;
     
@@ -314,6 +345,57 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
         return !getIncomingReferences().isEmpty();
     }
 
+    @FameProperty(name = "interfaceImplementations", opposite = "implementingClass", derived = true)
+    public Collection<TImplementation> getInterfaceImplementations() {
+        if (interfaceImplementations == null) {
+            interfaceImplementations = new MultivalueSet<TImplementation>() {
+                @Override
+                protected void clearOpposite(TImplementation e) {
+                    e.setImplementingClass(null);
+                }
+                @Override
+                protected void setOpposite(TImplementation e) {
+                    e.setImplementingClass(Class.this);
+                }
+            };
+        }
+        return interfaceImplementations;
+    }
+    
+    public void setInterfaceImplementations(Collection<? extends TImplementation> interfaceImplementations) {
+        this.getInterfaceImplementations().clear();
+        this.getInterfaceImplementations().addAll(interfaceImplementations);
+    }                    
+    
+        
+    public void addInterfaceImplementations(TImplementation one) {
+        this.getInterfaceImplementations().add(one);
+    }   
+    
+    public void addInterfaceImplementations(TImplementation one, TImplementation... many) {
+        this.getInterfaceImplementations().add(one);
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }   
+    
+    public void addInterfaceImplementations(Iterable<? extends TImplementation> many) {
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }   
+                
+    public void addInterfaceImplementations(TImplementation[] many) {
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }
+    
+    public int numberOfInterfaceImplementations() {
+        return getInterfaceImplementations().size();
+    }
+
+    public boolean hasInterfaceImplementations() {
+        return !getInterfaceImplementations().isEmpty();
+    }
+
     @FameProperty(name = "isAbstract")
     public Boolean getIsAbstract() {
         return isAbstract;
@@ -346,7 +428,7 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     public void setIsFinal(Boolean isFinal) {
         this.isFinal = isFinal;
     }
-
+    
     @FameProperty(name = "isPackage", derived = true)
     public Boolean getIsPackage() {
         return this.visibility.equals("package");
@@ -505,6 +587,30 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     
     @FameProperty(name = "numberOfDirectSubclasses", derived = true)
     public Number getNumberOfDirectSubclasses() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

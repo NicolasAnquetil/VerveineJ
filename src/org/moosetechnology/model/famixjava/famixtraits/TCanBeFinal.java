@@ -8,12 +8,13 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TCanBeFinal")
-public interface TCanBeFinal {
+public interface TCanBeFinal  {
 
-    @FameProperty(name = "isFinal")
-    Boolean getIsFinal();
+        @FameProperty(name = "isFinal")
+    public Boolean getIsFinal();
 
-    void setIsFinal(Boolean isFinal);
+    public void setIsFinal(Boolean isFinal);
+
 
 
 }

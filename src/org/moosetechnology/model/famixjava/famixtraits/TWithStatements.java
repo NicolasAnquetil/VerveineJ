@@ -11,7 +11,7 @@ import ch.akuhn.fame.FameProperty;
 public interface TWithStatements  {
 
         @FameProperty(name = "numberOfStatements", derived = true)
-        Number getNumberOfStatements();
+    public Number getNumberOfStatements();
 
 
 

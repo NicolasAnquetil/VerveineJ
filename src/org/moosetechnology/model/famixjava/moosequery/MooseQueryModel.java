@@ -12,8 +12,8 @@ public class MooseQueryModel {
     }
     
     public static void importInto(MetaRepository metamodel) {
-		metamodel.with(org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency.class);
 		metamodel.with(org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries.class);
+		metamodel.with(org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency.class);
 		metamodel.with(org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency.class);
 
     }

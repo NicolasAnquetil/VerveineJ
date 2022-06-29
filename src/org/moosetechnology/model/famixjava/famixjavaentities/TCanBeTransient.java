@@ -8,12 +8,13 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("TCanBeTransient")
-public interface TCanBeTransient {
+public interface TCanBeTransient  {
 
-    @FameProperty(name = "isTransient")
-    Boolean getIsTransient();
+        @FameProperty(name = "isTransient")
+    public Boolean getIsTransient();
 
-    void setIsTransient(Boolean isTransient);
+    public void setIsTransient(Boolean isTransient);
+
 
 
 }

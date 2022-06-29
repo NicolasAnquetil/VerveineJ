@@ -8,12 +8,13 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("TCanBeSynchronized")
-public interface TCanBeSynchronized {
+public interface TCanBeSynchronized  {
 
-    @FameProperty(name = "isSynchronized")
-    Boolean getIsSynchronized();
+        @FameProperty(name = "isSynchronized")
+    public Boolean getIsSynchronized();
 
-    void setIsSynchronized(Boolean isSynchronized);
+    public void setIsSynchronized(Boolean isSynchronized);
+
 
 
 }

@@ -8,25 +8,26 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TClassMetrics")
-public interface TClassMetrics {
+public interface TClassMetrics  {
 
-    @FameProperty(name = "numberOfLocallyDefinedMethods", derived = true)
-    Number getNumberOfLocallyDefinedMethods();
+        @FameProperty(name = "numberOfLocallyDefinedMethods", derived = true)
+    public Number getNumberOfLocallyDefinedMethods();
 
     @FameProperty(name = "numberOfMethodsOverriden", derived = true)
-    Number getNumberOfMethodsOverriden();
+    public Number getNumberOfMethodsOverriden();
 
     @FameProperty(name = "numberOfAttributesInherited", derived = true)
-    Number getNumberOfAttributesInherited();
+    public Number getNumberOfAttributesInherited();
 
     @FameProperty(name = "totalNumberOfSubclasses", derived = true)
-    Number getTotalNumberOfSubclasses();
+    public Number getTotalNumberOfSubclasses();
 
     @FameProperty(name = "numberOfMethodsInherited", derived = true)
-    Number getNumberOfMethodsInherited();
+    public Number getNumberOfMethodsInherited();
 
     @FameProperty(name = "numberOfMethodsInHierarchy", derived = true)
-    Number getNumberOfMethodsInHierarchy();
+    public Number getNumberOfMethodsInHierarchy();
+
 
 
 }

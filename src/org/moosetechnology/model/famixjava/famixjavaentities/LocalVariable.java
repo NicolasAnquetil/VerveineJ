@@ -5,16 +5,32 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
+import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAccess;
+import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeFinal;
+import org.moosetechnology.model.famixjava.famixtraits.TComment;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
+import org.moosetechnology.model.famixjava.famixtraits.TLocalVariable;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
+import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
+import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
+import org.moosetechnology.model.famixjava.famixtraits.TWithLocalVariables;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
-
-import java.util.Collection;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("LocalVariable")
-public class LocalVariable extends NamedEntity implements TAccessible, TCanBeFinal, TEntityMetaLevelDependency, TInvocationsReceiver, TLocalVariable, TNamedEntity, TSourceEntity, TStructuralEntity, TTypedEntity {
+public class LocalVariable extends NamedEntity implements TAccessible, TCanBeFinal, TEntityMetaLevelDependency, TInvocationsReceiver, TLocalVariable, TNamedEntity, TSourceEntity, TStructuralEntity, TTypedEntity, TWithComments {
+
+    private Collection<TComment> comments; 
 
     private TType declaredType;
     
@@ -42,6 +58,57 @@ public class LocalVariable extends NamedEntity implements TAccessible, TCanBeFin
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
         
+    @FameProperty(name = "comments", opposite = "container", derived = true)
+    public Collection<TComment> getComments() {
+        if (comments == null) {
+            comments = new MultivalueSet<TComment>() {
+                @Override
+                protected void clearOpposite(TComment e) {
+                    e.setContainer(null);
+                }
+                @Override
+                protected void setOpposite(TComment e) {
+                    e.setContainer(LocalVariable.this);
+                }
+            };
+        }
+        return comments;
+    }
+    
+    public void setComments(Collection<? extends TComment> comments) {
+        this.getComments().clear();
+        this.getComments().addAll(comments);
+    }                    
+    
+        
+    public void addComments(TComment one) {
+        this.getComments().add(one);
+    }   
+    
+    public void addComments(TComment one, TComment... many) {
+        this.getComments().add(one);
+        for (TComment each : many)
+            this.getComments().add(each);
+    }   
+    
+    public void addComments(Iterable<? extends TComment> many) {
+        for (TComment each : many)
+            this.getComments().add(each);
+    }   
+                
+    public void addComments(TComment[] many) {
+        for (TComment each : many)
+            this.getComments().add(each);
+    }
+    
+    public int numberOfComments() {
+        return getComments().size();
+    }
+
+    public boolean hasComments() {
+        return !getComments().isEmpty();
+    }
+
     @FameProperty(name = "containsReplicas", derived = true)
     public Boolean getContainsReplicas() {
         // TODO: this is a derived property, implement this method manually.
@@ -77,6 +144,12 @@ public class LocalVariable extends NamedEntity implements TAccessible, TCanBeFin
     
     @FameProperty(name = "fanOut", derived = true)
     public Number getFanOut() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "hasComments", derived = true)
+    public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -189,14 +262,44 @@ public class LocalVariable extends NamedEntity implements TAccessible, TCanBeFin
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfComments", derived = true)
+    public Number getNumberOfComments() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfDeadChildren", derived = true)
     public Number getNumberOfDeadChildren() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfGlobalAccesses", derived = true)
     public Number getNumberOfGlobalAccesses() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

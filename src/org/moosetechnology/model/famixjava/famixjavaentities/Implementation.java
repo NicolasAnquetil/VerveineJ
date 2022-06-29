@@ -6,17 +6,22 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
 import org.moosetechnology.model.famixjava.famixtraits.TAssociation;
-import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
+import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementable;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
-@FameDescription("Inheritance")
-public class Inheritance extends Entity implements TAssociation, TAssociationMetaLevelDependency, TInheritance, TSourceEntity {
+@FameDescription("Implementation")
+public class Implementation extends Entity implements TAssociation, TAssociationMetaLevelDependency, TImplementation, TSourceEntity {
 
+    private TCanImplement implementingClass;
+    
+    private TImplementable myInterface;
+    
     private Boolean isStub;
     
     private TAssociation next;
@@ -26,10 +31,6 @@ public class Inheritance extends Entity implements TAssociation, TAssociationMet
     private TAssociation previous;
     
     private TSourceAnchor sourceAnchor;
-    
-    private TWithInheritances subclass;
-    
-    private TWithInheritances superclass;
     
 
 
@@ -43,6 +44,36 @@ public class Inheritance extends Entity implements TAssociation, TAssociationMet
     public Number getDuplicationRate() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "implementingClass", opposite = "interfaceImplementations")
+    public TCanImplement getImplementingClass() {
+        return implementingClass;
+    }
+
+    public void setImplementingClass(TCanImplement implementingClass) {
+        if (this.implementingClass != null) {
+            if (this.implementingClass.equals(implementingClass)) return;
+            this.implementingClass.getInterfaceImplementations().remove(this);
+        }
+        this.implementingClass = implementingClass;
+        if (implementingClass == null) return;
+        implementingClass.getInterfaceImplementations().add(this);
+    }
+    
+    @FameProperty(name = "interface", opposite = "implementations")
+    public TImplementable getMyInterface() {
+        return myInterface;
+    }
+
+    public void setMyInterface(TImplementable myInterface) {
+        if (this.myInterface != null) {
+            if (this.myInterface.equals(myInterface)) return;
+            this.myInterface.getImplementations().remove(this);
+        }
+        this.myInterface = myInterface;
+        if (myInterface == null) return;
+        myInterface.getImplementations().add(this);
     }
     
     @FameProperty(name = "isStub")
@@ -121,36 +152,6 @@ public class Inheritance extends Entity implements TAssociation, TAssociationMet
     public String getSourceText() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "subclass", opposite = "superInheritances")
-    public TWithInheritances getSubclass() {
-        return subclass;
-    }
-
-    public void setSubclass(TWithInheritances subclass) {
-        if (this.subclass != null) {
-            if (this.subclass.equals(subclass)) return;
-            this.subclass.getSuperInheritances().remove(this);
-        }
-        this.subclass = subclass;
-        if (subclass == null) return;
-        subclass.getSuperInheritances().add(this);
-    }
-    
-    @FameProperty(name = "superclass", opposite = "subInheritances")
-    public TWithInheritances getSuperclass() {
-        return superclass;
-    }
-
-    public void setSuperclass(TWithInheritances superclass) {
-        if (this.superclass != null) {
-            if (this.superclass.equals(superclass)) return;
-            this.superclass.getSubInheritances().remove(this);
-        }
-        this.superclass = superclass;
-        if (superclass == null) return;
-        superclass.getSubInheritances().add(this);
     }
     
 

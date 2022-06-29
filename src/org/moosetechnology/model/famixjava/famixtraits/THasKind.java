@@ -8,24 +8,25 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("THasKind")
-public interface THasKind {
+public interface THasKind  {
 
-    @FameProperty(name = "isGetter", derived = true)
-    Boolean getIsGetter();
+        @FameProperty(name = "isGetter", derived = true)
+    public Boolean getIsGetter();
 
     @FameProperty(name = "isConstant", derived = true)
-    Boolean getIsConstant();
+    public Boolean getIsConstant();
 
     @FameProperty(name = "kind")
-    String getKind();
+    public String getKind();
 
-    void setKind(String kind);
+    public void setKind(String kind);
 
     @FameProperty(name = "isConstructor", derived = true)
-    Boolean getIsConstructor();
+    public Boolean getIsConstructor();
 
     @FameProperty(name = "isSetter", derived = true)
-    Boolean getIsSetter();
+    public Boolean getIsSetter();
+
 
 
 }

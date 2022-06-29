@@ -4,8 +4,7 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-
-import java.util.Collection;
+import java.util.*;
 
 
 @FamePackage("Famix-Traits")
@@ -13,27 +12,27 @@ import java.util.Collection;
 public interface THasModifiers  {
 
         @FameProperty(name = "isFinal", derived = true)
-        Boolean getIsFinal();
+    public Boolean getIsFinal();
 
     @FameProperty(name = "modifiers")
-    Collection<String> getModifiers();
+    public Collection<String> getModifiers();
 
-    void setModifiers(Collection<? extends String> modifiers);
+    public void setModifiers(Collection<? extends String> modifiers);
 
-    void addModifiers(String one);
+    public void addModifiers(String one);
 
-    void addModifiers(String one, String... many);
+    public void addModifiers(String one, String... many);
 
-    void addModifiers(Iterable<? extends String> many);
+    public void addModifiers(Iterable<? extends String> many);
 
-    void addModifiers(String[] many);
+    public void addModifiers(String[] many);
 
-    int numberOfModifiers();
+    public int numberOfModifiers();
 
-    boolean hasModifiers();
+    public boolean hasModifiers();
 
     @FameProperty(name = "isAbstract", derived = true)
-    Boolean getIsAbstract();
+    public Boolean getIsAbstract();
 
 
 

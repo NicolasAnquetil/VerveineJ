@@ -11,7 +11,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 @FameDescription("TAnnotationInstance")
 public interface TAnnotationInstance  {
 
-        @FameProperty(name = "annotatedEntity", opposite = "annotationInstances", container = true)
+        @FameProperty(name = "annotatedEntity", opposite = "annotationInstances")
     public TWithAnnotationInstances getAnnotatedEntity();
 
     public void setAnnotatedEntity(TWithAnnotationInstances annotatedEntity);

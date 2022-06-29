@@ -8,22 +8,23 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("TClassMetrics")
-public interface TClassMetrics {
+public interface TClassMetrics  {
 
-    @FameProperty(name = "numberOfProtectedMethods", derived = true)
-    Number getNumberOfProtectedMethods();
+        @FameProperty(name = "numberOfProtectedMethods", derived = true)
+    public Number getNumberOfProtectedMethods();
 
     @FameProperty(name = "numberOfPrivateMethods", derived = true)
-    Number getNumberOfPrivateMethods();
+    public Number getNumberOfPrivateMethods();
 
     @FameProperty(name = "numberOfPublicMethods", derived = true)
-    Number getNumberOfPublicMethods();
+    public Number getNumberOfPublicMethods();
 
     @FameProperty(name = "numberOfAccessorMethods", derived = true)
-    Number getNumberOfAccessorMethods();
+    public Number getNumberOfAccessorMethods();
 
     @FameProperty(name = "numberOfConstructorMethods", derived = true)
-    Number getNumberOfConstructorMethods();
+    public Number getNumberOfConstructorMethods();
+
 
 
 }

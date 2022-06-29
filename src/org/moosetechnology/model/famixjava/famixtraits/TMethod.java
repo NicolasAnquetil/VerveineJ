@@ -4,22 +4,24 @@ package org.moosetechnology.model.famixjava.famixtraits;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
+import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 
 
 @FamePackage("Famix-Traits")
 @FameDescription("TMethod")
 public interface TMethod  {
 
-        @FameProperty(name = "numberOfMessageSends", derived = true)
-        Number getNumberOfMessageSends();
+        @FameProperty(name = "hasClassScope", derived = true)
+    public Boolean getHasClassScope();
 
-    @FameProperty(name = "hasClassScope", derived = true)
-    Boolean getHasClassScope();
+    @FameProperty(name = "numberOfMessageSends", derived = true)
+    public Number getNumberOfMessageSends();
 
     @FameProperty(name = "parentType", opposite = "methods", container = true)
-    TWithMethods getParentType();
+    public TWithMethods getParentType();
 
-    void setParentType(TWithMethods parentType);
+    public void setParentType(TWithMethods parentType);
 
 
 

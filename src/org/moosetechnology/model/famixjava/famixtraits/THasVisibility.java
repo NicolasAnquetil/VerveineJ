@@ -8,24 +8,25 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("THasVisibility")
-public interface THasVisibility {
+public interface THasVisibility  {
 
-    @FameProperty(name = "isProtected", derived = true)
-    Boolean getIsProtected();
+        @FameProperty(name = "isProtected", derived = true)
+    public Boolean getIsProtected();
 
     @FameProperty(name = "visibility")
-    String getVisibility();
+    public String getVisibility();
 
-    void setVisibility(String visibility);
+    public void setVisibility(String visibility);
 
     @FameProperty(name = "isPublic", derived = true)
-    Boolean getIsPublic();
+    public Boolean getIsPublic();
 
     @FameProperty(name = "isPackage", derived = true)
-    Boolean getIsPackage();
+    public Boolean getIsPackage();
 
     @FameProperty(name = "isPrivate", derived = true)
-    Boolean getIsPrivate();
+    public Boolean getIsPrivate();
+
 
 
 }
