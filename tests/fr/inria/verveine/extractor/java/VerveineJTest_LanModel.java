@@ -85,7 +85,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		int nbClasses = 18; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable} + 1 Anonymous class IPrinter 
 		int nbInterfaces = 10; // Flushable + AutoCloseable + Serializable + Constable + Closeable + Appendable + CharSequence + ConstantDesc + IPrinter
-		int nbInherit = 35;
+		int nbInherit = 36;
 
 		assertEquals(nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
@@ -96,14 +96,14 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(2 + 4 + 1, entitiesOfType(Package.class).size());//2+{moose,java.lang,java.io,java} // +1 new package named java.lang.constant (java17?)
 		assertEquals(26, entitiesOfType(Parameter.class).size());
 		assertEquals(55, entitiesOfType(Invocation.class).size());
-		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());
 		assertEquals(45, entitiesOfType(Access.class).size());// 17 "internal" attributes + 9 System.out + 18 "this" + 1 "super"
 		assertEquals(0, entitiesOfType(LocalVariable.class).size());
 		assertEquals(1, entitiesOfType(AnnotationType.class).size()); //Override
 		assertEquals(2, entitiesOfType(AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
 		assertEquals(32, entitiesOfType(Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);// PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
 		assertEquals(0, entitiesOfType(ParameterizableClass.class).size()); // There is not ParameterizableClass
-
+		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());
+		assertEquals(nbInherit, entitiesOfType(Implementation.class).size());
 	}
 
 	@Test
