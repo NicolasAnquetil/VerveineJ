@@ -162,10 +162,13 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 			}
 			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) t, fmx, lastInheritance);
 		}
-		// --------------- interfaces implemented
 		for (ITypeBinding intbnd : bnd.getInterfaces()) {
 			Interface interface1 = (Interface) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true);
-			dico.ensureFamixImplementation(interface1, (TCanImplement) fmx, lastInheritance);
+			if(fmx instanceof Interface ) {
+				dico.ensureFamixInheritance(interface1, fmx, lastInheritance);
+			} else {
+				dico.ensureFamixImplementation(interface1, (TCanImplement) fmx, lastInheritance);
+			}
 		}
 	}
 

@@ -282,8 +282,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 		assertEquals(7, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable, ConstantDesc, Constable
 		assertEquals(3, entitiesOfType(ParameterizableClass.class).size()); //
-		assertEquals(10, entitiesOfType(Interface.class).size());
-		assertEquals(4, entitiesOfType(ParameterizableInterface.class).size());
+		assertEquals(9, entitiesOfType(Interface.class).size());
+		assertEquals(3, entitiesOfType(ParameterizableInterface.class).size());
 	}
 
 	@Test
