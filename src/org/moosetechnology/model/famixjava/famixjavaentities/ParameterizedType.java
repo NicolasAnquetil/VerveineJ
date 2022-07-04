@@ -6,6 +6,9 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
+import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementable;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
 import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
 import org.moosetechnology.model.famixjava.famixtraits.TParameterizedType;
 import org.moosetechnology.model.famixjava.famixtraits.TParameterizedTypeUser;
@@ -16,9 +19,13 @@ import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("ParameterizedType")
-public class ParameterizedType extends Type implements TParameterizedType, TWithInheritances, TWithParameterizedTypeUsers {
+public class ParameterizedType extends Type implements TCanImplement, TImplementable, TParameterizedType, TWithInheritances, TWithParameterizedTypeUsers {
 
     private Collection<TParameterizedTypeUser> arguments; 
+
+    private Collection<TImplementation> implementations; 
+
+    private Collection<TImplementation> interfaceImplementations; 
 
     private TWithParameterizedTypes parameterizableClass;
     
@@ -84,6 +91,108 @@ public class ParameterizedType extends Type implements TParameterizedType, TWith
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "implementations", opposite = "interface", derived = true)
+    public Collection<TImplementation> getImplementations() {
+        if (implementations == null) {
+            implementations = new MultivalueSet<TImplementation>() {
+                @Override
+                protected void clearOpposite(TImplementation e) {
+                    e.setMyInterface(null);
+                }
+                @Override
+                protected void setOpposite(TImplementation e) {
+                    e.setMyInterface(ParameterizedType.this);
+                }
+            };
+        }
+        return implementations;
+    }
+    
+    public void setImplementations(Collection<? extends TImplementation> implementations) {
+        this.getImplementations().clear();
+        this.getImplementations().addAll(implementations);
+    }                    
+    
+        
+    public void addImplementations(TImplementation one) {
+        this.getImplementations().add(one);
+    }   
+    
+    public void addImplementations(TImplementation one, TImplementation... many) {
+        this.getImplementations().add(one);
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
+    }   
+    
+    public void addImplementations(Iterable<? extends TImplementation> many) {
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
+    }   
+                
+    public void addImplementations(TImplementation[] many) {
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
+    }
+    
+    public int numberOfImplementations() {
+        return getImplementations().size();
+    }
+
+    public boolean hasImplementations() {
+        return !getImplementations().isEmpty();
+    }
+
+    @FameProperty(name = "interfaceImplementations", opposite = "implementingClass", derived = true)
+    public Collection<TImplementation> getInterfaceImplementations() {
+        if (interfaceImplementations == null) {
+            interfaceImplementations = new MultivalueSet<TImplementation>() {
+                @Override
+                protected void clearOpposite(TImplementation e) {
+                    e.setImplementingClass(null);
+                }
+                @Override
+                protected void setOpposite(TImplementation e) {
+                    e.setImplementingClass(ParameterizedType.this);
+                }
+            };
+        }
+        return interfaceImplementations;
+    }
+    
+    public void setInterfaceImplementations(Collection<? extends TImplementation> interfaceImplementations) {
+        this.getInterfaceImplementations().clear();
+        this.getInterfaceImplementations().addAll(interfaceImplementations);
+    }                    
+    
+        
+    public void addInterfaceImplementations(TImplementation one) {
+        this.getInterfaceImplementations().add(one);
+    }   
+    
+    public void addInterfaceImplementations(TImplementation one, TImplementation... many) {
+        this.getInterfaceImplementations().add(one);
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }   
+    
+    public void addInterfaceImplementations(Iterable<? extends TImplementation> many) {
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }   
+                
+    public void addInterfaceImplementations(TImplementation[] many) {
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }
+    
+    public int numberOfInterfaceImplementations() {
+        return getInterfaceImplementations().size();
+    }
+
+    public boolean hasInterfaceImplementations() {
+        return !getInterfaceImplementations().isEmpty();
+    }
+
     @FameProperty(name = "numberOfDirectSubclasses", derived = true)
     public Number getNumberOfDirectSubclasses() {
         // TODO: this is a derived property, implement this method manually.

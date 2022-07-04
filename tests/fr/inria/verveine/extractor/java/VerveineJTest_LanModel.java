@@ -103,7 +103,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(32, entitiesOfType(Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);// PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
 		assertEquals(0, entitiesOfType(ParameterizableClass.class).size()); // There is not ParameterizableClass
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());
-		assertEquals(nbInherit, entitiesOfType(Implementation.class).size());
+		assertEquals(2, entitiesOfType(Implementation.class).size());
 	}
 
 	@Test
@@ -233,6 +233,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
 		Collection<TInheritance> superInheritances;
 		Inheritance inh, inh2 = null;
+		Collection<TInheritance> inherits;
+		Collection<TImplementation> implementations;
 
 		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "PrintServer");
 		assertNotNull(clazz);
@@ -255,27 +257,38 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "XPrinter");
 		assertNotNull(clazz);
-		superInheritances = clazz.getSuperInheritances();
-		assertEquals(2, superInheritances.size()); // superInheritances: Object and IPrinter (in this order)
-		for (TInheritance tinheritance : superInheritances) {
-			Inheritance inheritance = (Inheritance) tinheritance;
-			assertSame(clazz, inheritance.getSubclass());
-			if (((TNamedEntity) inheritance.getSuperclass()).getName().equals("IPrinter")) {
-				inh2 = inheritance;
-				assertNull(inheritance.getNext());
-				assertSame(inheritance, inheritance.getPrevious().getNext());
-				assertSame(detectFamixElement(Interface.class,
-						"IPrinter"), inheritance.getSuperclass());
-			} else {
-				inh = inheritance;
-				assertNull(inheritance.getPrevious());
-				assertSame(inheritance, inheritance.getNext().getPrevious());
-				assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class,
-						JavaDictionary.OBJECT_NAME), inheritance.getSuperclass());
-			}
-		}
-		assertSame(inh.getNext(), inh2);
-		assertSame(inh2.getPrevious(), inh);
+		inherits = clazz.getSuperInheritances();
+		assertEquals(1, inherits.size()); // superInheritances: Object (in this order)
+		implementations = clazz.getInterfaceImplementations();
+		assertEquals(1, implementations.size()); // IPrinter
+
+			/**
+			 * Order shold be extends Object and then implements IPrinter
+			 */
+
+
+		Implementation implem = (Implementation) implementations.iterator().next();
+		assertSame(clazz, implem.getImplementingClass());
+		assertNull(implem.getNext());
+		assertSame(implem, implem.getPrevious().getNext());
+		assertSame(detectFamixElement(Interface.class, "IPrinter"), implem.getMyInterface());
+
+		inh = (Inheritance) inherits.iterator().next();;
+		assertSame(clazz, inh.getSubclass());
+		assertNull(inh.getPrevious());
+		assertSame(inh, inh.getNext().getPrevious());
+		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+
+		assertSame(inh.getNext(), implem);
+		assertSame(implem.getPrevious(), inh);
+
+
+		Interface interfacePrinter = detectFamixElement(Interface.class, "IPrinter");
+		assertNotNull(interfacePrinter);
+		inherits = interfacePrinter.getSubInheritances();
+		assertEquals(0, inherits.size());
+		Collection<TImplementation> impls = interfacePrinter.getImplementations();
+		assertEquals(2, impls.size()); // XPrinter and Anonymous Printer
 	}
 
 	@Test

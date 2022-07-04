@@ -292,23 +292,6 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			}
 		}
 
-		// --------------- superclasses (including interfaces)
-		Collection<Type> sups = new LinkedList<Type>();
-		if (bnd != null) {
-			if (!bnd.isInterface()) {
-				ITypeBinding supbnd = bnd.getSuperclass();
-				if (supbnd != null) {
-					sups.add(ensureFamixType(supbnd, alwaysPersist));
-				}
-				else {
-					sups.add( ensureFamixClassObject(null));
-				}
-			}
-			for (ITypeBinding intbnd : bnd.getInterfaces()) {
-				sups.add( ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist));
-			}
-		}
-
 		// ---------------- create
 		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
@@ -326,10 +309,21 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 			if (persistIt) {
-				Inheritance lastInheritance = null;
-				for (Type sup : sups) {
-					lastInheritance = ensureFamixInheritance((TWithInheritances) sup, fmx, lastInheritance);
-					// TODO create FileAnchor for each inheritance link ???
+				TAssociation lastInheritance = null;
+				Collection<Type> sups = new LinkedList<Type>();
+				if (bnd != null) {
+					ITypeBinding supbnd = bnd.getSuperclass();
+					if (supbnd != null) {
+						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastInheritance);
+					}
+					else {
+						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastInheritance);
+					}
+					if (!bnd.isInterface()) {
+						for (ITypeBinding intbnd : bnd.getInterfaces()) {
+							lastInheritance = ensureFamixImplementation((TImplementable) ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist), (TCanImplement)fmx, lastInheritance);
+						}
+					}
 				}
 			}
 		}
@@ -396,23 +390,6 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			}
 		}
 
-		// --------------- superclasses (including interfaces)
-		Collection<Type> sups = new LinkedList<Type>();
-		if (bnd != null) {
-			if (!bnd.isInterface()) {
-				ITypeBinding supbnd = bnd.getSuperclass();
-				if (supbnd != null) {
-					sups.add(ensureFamixType(supbnd, alwaysPersist));
-				}
-				else {
-					sups.add( ensureFamixClassObject(null));
-				}
-			}
-			for (ITypeBinding intbnd : bnd.getInterfaces()) {
-				sups.add( ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist));
-			}
-		}
-
 		// ---------------- create
 		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
@@ -430,10 +407,21 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 			if (persistIt) {
-				Inheritance lastInheritance = null;
-				for (Type sup : sups) {
-					lastInheritance = ensureFamixInheritance((TWithInheritances) sup, fmx, lastInheritance);
-					// TODO create FileAnchor for each inheritance link ???
+				TAssociation lastInheritance = null;
+				Collection<Type> sups = new LinkedList<Type>();
+				if (bnd != null) {
+					ITypeBinding supbnd = bnd.getSuperclass();
+					if (supbnd != null) {
+						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastInheritance);
+					}
+					else {
+						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastInheritance);
+					}
+					if (!bnd.isInterface()) {
+						for (ITypeBinding intbnd : bnd.getInterfaces()) {
+							lastInheritance = ensureFamixImplementation((TImplementable) ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist), (TCanImplement)fmx, lastInheritance);
+						}
+					}
 				}
 			}
 		}
