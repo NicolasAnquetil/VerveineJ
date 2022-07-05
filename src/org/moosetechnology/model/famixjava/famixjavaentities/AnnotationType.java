@@ -10,6 +10,8 @@ import org.moosetechnology.model.famixjava.famixtraits.TAnnotationType;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
 import org.moosetechnology.model.famixjava.famixtraits.TComment;
 import org.moosetechnology.model.famixjava.famixtraits.THasVisibility;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementable;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
 import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
 import org.moosetechnology.model.famixjava.famixtraits.TPackage;
 import org.moosetechnology.model.famixjava.famixtraits.TPackageable;
@@ -22,13 +24,15 @@ import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("AnnotationType")
-public class AnnotationType extends Type implements TAnnotationType, THasVisibility, TPackageable, TWithAttributes, TWithComments, TWithInheritances {
+public class AnnotationType extends Type implements TAnnotationType, THasVisibility, TImplementable, TPackageable, TWithAttributes, TWithComments, TWithInheritances {
 
     private TWithAnnotationTypes annotationTypesContainer;
     
     private Collection<TAttribute> attributes; 
 
     private Collection<TComment> comments; 
+
+    private Collection<TImplementation> implementations; 
 
     private Collection<TTypedAnnotationInstance> instances; 
 
@@ -171,6 +175,57 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "implementations", opposite = "interface", derived = true)
+    public Collection<TImplementation> getImplementations() {
+        if (implementations == null) {
+            implementations = new MultivalueSet<TImplementation>() {
+                @Override
+                protected void clearOpposite(TImplementation e) {
+                    e.setMyInterface(null);
+                }
+                @Override
+                protected void setOpposite(TImplementation e) {
+                    e.setMyInterface(AnnotationType.this);
+                }
+            };
+        }
+        return implementations;
+    }
+    
+    public void setImplementations(Collection<? extends TImplementation> implementations) {
+        this.getImplementations().clear();
+        this.getImplementations().addAll(implementations);
+    }                    
+    
+        
+    public void addImplementations(TImplementation one) {
+        this.getImplementations().add(one);
+    }   
+    
+    public void addImplementations(TImplementation one, TImplementation... many) {
+        this.getImplementations().add(one);
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
+    }   
+    
+    public void addImplementations(Iterable<? extends TImplementation> many) {
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
+    }   
+                
+    public void addImplementations(TImplementation[] many) {
+        for (TImplementation each : many)
+            this.getImplementations().add(each);
+    }
+    
+    public int numberOfImplementations() {
+        return getImplementations().size();
+    }
+
+    public boolean hasImplementations() {
+        return !getImplementations().isEmpty();
+    }
+
     @FameProperty(name = "instances", opposite = "annotationType", derived = true)
     public Collection<TTypedAnnotationInstance> getInstances() {
         if (instances == null) {

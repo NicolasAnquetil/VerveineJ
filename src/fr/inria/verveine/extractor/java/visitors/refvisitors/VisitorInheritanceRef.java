@@ -11,6 +11,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TAssociation;
 import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementable;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 
 import java.util.Collection;
@@ -163,9 +164,9 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) t, fmx, lastInheritance);
 		}
 		for (ITypeBinding intbnd : bnd.getInterfaces()) {
-			Interface interface1 = (Interface) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true);
+			TImplementable interface1 = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true);
 			if(fmx instanceof Interface ) {
-				dico.ensureFamixInheritance(interface1, fmx, lastInheritance);
+				dico.ensureFamixInheritance((Interface)interface1, fmx, lastInheritance);
 			} else {
 				dico.ensureFamixImplementation(interface1, (TCanImplement) fmx, lastInheritance);
 			}
