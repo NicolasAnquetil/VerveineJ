@@ -1,11 +1,13 @@
 package fr.inria.verveine.extractor.java.visitors;
 
+import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.EntityStack;
-import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
+import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 
@@ -73,13 +75,13 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 
 	// CompilationUnit --> FamixNamespace
 
-	protected Namespace visitCompilationUnit(CompilationUnit node) {
-		Namespace fmx;
+	protected Package visitCompilationUnit(CompilationUnit node) {
+		Package fmx;
 		PackageDeclaration pckg = node.getPackage();
 		if (pckg == null) {
-			fmx = dico.getFamixNamespaceDefault();
+			fmx = dico.getFamixPackageDefault();
 		} else {
-			fmx = (Namespace) dico.getEntityByKey(pckg.resolveBinding());
+			fmx = (Package) dico.getEntityByKey(pckg.resolveBinding());
 		}
 		this.context.pushPckg(fmx);
 
@@ -97,10 +99,14 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Can only be a class or interface declaration
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
-	protected org.moosetechnology.model.famixjava.famixjavaentities.Class visitTypeDeclaration(TypeDeclaration node) {
+	protected Type visitTypeDeclaration(TypeDeclaration node) {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
-
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
+		Type fmx;
+		if(bnd.isInterface()) {
+			fmx = dico.getFamixInterface(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
+		} else {
+			fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
+		}
 		if (fmx != null) {
 			this.context.pushType(fmx);
 		}
@@ -108,7 +114,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected void endVisitTypeDeclaration(TypeDeclaration node) {
-		if (context.topType() instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class) {
+		if (context.topType() instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class || context.topType() instanceof Interface) {
 			context.pop();
 		}
 		super.endVisit(node);

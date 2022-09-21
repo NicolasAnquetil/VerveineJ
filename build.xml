@@ -26,7 +26,7 @@
 	</target>
 
 	<target name="compile" depends="clean, makedir">
-		<javac srcdir="${src.dir}" destdir="${build.dir}" source="11" target="11" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
+		<javac srcdir="${src.dir}" destdir="${build.dir}" source="17" target="17" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
@@ -70,14 +70,15 @@
 
 	<!-- Run the JUnit Tests -->
 	<target name="junit" depends="jar">
-		<junit printsummary="on" fork="true" haltonfailure="true" haltonerror="true">
+		<junit fork="false" haltonfailure="true" haltonerror="true">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				   <include name="*.jar"/>
 				</fileset>
 			</classpath>
+
+			<formatter type="plain" usefile="false" />
 			<formatter type="plain"/>
-			<formatter type="xml" />
 			
 			 <batchtest fork="yes" todir="${test.report.dir}">
 			     <fileset dir="${testsrc.dir}">

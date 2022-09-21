@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Class;
 import org.moosetechnology.model.famixjava.famixjavaentities.Comment;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
 import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
@@ -39,6 +40,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	public static final String MODIFIER_PUBLIC   = "public";
 	public static final String MODIFIER_PRIVATE  = "private";
 	public static final String MODIFIER_PROTECTED= "protected";
+	public static final String MODIFIER_PACKAGE = "package";
 	public static final String MODIFIER_FINAL    = "final";
 	public static final String MODIFIER_STATIC    = "static";
 	public static final String MODIFIER_TRANSIENT = "transient";
@@ -67,48 +69,47 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * Returns the namespace with {@link AbstractDictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
 	 */
-	public Namespace getFamixNamespaceDefault() {
-		Collection<Namespace> l = getEntityByName( Namespace.class, DEFAULT_PCKG_NAME);
+	public Package getFamixPackageDefault() {
+		Collection<Package> l = getEntityByName(Package.class, DEFAULT_PCKG_NAME);
 		if (l.size() > 0) {
 			return l.iterator().next();
-		}
-		else {
+		} else {
 			return null;
 		}
 	}
 
 	/**
 	 * Returns a Famix Namespace associated with its IPackageBinding and/or fully qualified name.
-	 * The Entity is created if it does not exist (see also {@link AbstractDictionary#ensureFamixNamespace(Object, String)}).
+	 * The Entity is created if it does not exist (see also {@link AbstractDictionary#ensureFamixPackage(Object, String)}).
 	 * Also creates or recovers recusively it's parent namespaces.<br>
 	 * At least one of <b>bnd</b> and <b>name</b> must be non null.
-	 * @param bnd -- the JDT Binding that may be used as a uniq key to recover this namespace
+	 *
+	 * @param bnd  -- the JDT Binding that may be used as a uniq key to recover this namespace
 	 * @param name -- fully qualified name of the namespace (e.g. 'java.lang')
 	 * @return the Famix Namespace found or created. May return null in case of a Famix error
 	 */
-	public Namespace ensureFamixNamespace(IPackageBinding bnd, String name) {
-		Namespace fmx = null;
-		Namespace parent = null;
+	public Package ensureFamixPackage(IPackageBinding bnd, String name) {
+		Package fmx = null;
+		Package parent = null;
 
-		if ( (name == null) && (bnd != null) ) {
+		if ((name == null) && (bnd != null)) {
 			name = bnd.getName();
 		}
 
-		if ( (name == null)  || name.equals("") ) {
-			return ensureFamixNamespaceDefault();
-		}
-		else {
+		if ((name == null) || name.equals("")) {
+			return ensureFamixPackageDefault();
+		} else {
 			/* Note: Packages are created with their fully-qualified name to simplify recovering when we don't have a binding
 			 * (for example when creating parent packages of a package we have a binding for).
 			 * Because the preferred solution in Moose is to give their simple names to packages, they must be post-processed when
 			 * all is said and done. */
-			fmx = super.ensureFamixNamespace( bnd, name);
+			fmx = super.ensureFamixPackage(bnd, name);
 			String parentName = removeLastName(name);
 			if (parentName.length() > 0) {
-				parent = ensureFamixNamespace(null, parentName);
+				parent = ensureFamixPackage(null, parentName);
 				// set the parentscope relationship
-				if ((parent != null) && (fmx != null) && (fmx.getParentNamespace() == null)) {
-					parent.addChildNamespaces(fmx);
+				if ((parent != null) && (fmx != null) && (fmx.getParentPackage() == null)) {
+					parent.addChildEntities(fmx);
 				}
 			}
 		}
@@ -145,8 +146,8 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 				return fmx;
 			}
 
-			if ( (owner != null) && (owner instanceof ParameterizableClass) ) {
-				return this.ensureFamixParameterType(null, name, (ParameterizableClass) owner, alwaysPersist);
+			if ( (owner != null) && (owner instanceof TWithParameterizedTypes) ) {
+				return this.ensureFamixParameterType(null, name, (TWithParameterizedTypes) owner, alwaysPersist);
 			}
 			else {
 				// impossible to decide whether to persist it or not. So we just hope for the best
@@ -173,8 +174,12 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			return this.ensureFamixEnum(bnd, name, owner);
 		}
 
-		if (bnd.isRawType() || bnd.isGenericType()) {
+		if ((bnd.isRawType() || bnd.isGenericType()) && !bnd.isInterface() ) {
 			return this.ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
+		}
+
+		if ((bnd.isRawType() || bnd.isGenericType()) && bnd.isInterface() ) {
+			return this.ensureFamixInterface(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
 		}
 
 		if (bnd.isParameterizedType()) {
@@ -186,8 +191,11 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// it seems wise to test isClass after isGenericType, isParameterizedType, ... ?
-		if (bnd.isClass() || bnd.isInterface()) {
+		if (bnd.isClass()) {
 			return this.ensureFamixClass(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
+		}
+		if (bnd.isInterface()) {
+			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
 		}
 
 		if (name == null) {
@@ -270,7 +278,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- owner
 		if (owner == null) {
 			if (bnd == null) {
-				owner = ensureFamixNamespaceDefault();
+				owner = ensureFamixPackageDefault();
 			} else {
 				owner = ensureOwner(bnd, alwaysPersist);
 			}
@@ -281,23 +289,6 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			if (matchAndMapClass(bnd, name, owner, candidate)) {
 				fmx = candidate;
 				break;
-			}
-		}
-
-		// --------------- superclasses (including interfaces)
-		Collection<Type> sups = new LinkedList<Type>();
-		if (bnd != null) {
-			if (!bnd.isInterface()) {
-				ITypeBinding supbnd = bnd.getSuperclass();
-				if (supbnd != null) {
-					sups.add(ensureFamixType(supbnd, alwaysPersist));
-				}
-				else {
-					sups.add( ensureFamixClassObject(null));
-				}
-			}
-			for (ITypeBinding intbnd : bnd.getInterfaces()) {
-				sups.add( ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist));
 			}
 		}
 
@@ -315,14 +306,24 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		if (fmx!=null) {
 			// we just created it or it was not bound, so we make sure it has the right information in it
 			if (bnd != null) {
-				fmx.setIsInterface( bnd.isInterface());
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 			if (persistIt) {
-				Inheritance lastInheritance = null;
-				for (Type sup : sups) {
-					lastInheritance = ensureFamixInheritance((TWithInheritances) sup, fmx, lastInheritance);
-					// TODO create FileAnchor for each inheritance link ???
+				TAssociation lastInheritance = null;
+				Collection<Type> sups = new LinkedList<Type>();
+				if (bnd != null) {
+					ITypeBinding supbnd = bnd.getSuperclass();
+					if (supbnd != null) {
+						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastInheritance);
+					}
+					else {
+						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastInheritance);
+					}
+					if (!bnd.isInterface()) {
+						for (ITypeBinding intbnd : bnd.getInterfaces()) {
+							lastInheritance = ensureFamixImplementation((TImplementable) ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist), (TCanImplement)fmx, lastInheritance);
+						}
+					}
 				}
 			}
 		}
@@ -330,27 +331,131 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return fmx;
 	}
 
+	public Interface ensureFamixInterface(ITypeBinding bnd, String name, ContainerEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+		Interface fmx = null;
+
+		// --------------- some special cases
+		if (bnd != null) {
+			if (bnd.isArray()) {
+				bnd = bnd.getElementType();
+			}
+
+			// for inner classes defined in generics !!! For others should not change anything
+			bnd = bnd.getErasure();
+		}
+
+		// ---------------- to avoid useless computations if we can
+		fmx = (Interface) getEntityByKey(bnd);
+		if (fmx != null) {
+			return fmx;
+		}
+
+		// --------------- name
+		if (name == null) {
+			if (bnd == null) {
+				return null;  // not much we can do
+			} else if (!bnd.isAnonymous()) {
+				name = bnd.getErasure().getName();  // for generics, will give the "core" type name, for normal type, won't change anything
+			} else { // anonymous class
+				if (bnd.getSuperclass() != null) {
+					name = bnd.getSuperclass().getName();
+				}
+				if ((name == null) || name.equals(OBJECT_NAME)) {
+					ITypeBinding[] intfcs = bnd.getInterfaces();
+					if ((intfcs != null) && (intfcs.length > 0)) {
+						name = bnd.getInterfaces()[0].getName();
+					}
+					else {
+						name = "???";
+					}
+				}
+				name = ANONYMOUS_NAME_PREFIX + "(" + name + ")";
+			}
+		}
+
+		// --------------- owner
+		if (owner == null) {
+			if (bnd == null) {
+				owner = ensureFamixPackageDefault();
+			} else {
+				owner = ensureOwner(bnd, alwaysPersist);
+			}
+		}
+
+		// --------------- recover from name ?
+		for (Interface candidate : this.getEntityByName(Interface.class, name)) {
+			if (matchAndMapInterface(bnd, name, owner, candidate)) {
+				fmx = candidate;
+				break;
+			}
+		}
+
+		// ---------------- create
+		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
+		if (fmx == null) {
+			if (isGeneric) {
+				fmx = super.ensureFamixParameterizableInterface(bnd, name, owner, persistIt);
+			}
+			else {
+				fmx = super.ensureFamixInterface(bnd, name, owner, /*alwaysPersist?*/persistIt);
+			}
+		}
+
+		if (fmx!=null) {
+			// we just created it or it was not bound, so we make sure it has the right information in it
+			if (bnd != null) {
+				setClassModifiers(fmx, bnd.getDeclaredModifiers());
+			}
+			if (persistIt) {
+				TAssociation lastInheritance = null;
+				Collection<Type> sups = new LinkedList<Type>();
+				if (bnd != null) {
+					ITypeBinding supbnd = bnd.getSuperclass();
+					if (supbnd != null) {
+						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastInheritance);
+					}
+					else {
+						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastInheritance);
+					}
+					if (!bnd.isInterface()) {
+						for (ITypeBinding intbnd : bnd.getInterfaces()) {
+							lastInheritance = ensureFamixImplementation((TImplementable) ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist), (TCanImplement)fmx, lastInheritance);
+						}
+					}
+				}
+			}
+		}
+		return fmx;
+	}
+
 	public Type asClass(Type excepFmx) {
 		Class tmp = null;
+		IBinding key = null;
 		try {
 			ContainerEntity owner = Util.belongsToOf(excepFmx);
 			owner.getTypes().remove(excepFmx);
 			super.removeEntity(excepFmx);
 
-			tmp = super.ensureFamixClass(entityToKey.get(excepFmx), excepFmx.getName(), owner, /*alwaysPersist?*/true);
+			key = entityToKey.get(excepFmx);
+			tmp = super.ensureFamixClass(key, excepFmx.getName(), owner, /*alwaysPersist?*/true);
 
 			tmp.addMethods(excepFmx.getMethods());
 			if (excepFmx instanceof TWithAttributes) {
 				tmp.addAttributes(((TWithAttributes) excepFmx).getAttributes());
 			}
-			tmp.addModifiers(excepFmx.getModifiers());
+			//tmp.addModifiers(excepFmx.getModifiers());
+
+			if (key != null) {
+				setClassModifiers(tmp, key.getModifiers());
+			}
+
 			if (excepFmx instanceof TWithInheritances) {
 				tmp.addSuperInheritances(((TWithInheritances) excepFmx).getSuperInheritances());
 				tmp.addSubInheritances(((TWithInheritances) excepFmx).getSubInheritances());
 			}
 			tmp.setSourceAnchor(excepFmx.getSourceAnchor());
 			tmp.addAnnotationInstances(excepFmx.getAnnotationInstances());
-			tmp.addComments(excepFmx.getComments());
+			// tmp.addComments(excepFmx.getComments());
 			tmp.addIncomingReferences(excepFmx.getIncomingReferences());
 			tmp.setIsStub(excepFmx.getIsStub());
 			tmp.addTypes(excepFmx.getTypes());
@@ -367,6 +472,13 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 */
 	public Class getFamixClass(ITypeBinding bnd, String name, ContainerEntity owner) {
 		return ensureFamixClass(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
+	}
+
+		/**
+	 * helper method, we know the type exists, ensureFamixClass will recover it
+	 */
+	public Interface getFamixInterface(ITypeBinding bnd, String name, ContainerEntity owner) {
+		return ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
 	}
 
 	/**
@@ -396,10 +508,9 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			else {
 				IPackageBinding parentPckg = bnd.getPackage();
 				if (parentPckg != null) {
-					owner = this.ensureFamixNamespace(parentPckg, null);
-				}
-				else {
-					owner = this.ensureFamixNamespaceDefault();
+					owner = this.ensureFamixPackage(parentPckg, null);
+				} else {
+					owner = this.ensureFamixPackageDefault();
 				}
 			}
 		}
@@ -409,7 +520,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * e.g. see {@link JavaDictionary#ensureFamixClass}
 	 */
-	public ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, ParameterizableClass generic, ContainerEntity owner, boolean alwaysPersist) {
+	public ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, TWithParameterizedTypes generic, ContainerEntity owner, boolean alwaysPersist) {
 		ParameterizedType fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -437,11 +548,15 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- generic
 		if ((generic == null) && (bnd != null)) {
 			int modifiers = (bnd.getErasure() != null) ? bnd.getErasure().getModifiers() : UNKNOWN_MODIFIERS;
-			generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
+			if(bnd.isInterface()) {
+				generic = (ParameterizableInterface) ensureFamixInterface(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
+			} else {
+				generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
+			}
 		}
 
 		// --------------- owner
-		owner = (ContainerEntity) generic.getTypeContainer();
+		owner = (ContainerEntity) ((Type) generic).getTypeContainer();
 		/* Old behavior, see issue 868
 		   if (owner == null) {
 			if (bnd == null) {
@@ -468,7 +583,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 		// --------------- stub: same as ParameterizableClass
 		if ( (generic != null) && (fmx != null) ) {
-			fmx.setIsStub(generic.getIsStub());
+			fmx.setIsStub(((Type)generic).getIsStub());
 		}
 
 		return fmx;
@@ -507,7 +622,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- owner
 		if (owner == null) {
 			if (bnd == null) {
-				owner = ensureFamixNamespaceDefault();  // not really sure what to do here
+				owner = ensureFamixPackageDefault();  // not really sure what to do here
 			} else {
 				owner = ensureOwner(bnd, /*persistIt*/true); // owner should be a class or package so yes persist it
 			}
@@ -526,7 +641,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		if ((fmx != null) && (bnd != null) ) {
-			setNamedEntityModifiers(fmx, bnd.getModifiers());
+			setVisibility(fmx, bnd.getModifiers());
 		}
 
 		return fmx;
@@ -618,15 +733,14 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- owner
 		if (owner == null) {
 			if (bnd == null) {
-				owner = ensureFamixNamespaceDefault();
+				owner = ensureFamixPackageDefault();
 			}
 			else {
 				IPackageBinding parentPckg = bnd.getPackage();
 				if (parentPckg != null) {
-					owner = this.ensureFamixNamespace(parentPckg, null);
-				}
-				else {
-					owner = this.ensureFamixNamespaceDefault();
+					owner = this.ensureFamixPackage(parentPckg, null);
+				} else {
+					owner = this.ensureFamixPackageDefault();
 				}
 			}
 		}
@@ -646,7 +760,9 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		if ( (fmx!=null) && (bnd != null) ) {
-			setNamedEntityModifiers(fmx, bnd.getModifiers());
+			// Not supported in Famix
+
+			// setVisibility(fmx, bnd.getModifiers());
 		}
 
 		return fmx;
@@ -721,7 +837,9 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		if ( (fmx!=null) && (bnd != null) ) {
-			setNamedEntityModifiers(fmx, bnd.getModifiers());
+			// Not suopp
+
+			// setVisibility(fmx, bnd.getModifiers());
 		}
 
 		return fmx;
@@ -737,7 +855,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 /**
 	  * e.g. see {@link JavaDictionary#ensureFamixClass}
 	  */
-	public ParameterType ensureFamixParameterType(ITypeBinding bnd,	String name, ParameterizableClass owner, boolean persistIt) {
+	public ParameterType ensureFamixParameterType(ITypeBinding bnd,	String name, TWithParameterizedTypes owner, boolean persistIt) {
 		ParameterType fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -774,7 +892,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (Type candidate : this.getEntityByName(Type.class, name)) {
-			if ( matchAndMapType(bnd, name, owner, candidate) ) {
+			if ( matchAndMapType(bnd, name, (ContainerEntity) owner, candidate) ) {
 				fmx = (ParameterType) candidate;
 				break;
 			}
@@ -782,7 +900,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 		// --------------- create
 		if (fmx == null) {
-			fmx = super.ensureFamixParameterType(bnd, name, owner, persistIt);
+			fmx = super.ensureFamixParameterType(bnd, name, (ContainerEntity) owner, persistIt);
 		}
 
 		return fmx;
@@ -791,14 +909,15 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * Checks whether the existing unmapped Famix Namespace matches the binding.
 	 * Checks that the candidate has the same name as the JDT bound package, and checks recursively that owners also match.
-	 * @param bnd -- a JDT binding that we are trying to match to the candidate
-	 * @param name of the package
-	 * @param owner of the package
+	 *
+	 * @param bnd       -- a JDT binding that we are trying to match to the candidate
+	 * @param name      of the package
+	 * @param owner     of the package
 	 * @param candidate -- a Famix Entity
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean matchAndMapNamespace(IPackageBinding bnd, String name, Namespace owner, NamedEntity candidate) {
-		if (! (candidate instanceof Namespace) ) {
+	private boolean matchAndMapPackage(IPackageBinding bnd, String name, Package owner, NamedEntity candidate) {
+		if (!(candidate instanceof Package)) {
 			return false;
 		}
 
@@ -806,8 +925,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		CheckResult res = checkKeyMatch(bnd, candidate);
 		if (res == CheckResult.MATCH) {
 			return true;
-		}
-		else if (res == CheckResult.FAIL) {
+		} else if (res == CheckResult.FAIL) {
 			return false;
 		}
 
@@ -880,7 +998,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// check owners with bnd
 		// type is an annotation
 		if (bnd.isAnnotation() && (candidate instanceof AnnotationType)) {
-			if (matchAndMapNamespace(bnd.getPackage(), owner.getName(), (Namespace) Util.belongsToOf(owner), Util.belongsToOf(candidate))) {
+			if (matchAndMapPackage(bnd.getPackage(), owner.getName(), (Package) Util.belongsToOf(owner), Util.belongsToOf(candidate))) {
 				conditionalMapToKey(bnd, candidate);
 				return true;
 			} else {
@@ -903,15 +1021,19 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// check owners with bnd
 		// type is something elae (a class or interface)
 		// Annotation are interfaces too, so we should check this one after isAnnotation
-		if ( bnd.isClass() || bnd.isInterface() ) {
+		if ( bnd.isClass()) {
 			return matchAndMapClass(bnd, name, owner, (Type) candidate);
+		}
+
+		if(bnd.isInterface()) {
+			return matchAndMapInterface(bnd, name, owner, (Type) candidate);
 		}
 
 		return false;
 	}
 
 	/**
-	 * Checks whether the existing unmapped Famix Class (or Interface or Enum) matches the binding.
+	 * Checks whether the existing unmapped Famix Class (or Interface) matches the binding.
 	 * Checks that the candidate has the same name as the JDT bound type, and checks recursively that owners also match.
 	 * @param bnd -- a JDT binding that we are trying to match to the candidate
 	 * @param name of the class
@@ -921,6 +1043,36 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 */
 	private boolean matchAndMapClass(ITypeBinding bnd, String name, ContainerEntity owner, Type candidate) {
 		if (!(candidate instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class)) {
+			return false;
+		}
+
+		// check whether bnd and candidate are already bound
+		CheckResult res = checkKeyMatch(bnd, candidate);
+		if (res == CheckResult.MATCH) {
+			return true;
+		} else if (res == CheckResult.FAIL) {
+			return false;
+		}
+
+		if (checkNameMatch(bnd, name, candidate) == CheckResult.FAIL) {
+			return false;
+		}
+
+		// checking owner
+		return matchAndMapTypeOwner(bnd, owner, candidate);
+	}
+
+	/**
+	 * Checks whether the existing unmapped Famix Class (or Interface) matches the binding.
+	 * Checks that the candidate has the same name as the JDT bound type, and checks recursively that owners also match.
+	 * @param bnd -- a JDT binding that we are trying to match to the candidate
+	 * @param name of the class
+	 * @param owner of the class
+	 * @param candidate -- a Famix Entity
+	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
+	 */
+	private boolean matchAndMapInterface(ITypeBinding bnd, String name, ContainerEntity owner, Type candidate) {
+		if (!(candidate instanceof Interface)) {
 			return false;
 		}
 
@@ -1180,15 +1332,15 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	}
 
 	private CheckResult matchAndMapOwnerAsNamespace(IPackageBinding pckgBnd, NamedEntity owner, ContainerEntity candidateOwner) {
-		if ((pckgBnd != null) || ((owner != null) && (owner instanceof Namespace))) {
-			if (!(candidateOwner instanceof Namespace)) {
+		if ((pckgBnd != null) || ((owner != null) && (owner instanceof Package))) {
+			if (!(candidateOwner instanceof Package)) {
 				return CheckResult.FAIL;
 			}
 
-			Namespace ownerOwner = (owner != null) ? (Namespace) Util.belongsToOf(owner) : null;
-			String ownerName = (owner != null) ? ((Namespace) owner).getName() : null;
+			Package ownerOwner = (owner != null) ? (Package) Util.belongsToOf(owner) : null;
+			String ownerName = (owner != null) ? ((Package) owner).getName() : null;
 
-			if (matchAndMapNamespace(pckgBnd, ownerName, ownerOwner, candidateOwner)) {
+			if (matchAndMapPackage(pckgBnd, ownerName, ownerOwner, candidateOwner)) {
 				return CheckResult.MATCH;
 			} else {
 				return CheckResult.FAIL;
@@ -1393,82 +1545,52 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return fmx;
 	}
 
-	/** Sets the modifiers (abstract, public, ...) of a FamixNamedEntity
+	/**
+	 * Sets the visibility of a FamixNamedEntity
+	 *
 	 * @param fmx -- the FamixNamedEntity
 	 * @param mod -- a description of the modifiers as understood by org.eclipse.jdt.core.dom.Modifier
 	 */
-	public void setNamedEntityModifiers(NamedEntity fmx, int mod) {
-		if (Modifier.isAbstract(mod)) {
-			fmx.addModifiers(MODIFIER_ABSTRACT);
-			// fmx.setIsAbstract(new Boolean(Modifier.isAbstract(mod)));
-		}
+	public void setVisibility(THasVisibility fmx, int mod) {
 		if (Modifier.isPublic(mod)) {
-			fmx.addModifiers(MODIFIER_PUBLIC);
-			// fmx.setIsPublic(new Boolean(Modifier.isPublic(mod)));
+			fmx.setVisibility(MODIFIER_PUBLIC);
+		} else if (Modifier.isPrivate(mod)) {
+			fmx.setVisibility(MODIFIER_PRIVATE);
+		} else if (Modifier.isProtected(mod)) {
+			fmx.setVisibility(MODIFIER_PROTECTED);
+		} else {
+			fmx.setVisibility(MODIFIER_PACKAGE);
 		}
-		if (Modifier.isPrivate(mod)) {
-			fmx.addModifiers(MODIFIER_PRIVATE);
-			// fmx.setIsPrivate(new Boolean(Modifier.isPrivate(mod)));
-		}
-		if (Modifier.isProtected(mod)) {
-			fmx.addModifiers(MODIFIER_PROTECTED);
-			// fmx.setIsProtected(new Boolean(Modifier.isProtected(mod)));
-		}
-		if (Modifier.isFinal(mod)) {
-			fmx.addModifiers(MODIFIER_FINAL);
-			// fmx.setIsFinal(new Boolean(Modifier.isFinal(mod)));
-		}
-    }
+	}
 
-    public void setAttributeModifiers(Attribute fmx, int mod) {
-		setNamedEntityModifiers(fmx, mod);
+	public void setAttributeModifiers(Attribute fmx, int mod) {
+		setVisibility(fmx, mod);
+		fmx.setIsVolatile(Modifier.isVolatile(mod));
+		fmx.setIsTransient(Modifier.isTransient(mod));
+		fmx.setIsFinal(Modifier.isFinal(mod));
 		fmx.setIsClassSide(Modifier.isStatic(mod));
-		if (Modifier.isTransient(mod)) {
-			fmx.addModifiers(MODIFIER_TRANSIENT);
-		}
-		if (Modifier.isStatic(mod)) {
-			fmx.addModifiers(MODIFIER_STATIC);
-		}
-		if (Modifier.isSynchronized(mod)) {
-			fmx.addModifiers(MODIFIER_SYNCHRONIZED);
-		}
-		if (Modifier.isVolatile(mod)){
-			fmx.addModifiers(MODIFIER_VOLATILE);
-		}
-    }
+	}
 
-    public void setMethodModifiers(Method fmx, int mod) {
-		setNamedEntityModifiers(fmx, mod);
-		if (Modifier.isAbstract(mod)) {
-			// don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
-			fmx.addModifiers(MODIFIER_ABSTRACT);
-		}
+	public void setMethodModifiers(Method fmx, int mod) {
+		setVisibility(fmx, mod);
+		fmx.setIsSynchronized(Modifier.isSynchronized(mod));
+		fmx.setIsAbstract(Modifier.isAbstract(mod));
+		fmx.setIsFinal(Modifier.isFinal(mod));
 		fmx.setIsClassSide(Modifier.isStatic(mod));
-		if (Modifier.isTransient(mod)) {
-			fmx.addModifiers(MODIFIER_TRANSIENT);
-		}
-		if (Modifier.isStatic(mod)) {
-			fmx.addModifiers(MODIFIER_STATIC);
-		}
-		if (Modifier.isSynchronized(mod)) {
-			fmx.addModifiers(MODIFIER_SYNCHRONIZED);
-		}
-		if (Modifier.isVolatile(mod)){
-			fmx.addModifiers(MODIFIER_VOLATILE);
-		}
+	}
 
-    }
+	public void setClassModifiers(Class fmx, int mod) {
+		fmx.setIsAbstract(Modifier.isAbstract(mod));
+		fmx.setIsFinal(Modifier.isFinal(mod));
+		fmx.setIsClassSide(Modifier.isStatic(mod));
+		setVisibility(fmx, mod);
+	}
 
-    public void setClassModifiers(Class fmx, int mod) {
-        setNamedEntityModifiers(fmx, mod);
-        if (Modifier.isAbstract(mod)) {
-            // don't know why there must be two different ways to mark abstract classes !!! But this is a pain!
-            fmx.addModifiers(MODIFIER_ABSTRACT);
-        }
-		if (Modifier.isStatic(mod)) {
-			fmx.addModifiers(MODIFIER_STATIC);
-		}
-    }
+	public void setClassModifiers(Interface fmx, int mod) {
+		fmx.setIsFinal(Modifier.isFinal(mod));
+		fmx.setIsClassSide(Modifier.isStatic(mod));
+		setVisibility(fmx, mod);
+	}
 
 	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, Type owner, boolean persistIt) {
 		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, persistIt);
@@ -1733,7 +1855,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return super.ensureFamixImplicitVariable(bnd, name, type, owner, persistIt);
 	}
 
-	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, NamedEntity fmx) {
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments fmx) {
 		Comment cmt = null;
 
 		if ( (jCmt != null) && (fmx != null) && (! commentAlreadyRecorded(fmx, jCmt)) ) {
@@ -1747,7 +1869,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return cmt;
 	}
 
-	private boolean commentAlreadyRecorded(NamedEntity fmx, org.eclipse.jdt.core.dom.Comment jCmt) {
+	private boolean commentAlreadyRecorded(TWithComments fmx, org.eclipse.jdt.core.dom.Comment jCmt) {
 		int startPos = jCmt.getStartPosition();
 		boolean found = false;
 
@@ -1851,11 +1973,12 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * Creates or recovers a Famix Namespace for the package of Java class "Object" (i.e. "java.lang").
 	 * Because "Object" is the root of the inheritance tree, it needs to be treated differently.
+	 *
 	 * @param bnd -- a potential binding for the "java.lang" package
 	 * @return a Famix Namespace for "java.lang"
 	 */
-	public Namespace ensureFamixNamespaceJavaLang(IPackageBinding bnd) {
-		Namespace fmx = this.ensureFamixNamespace(bnd, OBJECT_PACKAGE_NAME);
+	public Package ensureFamixPackageJavaLang(IPackageBinding bnd) {
+		Package fmx = this.ensureFamixPackage(bnd, OBJECT_PACKAGE_NAME);
 
 		return fmx;
 	}
@@ -1871,7 +1994,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, bnd, OBJECT_NAME);
 
 		if (fmx != null) {
-			fmx.setTypeContainer(ensureFamixNamespaceJavaLang(null));
+			fmx.setTypeContainer(ensureFamixPackageJavaLang(null));
 		}
 		// Note: "Object" has no superclass
 
@@ -1882,7 +2005,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * Ensures the Java meta-class: Class<>
 	 */
 	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixMetaClass(ITypeBinding bnd) {
-		Namespace javaLang = ensureFamixNamespaceJavaLang((bnd == null) ? null : bnd.getPackage());
+		Package javaLang = ensureFamixPackageJavaLang((bnd == null) ? null : bnd.getPackage());
 		// always persist the MetaClass whatever the value of VerveineJParser.classSummary
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC & Modifier.FINAL, /*alwaysPersist?*/true);
 
@@ -1894,7 +2017,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	}
 
 	public org.moosetechnology.model.famixjava.famixjavaentities.Class getFamixMetaClass(ITypeBinding bnd) {
-		Namespace javaLang = ensureFamixNamespaceJavaLang((bnd == null) ? null : bnd.getPackage());
+		Package javaLang = ensureFamixPackageJavaLang((bnd == null) ? null : bnd.getPackage());
 		return this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, UNKNOWN_MODIFIERS, /*alwaysPersist?*/false);
 	}
 
@@ -1921,7 +2044,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, null, ARRAYS_NAME);
 		if (fmx != null) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
-			fmx.setContainer(ensureFamixNamespaceDefault());
+			fmx.setContainer(ensureFamixPackageDefault());
 
 			// may be not needed anymore now that we use modifiers
 			/*fmx.setIsAbstract(Boolean.FALSE);
@@ -1929,7 +2052,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			fmx.setIsInterface(Boolean.FALSE);
 			fmx.setIsPrivate(Boolean.FALSE);
 			fmx.setIsProtected(Boolean.FALSE);*/
-			fmx.addModifiers("public");
+			fmx.setVisibility(MODIFIER_PUBLIC);
 		}
 
 		return fmx;

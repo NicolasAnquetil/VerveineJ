@@ -6,6 +6,7 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstance;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
@@ -37,13 +38,13 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		new File(DEFAULT_OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.configure( new String[] {"test_src/jws_basic"});
+		parser.configure(new String[]{"-cp" , "test_src/jws_basic/lib/javax.jws-api-1.1.jar", "test_src/jws_basic/src"});
 		parser.parse();
 	}
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(3, entitiesOfType( AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
+		assertEquals(3, entitiesOfType(AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
 		// JDT no longer returns unresolved annotations: @Session, @WLHttpTransport,
 	}
 
@@ -67,9 +68,9 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		for (TAnnotationInstance a : cl.getAnnotationInstances()) {
 			AnnotationInstance ai = (AnnotationInstance) a;
 			if (((TNamedEntity) ai.getAnnotationType()).getName().equals("WebService")) {
-				assertEquals(detectFamixElement(Namespace.class, "jws"), (ai.getAnnotationType()).getAnnotationTypesContainer());
+				assertEquals(detectFamixElement(Package.class, "jws"), (ai.getAnnotationType()).getAnnotationTypesContainer());
 			} else if (((TNamedEntity) ai.getAnnotationType()).getName().equals("SOAPBinding")) {
-				assertEquals(detectFamixElement(Namespace.class, "soap"), (ai.getAnnotationType()).getAnnotationTypesContainer());
+				assertEquals(detectFamixElement(Package.class, "soap"), (ai.getAnnotationType()).getAnnotationTypesContainer());
 			} else {
 				assertTrue("Unexpected AnnotationInstance for SimpleBean: " + ((AnnotationType) ai.getAnnotationType()).getName(), false);
 			}

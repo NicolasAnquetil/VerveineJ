@@ -14,11 +14,11 @@ public interface TCohesionCouplingMetrics  {
         @FameProperty(name = "efferentCoupling", derived = true)
     public Number getEfferentCoupling();
 
-    @FameProperty(name = "distance", derived = true)
-    public Number getDistance();
-
     @FameProperty(name = "afferentCoupling", derived = true)
     public Number getAfferentCoupling();
+
+    @FameProperty(name = "distance", derived = true)
+    public Number getDistance();
 
     @FameProperty(name = "instability", derived = true)
     public Number getInstability();

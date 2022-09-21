@@ -1,5 +1,6 @@
 bin/*
 *.mse
+*.json
 testrep/*
 .idea/
 out/

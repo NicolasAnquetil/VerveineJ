@@ -11,19 +11,7 @@ import java.util.*;
 @FameDescription("THasModifiers")
 public interface THasModifiers  {
 
-        @FameProperty(name = "isProtected", derived = true)
-    public Boolean getIsProtected();
-
-    @FameProperty(name = "isPublic", derived = true)
-    public Boolean getIsPublic();
-
-    @FameProperty(name = "isPackage", derived = true)
-    public Boolean getIsPackage();
-
-    @FameProperty(name = "isPrivate", derived = true)
-    public Boolean getIsPrivate();
-
-    @FameProperty(name = "isFinal", derived = true)
+        @FameProperty(name = "isFinal", derived = true)
     public Boolean getIsFinal();
 
     @FameProperty(name = "modifiers")

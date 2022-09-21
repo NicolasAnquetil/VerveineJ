@@ -17,7 +17,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("AnnotationInstance")
-public class AnnotationInstance extends SourcedEntity implements TTypedAnnotationInstance, TEntityMetaLevelDependency, TAnnotationInstance, TWithAnnotationInstanceAttributes {
+public class AnnotationInstance extends SourcedEntity implements TAnnotationInstance, TEntityMetaLevelDependency, TTypedAnnotationInstance, TWithAnnotationInstanceAttributes {
 
     private TWithAnnotationInstances annotatedEntity;
     
@@ -27,7 +27,7 @@ public class AnnotationInstance extends SourcedEntity implements TTypedAnnotatio
 
 
 
-    @FameProperty(name = "annotatedEntity", opposite = "annotationInstances", container = true)
+    @FameProperty(name = "annotatedEntity", opposite = "annotationInstances")
     public TWithAnnotationInstances getAnnotatedEntity() {
         return annotatedEntity;
     }
@@ -134,6 +134,30 @@ public class AnnotationInstance extends SourcedEntity implements TTypedAnnotatio
     
     @FameProperty(name = "numberOfDeadChildren", derived = true)
     public Number getNumberOfDeadChildren() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

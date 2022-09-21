@@ -7,14 +7,14 @@ import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
+import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguages;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("SourceLanguage")
 public class SourceLanguage extends Entity implements TSourceLanguage {
 
-    private Collection<TWithSourceLanguage> sourcedEntities; 
+    private Collection<TWithSourceLanguages> sourcedEntities; 
 
 
 
@@ -25,15 +25,15 @@ public class SourceLanguage extends Entity implements TSourceLanguage {
     }
     
     @FameProperty(name = "sourcedEntities", opposite = "declaredSourceLanguage", derived = true)
-    public Collection<TWithSourceLanguage> getSourcedEntities() {
+    public Collection<TWithSourceLanguages> getSourcedEntities() {
         if (sourcedEntities == null) {
-            sourcedEntities = new MultivalueSet<TWithSourceLanguage>() {
+            sourcedEntities = new MultivalueSet<TWithSourceLanguages>() {
                 @Override
-                protected void clearOpposite(TWithSourceLanguage e) {
+                protected void clearOpposite(TWithSourceLanguages e) {
                     e.setDeclaredSourceLanguage(null);
                 }
                 @Override
-                protected void setOpposite(TWithSourceLanguage e) {
+                protected void setOpposite(TWithSourceLanguages e) {
                     e.setDeclaredSourceLanguage(SourceLanguage.this);
                 }
             };
@@ -41,29 +41,29 @@ public class SourceLanguage extends Entity implements TSourceLanguage {
         return sourcedEntities;
     }
     
-    public void setSourcedEntities(Collection<? extends TWithSourceLanguage> sourcedEntities) {
+    public void setSourcedEntities(Collection<? extends TWithSourceLanguages> sourcedEntities) {
         this.getSourcedEntities().clear();
         this.getSourcedEntities().addAll(sourcedEntities);
     }                    
     
         
-    public void addSourcedEntities(TWithSourceLanguage one) {
+    public void addSourcedEntities(TWithSourceLanguages one) {
         this.getSourcedEntities().add(one);
     }   
     
-    public void addSourcedEntities(TWithSourceLanguage one, TWithSourceLanguage... many) {
+    public void addSourcedEntities(TWithSourceLanguages one, TWithSourceLanguages... many) {
         this.getSourcedEntities().add(one);
-        for (TWithSourceLanguage each : many)
+        for (TWithSourceLanguages each : many)
             this.getSourcedEntities().add(each);
     }   
     
-    public void addSourcedEntities(Iterable<? extends TWithSourceLanguage> many) {
-        for (TWithSourceLanguage each : many)
+    public void addSourcedEntities(Iterable<? extends TWithSourceLanguages> many) {
+        for (TWithSourceLanguages each : many)
             this.getSourcedEntities().add(each);
     }   
                 
-    public void addSourcedEntities(TWithSourceLanguage[] many) {
-        for (TWithSourceLanguage each : many)
+    public void addSourcedEntities(TWithSourceLanguages[] many) {
+        for (TWithSourceLanguages each : many)
             this.getSourcedEntities().add(each);
     }
     

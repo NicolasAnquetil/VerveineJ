@@ -29,10 +29,10 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
     }
 
 	private void parse(String[] sources) {
-		parser.configure( sources);
-		parser.parse();
-		parser.exportModel();
-	}
+        parser.configure(sources);
+        parser.parse();
+        parser.exportModel();
+    }
 
     @Test
     public void testLambdaTypedParameter() {

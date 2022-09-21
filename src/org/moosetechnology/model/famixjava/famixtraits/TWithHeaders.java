@@ -7,8 +7,8 @@ import ch.akuhn.fame.FameProperty;
 
 
 @FamePackage("Famix-Traits")
-@FameDescription("TWithHeader")
-public interface TWithHeader  {
+@FameDescription("TWithHeaders")
+public interface TWithHeaders  {
 
         @FameProperty(name = "header", opposite = "headerOwner", derived = true)
     public THeader getHeader();

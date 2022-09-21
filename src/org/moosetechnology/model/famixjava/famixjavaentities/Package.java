@@ -7,31 +7,22 @@ import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.TComment;
 import org.moosetechnology.model.famixjava.famixtraits.TGlobalVariable;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TPackage;
 import org.moosetechnology.model.famixjava.famixtraits.TPackageable;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
-import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 import org.moosetechnology.model.famixjava.famixtraits.TWithGlobalVariables;
-import org.moosetechnology.model.famixjava.famixtraits.TWithPackages;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Package")
-public class Package extends ContainerEntity implements TNamedEntity, TPackage, TWithGlobalVariables, TSourceEntity, TEntityMetaLevelDependency, TWithSourceLanguage, TWithComments {
+public class Package extends ContainerEntity implements TEntityMetaLevelDependency, TNamedEntity, TPackage, TPackageable, TSourceEntity, TWithGlobalVariables {
 
     private Collection<TPackageable> childEntities; 
 
-    private Collection<TComment> comments; 
-
-    private TSourceLanguage declaredSourceLanguage;
-    
     private Collection<TGlobalVariable> globalVariables; 
 
     private Boolean isStub;
@@ -40,7 +31,7 @@ public class Package extends ContainerEntity implements TNamedEntity, TPackage, 
     
     private Number numberOfLinesOfCode;
     
-    private TWithPackages packageOwner;
+    private TPackage parentPackage;
     
     private TSourceAnchor sourceAnchor;
     
@@ -157,76 +148,10 @@ public class Package extends ContainerEntity implements TNamedEntity, TPackage, 
         return !getChildEntities().isEmpty();
     }
 
-    @FameProperty(name = "comments", opposite = "container", derived = true)
-    public Collection<TComment> getComments() {
-        if (comments == null) {
-            comments = new MultivalueSet<TComment>() {
-                @Override
-                protected void clearOpposite(TComment e) {
-                    e.setContainer(null);
-                }
-                @Override
-                protected void setOpposite(TComment e) {
-                    e.setContainer(Package.this);
-                }
-            };
-        }
-        return comments;
-    }
-    
-    public void setComments(Collection<? extends TComment> comments) {
-        this.getComments().clear();
-        this.getComments().addAll(comments);
-    }                    
-    
-        
-    public void addComments(TComment one) {
-        this.getComments().add(one);
-    }   
-    
-    public void addComments(TComment one, TComment... many) {
-        this.getComments().add(one);
-        for (TComment each : many)
-            this.getComments().add(each);
-    }   
-    
-    public void addComments(Iterable<? extends TComment> many) {
-        for (TComment each : many)
-            this.getComments().add(each);
-    }   
-                
-    public void addComments(TComment[] many) {
-        for (TComment each : many)
-            this.getComments().add(each);
-    }
-    
-    public int numberOfComments() {
-        return getComments().size();
-    }
-
-    public boolean hasComments() {
-        return !getComments().isEmpty();
-    }
-
     @FameProperty(name = "containsReplicas", derived = true)
     public Boolean getContainsReplicas() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
     }
     
     @FameProperty(name = "duplicationRate", derived = true)
@@ -298,12 +223,6 @@ public class Package extends ContainerEntity implements TNamedEntity, TPackage, 
         return !getGlobalVariables().isEmpty();
     }
 
-    @FameProperty(name = "hasComments", derived = true)
-    public Boolean getHasComments() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead() {
         // TODO: this is a derived property, implement this method manually.
@@ -334,14 +253,32 @@ public class Package extends ContainerEntity implements TNamedEntity, TPackage, 
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfComments", derived = true)
-    public Number getNumberOfComments() {
+    @FameProperty(name = "numberOfDeadChildren", derived = true)
+    public Number getNumberOfDeadChildren() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfDeadChildren", derived = true)
-    public Number getNumberOfDeadChildren() {
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -361,19 +298,19 @@ public class Package extends ContainerEntity implements TNamedEntity, TPackage, 
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "packageOwner", opposite = "packages")
-    public TWithPackages getPackageOwner() {
-        return packageOwner;
+    @FameProperty(name = "parentPackage", opposite = "childEntities", container = true)
+    public TPackage getParentPackage() {
+        return parentPackage;
     }
 
-    public void setPackageOwner(TWithPackages packageOwner) {
-        if (this.packageOwner != null) {
-            if (this.packageOwner.equals(packageOwner)) return;
-            this.packageOwner.getPackages().remove(this);
+    public void setParentPackage(TPackage parentPackage) {
+        if (this.parentPackage != null) {
+            if (this.parentPackage.equals(parentPackage)) return;
+            this.parentPackage.getChildEntities().remove(this);
         }
-        this.packageOwner = packageOwner;
-        if (packageOwner == null) return;
-        packageOwner.getPackages().add(this);
+        this.parentPackage = parentPackage;
+        if (parentPackage == null) return;
+        parentPackage.getChildEntities().add(this);
     }
     
     @FameProperty(name = "replicas", derived = true)

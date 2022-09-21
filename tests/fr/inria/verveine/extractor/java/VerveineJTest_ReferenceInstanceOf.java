@@ -4,9 +4,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.Class;
 
-import static org.junit.Assert.assertEquals;
-
 import java.io.File;
+
+import static org.junit.Assert.assertEquals;
 
 public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
 
@@ -34,7 +34,8 @@ public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
     public void testReferenceToString() {
         parse(new String[]{"-alllocals", "-anchor", "assoc", "test_src/instanceOf"});
         Class stringClass = detectFamixElement( Class.class, "String");
-        assertEquals (stringClass.getIncomingReferences().size(), 1);
+        // From Calculated Expression "hello" and from TypeLiteral String.class
+        assertEquals (stringClass.getIncomingReferences().size(), 2);
     }
 
 }

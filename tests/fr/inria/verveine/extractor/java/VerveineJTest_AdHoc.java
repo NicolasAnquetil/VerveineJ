@@ -8,6 +8,7 @@ import fr.inria.verveine.extractor.java.utils.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.*;
 
@@ -42,7 +43,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 
 	private void parse(String[] sources) {
-		parser.configure( sources);
+		parser.configure(sources);
 		parser.parse();
 		parser.exportModel(DEFAULT_OUTPUT_FILE);
 	}
@@ -53,9 +54,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		generatedMSE.deleteOnExit();
 
 		parse(new String[]{"test_src/ad_hoc/Junit5Bug1.java"});
-		
-		assertTrue( generatedMSE.exists());
-		assertTrue( generatedMSE.length() > 0);
+
+		assertTrue(generatedMSE.exists());
+		assertTrue(generatedMSE.length() > 0);
 	}
 
 	@Test
@@ -64,9 +65,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		generatedMSE.deleteOnExit();
 
 		parse(new String[]{"test_src/ad_hoc/Junit5Bug2.java"});
-		
-		assertTrue( generatedMSE.exists());
-		assertTrue( generatedMSE.length() > 0);
+
+		assertTrue(generatedMSE.exists());
+		assertTrue(generatedMSE.length() > 0);
 	}
 
 	@Test
@@ -136,6 +137,27 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(1, methOutgoingInvocations.size());
 		Invocation invok = (Invocation) firstElt(methOutgoingInvocations);
 		assertEquals("Book(\"The Monster Book of Monsters\",\"Hagrid\")", invok.getSignature());
+	}
+
+	@ Test
+	public void testDeclaredTypeOfExternalEnum() {
+		parse(new String[] {"test_src/ad_hoc/ExternalEnum.java", "test_src/ad_hoc/AClassThatUseExternalEnum.java"});
+
+		org.moosetechnology.model.famixjava.famixjavaentities.Class aClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "AClassThatUseExternalEnum");
+		assertNotNull(aClass);
+
+		
+		org.moosetechnology.model.famixjava.famixjavaentities.Enum externalEnum = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "ExternalEnum");
+		assertNotNull(externalEnum);
+		assertEquals("ExternalEnum", externalEnum.getName());
+
+		assertEquals(1, aClass.getAttributes().size());
+		for (TAttribute ta : aClass.getAttributes()) {
+			Attribute a = (Attribute) ta;
+			assertEquals(a.getName(), "enumeration");
+			assertEquals(externalEnum, a.getDeclaredType());
+		}
+
 	}
 
 	@ Test
@@ -258,8 +280,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testArrayListMatthias() {
 		parse(new String[]{"test_src/ad_hoc/Bla.java"});
 
-		assertEquals(15, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable
-		assertEquals(7, entitiesOfType(ParameterizableClass.class).size()); //
+		assertEquals(7, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable, ConstantDesc, Constable
+		assertEquals(3, entitiesOfType(ParameterizableClass.class).size()); //
+		assertEquals(9, entitiesOfType(Interface.class).size());
+		assertEquals(3, entitiesOfType(ParameterizableInterface.class).size());
 	}
 
 	@Test
@@ -338,7 +362,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(ParameterizedType.class, stSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType) stSuper).getParameterizableClass());
 		assertEquals(4, st.getEnumValues().size());
-		assertSame(detectFamixElement(Namespace.class, "ad_hoc"), Util.belongsToOf(st));
+		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.belongsToOf(st));
 
 		EnumValue hrt = detectFamixElement(EnumValue.class, "HEARTS");
 		assertNotNull(hrt);
@@ -364,7 +388,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Type plSuper = (Type) firstElt(pl.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, plSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType) plSuper).getParameterizableClass());
-		assertSame(detectFamixElement(Namespace.class, "ad_hoc"), Util.belongsToOf(pl));
+		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.belongsToOf(pl));
 		assertEquals(8, pl.getEnumValues().size());
 		assertEquals(4, pl.getAttributes().size());
 		assertEquals(7 + 2, pl.getMethods().size()); // 7 methods + <initializer> + implicit used: values()
@@ -536,9 +560,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Attribute attribute = detectFamixElement( Attribute.class, "privateFinalAttribute");
 		assertNotNull(attribute);
 
-		assertEquals(2, attribute.getModifiers().size());
-		assertTrue(attribute.getModifiers().contains(JavaDictionary.MODIFIER_PRIVATE));
-		assertTrue(attribute.getModifiers().contains(JavaDictionary.MODIFIER_FINAL));
+		assertTrue(attribute.getIsPrivate());
+		assertTrue(attribute.getIsFinal());
+		assertFalse(attribute.getIsPublic());
+		assertFalse(attribute.getIsClassSide());
+		assertFalse(attribute.getIsTransient());
 	}
 
 	@Test
@@ -609,11 +635,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ThisIsTheStaticInnerClass");
 		assertNotNull(clazz);
 
-		// assertTrue(clazz.getIsPublic()); --- set as a modifier 
-		assertEquals(2, clazz.getModifiers().size());
-		for (String mod : clazz.getModifiers()) {
-			assertTrue(mod.equals(JavaDictionary.MODIFIER_PUBLIC) || mod.equals(JavaDictionary.MODIFIER_STATIC));
-		}
+		assertTrue(clazz.getIsPublic());
+		assertTrue(clazz.getIsClassSide());
+
 	}
 
     @Test
@@ -649,13 +673,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method method = firstElt(meths);
 
 		assertNotNull(method);
-		assertEquals(6, method.getModifiers().size());
-		assertTrue( method.getModifiers().contains("transient"));
-		assertTrue( method.getModifiers().contains("public"));
-		assertTrue( method.getModifiers().contains("static"));
-		assertTrue( method.getModifiers().contains("final"));
-		assertTrue( method.getModifiers().contains("volatile"));
-		assertTrue( method.getModifiers().contains("synchronized"));
+		assertTrue( method.getIsPublic());
+		assertTrue( method.getIsClassSide());
+		assertTrue( method.getIsFinal());
+		assertTrue( method.getIsSynchronized());
 	}
 
 	@Test
@@ -665,12 +686,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Attribute attribute = firstElt(entitiesNamed( Attribute.class, "attribute"));
 
 		assertNotNull(attribute);
-		assertEquals(5, attribute.getModifiers().size());
-		assertTrue( attribute.getModifiers().contains("public"));
-		assertTrue( attribute.getModifiers().contains("static"));
-		assertTrue( attribute.getModifiers().contains("transient"));
-		assertTrue( attribute.getModifiers().contains("volatile"));
-		assertTrue( attribute.getModifiers().contains("final"));
+		assertTrue( attribute.getIsPublic());
+		assertTrue( attribute.getIsClassSide());
+		assertTrue( attribute.getIsTransient());
+		assertTrue( attribute.getIsVolatile());
+		assertTrue( attribute.getIsFinal());
 	}
 
 }

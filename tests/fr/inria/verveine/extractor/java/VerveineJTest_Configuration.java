@@ -19,7 +19,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
 	private static final String OTHER_MSE_FILE = "other_output.mse";
 	private static final String JSON_OUTPUT_FILE = "output.json";
-	
+
 
 	public VerveineJTest_Configuration() {
 		super(false);
@@ -42,19 +42,18 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	}
 
 	@Test
-	public void testChangeOutputFilePath()
-	{
+	public void testChangeOutputFilePath() {
 		File defaultMSE = new File(DEFAULT_OUTPUT_FILE);
 		File alternateMSE = new File(OTHER_MSE_FILE);
-		
+
 		defaultMSE.delete();
 		alternateMSE.delete();  // delete it now
 		alternateMSE.deleteOnExit();  // and delete it also after we are done
 
 		assertFalse(defaultMSE.exists());
 		assertFalse(alternateMSE.exists());
-	
-		parse( new String[] {"-o", OTHER_MSE_FILE, "test_src/LANModel/moose/lan/Node.java"});
+
+		parse(new String[]{"-o", OTHER_MSE_FILE, "test_src/LANModel/moose/lan/Node.java"});
 		parser.exportModel();
 
 		assertFalse(defaultMSE.exists());
@@ -66,13 +65,12 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	 * This is very crude, JSON files start with "[{" while MSE files start with "("
 	 */
 	@Test
-	public void testValidJSonFormat()
-	{
+	public void testValidJSonFormat() {
 		File defaultJSON = new File(JSON_OUTPUT_FILE);
 		defaultJSON.delete();
 		defaultJSON.deleteOnExit();
 
-		parse( new String[] {"-format","json", "test_src/LANModel/moose/lan/Node.java"});
+		parse(new String[]{"-format", "json", "test_src/LANModel/moose/lan/Node.java"});
 		parser.exportModel();
 
 		FileReader reader;
@@ -86,8 +84,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	}
 
 	@Test
-	public void testChangeOutputFormat()
-	{
+	public void testChangeOutputFormat() {
 		File defaultMSE = new File(DEFAULT_OUTPUT_FILE);
 		File defaultJSON = new File(JSON_OUTPUT_FILE);
 
@@ -97,8 +94,8 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
 		assertFalse(defaultMSE.exists());
 		assertFalse(defaultJSON.exists());
-	
-		parse( new String[] {"-format","json", "test_src/LANModel/moose/lan/Node.java"});
+
+		parse(new String[]{"-format", "json", "test_src/LANModel/moose/lan/Node.java"});
 		parser.exportModel();
 
 		assertTrue(defaultJSON.exists());
@@ -109,8 +106,8 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	public void testNotAlllocals() {
 		// works in team with testAlllocals
 		parse(new String[]{"test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
-		assertEquals(3, entitiesOfType( LocalVariable.class).size());  // nom, num, e
-		assertEquals(8, entitiesOfType( Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom + 4 "this"
+		assertEquals(3, entitiesOfType(LocalVariable.class).size());  // nom, num, e
+		assertEquals(8, entitiesOfType(Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom + 4 "this"
 	}
 
 	@Test
@@ -232,9 +229,9 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		}
 
 		// testing invocation
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IPrinter");
-		assertNotNull(clazz);
-		Method mth = (Method) firstElt(clazz.getMethods());  // first (and sole) method
+		Interface interfacePrinter = detectFamixElement(Interface.class, "IPrinter");
+		assertNotNull(interfacePrinter);
+		Method mth = (Method) firstElt(interfacePrinter.getMethods());  // first (and sole) method
 		assertNotNull(mth);
 		assertEquals("print", mth.getName());
 		assertEquals(1, mth.getIncomingInvocations().size());

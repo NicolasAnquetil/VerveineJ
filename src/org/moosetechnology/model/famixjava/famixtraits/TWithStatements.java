@@ -13,14 +13,6 @@ public interface TWithStatements  {
         @FameProperty(name = "numberOfStatements", derived = true)
     public Number getNumberOfStatements();
 
-    @FameProperty(name = "numberOflinesOfDeadCode", derived = true)
-    public Number getNumberOflinesOfDeadCode();
-
-    @FameProperty(name = "cyclomaticComplexity")
-    public Number getCyclomaticComplexity();
-
-    public void setCyclomaticComplexity(Number cyclomaticComplexity);
-
 
 
 }

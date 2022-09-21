@@ -22,8 +22,11 @@ public class ParameterizableClass extends Class implements TWithParameterizedTyp
 
     @FameProperty(name = "parameters", derived = true)
     public Collection<ParameterType> getParameters() {
-        return this.getTypes().stream().filter(tType -> tType instanceof ParameterType)
-                .map(tType -> (ParameterType) tType).collect(Collectors.toList());
+        return this.getTypes().stream().filter((tType) -> {
+            return tType instanceof ParameterType;
+        }).map((tType) -> {
+            return (ParameterType)tType;
+        }).collect(Collectors.toList());
     }
         
     @FameProperty(name = "parameterizedTypes", opposite = "parameterizableClass", derived = true)

@@ -14,7 +14,7 @@ import org.moosetechnology.model.famixjava.famixtraits.TWithFiles;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("File")
-public class File extends NamedEntity implements TFileSystemEntity, TFile {
+public class File extends NamedEntity implements TFile, TFileSystemEntity {
 
     private Collection<TWithFiles> entities; 
 

@@ -12,10 +12,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 @FameDescription("TType")
 public interface TType  {
 
-        @FameProperty(name = "numberOfAccessesToForeignData", derived = true)
-    public Number getNumberOfAccessesToForeignData();
-
-    @FameProperty(name = "typeContainer", opposite = "types", container = true)
+        @FameProperty(name = "typeContainer", opposite = "types", container = true)
     public TWithTypes getTypeContainer();
 
     public void setTypeContainer(TWithTypes typeContainer);
@@ -36,9 +33,6 @@ public interface TType  {
     public int numberOfTypedEntities();
 
     public boolean hasTypedEntities();
-
-    @FameProperty(name = "numberOfDuplicatedLinesOfCodeInternally", derived = true)
-    public Number getNumberOfDuplicatedLinesOfCodeInternally();
 
 
 

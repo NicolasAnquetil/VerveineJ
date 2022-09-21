@@ -7,26 +7,18 @@ import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
-import org.moosetechnology.model.famixjava.famixtraits.TComment;
 import org.moosetechnology.model.famixjava.famixtraits.TFile;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
-import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 import org.moosetechnology.model.famixjava.famixtraits.TWithFiles;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("SourcedEntity")
-public class SourcedEntity extends Entity implements TWithFiles, TSourceEntity, TWithSourceLanguage, TWithComments {
-
-    private Collection<TComment> comments; 
+public class SourcedEntity extends Entity implements TSourceEntity, TWithFiles {
 
     private Collection<TFile> containerFiles; 
 
-    private TSourceLanguage declaredSourceLanguage;
-    
     private Boolean isStub;
     
     private Number numberOfLinesOfCode;
@@ -41,57 +33,6 @@ public class SourcedEntity extends Entity implements TWithFiles, TSourceEntity, 
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "comments", opposite = "container", derived = true)
-    public Collection<TComment> getComments() {
-        if (comments == null) {
-            comments = new MultivalueSet<TComment>() {
-                @Override
-                protected void clearOpposite(TComment e) {
-                    e.setContainer(null);
-                }
-                @Override
-                protected void setOpposite(TComment e) {
-                    e.setContainer(SourcedEntity.this);
-                }
-            };
-        }
-        return comments;
-    }
-    
-    public void setComments(Collection<? extends TComment> comments) {
-        this.getComments().clear();
-        this.getComments().addAll(comments);
-    }                    
-    
-        
-    public void addComments(TComment one) {
-        this.getComments().add(one);
-    }   
-    
-    public void addComments(TComment one, TComment... many) {
-        this.getComments().add(one);
-        for (TComment each : many)
-            this.getComments().add(each);
-    }   
-    
-    public void addComments(Iterable<? extends TComment> many) {
-        for (TComment each : many)
-            this.getComments().add(each);
-    }   
-                
-    public void addComments(TComment[] many) {
-        for (TComment each : many)
-            this.getComments().add(each);
-    }
-    
-    public int numberOfComments() {
-        return getComments().size();
-    }
-
-    public boolean hasComments() {
-        return !getComments().isEmpty();
-    }
-
     @FameProperty(name = "containerFiles", opposite = "entities")
     public Collection<TFile> getContainerFiles() {
         if (containerFiles == null) {
@@ -148,29 +89,8 @@ public class SourcedEntity extends Entity implements TWithFiles, TSourceEntity, 
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
-    }
-    
     @FameProperty(name = "duplicationRate", derived = true)
     public Number getDuplicationRate() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "hasComments", derived = true)
-    public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -182,12 +102,6 @@ public class SourcedEntity extends Entity implements TWithFiles, TSourceEntity, 
 
     public void setIsStub(Boolean isStub) {
         this.isStub = isStub;
-    }
-    
-    @FameProperty(name = "numberOfComments", derived = true)
-    public Number getNumberOfComments() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "numberOfLinesOfCode")

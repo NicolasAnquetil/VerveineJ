@@ -12,17 +12,17 @@ import java.util.*;
 public interface TSourceLanguage  {
 
         @FameProperty(name = "sourcedEntities", opposite = "declaredSourceLanguage", derived = true)
-    public Collection<TWithSourceLanguage> getSourcedEntities();
+    public Collection<TWithSourceLanguages> getSourcedEntities();
 
-    public void setSourcedEntities(Collection<? extends TWithSourceLanguage> sourcedEntities);
+    public void setSourcedEntities(Collection<? extends TWithSourceLanguages> sourcedEntities);
 
-    public void addSourcedEntities(TWithSourceLanguage one);
+    public void addSourcedEntities(TWithSourceLanguages one);
 
-    public void addSourcedEntities(TWithSourceLanguage one, TWithSourceLanguage... many);
+    public void addSourcedEntities(TWithSourceLanguages one, TWithSourceLanguages... many);
 
-    public void addSourcedEntities(Iterable<? extends TWithSourceLanguage> many);
+    public void addSourcedEntities(Iterable<? extends TWithSourceLanguages> many);
 
-    public void addSourcedEntities(TWithSourceLanguage[] many);
+    public void addSourcedEntities(TWithSourceLanguages[] many);
 
     public int numberOfSourcedEntities();
 

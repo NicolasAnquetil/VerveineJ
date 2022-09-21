@@ -10,39 +10,43 @@ import org.moosetechnology.model.famixjava.famixreplication.Replica;
 import org.moosetechnology.model.famixjava.famixtraits.TAccess;
 import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeClassSide;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famixjava.famixtraits.TComment;
+import org.moosetechnology.model.famixjava.famixtraits.THasVisibility;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
-import org.moosetechnology.model.famixjava.famixtraits.TWithClassScope;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Attribute")
-public class Attribute extends NamedEntity implements TNamedEntity, TWithClassScope, TSourceEntity, TEntityMetaLevelDependency, TInvocationsReceiver, TStructuralEntity, TWithSourceLanguage, TAttribute, TTypedEntity, TAccessible, TWithComments {
+public class Attribute extends NamedEntity implements TAccessible, TAttribute, TCanBeClassSide, TCanBeFinal, TCanBeTransient, TCanBeVolatile, TEntityMetaLevelDependency, THasVisibility, TInvocationsReceiver, TNamedEntity, TSourceEntity, TStructuralEntity, TTypedEntity, TWithComments {
 
     private Collection<TComment> comments; 
 
-    private TSourceLanguage declaredSourceLanguage;
-    
     private TType declaredType;
     
     private Collection<TAccess> incomingAccesses; 
 
-    private Boolean isClassSide;
+    private Boolean isClassSide = false;
     
-    private Boolean isStub;
+    private Boolean isFinal = false;
+    
+    private Boolean isStub = false;
+    
+    private Boolean isTransient = false;
+    
+    private Boolean isVolatile = false;
     
     private String name;
     
@@ -53,6 +57,8 @@ public class Attribute extends NamedEntity implements TNamedEntity, TWithClassSc
     private Collection<TInvocation> receivingInvocations; 
 
     private TSourceAnchor sourceAnchor;
+    
+    private String visibility;
     
 
 
@@ -117,21 +123,6 @@ public class Attribute extends NamedEntity implements TNamedEntity, TWithClassSc
     public Boolean getContainsReplicas() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
     }
     
     @FameProperty(name = "declaredType", opposite = "typedEntities")
@@ -251,6 +242,35 @@ public class Attribute extends NamedEntity implements TNamedEntity, TWithClassSc
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "isFinal")
+    public Boolean getIsFinal() {
+        return isFinal;
+    }
+
+    public void setIsFinal(Boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+
+    @FameProperty(name = "isPackage", derived = true)
+    public Boolean getIsPackage() {
+        return this.visibility.equals("package");
+    }
+
+    @FameProperty(name = "isPrivate", derived = true)
+    public Boolean getIsPrivate() {
+        return this.visibility.equals("private");
+    }
+
+    @FameProperty(name = "isProtected", derived = true)
+    public Boolean getIsProtected() {
+        return this.visibility.equals("protected");
+    }
+
+    @FameProperty(name = "isPublic", derived = true)
+    public Boolean getIsPublic() {
+        return this.visibility.equals("public");
+    }
+    
     @FameProperty(name = "isStub")
     public Boolean getIsStub() {
         return isStub;
@@ -258,6 +278,24 @@ public class Attribute extends NamedEntity implements TNamedEntity, TWithClassSc
 
     public void setIsStub(Boolean isStub) {
         this.isStub = isStub;
+    }
+    
+    @FameProperty(name = "isTransient")
+    public Boolean getIsTransient() {
+        return isTransient;
+    }
+
+    public void setIsTransient(Boolean isTransient) {
+        this.isTransient = isTransient;
+    }
+    
+    @FameProperty(name = "isVolatile")
+    public Boolean getIsVolatile() {
+        return isVolatile;
+    }
+
+    public void setIsVolatile(Boolean isVolatile) {
+        this.isVolatile = isVolatile;
     }
     
     @FameProperty(name = "name")
@@ -305,8 +343,32 @@ public class Attribute extends NamedEntity implements TNamedEntity, TWithClassSc
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfGlobalAccesses", derived = true)
     public Number getNumberOfGlobalAccesses() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -424,6 +486,15 @@ public class Attribute extends NamedEntity implements TNamedEntity, TWithClassSc
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "visibility")
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
 
 
 }

@@ -13,17 +13,29 @@ public interface TEntityMetaLevelDependency  {
         @FameProperty(name = "numberOfDeadChildren", derived = true)
     public Number getNumberOfDeadChildren();
 
+    @FameProperty(name = "fanIn", derived = true)
+    public Number getFanIn();
+
     @FameProperty(name = "fanOut", derived = true)
     public Number getFanOut();
 
     @FameProperty(name = "numberOfChildren", derived = true)
     public Number getNumberOfChildren();
 
-    @FameProperty(name = "fanIn", derived = true)
-    public Number getFanIn();
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders();
+
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders();
+
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients();
 
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead();
+
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients();
 
 
 

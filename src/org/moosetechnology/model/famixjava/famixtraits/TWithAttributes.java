@@ -11,17 +11,8 @@ import java.util.*;
 @FameDescription("TWithAttributes")
 public interface TWithAttributes  {
 
-        @FameProperty(name = "numberOfProtectedAttributes", derived = true)
-    public Number getNumberOfProtectedAttributes();
-
-    @FameProperty(name = "numberOfAttributes", derived = true)
+        @FameProperty(name = "numberOfAttributes", derived = true)
     public Number getNumberOfAttributes();
-
-    @FameProperty(name = "numberOfRevealedAttributes", derived = true)
-    public Number getNumberOfRevealedAttributes();
-
-    @FameProperty(name = "numberOfPublicAttributes", derived = true)
-    public Number getNumberOfPublicAttributes();
 
     @FameProperty(name = "attributes", opposite = "parentType", derived = true)
     public Collection<TAttribute> getAttributes();
@@ -39,9 +30,6 @@ public interface TWithAttributes  {
     public int numberOfAttributes();
 
     public boolean hasAttributes();
-
-    @FameProperty(name = "numberOfPrivateAttributes", derived = true)
-    public Number getNumberOfPrivateAttributes();
 
 
 

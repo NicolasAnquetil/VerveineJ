@@ -4,35 +4,25 @@ package org.moosetechnology.model.famixjava.famixjavaentities;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import ch.akuhn.fame.internal.MultivalueSet;
-import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
 import org.moosetechnology.model.famixjava.famixtraits.TAccess;
 import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
 import org.moosetechnology.model.famixjava.famixtraits.TAssociation;
-import org.moosetechnology.model.famixjava.famixtraits.TComment;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
-import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
 import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Access")
-public class Access extends Entity implements TAccess, TAssociation, TSourceEntity, TWithSourceLanguage, TAssociationMetaLevelDependency, TWithComments {
+public class Access extends Entity implements TAccess, TAssociation, TAssociationMetaLevelDependency, TSourceEntity {
 
     private TWithAccesses accessor;
     
-    private Collection<TComment> comments; 
-
-    private TSourceLanguage declaredSourceLanguage;
-    
     private Boolean isStub;
     
-    private Boolean isWrite;
+    private Boolean isWrite = false;
     
     private TAssociation next;
     
@@ -61,76 +51,10 @@ public class Access extends Entity implements TAccess, TAssociation, TSourceEnti
         accessor.getAccesses().add(this);
     }
     
-    @FameProperty(name = "comments", opposite = "container", derived = true)
-    public Collection<TComment> getComments() {
-        if (comments == null) {
-            comments = new MultivalueSet<TComment>() {
-                @Override
-                protected void clearOpposite(TComment e) {
-                    e.setContainer(null);
-                }
-                @Override
-                protected void setOpposite(TComment e) {
-                    e.setContainer(Access.this);
-                }
-            };
-        }
-        return comments;
-    }
-    
-    public void setComments(Collection<? extends TComment> comments) {
-        this.getComments().clear();
-        this.getComments().addAll(comments);
-    }                    
-    
-        
-    public void addComments(TComment one) {
-        this.getComments().add(one);
-    }   
-    
-    public void addComments(TComment one, TComment... many) {
-        this.getComments().add(one);
-        for (TComment each : many)
-            this.getComments().add(each);
-    }   
-    
-    public void addComments(Iterable<? extends TComment> many) {
-        for (TComment each : many)
-            this.getComments().add(each);
-    }   
-                
-    public void addComments(TComment[] many) {
-        for (TComment each : many)
-            this.getComments().add(each);
-    }
-    
-    public int numberOfComments() {
-        return getComments().size();
-    }
-
-    public boolean hasComments() {
-        return !getComments().isEmpty();
-    }
-
     @FameProperty(name = "containsReplicas", derived = true)
     public Boolean getContainsReplicas() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
     }
     
     @FameProperty(name = "duplicationRate", derived = true)
@@ -139,15 +63,9 @@ public class Access extends Entity implements TAccess, TAssociation, TSourceEnti
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "hasComments", derived = true)
-    public Boolean getHasComments() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "isRead", derived = true)
     public Boolean getIsRead() {
-        return isWrite != null && !isWrite;
+        return !this.isWrite;
     }
     
     @FameProperty(name = "isReadWriteUnknown", derived = true)
@@ -186,12 +104,6 @@ public class Access extends Entity implements TAccess, TAssociation, TSourceEnti
             if (old_next != null) old_next.setPrevious(null);
             if (next != null) next.setPrevious(this);
         }
-    }
-    
-    @FameProperty(name = "numberOfComments", derived = true)
-    public Number getNumberOfComments() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "numberOfLinesOfCode")

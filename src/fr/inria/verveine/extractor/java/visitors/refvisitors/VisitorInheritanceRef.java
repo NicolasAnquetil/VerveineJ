@@ -6,8 +6,12 @@ import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAssociation;
+import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementable;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 
 import java.util.Collection;
@@ -24,7 +28,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 	}
 
 	public boolean visit(TypeDeclaration node) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = visitTypeDeclaration(node);
+		TWithInheritances fmx = (TWithInheritances) visitTypeDeclaration(node);
 		ITypeBinding bnd = node.resolveBinding();
 		if ((fmx != null) && (bnd != null)) {
 			ensureInheritances(bnd, fmx);
@@ -81,7 +85,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 			if (supbnd != null) {
 				sup = dico.ensureFamixType(supbnd, /*alwaysPersist*/true);
 			} else {
-				Namespace javaLang = dico.ensureFamixNamespaceJavaLang(null);
+				Package javaLang = dico.ensureFamixPackageJavaLang(null);
 				ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/javaLang, /*isGeneric*/true, /*modifiers*/Modifier.ABSTRACT & Modifier.PUBLIC, /*alwaysPersist*/true);
 				sup = dico.ensureFamixParameterizedType(/*bnd*/null, /*name*/"Enum", generic, /*ctxt*/(ContainerEntity) context.top(), /*alwaysPersist*/true);
 			}
@@ -145,26 +149,27 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 	// UTILITY METHODS
 
 	protected void ensureInheritances(ITypeBinding bnd, TWithInheritances fmx) {
-		Inheritance lastInheritance = null;
+		TAssociation lastInheritance = null;
 
 		// --------------- superclass
 		Collection<Type> sups = new LinkedList<>();
 		if (!bnd.isInterface()) {
 			ITypeBinding supbnd = bnd.getSuperclass();
+			Type t;
 			if (supbnd != null) {
-				sups.add(dico.ensureFamixType(supbnd, /*persistIt)*/true));
+				t = dico.ensureFamixType(supbnd, /*persistIt)*/true);
 			} else {
-				sups.add(dico.ensureFamixClassObject(null));
+				t = dico.ensureFamixClassObject(null);
 			}
+			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) t, fmx, lastInheritance);
 		}
-		// --------------- interfaces implemented
 		for (ITypeBinding intbnd : bnd.getInterfaces()) {
-			sups.add(dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true));
-		}
-
-		for (Type sup : sups) {
-			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) sup, fmx, lastInheritance);
-			// create FileAnchor for each inheritance link ???
+			TImplementable interface1 = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true);
+			if(fmx instanceof Interface ) {
+				dico.ensureFamixInheritance((Interface)interface1, fmx, lastInheritance);
+			} else {
+				dico.ensureFamixImplementation(interface1, (TCanImplement) fmx, lastInheritance);
+			}
 		}
 	}
 

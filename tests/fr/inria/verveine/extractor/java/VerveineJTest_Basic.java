@@ -4,6 +4,7 @@ import ch.akuhn.fame.Repository;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.junit.Assume;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
@@ -191,13 +192,13 @@ public abstract class VerveineJTest_Basic {
 		Assume.assumeTrue(testsToRun[3]);
 
 		// namespaces
-		Namespace java = detectFamixElement(Namespace.class, "java");
+		Package java = detectFamixElement(Package.class, "java");
 		assertNotNull(java);
 
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
-		Namespace javaLang = detectFamixElement(Namespace.class, javaLangName);
+		Package javaLang = detectFamixElement(Package.class, javaLangName);
 		assertNotNull(javaLang);
-		assertEquals(java, javaLang.getParentNamespace());
+		assertEquals(java, javaLang.getParentPackage());
 		// Object,String,StringBuffer,AbstractStringBuilder,System,Comparable,Comparable<String>,Appendable,CharSequence
 
 		/* java.io no longer created by default
@@ -251,7 +252,7 @@ public abstract class VerveineJTest_Basic {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class syst = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "System");
 		assertNotNull(syst);
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
-		Namespace javaLang = detectFamixElement(Namespace.class, javaLangName);
+		Package javaLang = detectFamixElement(Package.class, javaLangName);
 		assertSame(javaLang, syst.getTypeContainer());
 		boolean found = false;
 		for (TAttribute att : syst.getAttributes()) {

@@ -4,16 +4,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
+
+import static org.junit.Assert.*;
 
 public class verveineJTest_Annotations extends VerveineJTest_Basic {
 

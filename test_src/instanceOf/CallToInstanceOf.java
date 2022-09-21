@@ -10,7 +10,7 @@ public class InnerClass {
      * We are testing that String as a reference
      */
     private void methodWithInstanceOf() {
-        String a = "hello";
+        Object a = "hello";
         hello(a instanceof String);
     }
 

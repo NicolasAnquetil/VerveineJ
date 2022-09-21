@@ -11,24 +11,7 @@ import java.util.*;
 @FameDescription("TWithInheritances")
 public interface TWithInheritances  {
 
-        @FameProperty(name = "superInheritances", opposite = "subclass", derived = true)
-    public Collection<TInheritance> getSuperInheritances();
-
-    public void setSuperInheritances(Collection<? extends TInheritance> superInheritances);
-
-    public void addSuperInheritances(TInheritance one);
-
-    public void addSuperInheritances(TInheritance one, TInheritance... many);
-
-    public void addSuperInheritances(Iterable<? extends TInheritance> many);
-
-    public void addSuperInheritances(TInheritance[] many);
-
-    public int numberOfSuperInheritances();
-
-    public boolean hasSuperInheritances();
-
-    @FameProperty(name = "subInheritances", opposite = "superclass", derived = true)
+        @FameProperty(name = "subInheritances", opposite = "superclass", derived = true)
     public Collection<TInheritance> getSubInheritances();
 
     public void setSubInheritances(Collection<? extends TInheritance> subInheritances);
@@ -45,6 +28,23 @@ public interface TWithInheritances  {
 
     public boolean hasSubInheritances();
 
+    @FameProperty(name = "superInheritances", opposite = "subclass", derived = true)
+    public Collection<TInheritance> getSuperInheritances();
+
+    public void setSuperInheritances(Collection<? extends TInheritance> superInheritances);
+
+    public void addSuperInheritances(TInheritance one);
+
+    public void addSuperInheritances(TInheritance one, TInheritance... many);
+
+    public void addSuperInheritances(Iterable<? extends TInheritance> many);
+
+    public void addSuperInheritances(TInheritance[] many);
+
+    public int numberOfSuperInheritances();
+
+    public boolean hasSuperInheritances();
+
     @FameProperty(name = "hierarchyNestingLevel", derived = true)
     public Number getHierarchyNestingLevel();
 
@@ -53,9 +53,6 @@ public interface TWithInheritances  {
 
     @FameProperty(name = "numberOfSubclasses", derived = true)
     public Number getNumberOfSubclasses();
-
-    @FameProperty(name = "totalNumberOfSubclasses", derived = true)
-    public Number getTotalNumberOfSubclasses();
 
     @FameProperty(name = "numberOfDirectSubclasses", derived = true)
     public Number getNumberOfDirectSubclasses();

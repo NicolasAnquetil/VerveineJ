@@ -12,26 +12,11 @@ import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 @FameDescription("TClass")
 public interface TClass  {
 
-        @FameProperty(name = "numberOfMethodsOverriden", derived = true)
-    public Number getNumberOfMethodsOverriden();
-
-    @FameProperty(name = "numberOfAttributesInherited", derived = true)
-    public Number getNumberOfAttributesInherited();
-
-    @FameProperty(name = "isTestCase", derived = true)
+        @FameProperty(name = "isTestCase", derived = true)
     public Boolean getIsTestCase();
-
-    @FameProperty(name = "numberOfMethodsAdded", derived = true)
-    public Number getNumberOfMethodsAdded();
-
-    @FameProperty(name = "numberOfMethodsInherited", derived = true)
-    public Number getNumberOfMethodsInherited();
 
     @FameProperty(name = "weightOfAClass", derived = true)
     public Number getWeightOfAClass();
-
-    @FameProperty(name = "numberOfMethodsInHierarchy", derived = true)
-    public Number getNumberOfMethodsInHierarchy();
 
 
 

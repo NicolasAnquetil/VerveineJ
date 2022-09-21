@@ -5,12 +5,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.IndexedFileAnchor;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 
 public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
@@ -30,10 +31,10 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
     }
 
 	private void parse(String[] sources) {
-		parser.configure( sources);
-		parser.parse();
-		parser.exportModel(DEFAULT_OUTPUT_FILE);
-	}
+        parser.configure(sources);
+        parser.parse();
+        parser.exportModel(DEFAULT_OUTPUT_FILE);
+    }
 
     @Test
     public void testStartPosSourceAnchorMethod() {

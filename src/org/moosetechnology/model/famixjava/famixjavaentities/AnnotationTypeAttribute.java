@@ -12,12 +12,9 @@ import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
 import org.moosetechnology.model.famixjava.famixtraits.TAnnotationTypeAttribute;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
 import org.moosetechnology.model.famixjava.famixtraits.TComment;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TTypedAnnotationInstanceAttribute;
@@ -25,13 +22,12 @@ import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("AnnotationTypeAttribute")
-public class AnnotationTypeAttribute extends NamedEntity implements TNamedEntity, TTypedAnnotationInstanceAttribute, TSourceEntity, TEntityMetaLevelDependency, TInvocationsReceiver, TStructuralEntity, TWithSourceLanguage, TAttribute, TAnnotationTypeAttribute, TTypedEntity, TAccessible, TWithComments {
+public class AnnotationTypeAttribute extends NamedEntity implements TAccessible, TAnnotationTypeAttribute, TAttribute, TEntityMetaLevelDependency, TNamedEntity, TSourceEntity, TStructuralEntity, TTypedAnnotationInstanceAttribute, TTypedEntity, TWithComments {
 
     private Collection<TTypedAnnotationInstanceAttribute> annotationAttributeInstances; 
 
@@ -39,14 +35,10 @@ public class AnnotationTypeAttribute extends NamedEntity implements TNamedEntity
     
     private Collection<TComment> comments; 
 
-    private TSourceLanguage declaredSourceLanguage;
-    
     private TType declaredType;
     
     private Collection<TAccess> incomingAccesses; 
 
-    private Boolean isClassSide;
-    
     private Boolean isStub;
     
     private String name;
@@ -55,8 +47,6 @@ public class AnnotationTypeAttribute extends NamedEntity implements TNamedEntity
     
     private TWithAttributes parentType;
     
-    private Collection<TInvocation> receivingInvocations; 
-
     private TSourceAnchor sourceAnchor;
     
 
@@ -196,21 +186,6 @@ public class AnnotationTypeAttribute extends NamedEntity implements TNamedEntity
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
-    }
-    
     @FameProperty(name = "declaredType", opposite = "typedEntities")
     public TType getDeclaredType() {
         return declaredType;
@@ -313,15 +288,6 @@ public class AnnotationTypeAttribute extends NamedEntity implements TNamedEntity
         return !getIncomingAccesses().isEmpty();
     }
 
-    @FameProperty(name = "isClassSide")
-    public Boolean getIsClassSide() {
-        return isClassSide;
-    }
-
-    public void setIsClassSide(Boolean isClassSide) {
-        this.isClassSide = isClassSide;
-    }
-    
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead() {
         // TODO: this is a derived property, implement this method manually.
@@ -382,8 +348,32 @@ public class AnnotationTypeAttribute extends NamedEntity implements TNamedEntity
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfGlobalAccesses", derived = true)
     public Number getNumberOfGlobalAccesses() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -424,57 +414,6 @@ public class AnnotationTypeAttribute extends NamedEntity implements TNamedEntity
         parentType.getAttributes().add(this);
     }
     
-    @FameProperty(name = "receivingInvocations", opposite = "receiver", derived = true)
-    public Collection<TInvocation> getReceivingInvocations() {
-        if (receivingInvocations == null) {
-            receivingInvocations = new MultivalueSet<TInvocation>() {
-                @Override
-                protected void clearOpposite(TInvocation e) {
-                    e.setReceiver(null);
-                }
-                @Override
-                protected void setOpposite(TInvocation e) {
-                    e.setReceiver(AnnotationTypeAttribute.this);
-                }
-            };
-        }
-        return receivingInvocations;
-    }
-    
-    public void setReceivingInvocations(Collection<? extends TInvocation> receivingInvocations) {
-        this.getReceivingInvocations().clear();
-        this.getReceivingInvocations().addAll(receivingInvocations);
-    }                    
-    
-        
-    public void addReceivingInvocations(TInvocation one) {
-        this.getReceivingInvocations().add(one);
-    }   
-    
-    public void addReceivingInvocations(TInvocation one, TInvocation... many) {
-        this.getReceivingInvocations().add(one);
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }   
-    
-    public void addReceivingInvocations(Iterable<? extends TInvocation> many) {
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }   
-                
-    public void addReceivingInvocations(TInvocation[] many) {
-        for (TInvocation each : many)
-            this.getReceivingInvocations().add(each);
-    }
-    
-    public int numberOfReceivingInvocations() {
-        return getReceivingInvocations().size();
-    }
-
-    public boolean hasReceivingInvocations() {
-        return !getReceivingInvocations().isEmpty();
-    }
-
     @FameProperty(name = "replicas", derived = true)
     public Replica getReplicas() {
         // TODO: this is a derived property, implement this method manually.

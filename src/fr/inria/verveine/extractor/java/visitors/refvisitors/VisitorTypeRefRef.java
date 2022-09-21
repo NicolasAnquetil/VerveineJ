@@ -268,7 +268,9 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
             searchTypeRef = false;
         }
         for (Expression arg : (List<Expression>)node.arguments()) {
+			searchTypeRef = true;
             arg.accept(this);
+			searchTypeRef = false;
         }
         for (Type targ : (List<Type>)node.typeArguments()) {
             searchTypeRef = true;
@@ -286,9 +288,11 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 				org.moosetechnology.model.famixjava.famixjavaentities.Type referred = referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
 				Reference ref = dico.addFamixReference((Method) context.top(), referred, context.getLastReference());
 				context.setLastReference(ref);
+				if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {
+					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+				}
 			}
 		}
-
         return false;
     }
 

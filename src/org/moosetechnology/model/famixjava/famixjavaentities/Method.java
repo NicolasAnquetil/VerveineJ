@@ -8,27 +8,31 @@ import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
 import org.moosetechnology.model.famixjava.famixtraits.TAccess;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeAbstract;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeClassSide;
+import org.moosetechnology.model.famixjava.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famixjava.famixtraits.TCaughtException;
 import org.moosetechnology.model.famixjava.famixtraits.TComment;
 import org.moosetechnology.model.famixjava.famixtraits.TDeclaredException;
+import org.moosetechnology.model.famixjava.famixtraits.THasKind;
 import org.moosetechnology.model.famixjava.famixtraits.THasSignature;
+import org.moosetechnology.model.famixjava.famixtraits.THasVisibility;
 import org.moosetechnology.model.famixjava.famixtraits.TImplicitVariable;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocable;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
 import org.moosetechnology.model.famixjava.famixtraits.TLocalVariable;
 import org.moosetechnology.model.famixjava.famixtraits.TMethod;
+import org.moosetechnology.model.famixjava.famixtraits.TMethodMetrics;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TParameter;
 import org.moosetechnology.model.famixjava.famixtraits.TReference;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceLanguage;
 import org.moosetechnology.model.famixjava.famixtraits.TThrownException;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
 import org.moosetechnology.model.famixjava.famixtraits.TWithCaughtExceptions;
-import org.moosetechnology.model.famixjava.famixtraits.TWithClassScope;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 import org.moosetechnology.model.famixjava.famixtraits.TWithDeclaredExceptions;
 import org.moosetechnology.model.famixjava.famixtraits.TWithImplicitVariables;
@@ -37,7 +41,6 @@ import org.moosetechnology.model.famixjava.famixtraits.TWithLocalVariables;
 import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
 import org.moosetechnology.model.famixjava.famixtraits.TWithParameters;
 import org.moosetechnology.model.famixjava.famixtraits.TWithReferences;
-import org.moosetechnology.model.famixjava.famixtraits.TWithSourceLanguage;
 import org.moosetechnology.model.famixjava.famixtraits.TWithStatements;
 import org.moosetechnology.model.famixjava.famixtraits.TWithThrownExceptions;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
@@ -46,10 +49,8 @@ import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Method")
-public class Method extends ContainerEntity implements TWithReferences, TWithClassScope, TMethod, TSourceEntity, TWithAccesses, TWithImplicitVariables, TWithCaughtExceptions, TOODependencyQueries, TWithParameters, TInvocable, TWithInvocations, TWithLocalVariables, TNamedEntity, TWithThrownExceptions, TWithDeclaredExceptions, TEntityMetaLevelDependency, TWithSourceLanguage, THasSignature, TTypedEntity, TWithStatements, TWithComments {
+public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanBeSynchronized, TEntityMetaLevelDependency, THasKind, THasSignature, THasVisibility, TInvocable, TMethod, TMethodMetrics, TNamedEntity, TOODependencyQueries, TSourceEntity, TTypedEntity, TWithAccesses, TWithCaughtExceptions, TWithComments, TWithDeclaredExceptions, TWithImplicitVariables, TWithInvocations, TWithLocalVariables, TWithParameters, TWithReferences, TWithStatements, TWithThrownExceptions {
 
-    private String category;
-    
     private Number numberOfConditionals;
     
     private Collection<TAccess> accesses; 
@@ -62,19 +63,21 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
     
     private Collection<TDeclaredException> declaredExceptions; 
 
-    private TSourceLanguage declaredSourceLanguage;
-    
     private TType declaredType;
     
     private Collection<TImplicitVariable> implicitVariables; 
 
     private Collection<TInvocation> incomingInvocations; 
 
-    private Boolean isAbstract;
+    private Boolean isAbstract = false;
     
-    private Boolean isClassSide;
+    private Boolean isClassSide = false;
+    
+    private Boolean isFinal = false;
     
     private Boolean isStub;
+    
+    private Boolean isSynchronized;
     
     private String kind;
     
@@ -98,17 +101,10 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
     
     private Collection<TThrownException> thrownExceptions; 
 
-
-
-    @FameProperty(name = "category")
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
+    private String visibility;
     
+
+
     @FameProperty(name = "clientBehaviours", derived = true)
     public Collection<Method> getClientBehaviours() {
         // TODO: this is a derived property, implement this method manually.
@@ -163,8 +159,8 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfAnnotationInstances", derived = true)
-    public Number getNumberOfAnnotationInstances() {
+    @FameProperty(name = "numberOfComments", derived = true)
+    public Number getNumberOfComments() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -180,12 +176,6 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
     
     @FameProperty(name = "numberOfInvokedMethods", derived = true)
     public Number getNumberOfInvokedMethods() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfOutgoingInvocations", derived = true)
-    public Number getNumberOfOutgoingInvocations() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -415,21 +405,6 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
         return !getDeclaredExceptions().isEmpty();
     }
 
-    @FameProperty(name = "declaredSourceLanguage", opposite = "sourcedEntities")
-    public TSourceLanguage getDeclaredSourceLanguage() {
-        return declaredSourceLanguage;
-    }
-
-    public void setDeclaredSourceLanguage(TSourceLanguage declaredSourceLanguage) {
-        if (this.declaredSourceLanguage != null) {
-            if (this.declaredSourceLanguage.equals(declaredSourceLanguage)) return;
-            this.declaredSourceLanguage.getSourcedEntities().remove(this);
-        }
-        this.declaredSourceLanguage = declaredSourceLanguage;
-        if (declaredSourceLanguage == null) return;
-        declaredSourceLanguage.getSourcedEntities().add(this);
-    }
-    
     @FameProperty(name = "declaredType", opposite = "typedEntities")
     public TType getDeclaredType() {
         return declaredType;
@@ -618,12 +593,21 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "isFinal")
+    public Boolean getIsFinal() {
+        return isFinal;
+    }
+
+    public void setIsFinal(Boolean isFinal) {
+        this.isFinal = isFinal;
+    }
+    
     @FameProperty(name = "isGetter", derived = true)
     public Boolean getIsGetter() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
-    
+
     @FameProperty(name = "isSetter", derived = true)
     public Boolean getIsSetter() {
         // TODO: this is a derived property, implement this method manually.
@@ -637,6 +621,15 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
 
     public void setIsStub(Boolean isStub) {
         this.isStub = isStub;
+    }
+    
+    @FameProperty(name = "isSynchronized")
+    public Boolean getIsSynchronized() {
+        return isSynchronized;
+    }
+
+    public void setIsSynchronized(Boolean isSynchronized) {
+        this.isSynchronized = isSynchronized;
     }
     
     @FameProperty(name = "kind")
@@ -708,20 +701,44 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
         this.name = name;
     }
     
+    @FameProperty(name = "numberOfAnnotationInstances", derived = true)
+    public Number getNumberOfAnnotationInstances() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfChildren", derived = true)
     public Number getNumberOfChildren() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfComments", derived = true)
-    public Number getNumberOfComments() {
+    @FameProperty(name = "numberOfDeadChildren", derived = true)
+    public Number getNumberOfDeadChildren() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfDeadChildren", derived = true)
-    public Number getNumberOfDeadChildren() {
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -747,14 +764,14 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfParameters", derived = true)
-    public Number getNumberOfParameters() {
+    @FameProperty(name = "numberOfOutgoingInvocations", derived = true)
+    public Number getNumberOfOutgoingInvocations() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOflinesOfDeadCode", derived = true)
-    public Number getNumberOflinesOfDeadCode() {
+    @FameProperty(name = "numberOfParameters", derived = true)
+    public Number getNumberOfParameters() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -1013,6 +1030,17 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
         return !getThrownExceptions().isEmpty();
     }
 
+    @FameProperty(name = "visibility")
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+    
+    // Manually added
+
     private Number numberOfStatements;
 
     @FameProperty(name = "numberOfStatements")
@@ -1022,6 +1050,26 @@ public class Method extends ContainerEntity implements TWithReferences, TWithCla
 
     public void setNumberOfStatements(Number number) {
         numberOfStatements = number;
+    }
+
+    @FameProperty(name = "isPackage", derived = true)
+    public Boolean getIsPackage() {
+        return this.visibility.equals("package");
+    }
+
+    @FameProperty(name = "isPrivate", derived = true)
+    public Boolean getIsPrivate() {
+        return this.visibility.equals("private");
+    }
+
+    @FameProperty(name = "isProtected", derived = true)
+    public Boolean getIsProtected() {
+        return this.visibility.equals("protected");
+    }
+
+    @FameProperty(name = "isPublic", derived = true)
+    public Boolean getIsPublic() {
+        return this.visibility.equals("public");
     }
 
 

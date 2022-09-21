@@ -1,19 +1,11 @@
 package fr.inria.verveine.extractor.java;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTParser;
+
+import java.io.*;
+import java.util.*;
+import java.util.regex.Pattern;
 
 public class VerveineJOptions {
 
@@ -22,14 +14,18 @@ public class VerveineJOptions {
 	 */
 	public enum AnchorOptions {
 		none, entity, assoc;
-	
+
 		public static AnchorOptions getValue(String option) {
 			switch (option) {
 				case "default":
-				case "entity": return entity;
-				case "assoc": return assoc;
-				case "none": return none;
-				default: return null;
+				case "entity":
+					return entity;
+				case "assoc":
+					return assoc;
+				case "none":
+					return none;
+				default:
+					return null;
 			}
 		}
 	}
@@ -37,22 +33,22 @@ public class VerveineJOptions {
 
 	/**
 	 * Name (without extension) of the default file where to put the MSE model
-	 * 
+	 * <p>
 	 * By default, the extension is provided by the output format
 	 */
 	public final static String OUTPUT_FILE = "output";
-	
+
 	/**
 	 * Option for MSE output format
 	 */
 	public final static String MSE_OUTPUT_FORMAT = "MSE";
-	
+
 	/**
 	 * Option for JSON output format
 	 */
 	public final static String JSON_OUTPUT_FORMAT = "JSON";
-	
-	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_1_5;
+
+	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_9;
 
 	/**
 	 * TODO remove ?
@@ -117,12 +113,17 @@ public class VerveineJOptions {
 
 	/**
 	 * Whether parsing is incremental
-	 * 
+	 * <p>
 	 * Incremental means an entire project is parsed by parts, verveineJ saving and reloading the model
-	 * respectively at the end of an execution and at the satrt of the next one  
+	 * respectively at the end of an execution and at the satrt of the next one
 	 */
 	protected boolean incrementalParsing;
-	
+
+	/**
+	 * If possible, should I use a prettyPrinter
+	 */
+	protected boolean prettyPrint = false;
+
 	public VerveineJOptions() {
 		this.classSummary = false;
 		this.allLocals = false;
@@ -138,13 +139,12 @@ public class VerveineJOptions {
 		argPath = new ArrayList<String>();
 		argFiles = new ArrayList<String>();
 		excludePaths = new ArrayList<String>();
-	
+
 		int i = 0;
 		while (i < args.length && args[i].trim().startsWith("-")) {
 			try {
-				i += setOption( args, i);
-			}
-			catch (IllegalArgumentException e) {
+				i += setOption(args, i);
+			} catch (IllegalArgumentException e) {
 				System.err.println(e.getMessage());
 				usage();
 			}
@@ -159,7 +159,7 @@ public class VerveineJOptions {
 		if (anchors == null) {
 			anchors = VerveineJOptions.AnchorOptions.getValue("default");
 		}
-	
+
 		while (i < args.length) {
 			String arg = args[i++].trim();
 			if (arg.endsWith(".java") && new File(arg).isFile()) {
@@ -190,43 +190,37 @@ public class VerveineJOptions {
 		else if (arg.equals("-summary")) {
 			classSummary = true;
 			allLocals = false;
-		}
-		else if (arg.equals("-alllocals")) {
+		} else if (arg.equals("-alllocals")) {
 			classSummary = false;
 			allLocals = true;
-		}
-		else if ( (arg.charAt(0) == '-') && (arg.endsWith("cp")) ) {
-			classPathOptions = setOptionClassPath( classPathOptions, args, i);
+		} else if (arg.equals("-prettyPrint")) {
+			prettyPrint = true;
+		} else if ((arg.charAt(0) == '-') && (arg.endsWith("cp"))) {
+			classPathOptions = setOptionClassPath(classPathOptions, args, i);
 			argumentsTreated++;
-		}
-		else if (arg.equals("-anchor")) {
-			setOptionAnchor( args, i);
+		} else if (arg.equals("-anchor")) {
+			setOptionAnchor(args, i);
 			argumentsTreated++;
-		}
-		else if (arg.equals("-format")) {
-			setOptionFormat( args, i);
+		} else if (arg.equals("-format")) {
+			setOptionFormat(args, i);
 			argumentsTreated++;
-		}
-		else if (arg.equals("-excludepath")) {
+		} else if (arg.equals("-excludepath")) {
 			if (i < args.length) {
-				excludePaths.add(args[i+1]);
+				excludePaths.add(args[i + 1]);
 				argumentsTreated++;
 			} else {
 				throw new IllegalArgumentException("-excludepath requires a globbing expression");
 			}
-		}
-		else if (arg.equals("-o")) {
+		} else if (arg.equals("-o")) {
 			if (i < args.length) {
 				outputFileName = args[i+1].trim();
 				argumentsTreated++;
 			} else {
 				throw new IllegalArgumentException("-o requires a filename");
 			}
-		}
-		else if (arg.equals("-i")) {
+		} else if (arg.equals("-i")) {
 			incrementalParsing = true;
-		}
-		else {
+		} else {
 			throw new IllegalArgumentException("** Unrecognized option: " + arg);
 		}
 	
@@ -307,23 +301,23 @@ public class VerveineJOptions {
 		return tmpPath;
 	}
 
-	protected void setOptionAnchor( String[] args, int i) {
+	protected void setOptionAnchor(String[] args, int i) {
 		if (i < args.length) {
-			String anchor = args[i+1].trim();
+			String anchor = args[i + 1].trim();
 			anchors = VerveineJOptions.AnchorOptions.getValue(anchor);
 			if (anchors == null) {
-				throw new IllegalArgumentException("unknown option to -anchor: "+anchor);
+				throw new IllegalArgumentException("unknown option to -anchor: " + anchor);
 			}
 		} else {
 			throw new IllegalArgumentException("-anchor requires an option (none|default|assoc)");
 		}
 	}
 
-	protected void setOptionFormat( String[] args, int i) {
+	protected void setOptionFormat(String[] args, int i) {
 		if (i < args.length) {
-			outputFormat = args[i+1].trim();
-			if ( (! outputFormat.equalsIgnoreCase(MSE_OUTPUT_FORMAT)) && (! outputFormat.equalsIgnoreCase(JSON_OUTPUT_FORMAT)) ) {
-				throw new IllegalArgumentException("unknown option to -format: "+outputFormat);
+			outputFormat = args[i + 1].trim();
+			if ((!outputFormat.equalsIgnoreCase(MSE_OUTPUT_FORMAT)) && (!outputFormat.equalsIgnoreCase(JSON_OUTPUT_FORMAT))) {
+				throw new IllegalArgumentException("unknown option to -format: " + outputFormat);
 			}
 		} else {
 			throw new IllegalArgumentException("-format requires an option (mse|json)");
@@ -340,20 +334,21 @@ public class VerveineJOptions {
 		 * -classdep = generate dependencies between classes not between their members. Implies not creating accesses, reference, invocation but instead
 		 *   some new relation: classdep
 		 */
-		
-		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
+
+		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-prettyPrint] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
 		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
-		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default:"+OUTPUT_FILE+")");
-		System.err.println("      [-format (mse|json)] specifies the output format (default:"+MSE_OUTPUT_FORMAT+")");
+		System.err.println("      [-o <output-file-name>] specifies the name of the output file (default:" + OUTPUT_FILE + ")");
+		System.err.println("      [-format (mse|json)] specifies the output format (default:" + MSE_OUTPUT_FORMAT + ")");
+		System.err.println("      [-prettyPrint] toggles the usage of the json pretty printer");
 		System.err.println("      [-summary] toggles summarization of information at the level of classes.");
 		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
-		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");	
+		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");
 		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\")");
 		System.err.println("      [-anchor (none|entity|default|assoc)] options for source anchor information:\n" +
-				   "                                     - no entity\n" +
-				   "                                     - only named entities [default]\n" +
-				   "                                     - named entities+associations (i.e. accesses, invocations, references)");
+				"                                     - no entity\n" +
+				"                                     - only named entities [default]\n" +
+				"                                     - named entities+associations (i.e. accesses, invocations, references)");
 		System.err.println("      [-cp CLASSPATH] classpath where to look for stubs");
 		System.err.println("      [-autocp DIR] gather all jars in DIR and put them in the classpath");
 		System.err.println("      [-filecp FILE] gather all jars listed in FILE (absolute paths) and put them in the classpath");

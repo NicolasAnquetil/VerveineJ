@@ -17,11 +17,6 @@ public interface TAttribute  {
     @FameProperty(name = "hasClassScope", derived = true)
     public Boolean getHasClassScope();
 
-    @FameProperty(name = "isClassSide")
-    public Boolean getIsClassSide();
-
-    public void setIsClassSide(Boolean isClassSide);
-
     @FameProperty(name = "parentType", opposite = "attributes", container = true)
     public TWithAttributes getParentType();
 

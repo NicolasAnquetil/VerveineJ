@@ -7,10 +7,13 @@ import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationTypeAttribute;
+import org.moosetechnology.model.famixjava.famixjavaentities.Attribute;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
+import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
+import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
@@ -68,7 +71,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(TypeDeclaration node) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = visitTypeDeclaration(node);
+		TWithComments fmx = (TWithComments) visitTypeDeclaration(node);
 		if (fmx != null) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
@@ -252,7 +255,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	// UTILITY METHODS
 
-    protected void commentOnEntity(ASTNode node, NamedEntity fmx) {
+    protected void commentOnEntity(ASTNode node, TWithComments fmx) {
 		Comment cmt = null;
 
 		if (fmx == null) {
@@ -292,10 +295,24 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 			switch (structuralKind) {
 			case ATTRIBUTE:
 				fmx = dico.getFamixAttribute(bnd, name, context.topType());
+				if (!((TSourceEntity) fmx).getIsStub()) {
+					// if it is a stub, it might have been created by the getFamixXXX just above
+					// or something very strange happened
+					// Anyway we cannot have a comment on a stub
+
+					dico.createFamixComment(cmt, (Attribute) fmx);
+				}
 				break;
 
 			case PARAMETER:
 				fmx = dico.getFamixParameter(bnd, name, context.topMethod());
+				if (!((TSourceEntity) fmx).getIsStub()) {
+					// if it is a stub, it might have been created by the getFamixXXX just above
+					// or something very strange happened
+					// Anyway we cannot have a comment on a stub
+
+					dico.createFamixComment(cmt, (Parameter) fmx);
+				}
 				break;
 
 			case LOCALVAR:
@@ -304,13 +321,6 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 			default:
 				break;
-			}
-
-			if (!((TSourceEntity) fmx).getIsStub()) {
-				// if it is a stub, it might have been created by the getFamixXXX just above
-				// or something very strange happened
-				// Anyway we cannot have a comment on a stub
-				dico.createFamixComment(cmt, (NamedEntity) fmx);
 			}
 		}
 	}

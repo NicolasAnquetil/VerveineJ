@@ -13,7 +13,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("AnnotationInstanceAttribute")
-public class AnnotationInstanceAttribute extends SourcedEntity implements TTypedAnnotationInstanceAttribute, TEntityMetaLevelDependency, TAnnotationInstanceAttribute {
+public class AnnotationInstanceAttribute extends SourcedEntity implements TAnnotationInstanceAttribute, TEntityMetaLevelDependency, TTypedAnnotationInstanceAttribute {
 
     private TAnnotationTypeAttribute annotationTypeAttribute;
     
@@ -64,6 +64,30 @@ public class AnnotationInstanceAttribute extends SourcedEntity implements TTyped
     
     @FameProperty(name = "numberOfDeadChildren", derived = true)
     public Number getNumberOfDeadChildren() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalClients", derived = true)
+    public Number getNumberOfExternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfExternalProviders", derived = true)
+    public Number getNumberOfExternalProviders() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalClients", derived = true)
+    public Number getNumberOfInternalClients() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfInternalProviders", derived = true)
+    public Number getNumberOfInternalProviders() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

@@ -11,7 +11,10 @@ import java.util.*;
 @FameDescription("TWithInvocations")
 public interface TWithInvocations  {
 
-        @FameProperty(name = "outgoingInvocations", opposite = "sender", derived = true)
+        @FameProperty(name = "numberOfOutgoingInvocations", derived = true)
+    public Number getNumberOfOutgoingInvocations();
+
+    @FameProperty(name = "outgoingInvocations", opposite = "sender", derived = true)
     public Collection<TInvocation> getOutgoingInvocations();
 
     public void setOutgoingInvocations(Collection<? extends TInvocation> outgoingInvocations);
