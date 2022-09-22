@@ -177,26 +177,24 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		if ((bnd.isRawType() || bnd.isGenericType()) && !bnd.isInterface() ) {
 			return this.ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
 		}
+		
+		if (bnd.isAnnotation()) {
+			return this.ensureFamixAnnotationType(bnd, name, owner, alwaysPersist);
+		}
 
-		if ((bnd.isRawType() || bnd.isGenericType()) && bnd.isInterface() ) {
-			return this.ensureFamixInterface(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
+		if (bnd.isInterface()) {
+			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/bnd.isParameterizedType(), modifiers, alwaysPersist);
 		}
 
 		if (bnd.isParameterizedType()) {
 			return this.ensureFamixParameterizedType(bnd, name, /*generic*/null, ctxt, alwaysPersist);
 		}
 
-		if (bnd.isAnnotation()) {
-			return this.ensureFamixAnnotationType(bnd, name, owner, alwaysPersist);
-		}
-
-		// it seems wise to test isClass after isGenericType, isParameterizedType, ... ?
 		if (bnd.isClass()) {
 			return this.ensureFamixClass(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
 		}
-		if (bnd.isInterface()) {
-			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
-		}
+
+		//otherwise (none of the above)
 
 		if (name == null) {
 			name = bnd.getName();

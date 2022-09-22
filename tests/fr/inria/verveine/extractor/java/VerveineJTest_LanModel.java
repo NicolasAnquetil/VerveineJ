@@ -37,15 +37,18 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		new File(DEFAULT_OUTPUT_FILE).delete();
 
 		String[] files = new String[] {
+
+				"server/FileServer.java",
+				"server/IPrinter.java",
+				"server/OutputServer.java",
+				"server/PrintServer.java",
+
 				"AbstractDestinationAddress.java",
 				"Node.java",
 				"Packet.java",
 				"SingleDestinationAddress.java",
 				"WorkStation.java",
-				"server/FileServer.java",
-				"server/IPrinter.java",
-				"server/OutputServer.java",
-				"server/PrintServer.java"
+
 		};
 
 		// separate parsing of each source file --------
@@ -104,6 +107,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(0, entitiesOfType(ParameterizableClass.class).size()); // There is not ParameterizableClass
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());
 		assertEquals(18, entitiesOfType(Implementation.class).size());
+//for (Implementation imp : entitiesOfType(Implementation.class)) System.out.println(((NamedEntity)imp.getMyInterface()).getName() + " <|-- "+ ((NamedEntity)imp.getImplementingClass()).getName());
 	}
 
 	@Test
