@@ -11,7 +11,12 @@ import org.moosetechnology.model.famixjava.famixtraits.*;
 
 import java.io.File;
 import java.lang.Exception;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
@@ -86,13 +91,32 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testEntitiesNumber() {
 
-		int nbClasses = 18; // 11+ Object,String,StringBuffer,PrintStream,System,AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable} + 1 Anonymous class IPrinter 
-		int nbInterfaces = 9; // Flushable + AutoCloseable + Serializable + Constable + Closeable + Appendable + CharSequence + ConstantDesc + IPrinter
+		int nbClasses = 10; // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter,	Packet,	PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
 		int nbInherit = 26;
+		
+		// find all classes
+		Set<java.lang.Class<?>> allClasses = new HashSet<>();
+		allClasses.addAll( allJavaSuperClasses( java.lang.String.class));
+		allClasses.addAll( allJavaSuperClasses( java.lang.StringBuffer.class));
+		allClasses.addAll( allJavaSuperClasses( java.io.PrintStream.class));
+		allClasses.addAll( allJavaSuperClasses( java.lang.System.class));
+		allClasses.addAll( allJavaSuperClasses( java.io.FilterOutputStream.class));
+		allClasses.addAll( allJavaSuperClasses( java.io.OutputStream.class));
 
-		assertEquals(nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
-		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
+		assertEquals(allClasses.size()+nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
+
+		// find all interfaces
+		Set<java.lang.Class<?>> allInterfaces = new HashSet<>();
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.lang.String.class)));
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.lang.StringBuffer.class)));
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.io.PrintStream.class)));
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.lang.System.class)));
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.io.FilterOutputStream.class)));
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.io.OutputStream.class)));
+		int nbInterfaces = allInterfaces.size() - 6 + 1; // discount the 6 classes above and add IPrinter
 		assertEquals(nbInterfaces, entitiesOfType(Interface.class).size());//IPrinter + abstract one
+
+		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
 		assertEquals(1, entitiesOfType(ParameterizableInterface.class).size());// Comparable
 		assertEquals(40 + 8 + 1, entitiesOfType(Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
 		assertEquals(10 + 1, entitiesOfType(Attribute.class).size());//10+{System.out}

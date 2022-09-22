@@ -14,8 +14,13 @@ import org.moosetechnology.model.famixjava.famixtraits.*;
 
 import java.io.File;
 import java.lang.Exception;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
@@ -281,9 +286,26 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		parse(new String[]{"test_src/ad_hoc/Bla.java"});
 
 		assertEquals(7, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable, ConstantDesc, Constable
-		assertEquals(3, entitiesOfType(ParameterizableClass.class).size()); //
-		assertEquals(9, entitiesOfType(Interface.class).size());
-		assertEquals(3, entitiesOfType(ParameterizableInterface.class).size());
+		assertEquals(3, entitiesOfType(ParameterizableClass.class).size());
+		
+		// compute all interfaces used by the 3 types String, ArrayList, Arrays
+		Set<java.lang.Class<?>> allInterfaces = new HashSet<>();
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( String.class)));
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( List.class)));
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( ArrayList.class)));
+		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( Arrays.class)));
+
+		// removes the 3 classes from the list of interfaces (List is an interface)
+		allInterfaces.remove(String.class);
+		allInterfaces.remove(ArrayList.class);
+		allInterfaces.remove(Arrays.class);
+
+		int nbInterface = allInterfaces.size();
+		assertEquals(nbInterface, entitiesOfType(Interface.class).size());
+
+		// count all interfaces that have type parameters (i.e. are Parameterizable)
+		nbInterface = (int)allInterfaces.stream().filter( (e) -> e.getTypeParameters().length > 0).count();
+		assertEquals(nbInterface, entitiesOfType(ParameterizableInterface.class).size());
 	}
 
 	@Test

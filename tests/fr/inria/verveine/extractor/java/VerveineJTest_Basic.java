@@ -12,8 +12,13 @@ import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
 
 import java.lang.Class;
+import java.util.AbstractMap;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Vector;
 
 import static org.junit.Assert.*;
@@ -80,7 +85,7 @@ public abstract class VerveineJTest_Basic {
     }
 
     public <T extends NamedEntity> Collection<T> entitiesNamed( Class<T> clazz, String name) {
-        Vector ret = new Vector();
+        Vector<T> ret = new Vector<T>();
         Iterator<T> iter = entitiesOfType(clazz).iterator();
 
         while(iter.hasNext()) {
@@ -314,7 +319,61 @@ public abstract class VerveineJTest_Basic {
 		}
 	}
 
+	// UTILITIES
+	
     protected boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().contains("win");
     }
+    
+    /**
+     * returns the list of all java superclasses of <code>clazz</code> up to <code>Object</code>
+     */
+    protected List<Class<?>> allJavaSuperClasses(Class<?> clazz) {
+    	List<Class<?>> allsupers;
+    	Class<?> superclazz = clazz.getSuperclass();
+    	if (superclazz == null) {
+    		allsupers = new LinkedList<>();
+    	}
+    	else {
+    		allsupers = allJavaSuperClasses(superclazz);
+    	}
+    	allsupers.add(clazz);
+    	return allsupers;
+    }
+
+    /**
+     * Returns an association with key=the parameter <code>typ</code> and value=all java interface recursively implemented by <code>typ</code>
+     * "all java interface implemented by <code>typ</code>" is of list of associations returned by this method
+     * Therefore, this is a recursive method and the return value is a recursive structure (an association with a list containing associations, with lists...),
+     */
+    protected Map.Entry<Class<?>, List<Object>> allImplementedJavaInterfaces(Class<?> typ) {
+    	List<Object> allInterfaces = new LinkedList<>();
+    	Map.Entry<Class<?>, List<Object>> tuple = new AbstractMap.SimpleEntry<>(typ, allInterfaces);
+
+    	for (Class<?> interf : typ.getInterfaces()) {
+    		allInterfaces.add( allImplementedJavaInterfaces(interf));
+    	}
+
+    	return tuple;
+    }
+
+    /**
+     * flattens the result of {@link allImplementedJavaInterfaces} to return a list of interfaces
+     */
+    @SuppressWarnings("unchecked")
+	protected List<Class<?>> flattenImplementedJavaInterfaces(Map.Entry<Class<?>, List<Object>> association) {
+    	List<Class<?>> flattened = new LinkedList<>();
+    	flattened.add(association.getKey());
+ 
+    	if (association.getValue().isEmpty()) {
+    		return flattened;
+    	}
+
+    	for (Object childAssoc : association.getValue()) {
+    		flattened.addAll( flattenImplementedJavaInterfaces( (Entry<Class<?>, List<Object>>) childAssoc) );
+    	}
+
+    	return flattened;
+    }
+
 }

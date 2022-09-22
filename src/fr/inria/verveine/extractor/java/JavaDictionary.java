@@ -405,19 +405,23 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 			if (persistIt) {
-				TAssociation lastInheritance = null;
+				TAssociation lastAssociation = null;
 				Collection<Type> sups = new LinkedList<Type>();
 				if (bnd != null) {
 					ITypeBinding supbnd = bnd.getSuperclass();
 					if (supbnd != null) {
-						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastInheritance);
+						lastAssociation = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastAssociation);
 					}
 					else {
-						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastInheritance);
+						lastAssociation = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastAssociation);
 					}
-					if (!bnd.isInterface()) {
-						for (ITypeBinding intbnd : bnd.getInterfaces()) {
-							lastInheritance = ensureFamixImplementation((TImplementable) ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist), (TCanImplement)fmx, lastInheritance);
+					for (ITypeBinding intbnd : bnd.getInterfaces()) {
+						Type superTyp = ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist);
+						if (bnd.isInterface()) {
+							lastAssociation = ensureFamixInheritance((TWithInheritances)superTyp, fmx, lastAssociation);
+						}
+						else {
+							lastAssociation = ensureFamixImplementation((TImplementable)superTyp, (TCanImplement)fmx, lastAssociation);
 						}
 					}
 				}
