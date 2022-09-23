@@ -12,10 +12,10 @@ import org.moosetechnology.model.famixjava.famixtraits.*;
 import java.io.File;
 import java.lang.Exception;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -90,37 +90,41 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
+		// find all classes to count them
+		List<java.lang.Class<?>> recursiveAPISuperClasses = new ArrayList<>();
+		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.String.class));
+		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.StringBuffer.class));
+		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.PrintStream.class));
+		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.System.class));
+		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.FilterOutputStream.class));
+		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.OutputStream.class));
 
-		int nbClasses = 10; // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter,	Packet,	PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
-		int nbInherit = 26;
-		
-		// find all classes
-		Set<java.lang.Class<?>> allClasses = new HashSet<>();
-		allClasses.addAll( allJavaSuperClasses( java.lang.String.class));
-		allClasses.addAll( allJavaSuperClasses( java.lang.StringBuffer.class));
-		allClasses.addAll( allJavaSuperClasses( java.io.PrintStream.class));
-		allClasses.addAll( allJavaSuperClasses( java.lang.System.class));
-		allClasses.addAll( allJavaSuperClasses( java.io.FilterOutputStream.class));
-		allClasses.addAll( allJavaSuperClasses( java.io.OutputStream.class));
+		Set<java.lang.Class<?>> setOfSuperClasses = new HashSet<>();
+		setOfSuperClasses.addAll(recursiveAPISuperClasses);
+		assertEquals(setOfSuperClasses.size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
+				entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 
-		assertEquals(allClasses.size()+nbClasses, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
+		// find all interfaces to count them
+		List<ImplementedInterfaces> recursiveAPIInterfaces = new ArrayList<>();
+		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.String.class));
+		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.StringBuffer.class));
+		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.PrintStream.class));
+		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.System.class));
+		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.FilterOutputStream.class));
+		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.OutputStream.class));
 
-		// find all interfaces
-		Set<java.lang.Class<?>> allInterfaces = new HashSet<>();
-		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.lang.String.class)));
-		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.lang.StringBuffer.class)));
-		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.io.PrintStream.class)));
-		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.lang.System.class)));
-		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.io.FilterOutputStream.class)));
-		allInterfaces.addAll( flattenImplementedJavaInterfaces( allImplementedJavaInterfaces( java.io.OutputStream.class)));
-		int nbInterfaces = allInterfaces.size() - 6 + 1; // discount the 6 classes above and add IPrinter
-		assertEquals(nbInterfaces, entitiesOfType(Interface.class).size());//IPrinter + abstract one
+		Set<java.lang.Class<?>> setOfInterfaces = new HashSet<>();
+		for (ImplementedInterfaces each : recursiveAPIInterfaces) {
+			setOfInterfaces.addAll( each.flatten());
+		}
+		assertEquals(setOfInterfaces.size() - 6 + 1,  // discount the 6 classes above and add IPrinter
+				entitiesOfType(Interface.class).size());
 
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
 		assertEquals(1, entitiesOfType(ParameterizableInterface.class).size());// Comparable
-		assertEquals(40 + 8 + 1, entitiesOfType(Method.class).size());//40+{System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
-		assertEquals(10 + 1, entitiesOfType(Attribute.class).size());//10+{System.out}
-		assertEquals(2 + 4 + 1, entitiesOfType(Package.class).size());//2+{moose,java.lang,java.io,java} // +1 new package named java.lang.constant (java17?)
+		assertEquals(40 + 8 + 1, entitiesOfType(Method.class).size());//40 + {System.out.println(),System.out.println(...),System.out.print,StringBuffer.append,Object.equals,String.equals,Object.toString,<Initializer>}
+		assertEquals(10 + 1, entitiesOfType(Attribute.class).size());//10 + System.out
+		assertEquals(2 + 4 + 1, entitiesOfType(Package.class).size());//2 + {moose, java.lang, java.io, java} // +1 new package named java.lang.constant (java17?)
 		assertEquals(26, entitiesOfType(Parameter.class).size());
 		assertEquals(55, entitiesOfType(Invocation.class).size());
 		assertEquals(45, entitiesOfType(Access.class).size());// 17 "internal" attributes + 9 System.out + 18 "this" + 1 "super"
@@ -129,9 +133,21 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(2, entitiesOfType(AnnotationInstance.class).size()); //PrintServer.output, SingleDestinationAddress.isDestinationFor
 		assertEquals(32, entitiesOfType(Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);// PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
 		assertEquals(0, entitiesOfType(ParameterizableClass.class).size()); // There is not ParameterizableClass
-		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());
-		assertEquals(18, entitiesOfType(Implementation.class).size());
-//for (Implementation imp : entitiesOfType(Implementation.class)) System.out.println(((NamedEntity)imp.getMyInterface()).getName() + " <|-- "+ ((NamedEntity)imp.getImplementingClass()).getName());
+
+		// all classes have 1 inheritance except Object
+		int nbInherit = setOfSuperClasses.size() + 10 - 1; 
+		// interfaces _inherit_ from super-interfaces
+		for (ImplementedInterfaces each : recursiveAPIInterfaces) {
+			nbInherit += each.countInterfacesSubtyped();
+		}
+		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());  
+
+		int nbImplementations = 0;
+		// Implementations are strictly between classes and interfaces
+		for (ImplementedInterfaces each : recursiveAPIInterfaces) {
+			nbImplementations += each.directInterfaces().size();
+		}
+		assertEquals(nbImplementations, entitiesOfType(Implementation.class).size());
 	}
 
 	@Test
@@ -260,7 +276,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testInheritance() {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
 		Collection<TInheritance> superInheritances;
-		Inheritance inh, inh2 = null;
+		Inheritance inh = null;
 		Collection<TInheritance> inherits;
 		Collection<TImplementation> implementations;
 

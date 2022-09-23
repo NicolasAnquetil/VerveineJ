@@ -346,34 +346,68 @@ public abstract class VerveineJTest_Basic {
      * "all java interface implemented by <code>typ</code>" is of list of associations returned by this method
      * Therefore, this is a recursive method and the return value is a recursive structure (an association with a list containing associations, with lists...),
      */
-    protected Map.Entry<Class<?>, List<Object>> allImplementedJavaInterfaces(Class<?> typ) {
-    	List<Object> allInterfaces = new LinkedList<>();
-    	Map.Entry<Class<?>, List<Object>> tuple = new AbstractMap.SimpleEntry<>(typ, allInterfaces);
+    protected ImplementedInterfaces allImplementedJavaInterfaces(Class<?> typ) {
+    	List<ImplementedInterfaces> allInterfaces = new LinkedList<>();
 
     	for (Class<?> interf : typ.getInterfaces()) {
     		allInterfaces.add( allImplementedJavaInterfaces(interf));
     	}
 
-    	return tuple;
+    	return new ImplementedInterfaces(typ, allInterfaces);
     }
 
-    /**
-     * flattens the result of {@link allImplementedJavaInterfaces} to return a list of interfaces
-     */
-    @SuppressWarnings("unchecked")
-	protected List<Class<?>> flattenImplementedJavaInterfaces(Map.Entry<Class<?>, List<Object>> association) {
-    	List<Class<?>> flattened = new LinkedList<>();
-    	flattened.add(association.getKey());
- 
-    	if (association.getValue().isEmpty()) {
-    		return flattened;
-    	}
+    protected class ImplementedInterfaces {
+    	protected Class<?> implementor;
+    	protected List<ImplementedInterfaces> interfaces;
+    	
+		public ImplementedInterfaces(Class<?> implementor, List<ImplementedInterfaces> interfaces) {
+			this.implementor = implementor;
+			this.interfaces = interfaces;
+		}
 
-    	for (Object childAssoc : association.getValue()) {
-    		flattened.addAll( flattenImplementedJavaInterfaces( (Entry<Class<?>, List<Object>>) childAssoc) );
-    	}
+		public Class<?> getImplementor() {
+			return implementor;
+		}
 
-    	return flattened;
+		public List<ImplementedInterfaces> getInterfaces() {
+			return interfaces;
+		}
+    	
+		public List<Class<?>> flatten() {
+	    	List<Class<?>> flattened = new LinkedList<>();
+	    	flattened.add(implementor);
+	 
+	    	if (interfaces.isEmpty()) return flattened;
+
+	    	for (ImplementedInterfaces recursiveImplementations : interfaces) {
+	    		flattened.addAll( recursiveImplementations.flatten() );
+	    	}
+
+	    	return flattened;
+		}
+
+		/**
+		 * Counts how many interfaces are subtyped (by other interfaces)
+		 */
+		public int countInterfacesSubtyped() {
+			int total = 0;
+			if (interfaces.isEmpty()) return 0;
+			for (ImplementedInterfaces each : interfaces) {
+				total += each.countInterfacesSubtyped();
+			}
+			if (implementor.isInterface()) {
+				total += interfaces.size();
+			}
+			return total;
+		}
+		
+		public List<Class<?>> directInterfaces() {
+	    	List<Class<?>> direct = new LinkedList<>();
+			for (ImplementedInterfaces each : interfaces) {
+				direct.add( each.getImplementor());
+			}
+			return direct;
+		}
     }
 
 }
