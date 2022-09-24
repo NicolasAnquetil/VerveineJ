@@ -90,34 +90,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		// find all classes to count them
-		List<java.lang.Class<?>> recursiveAPISuperClasses = new ArrayList<>();
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.String.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.StringBuffer.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.PrintStream.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.System.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.FilterOutputStream.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.OutputStream.class));
-
-		Set<java.lang.Class<?>> setOfSuperClasses = new HashSet<>();
-		setOfSuperClasses.addAll(recursiveAPISuperClasses);
-		assertEquals(setOfSuperClasses.size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
+		Collection<java.lang.Class<?>> javaClassesSuperClasses = javaClassesSuperClasses();
+		assertEquals(
+				javaClassesSuperClasses.size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
 				entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 
-		// find all interfaces to count them
-		List<ImplementedInterfaces> recursiveAPIInterfaces = new ArrayList<>();
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.String.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.StringBuffer.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.PrintStream.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.System.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.FilterOutputStream.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.OutputStream.class));
-
-		Set<java.lang.Class<?>> setOfInterfaces = new HashSet<>();
-		for (ImplementedInterfaces each : recursiveAPIInterfaces) {
-			setOfInterfaces.addAll( each.flatten());
-		}
-		assertEquals(setOfInterfaces.size() - 6 + 1,  // discount the 6 classes above and add IPrinter
+		assertEquals(
+				allImplementedInterfaces().size() + 1,  // add IPrinter
 				entitiesOfType(Interface.class).size());
 
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
@@ -135,7 +114,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(0, entitiesOfType(ParameterizableClass.class).size()); // There is not ParameterizableClass
 
 		// all classes have 1 inheritance except Object
-		int nbInherit = setOfSuperClasses.size() + 10 - 1; 
+		int nbInherit = javaClassesSuperClasses.size() + 10 - 1; 
 		// interfaces _inherit_ from super-interfaces
 		for (ImplementedInterfaces each : recursiveAPIInterfaces) {
 			nbInherit += each.countInterfacesSubtyped();

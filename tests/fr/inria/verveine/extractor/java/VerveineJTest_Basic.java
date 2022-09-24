@@ -13,12 +13,16 @@ import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
 
 import java.lang.Class;
 import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.Vector;
 
 import static org.junit.Assert.*;
@@ -319,7 +323,8 @@ public abstract class VerveineJTest_Basic {
 		}
 	}
 
-	// UTILITIES
+	// UTILITIES to compute super-classes and implemented interfaces
+	// this is computed using recursive API because it varies according to Java versions
 	
     protected boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().contains("win");
@@ -356,7 +361,93 @@ public abstract class VerveineJTest_Basic {
     	return new ImplementedInterfaces(typ, allInterfaces);
     }
 
-    protected class ImplementedInterfaces {
+    /**
+	 * Array of all the java classes that are directly used in the LANModel "project"
+	 */
+	protected java.lang.Class<?> [] usedJavaClassesInLANModel() {
+		return new java.lang.Class<?> [] { 
+			java.lang.String.class,
+			java.lang.StringBuffer.class,
+			java.io.PrintStream.class,
+			java.lang.System.class,
+			java.io.FilterOutputStream.class,
+			java.io.OutputStream.class
+		};
+	}
+
+	/**
+	 * finds the list of all interfaces implemented by one of the Java class used in LANModel "project"
+	 * @return A collection of the interfaces without duplicate
+	 */
+	protected Collection<java.lang.Class<?>> allImplementedInterfaces() {
+		Set<java.lang.Class<?>> setOfInterfaces = new HashSet<>();
+		for (ImplementedInterfaces each : implementedOrSubtypedInterfaces()) {
+			setOfInterfaces.addAll( each.flatten());
+		}
+		for (java.lang.Class<?> javaClass : usedJavaClassesInLANModel()) {
+			setOfInterfaces.remove(javaClass);
+		}
+		return setOfInterfaces;
+	}
+
+	/**
+	 * Using Java recursive API, lists all java classes or interfaces used in LANModel "project"
+	 * with the Java interfaces they use/subtype
+	 * @return A collection of ImplementedInterfaces (associating a class/interface with implemented/subtyped interfaces)
+	 */
+	protected Collection<ImplementedInterfaces> implementedOrSubtypedInterfaces() {
+		List<ImplementedInterfaces> recursiveAPIInterfaces = new ArrayList<>();
+	
+		for (java.lang.Class<?> javaClass : usedJavaClassesInLANModel()) {
+			recursiveAPIInterfaces.add( allImplementedJavaInterfaces( javaClass) );
+		}
+	
+		return recursiveAPIInterfaces;
+	}
+
+	/**
+	 * Using Java recursive API, computes all classes inherited by java classes directly used in LANModel "project"
+	 */
+	protected Collection<java.lang.Class<?>> javaClassesSuperClasses() {
+		Set<java.lang.Class<?>> recursiveAPISuperClasses = new HashSet<>();
+	
+		for (java.lang.Class<?> javaClass : usedJavaClassesInLANModel()) {
+			recursiveAPISuperClasses.addAll( allJavaSuperClasses( javaClass));
+		}
+	
+		return recursiveAPISuperClasses;
+	}
+
+	/**
+	 * Using Java recursive API, counts all inheritances between interfaces used by any of the used java classes.
+	 */
+	protected Collection<java.lang.Class<?>> javaInterfacesSubtyped() {
+		/* 
+		 * 1- recursiveAPIInterfaces: collects all interface implementated
+		 * 2- keysValues: puts in a map a class or interface associated with the interfaces it implements/subtypes
+		 * 3- remove from the map the class itself (because it is not an interface, therefore it is not subtyping
+		 *    interfaces, but implementing interfaces)
+		 * What remains is a map with all interfaces and what other interfaces they subtype
+		 * If an interface is implemented by several classes, it will appear only once in the map (removing duplicates)
+		 */
+		Map<java.lang.Class<?>,List<java.lang.Class<?>>> allInterfacesSubtyped = new HashMap<>();
+		
+		for (ImplementedInterfaces each : implementedOrSubtypedInterfaces()) {
+			allInterfacesSubtyped.putAll(each.keysValues());
+		}
+		for (java.lang.Class<?> javaClass : usedJavaClassesInLANModel()) {
+			allInterfacesSubtyped.remove(javaClass);
+		}
+	
+		Set<java.lang.Class<?>> interfacesSubbtyped = new HashSet<>();
+		for (List<java.lang.Class<?>> l : allInterfacesSubtyped.values()) {
+			interfacesSubbtyped.addAll( l);
+		}
+	
+		return interfacesSubbtyped;
+	}
+
+	protected class ImplementedInterfaces {
     	protected Class<?> implementor;
     	protected List<ImplementedInterfaces> interfaces;
     	
@@ -384,6 +475,19 @@ public abstract class VerveineJTest_Basic {
 	    	}
 
 	    	return flattened;
+		}
+
+		public Map<Class<?>,List<Class<?>>> keysValues() {
+			Map<Class<?>,List<Class<?>>> dictionary = new HashMap<>();
+			Class<?> key = implementor;
+			List<Class<?>> value = new ArrayList<>();
+			for (ImplementedInterfaces each : interfaces) {
+				value.add(each.getImplementor());
+				dictionary.putAll( each.keysValues());
+			}
+			
+			dictionary.put( key, value);
+			return dictionary;
 		}
 
 		/**

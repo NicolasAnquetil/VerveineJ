@@ -3,6 +3,15 @@
  */
 package fr.inria.verveine.extractor.java;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.util.Collection;
+
 /*
 PrintServer
 - OutputServer
@@ -64,23 +73,26 @@ FileServer
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Access;
+import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationInstance;
+import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationType;
+import org.moosetechnology.model.famixjava.famixjavaentities.Attribute;
+import org.moosetechnology.model.famixjava.famixjavaentities.Comment;
+import org.moosetechnology.model.famixjava.famixjavaentities.Implementation;
+import org.moosetechnology.model.famixjava.famixjavaentities.IndexedFileAnchor;
+import org.moosetechnology.model.famixjava.famixjavaentities.Inheritance;
+import org.moosetechnology.model.famixjava.famixjavaentities.Interface;
+import org.moosetechnology.model.famixjava.famixjavaentities.Invocation;
+import org.moosetechnology.model.famixjava.famixjavaentities.LocalVariable;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
 import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famixjava.famixjavaentities.Reference;
 import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
 import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-
-import fr.inria.verveine.extractor.java.VerveineJTest_Basic.ImplementedInterfaces;
-
-import java.io.File;
-import java.lang.Exception;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.Assert.*;
 
 /**
  * @author Nicolas Anquetil
@@ -145,34 +157,12 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		// find all classes to count them
-		List<java.lang.Class<?>> recursiveAPISuperClasses = new ArrayList<>();
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.String.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.StringBuffer.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.PrintStream.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.System.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.FilterOutputStream.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.OutputStream.class));
-
-		Set<java.lang.Class<?>> setOfSuperClasses = new HashSet<>();
-		setOfSuperClasses.addAll(recursiveAPISuperClasses);
-		assertEquals(setOfSuperClasses.size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
+		assertEquals(
+				javaClassesSuperClasses().size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
 				entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 
-		// find all interfaces to count them
-		List<ImplementedInterfaces> recursiveAPIInterfaces = new ArrayList<>();
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.String.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.StringBuffer.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.PrintStream.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.lang.System.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.FilterOutputStream.class));
-		recursiveAPIInterfaces.add( allImplementedJavaInterfaces( java.io.OutputStream.class));
-
-		Set<java.lang.Class<?>> setOfInterfaces = new HashSet<>();
-		for (ImplementedInterfaces each : recursiveAPIInterfaces) {
-			setOfInterfaces.addAll( each.flatten());
-		}
-		assertEquals(setOfInterfaces.size() - 6 + 1,  // discount the 6 classes above and add IPrinter
+		assertEquals(
+				allImplementedInterfaces().size() + 1,  // add IPrinter
 				entitiesOfType(Interface.class).size());
 
 		assertEquals(1, entitiesOfType(ParameterizableInterface.class).size());//IPrinter
@@ -220,39 +210,14 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testInheritance() {
-		// --WorkStation extends Node
-		// --SingleDestinationAddress extends AbstractDestinationAddress
-		// --Packet
-		// --Node
-		// --AbstractDestinationAddress
-		// --PrintServer extends OutputServer
-		// --XPrinter implements IPrinter
-		// --XPrinter
-		// ** **new IPrinter() {
-		// --OutputServer extends Node
-		// --FileServer extends OutputServer
-
 		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
 		Collection<TInheritance> inherits;
 		Collection<TImplementation> implementations;
 		Inheritance inh = null;
 		
-		int nbInherit = 9;  // all classes of the project (note: _Anonymous(IPrinter) is not created) have inheritance
-		Set<java.lang.Class<?>> recursiveAPISuperClasses = new HashSet<>();
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.String.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.StringBuffer.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.PrintStream.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.lang.System.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.FilterOutputStream.class));
-		recursiveAPISuperClasses.addAll( allJavaSuperClasses( java.io.OutputStream.class));
-		nbInherit += recursiveAPISuperClasses.size() - 1; // Object has no inheritance
-
-		nbInherit +=  allImplementedJavaInterfaces( java.lang.String.class).countInterfacesSubtyped();
-		nbInherit +=   allImplementedJavaInterfaces( java.lang.StringBuffer.class).countInterfacesSubtyped();
-		nbInherit +=   allImplementedJavaInterfaces( java.io.PrintStream.class).countInterfacesSubtyped();
-		nbInherit +=   allImplementedJavaInterfaces( java.lang.System.class).countInterfacesSubtyped();
-		nbInherit +=   allImplementedJavaInterfaces( java.io.FilterOutputStream.class).countInterfacesSubtyped();
-		nbInherit +=   allImplementedJavaInterfaces( java.io.OutputStream.class).countInterfacesSubtyped();
+		int nbInherit = 9;  // all classes of the project have inheritance (note that _Anonymous(IPrinter) is not created)
+		nbInherit += javaClassesSuperClasses().size() - 1; // Inheritance in Java classes, considering that Object has no inheritance
+		nbInherit += javaInterfacesSubtyped().size(); // Subtyping between interfaces is considered inheritance
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
 		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "PrintServer");
@@ -278,11 +243,9 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		implementations = clazz.getInterfaceImplementations();
 		assertEquals(1, implementations.size()); // IPrinter
 
-			/**
-			 * Order shold be extends Object and then implements IPrinter
-			 */
-
-
+		/*
+		 * Order should be extends Object and then implements IPrinter
+		 */
 		Implementation implem = (Implementation) implementations.iterator().next();
 		assertSame(clazz, implem.getImplementingClass());
 		assertNull(implem.getNext());
@@ -307,7 +270,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(1, impls.size());
 
 	}
-
+	
 	@Test
 	public void testComments() {
 		Collection<Comment> cmts = entitiesOfType( Comment.class);
