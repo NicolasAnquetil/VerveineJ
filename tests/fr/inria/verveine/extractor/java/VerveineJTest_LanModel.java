@@ -90,13 +90,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		Collection<java.lang.Class<?>> javaClassesSuperClasses = javaClassesSuperClasses();
+		Collection<java.lang.Class<?>> lanModelJavaClasses = lanModelJavaClasses();
 		assertEquals(
-				javaClassesSuperClasses.size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
+				lanModelJavaClasses.size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
 				entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 
 		assertEquals(
-				allImplementedInterfaces().size() + 1,  // add IPrinter
+				lanModelJavaInterfaces().size() + 1,  // add IPrinter
 				entitiesOfType(Interface.class).size());
 
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void
@@ -113,20 +113,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(32, entitiesOfType(Comment.class).size());  // AbstractDestinationAddress=2(1,64);FileServer=3(1,97,204);IPrinter=2(1,71);Node=4(1,64,611,837);OutputServer=4(1,121,270,577);Packet=2(42,64);// PrintServer=4(1,97,314,695);SingleDestinationAddress=5(1,64,316,533,619);Workstation=6(42,64,164,249,608,1132);XPrinter=0()
 		assertEquals(0, entitiesOfType(ParameterizableClass.class).size()); // There is not ParameterizableClass
 
-		// all classes have 1 inheritance except Object
-		int nbInherit = javaClassesSuperClasses.size() + 10 - 1; 
-		// interfaces _inherit_ from super-interfaces
-		for (ImplementedInterfaces each : recursiveAPIInterfaces) {
-			nbInherit += each.countInterfacesSubtyped();
-		}
+		int nbInherit = lanModelJavaClasses.size() + 10 - 1;   // all classes have 1 inheritance except Object 
+		nbInherit += lanModelInterfacesSubtyped().size();      // interface subtyping is represented as inheritance
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size());  
 
-		int nbImplementations = 0;
-		// Implementations are strictly between classes and interfaces
-		for (ImplementedInterfaces each : recursiveAPIInterfaces) {
-			nbImplementations += each.directInterfaces().size();
-		}
-		assertEquals(nbImplementations, entitiesOfType(Implementation.class).size());
+		assertEquals(
+				lanModelDirectImplement().size() + 2,   // XPrinter, _anonymous(IPrinter)
+				entitiesOfType(Implementation.class).size());
 	}
 
 	@Test

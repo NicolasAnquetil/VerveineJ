@@ -290,10 +290,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		
 		// compute all interfaces used by the 3 types String, ArrayList, Arrays
 		Set<java.lang.Class<?>> allInterfaces = new HashSet<>();
-		allInterfaces.addAll( allImplementedJavaInterfaces( String.class).flatten());
-		allInterfaces.addAll( allImplementedJavaInterfaces( List.class).flatten());
-		allInterfaces.addAll( allImplementedJavaInterfaces( ArrayList.class).flatten());
-		allInterfaces.addAll( allImplementedJavaInterfaces( Arrays.class).flatten());
+		allInterfaces.addAll( allJavaInterfaces( String.class).flattenToCollection());
+		allInterfaces.addAll( allJavaInterfaces( List.class).flattenToCollection());
+		allInterfaces.addAll( allJavaInterfaces( ArrayList.class).flattenToCollection());
+		allInterfaces.addAll( allJavaInterfaces( Arrays.class).flattenToCollection());
 
 		// removes the 3 classes from the list of interfaces (List is an interface)
 		allInterfaces.remove(String.class);

@@ -33,6 +33,12 @@ public class Implementation extends Entity implements TAssociation, TAssociation
     private TSourceAnchor sourceAnchor;
     
 
+	@Override
+	public String toString() {
+		// mainly for debugging purposes (in Eclipse debugger)
+		return implementingClass.toString() + " --|> " + myInterface.toString();
+	}
+
 
     @FameProperty(name = "containsReplicas", derived = true)
     public Boolean getContainsReplicas() {
