@@ -11,11 +11,37 @@ import org.moosetechnology.model.famixjava.famixtraits.TType;
 import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 
 public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
+	/**
+	 * Array of all the java classes that are directly used in the Generics "project"
+	 */
+	protected final java.lang.Class<?> [] JAVA_CLASSES_USED =
+			new java.lang.Class<?> [] { 
+		java.lang.String.class,
+		java.util.Hashtable.class,
+		java.util.ArrayList.class,
+		java.lang.Class.class,
+		java.lang.System.class,
+	};
+
+	/**
+	 * Array of all the java classes that are directly used in the Generics "project"
+	 */
+	protected final java.lang.Class<?> [] JAVA_INTERFACES_USED =
+			new java.lang.Class<?> [] { 
+		java.util.Map.class,
+		java.util.List.class,
+		java.util.Collection.class,
+	};
+
+		
     public VerveineJTest_Generics() {
         super(false);
     }
@@ -34,26 +60,11 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
     @Test
     public void testParameterizableClass() {
-        assertEquals(7, entitiesOfType( ParameterizableClass.class).size());
-        assertEquals(5, entitiesOfType( ParameterizableInterface.class).size());
+    	long nbJavaGenerics = allClasses().stream().filter( (e) -> e.getTypeParameters().length > 0).count();
+        assertEquals( nbJavaGenerics + 1, entitiesOfType( ParameterizableClass.class).size());   // Java generics + Dictionary
 
-        // WrongInvocation -> List<X>, ArrayList<X>
-        // Dictionary -> Dictionary<X>, Map<X,Y>, Hashtable<X,Y>, Collection<X>, Class<X>, ArrayList<X>
-
-        /**
-         * - Map
-         * - Class
-         * - AbstractList
-         * - ArrayList
-         * - Iterable
-         * - List
-         * - Comparable
-         * - Hashtable
-         * - AsbtractCollection
-         * - OfField // Java 15
-         * - Collection
-         * - Dictionary * 2
-         */
+        nbJavaGenerics = allInterfaces().stream().filter( (e) -> e.getTypeParameters().length > 0).count();
+        assertEquals(nbJavaGenerics, entitiesOfType( ParameterizableInterface.class).size());
 
         ParameterizableClass generic = null;
         for (ParameterizableClass g : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
@@ -85,7 +96,33 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(collec);
     }
 
-    @Test
+    private Collection<java.lang.Class<?>> allClasses() {
+		Set<java.lang.Class<?>> allClasses = new HashSet<>();
+		
+		for (java.lang.Class<?> javaClass : JAVA_CLASSES_USED) {
+			allClasses.addAll( allJavaSuperClasses( javaClass));
+		}
+	
+		return allClasses;
+	}
+
+    private Collection<java.lang.Class<?>> allInterfaces() {
+		Set<java.lang.Class<?>> allInterfaces = new HashSet<>();
+		
+		for (java.lang.Class<?> javaClass : JAVA_CLASSES_USED) {
+			
+			List<java.lang.Class<?>> intrfcFromClasses = allJavaInterfaces( javaClass).flattenToCollection().stream().filter( (e) -> e.isInterface()).toList();
+			allInterfaces.addAll( intrfcFromClasses);
+		}
+
+		for (java.lang.Class<?> javaClass : JAVA_INTERFACES_USED) {
+			allInterfaces.addAll( allJavaInterfaces( javaClass).flattenToCollection());
+		}
+	
+		return allInterfaces;
+	}
+
+	@Test
     public void testParameterizedType() {
         Method getx = detectFamixElement( Method.class, "getX");
         assertNotNull(getx);
