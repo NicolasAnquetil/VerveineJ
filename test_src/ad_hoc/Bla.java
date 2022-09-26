@@ -8,7 +8,7 @@ import java.util.List;
 public class Bla {
 
 	public static void main(String[] arg){
-		List list = new ArrayList();
+		List<?> list = new ArrayList();
 		Arrays.asList("abc");
 	}
 }

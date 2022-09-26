@@ -539,9 +539,9 @@ public class AbstractDictionary<B> {
 	}
 
 		/**
-	 * Returns a Famix Inheritance relationship between two Famix Classes creating it if needed
-	 * @param sup -- the super class
-	 * @param sub -- the sub class
+	 * Returns a Famix Implementation relationship between two Famix Classes creating it if needed
+	 * @param sup -- the implemented interface
+	 * @param sub -- the implementing class
 	 * @param prev -- previous inheritance relationship in the same context
 	 * @return the Inheritance relationship
 	 */
@@ -550,9 +550,9 @@ public class AbstractDictionary<B> {
 			return null;
 		}
 
-		for (TImplementation i : (myInterface).getImplementations()) {
-			if (i.getImplementingClass() == implementingClass) {
-				return (Implementation) i;
+		for (TImplementation imp : myInterface.getImplementations()) {
+			if (imp.getImplementingClass() == implementingClass) {
+				return (Implementation) imp;
 			}
 		}
 		Implementation implementation = new Implementation();

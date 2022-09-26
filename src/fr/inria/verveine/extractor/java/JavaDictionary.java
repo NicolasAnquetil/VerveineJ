@@ -177,26 +177,24 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		if ((bnd.isRawType() || bnd.isGenericType()) && !bnd.isInterface() ) {
 			return this.ensureFamixClass(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
 		}
+		
+		if (bnd.isAnnotation()) {
+			return this.ensureFamixAnnotationType(bnd, name, owner, alwaysPersist);
+		}
 
-		if ((bnd.isRawType() || bnd.isGenericType()) && bnd.isInterface() ) {
-			return this.ensureFamixInterface(bnd.getErasure(), name, owner, /*isGeneric*/true, modifiers, alwaysPersist);
+		if (bnd.isInterface()) {
+			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/bnd.isParameterizedType(), modifiers, alwaysPersist);
 		}
 
 		if (bnd.isParameterizedType()) {
 			return this.ensureFamixParameterizedType(bnd, name, /*generic*/null, ctxt, alwaysPersist);
 		}
 
-		if (bnd.isAnnotation()) {
-			return this.ensureFamixAnnotationType(bnd, name, owner, alwaysPersist);
-		}
-
-		// it seems wise to test isClass after isGenericType, isParameterizedType, ... ?
 		if (bnd.isClass()) {
 			return this.ensureFamixClass(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
 		}
-		if (bnd.isInterface()) {
-			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
-		}
+
+		//otherwise (none of the above)
 
 		if (name == null) {
 			name = bnd.getName();
@@ -309,21 +307,17 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 			if (persistIt) {
-				TAssociation lastInheritance = null;
+				TAssociation lastAssoc = null;
 				Collection<Type> sups = new LinkedList<Type>();
 				if (bnd != null) {
 					ITypeBinding supbnd = bnd.getSuperclass();
 					if (supbnd != null) {
-						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastInheritance);
+						lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastAssoc);
 					}
 					else {
-						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastInheritance);
+						lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastAssoc);
 					}
-					if (!bnd.isInterface()) {
-						for (ITypeBinding intbnd : bnd.getInterfaces()) {
-							lastInheritance = ensureFamixImplementation((TImplementable) ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist), (TCanImplement)fmx, lastInheritance);
-						}
-					}
+					ensureImplementedInterfaces(bnd, fmx, owner, lastAssoc, alwaysPersist);
 				}
 			}
 		}
@@ -407,25 +401,26 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 			if (persistIt) {
-				TAssociation lastInheritance = null;
+				TAssociation lastAssociation = null;
 				Collection<Type> sups = new LinkedList<Type>();
 				if (bnd != null) {
-					ITypeBinding supbnd = bnd.getSuperclass();
-					if (supbnd != null) {
-						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastInheritance);
-					}
-					else {
-						lastInheritance = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastInheritance);
-					}
-					if (!bnd.isInterface()) {
-						for (ITypeBinding intbnd : bnd.getInterfaces()) {
-							lastInheritance = ensureFamixImplementation((TImplementable) ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist), (TCanImplement)fmx, lastInheritance);
-						}
-					}
+					ensureImplementedInterfaces(bnd, fmx, owner, lastAssociation, alwaysPersist);
 				}
 			}
 		}
 		return fmx;
+	}
+
+	protected void ensureImplementedInterfaces(ITypeBinding bnd, Type fmx, ContainerEntity owner, TAssociation lastAssociation, boolean alwaysPersist) {
+		for (ITypeBinding intbnd : bnd.getInterfaces()) {
+			Type superTyp = ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist);
+			if (bnd.isInterface()) {
+				lastAssociation = ensureFamixInheritance((TWithInheritances)superTyp, (TWithInheritances)fmx, lastAssociation);
+			}
+			else {
+				lastAssociation = ensureFamixImplementation((TImplementable)superTyp, (TCanImplement)fmx, lastAssociation);
+			}
+		}
 	}
 
 	public Type asClass(Type excepFmx) {

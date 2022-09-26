@@ -34,6 +34,21 @@ public class ParameterizedType extends Type implements TCanImplement, TImplement
     private Collection<TInheritance> superInheritances; 
 
 
+	@Override
+	public String toString() {
+		// mainly for debugging purposes (in Eclipse debugger)
+		StringBuilder str = new StringBuilder();
+		str.append(super.toString());
+		str.append('<');
+		for (TParameterizedTypeUser tparam : arguments) {
+			str.append( ((NamedEntity)tparam).getName());
+			str.append(',');
+
+		}
+		str.append('>');
+		return  str.toString();
+	}
+
 
     @FameProperty(name = "arguments", opposite = "argumentsInParameterizedTypes")
     public Collection<TParameterizedTypeUser> getArguments() {
@@ -82,7 +97,7 @@ public class ParameterizedType extends Type implements TCanImplement, TImplement
     }
 
     public boolean hasArguments() {
-        return !getArguments().isEmpty();
+    	return !getArguments().isEmpty();
     }
 
     @FameProperty(name = "hierarchyNestingLevel", derived = true)

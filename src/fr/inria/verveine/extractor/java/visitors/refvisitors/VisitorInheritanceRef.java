@@ -152,7 +152,6 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 		TAssociation lastInheritance = null;
 
 		// --------------- superclass
-		Collection<Type> sups = new LinkedList<>();
 		if (!bnd.isInterface()) {
 			ITypeBinding supbnd = bnd.getSuperclass();
 			Type t;
@@ -162,13 +161,15 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 				t = dico.ensureFamixClassObject(null);
 			}
 			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) t, fmx, lastInheritance);
-		}
-		for (ITypeBinding intbnd : bnd.getInterfaces()) {
-			TImplementable interface1 = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true);
-			if(fmx instanceof Interface ) {
-				dico.ensureFamixInheritance((Interface)interface1, fmx, lastInheritance);
-			} else {
-				dico.ensureFamixImplementation(interface1, (TCanImplement) fmx, lastInheritance);
+
+			for (ITypeBinding intbnd : bnd.getInterfaces()) {
+				TImplementable interfac = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true);
+				// If "implementor" is an interface, then relation is an inheritance
+				if(fmx instanceof Interface ) {
+					dico.ensureFamixInheritance((Interface)interfac, fmx, lastInheritance);
+				} else {
+					dico.ensureFamixImplementation(interfac, (TCanImplement)fmx, lastInheritance);
+				}
 			}
 		}
 	}

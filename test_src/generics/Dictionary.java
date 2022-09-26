@@ -125,7 +125,7 @@ class NamedEntity {
 }
 
 class ImplicitVariable extends NamedEntity {
-	
+
 }
 
 class Repository {
