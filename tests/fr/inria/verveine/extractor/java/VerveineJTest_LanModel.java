@@ -90,13 +90,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesNumber() {
-		Collection<java.lang.Class<?>> lanModelJavaClasses = lanModelJavaClasses();
+		Collection<java.lang.Class<?>> lanModelJavaClasses = allJavaSuperClasses(LAN_MODEL_JAVA_CLASSES_USED);
 		assertEquals(
 				lanModelJavaClasses.size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
 				entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 
 		assertEquals(
-				lanModelJavaInterfaces().size() + 1,  // add IPrinter
+				allInterfacesFromClasses(LAN_MODEL_JAVA_CLASSES_USED).size() + 1,  // add IPrinter
 				entitiesOfType(Interface.class).size());
 
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());//int,boolean,void

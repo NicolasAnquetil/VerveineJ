@@ -1,28 +1,36 @@
 package fr.inria.verveine.extractor.java;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TParameter;
 import org.moosetechnology.model.famixjava.famixtraits.TParameterizedType;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
-
-import java.io.File;
-import java.lang.Exception;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.Assert.*;
 
 public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
 	/**
 	 * Array of all the java classes that are directly used in the Generics "project"
 	 */
-	protected final java.lang.Class<?> [] JAVA_CLASSES_USED =
+	protected static final java.lang.Class<?> [] JAVA_CLASSES_USED =
 			new java.lang.Class<?> [] { 
 		java.lang.String.class,
 		java.util.Hashtable.class,
@@ -60,11 +68,8 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
     @Test
     public void testParameterizableClass() {
-    	long nbJavaGenerics = allClasses().stream().filter( (e) -> e.getTypeParameters().length > 0).count();
-        assertEquals( nbJavaGenerics + 1, entitiesOfType( ParameterizableClass.class).size());   // Java generics + Dictionary
-
-        nbJavaGenerics = allInterfaces().stream().filter( (e) -> e.getTypeParameters().length > 0).count();
-        assertEquals(nbJavaGenerics, entitiesOfType( ParameterizableInterface.class).size());
+        assertEquals( allParameterizedClasses().count() + 1, entitiesOfType( ParameterizableClass.class).size());   // Java generics + Dictionary
+        assertEquals(allParameterizedInterfaces().count(), entitiesOfType( ParameterizableInterface.class).size());
 
         ParameterizableClass generic = null;
         for (ParameterizableClass g : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
@@ -95,32 +100,6 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         ParameterizableInterface collec = detectFamixElement( ParameterizableInterface.class, "Collection");
         assertNotNull(collec);
     }
-
-    private Collection<java.lang.Class<?>> allClasses() {
-		Set<java.lang.Class<?>> allClasses = new HashSet<>();
-		
-		for (java.lang.Class<?> javaClass : JAVA_CLASSES_USED) {
-			allClasses.addAll( allJavaSuperClasses( javaClass));
-		}
-	
-		return allClasses;
-	}
-
-    private Collection<java.lang.Class<?>> allInterfaces() {
-		Set<java.lang.Class<?>> allInterfaces = new HashSet<>();
-		
-		for (java.lang.Class<?> javaClass : JAVA_CLASSES_USED) {
-			
-			List<java.lang.Class<?>> intrfcFromClasses = allJavaInterfaces( javaClass).flattenToCollection().stream().filter( (e) -> e.isInterface()).toList();
-			allInterfaces.addAll( intrfcFromClasses);
-		}
-
-		for (java.lang.Class<?> javaClass : JAVA_INTERFACES_USED) {
-			allInterfaces.addAll( allJavaInterfaces( javaClass).flattenToCollection());
-		}
-	
-		return allInterfaces;
-	}
 
 	@Test
     public void testParameterizedType() {
@@ -156,9 +135,29 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
     @Test  // issue 960
     public void testStubStatusParameterizedTypes() {
         Collection<ParameterizedType> ptypes = entitiesOfType( ParameterizedType.class);
-        int numberParameterizedTypes = 25;
-        assertEquals(numberParameterizedTypes, ptypes.size());  // List*1, ArrayList*2, Map*3, Collection<NamedEntity>, Collection<T>, Hashtable*3, Class*3, Dictionary*1 + all stub superclasses
-        //coll2
+
+        /*
+        - ArrayList<ABC> Repository.List<X>()
+        - List<X> Repository.List<X>()
+        - Map<B,NamedEntity> Dictionary.mapBind
+        - Map<String,Collection<NamedEntity>> Dictionary.mapName
+        - Map<NamedEntity,ImplicitVars> Dictionary.mapImpVar
+        - Hashtable<B,NamedEntity>() Dictionary.Dictionary().mapBind
+        - Hashtable<String,Collection<NamedEntity>> Dictionary.Dictionary().mapName
+        - Hashtable<NamedEntity,ImplicitVar> Dictionary.Dictionary().mapImpVar
+        - Collection<T> Dictionary.getEntityByName()
+        - Class<T> Dictionary.getEntityByName().fmxClass
+        - ArrayList<T> Dictionary.getEntityByName().ret
+        - Collection<NamedEntity> Dictionary.getEntityByName().l_name
+        - Class<T> Dictionary.createFamixEntity().fmxClass
+        - Class<T> Dictionary.ensureFamixEntity().fmxClass
+        - Dictionary<String> Repository.dico
+		- java.util.Dictionary<> Hashtable
+        - AbstractList<> ArrayList
+        - java.util.AbstractCollection<> java.util.AbstractList
+        */     
+        assertEquals(18, ptypes.size());
+
         for (ParameterizedType typ : ptypes) {
             assertEquals(((Type)typ.getParameterizableClass()).getIsStub(), typ.getIsStub());
         }
@@ -212,5 +211,25 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
             }
         }
     }
+
+    	// UTILITIES --------------------------------------------------
+
+    private Collection<java.lang.Class<?>> allInterfaces() {
+		Set<java.lang.Class<?>> allInterfaces = (Set<java.lang.Class<?>>) allInterfacesFromClasses(JAVA_CLASSES_USED);
+		
+		for (java.lang.Class<?> javaClass : JAVA_INTERFACES_USED) {
+			allInterfaces.addAll( allJavaInterfaces( javaClass).flattenToCollection());
+		}
+	
+		return allInterfaces;
+	}
+
+	private Stream<java.lang.Class<?>> allParameterizedInterfaces() {
+		return allInterfaces().stream().filter( (e) -> e.getTypeParameters().length > 0);
+	}
+
+	private Stream<java.lang.Class<?>> allParameterizedClasses() {
+		return allJavaSuperClasses(JAVA_CLASSES_USED).stream().filter( (e) -> e.getTypeParameters().length > 0);
+	}
 
 }

@@ -324,17 +324,21 @@ public abstract class VerveineJTest_Basic {
 		}
 	}
 
+	// UTILITIES --------------------------------------------------
+
     protected boolean isWindows() {
         return System.getProperty("os.name").toLowerCase().contains("win");
     }
+        
     
-	// UTILITIES to compute super-classes and implemented interfaces
+	// UTILITIES --------------------------------------------------
+    //  computing super-classes and implemented interfaces
 	// this is computed using recursive API because it varies according to Java versions
 
     /**
 	 * Array of all the java classes that are directly used in the LANModel "project"
 	 */
-	protected final java.lang.Class<?> [] LAN_MODEL_JAVA_CLASSES =
+	protected static final java.lang.Class<?> [] LAN_MODEL_JAVA_CLASSES_USED =
 		new java.lang.Class<?> [] { 
 			java.lang.String.class,
 			java.lang.StringBuffer.class,
@@ -376,14 +380,14 @@ public abstract class VerveineJTest_Basic {
     }
 
 	/**
-	 * Computes the collection of all interfaces implemented by any of the Java class used in LANModel
+	 * Computes the collection of all interfaces implemented by any of the class in <code>seedClasses</code>
 	 * @return A flat collection of the interfaces without duplicate
 	 */
-	protected Collection<java.lang.Class<?>> lanModelJavaInterfaces() {
+	protected Collection<java.lang.Class<?>> allInterfacesFromClasses(java.lang.Class<?> [] seedClasses) {
 		Set<java.lang.Class<?>> setOfInterfaces = new HashSet<>();
 
-		for (InterfaceTree each : lanModelAllInterfaceTrees()) {
-			setOfInterfaces.addAll( each.innerNodes());
+		for (InterfaceTree each : allInterfaceTrees(seedClasses)) {
+			setOfInterfaces.addAll( each.flattenToCollection().stream().filter( (e) -> e.isInterface()).toList());
 		}
 
 		return setOfInterfaces;
@@ -392,7 +396,7 @@ public abstract class VerveineJTest_Basic {
 	protected Collection<java.lang.Class<?>> lanModelDirectImplement() {
 		Collection<java.lang.Class<?>> implementedInterfaces = new ArrayList<>();
 
-		for (Class<?> aJavaClass : lanModelJavaClasses()) {
+		for (Class<?> aJavaClass : allJavaSuperClasses(LAN_MODEL_JAVA_CLASSES_USED)) {
 			implementedInterfaces.addAll( allJavaInterfaces(aJavaClass).directChildren());
 		}
 
@@ -405,10 +409,10 @@ public abstract class VerveineJTest_Basic {
 	 * with the Java interfaces they use/subtype
 	 * @return A collection of ImplementedInterfaces (associating a class/interface with implemented/subtyped interfaces)
 	 */
-	protected Collection<InterfaceTree> lanModelAllInterfaceTrees() {
+	protected Collection<InterfaceTree> allInterfaceTrees(java.lang.Class<?> [] seedClasses) {
 		List<InterfaceTree> recursiveAPIInterfaces = new ArrayList<>();
 	
-		for (java.lang.Class<?> javaClass : LAN_MODEL_JAVA_CLASSES) {
+		for (java.lang.Class<?> javaClass : seedClasses) {
 			recursiveAPIInterfaces.add( allJavaInterfaces( javaClass) );
 		}
 	
@@ -416,12 +420,12 @@ public abstract class VerveineJTest_Basic {
 	}
 
 	/**
-	 * Using Java recursive API, computes all classes inherited by java classes directly used in LANModel
+	 * Using Java recursive API, computes all classes inherited by java classes in the array <code>seedClasses</code>
 	 */
-	protected Collection<java.lang.Class<?>> lanModelJavaClasses() {
+	protected Collection<java.lang.Class<?>> allJavaSuperClasses(java.lang.Class<?> [] seedClasses) {
 		Set<java.lang.Class<?>> allClasses = new HashSet<>();
 	
-		for (java.lang.Class<?> javaClass : LAN_MODEL_JAVA_CLASSES) {
+		for (java.lang.Class<?> javaClass : seedClasses) {
 			allClasses.addAll( allJavaSuperClasses( javaClass));
 		}
 	
@@ -439,10 +443,10 @@ public abstract class VerveineJTest_Basic {
 		 */
 		Map<java.lang.Class<?>,List<java.lang.Class<?>>> allInterfacesSubtyped = new HashMap<>();
 		
-		for (InterfaceTree each : lanModelAllInterfaceTrees()) {
+		for (InterfaceTree each : allInterfaceTrees(LAN_MODEL_JAVA_CLASSES_USED)) {
 			allInterfacesSubtyped.putAll(each.flattenToMap());
 		}
-		for (java.lang.Class<?> javaClass : LAN_MODEL_JAVA_CLASSES) {
+		for (java.lang.Class<?> javaClass : LAN_MODEL_JAVA_CLASSES_USED) {
 			allInterfacesSubtyped.remove(javaClass);
 		}
 	
@@ -477,7 +481,7 @@ public abstract class VerveineJTest_Basic {
 	    	return flattened;
 		}
 
-		protected List<Class<?>> innerNodes() {
+		public List<Class<?>> innerNodes() {
 	    	List<Class<?>> flattened = new LinkedList<>();
 			for (InterfaceTree recursiveImplementations : branches) {
 	    		flattened.addAll( recursiveImplementations.flattenToCollection() );

@@ -158,11 +158,11 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	@Test
 	public void testEntitiesNumber() {
 		assertEquals(
-				lanModelJavaClasses().size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
+				allJavaSuperClasses(LAN_MODEL_JAVA_CLASSES_USED).size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
 				entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
 
 		assertEquals(
-				lanModelJavaInterfaces().size() + 1,  // add IPrinter
+				allInterfacesFromClasses(LAN_MODEL_JAVA_CLASSES_USED).size() + 1,  // add IPrinter
 				entitiesOfType(Interface.class).size());
 
 		assertEquals(1, entitiesOfType(ParameterizableInterface.class).size());//IPrinter
@@ -216,7 +216,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		Inheritance inh = null;
 		
 		int nbInherit = 9;  // all classes of the project have inheritance (note that _Anonymous(IPrinter) is not created)
-		nbInherit += lanModelJavaClasses().size() - 1; // Inheritance in Java classes, considering that Object has no inheritance
+		nbInherit += allJavaSuperClasses(LAN_MODEL_JAVA_CLASSES_USED).size() - 1; // Inheritance in Java classes, considering that Object has no inheritance
 		nbInherit += lanModelInterfacesSubtyped().size(); // Subtyping between interfaces is considered inheritance
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
