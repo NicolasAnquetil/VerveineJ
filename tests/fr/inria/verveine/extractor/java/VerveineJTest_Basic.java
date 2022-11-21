@@ -6,6 +6,7 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Exception;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;

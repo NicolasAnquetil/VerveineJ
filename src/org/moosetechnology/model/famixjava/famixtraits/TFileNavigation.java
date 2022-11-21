@@ -8,7 +8,7 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TFileNavigation")
-public interface TFileNavigation  {
+public interface TFileNavigation extends TFileAnchor {
 
         @FameProperty(name = "endLine")
     public Number getEndLine();

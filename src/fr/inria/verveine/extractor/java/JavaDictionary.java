@@ -423,18 +423,18 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 	}
 
-	public Type asClass(Type excepFmx) {
+	public TType asClass(TType excepFmx) {
 		Class tmp = null;
 		IBinding key = null;
 		try {
-			ContainerEntity owner = Util.belongsToOf(excepFmx);
+			ContainerEntity owner = Util.belongsToOf((Entity) excepFmx);
 			owner.getTypes().remove(excepFmx);
-			super.removeEntity(excepFmx);
+			super.removeEntity((NamedEntity) excepFmx);
 
-			key = entityToKey.get(excepFmx);
+			key = entityToKey.get((NamedEntity) excepFmx);
 			tmp = super.ensureFamixClass(key, excepFmx.getName(), owner, /*alwaysPersist?*/true);
 
-			tmp.addMethods(excepFmx.getMethods());
+			tmp.addMethods(((Class) excepFmx).getMethods());
 			if (excepFmx instanceof TWithAttributes) {
 				tmp.addAttributes(((TWithAttributes) excepFmx).getAttributes());
 			}
@@ -449,11 +449,11 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 				tmp.addSubInheritances(((TWithInheritances) excepFmx).getSubInheritances());
 			}
 			tmp.setSourceAnchor(excepFmx.getSourceAnchor());
-			tmp.addAnnotationInstances(excepFmx.getAnnotationInstances());
+			tmp.addAnnotationInstances(((NamedEntity) excepFmx).getAnnotationInstances());
 			// tmp.addComments(excepFmx.getComments());
 			tmp.addIncomingReferences(excepFmx.getIncomingReferences());
 			tmp.setIsStub(excepFmx.getIsStub());
-			tmp.addTypes(excepFmx.getTypes());
+			tmp.addTypes(((ContainerEntity) excepFmx).getTypes());
 		}
 		catch( ConcurrentModificationException e) {
 			e.printStackTrace();

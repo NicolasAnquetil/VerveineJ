@@ -90,7 +90,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			} else {
 
 				Type clazz = node.getType();
-				fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+				fmx = (org.moosetechnology.model.famixjava.famixjavaentities.Type) referedType(clazz, (ContainerEntity) context.top(), true);
 
 				// create an invocation to the constructor
 				if (fmx == null) {

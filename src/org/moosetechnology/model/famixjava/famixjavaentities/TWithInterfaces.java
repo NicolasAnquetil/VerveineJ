@@ -8,7 +8,7 @@ import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("TWithInterfaces")
-public interface TWithInterfaces  {
+public interface TWithInterfaces extends TWithTypes {
 
     
 

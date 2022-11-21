@@ -539,9 +539,12 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			return true;
 		} else if (accessed instanceof EnumValue && ((EnumValue) accessed).getParentEnum() == accessor) {
 			return true;
-		} else if (accessed instanceof GlobalVariable && ((GlobalVariable) accessed).getParentScope() == accessor) {
-			return true;
-		} else if (accessed instanceof ImplicitVariable && ((ImplicitVariable) accessed).getParentBehaviouralEntity() == accessor) {
+		} 
+		// Benoit Verhaeghe: Has been removed between VerveineJ 3.0.0 and VerveineJ 3.0.1
+		// else if (accessed instanceof GlobalVariable && ((GlobalVariable) accessed).getParentScope() == accessor) {
+		// 	return true;
+		// } 
+		else if (accessed instanceof ImplicitVariable && ((ImplicitVariable) accessed).getParentBehaviouralEntity() == accessor) {
 			return true;
 		} else if (accessed instanceof LocalVariable && ((LocalVariable) accessed).getParentBehaviouralEntity() == accessor) {
 			return true;

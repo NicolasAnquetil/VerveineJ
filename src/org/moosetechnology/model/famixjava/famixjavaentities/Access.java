@@ -22,7 +22,7 @@ public class Access extends Entity implements TAccess, TAssociation, TAssociatio
     
     private Boolean isStub;
     
-    private Boolean isWrite = false;
+    private Boolean isWrite;
     
     private TAssociation next;
     
@@ -65,7 +65,8 @@ public class Access extends Entity implements TAccess, TAssociation, TAssociatio
     
     @FameProperty(name = "isRead", derived = true)
     public Boolean getIsRead() {
-        return !this.isWrite;
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "isReadWriteUnknown", derived = true)

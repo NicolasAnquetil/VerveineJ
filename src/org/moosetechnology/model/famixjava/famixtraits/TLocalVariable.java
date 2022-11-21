@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Traits")
 @FameDescription("TLocalVariable")
-public interface TLocalVariable  {
+public interface TLocalVariable extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TStructuralEntity, TTypedEntity, TAccessible {
 
         @FameProperty(name = "parentBehaviouralEntity", opposite = "localVariables", container = true)
     public TWithLocalVariables getParentBehaviouralEntity();

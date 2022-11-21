@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
 
 /**
@@ -56,7 +57,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	 * @param isClass we are sure that the type is actually a class
 	 * @return a famix type or null
 	 */
-	protected org.moosetechnology.model.famixjava.famixjavaentities.Type referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
+	protected TType referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
 		if (typ == null) {
 			return null;
 		} else if (typ.resolveBinding() != null) {
@@ -83,7 +84,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	/**
 	 * Same as {@link AbstractRefVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
-	protected org.moosetechnology.model.famixjava.famixjavaentities.Type
+	protected TType
 	referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
 		org.moosetechnology.model.famixjava.famixjavaentities.Type fmxTyp = null;
 
@@ -118,7 +119,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
-				org.moosetechnology.model.famixjava.famixjavaentities.Type fmxTArg = this.referedType(targ, ctxt, false);
+				org.moosetechnology.model.famixjava.famixjavaentities.Type fmxTArg = (org.moosetechnology.model.famixjava.famixjavaentities.Type) this.referedType(targ, ctxt, false);
 				if ((fmxTArg != null) && persistClass(targ)) {
 					((org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType) fmxTyp).addArguments(fmxTArg);
 				}

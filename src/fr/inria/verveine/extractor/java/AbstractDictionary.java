@@ -651,15 +651,16 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception declared to be thrown
 	 * @return the DeclaredException
 	 */
-	public DeclaredException createFamixDeclaredException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixDeclaredException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
-		DeclaredException decl = new DeclaredException();
-		decl.setExceptionClass(excep);
-		decl.setDefiningEntity(meth);
-		famixRepoAdd(decl);
-		return decl;
+		//org.moosetechnology.model.famixjava.famixjavaentities.Exception decl = new org.moosetechnology.model.famixjava.famixjavaentities.Exception();
+		// decl.setExceptionClass(excep);
+		// excep.getDeclaringEntities().add(meth);
+		// famixRepoAdd(excep);
+		meth.getDeclaredExceptions().add(excep);
+		return excep;
 	}
 
 	/**
@@ -668,15 +669,16 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception caught
 	 * @return the CaughtException
 	 */
-	public CaughtException createFamixCaughtException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixCaughtException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
-		CaughtException decl = new CaughtException();
-		decl.setExceptionClass(excep);
-		decl.setDefiningEntity(meth);
-		famixRepoAdd(decl);
-		return decl;
+		// CaughtException decl = new CaughtException();
+		// decl.setExceptionClass(excep);
+		// decl.setDefiningEntity(meth);
+		// famixRepoAdd(decl);
+		meth.getCaughtExceptions().add(excep);
+		return excep;
 	}
 
 	/**
@@ -687,15 +689,16 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception thrown
 	 * @return the ThrownException
 	 */
-	public ThrownException createFamixThrownException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixThrownException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
-		ThrownException decl = new ThrownException();
-		decl.setExceptionClass(excep);
-		decl.setDefiningEntity(meth);
-		famixRepoAdd(decl);
-		return decl;
+		// ThrownException decl = new ThrownException();
+		// decl.setExceptionClass(excep);
+		// decl.setDefiningEntity(meth);
+		// famixRepoAdd(decl);
+		meth.getThrownExceptions().add(excep);
+		return excep;
 	}
 
 	///// Special Case: ImplicitVariables /////

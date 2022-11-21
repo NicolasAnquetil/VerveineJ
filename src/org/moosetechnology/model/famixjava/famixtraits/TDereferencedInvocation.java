@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDepen
 
 @FamePackage("Famix-Traits")
 @FameDescription("TDereferencedInvocation")
-public interface TDereferencedInvocation  {
+public interface TDereferencedInvocation extends TAssociationMetaLevelDependency, TAssociation, TSourceEntity, TInvocation {
 
         @FameProperty(name = "referencer", opposite = "dereferencedInvocations")
     public TWithDereferencedInvocations getReferencer();

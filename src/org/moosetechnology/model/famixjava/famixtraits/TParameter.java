@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Traits")
 @FameDescription("TParameter")
-public interface TParameter  {
+public interface TParameter extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TStructuralEntity, TTypedEntity, TAccessible {
 
         @FameProperty(name = "parentBehaviouralEntity", opposite = "parameters", container = true)
     public TWithParameters getParentBehaviouralEntity();

@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDepen
 
 @FamePackage("Famix-Traits")
 @FameDescription("TAccess")
-public interface TAccess  {
+public interface TAccess extends TAssociationMetaLevelDependency, TAssociation, TSourceEntity {
 
         @FameProperty(name = "isReadWriteUnknown", derived = true)
     public Boolean getIsReadWriteUnknown();

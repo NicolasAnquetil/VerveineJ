@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Traits")
 @FameDescription("TCohesionCouplingMetrics")
-public interface TCohesionCouplingMetrics  {
+public interface TCohesionCouplingMetrics extends TNamedEntity, TEntityMetaLevelDependency, TPackage, TSourceEntity {
 
         @FameProperty(name = "efferentCoupling", derived = true)
     public Number getEfferentCoupling();

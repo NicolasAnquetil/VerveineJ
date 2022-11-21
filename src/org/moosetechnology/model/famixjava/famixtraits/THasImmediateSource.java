@@ -8,7 +8,7 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("THasImmediateSource")
-public interface THasImmediateSource  {
+public interface THasImmediateSource extends TSourceAnchor {
 
         @FameProperty(name = "source")
     public String getSource();

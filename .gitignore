@@ -5,3 +5,4 @@ testrep/*
 .idea/
 out/
 /bin/
+.project

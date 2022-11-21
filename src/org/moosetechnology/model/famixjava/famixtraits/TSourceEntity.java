@@ -11,13 +11,13 @@ import org.moosetechnology.model.famixjava.famixreplication.Replica;
 @FameDescription("TSourceEntity")
 public interface TSourceEntity  {
 
-        @FameProperty(name = "isStub")
+        @FameProperty(name = "duplicationRate", derived = true)
+    public Number getDuplicationRate();
+
+    @FameProperty(name = "isStub")
     public Boolean getIsStub();
 
     public void setIsStub(Boolean isStub);
-
-    @FameProperty(name = "duplicationRate", derived = true)
-    public Number getDuplicationRate();
 
     @FameProperty(name = "containsReplicas", derived = true)
     public Boolean getContainsReplicas();

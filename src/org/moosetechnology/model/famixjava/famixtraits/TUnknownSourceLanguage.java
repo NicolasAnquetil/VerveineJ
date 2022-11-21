@@ -7,7 +7,7 @@ import ch.akuhn.fame.FamePackage;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TUnknownSourceLanguage")
-public interface TUnknownSourceLanguage  {
+public interface TUnknownSourceLanguage extends TSourceLanguage {
 
     
 
