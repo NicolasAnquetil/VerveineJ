@@ -7,6 +7,7 @@ import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
 import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
@@ -397,7 +398,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		ImplicitVariable fmx = dico.ensureFamixImplicitVariable(
 				bnd, 
 				JavaDictionary.SELF_NAME, 
-				this.context.topType(), 
+				(Type) this.context.topType(), 
 				context.topMethod(), 
 				/*persistIt*/! summarizeClasses());
 		if (fmx != null) {

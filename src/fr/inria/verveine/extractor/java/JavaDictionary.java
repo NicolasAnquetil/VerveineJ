@@ -1566,7 +1566,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return ensureFamixMethod(bnd, /*name*/null, /*paramsType*/(Collection<String>)null, /*returnType*/null, /*owner*/null, modifiers, persistIt);
 	}
 
-	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, Type owner, int modifiers, boolean persistIt) {
+	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, TType owner, int modifiers, boolean persistIt) {
 		return ensureFamixMethod(bnd, name, paramTypes, /*returnType*/null, owner,modifiers, persistIt);
 	}
 
@@ -2008,9 +2008,9 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return fmx;
 	}
 
-	public ImplicitVariable ensureFamixImplicitVariable(String name, Type type, Method owner, boolean persistIt) {
+	public ImplicitVariable ensureFamixImplicitVariable(String name, TType tType, Method owner, boolean persistIt) {
 		IBinding bnd = ImplicitVarBinding.getInstance(owner, name);
-		return super.ensureFamixImplicitVariable(bnd, name, type, owner, persistIt);
+		return super.ensureFamixImplicitVariable(bnd, name, tType, owner, persistIt);
 	}
 
 	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments fmx) {

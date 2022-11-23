@@ -5,6 +5,7 @@ import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Class;
+import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.Exception;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
 import org.moosetechnology.model.famixjava.famixjavaentities.Package;
@@ -60,7 +61,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 		Method fmx = visitMethodDeclaration( node);
 		if (fmx != null) {
 		    for (Type excep : (List<Type>)node.thrownExceptionTypes()) {
-                TType excepFmx = (TType) this.referedType(excep.resolveBinding(), context.topType(), true);
+                TType excepFmx = (TType) this.referedType(excep.resolveBinding(), (ContainerEntity) context.topType(), true);
                 if (excepFmx != null) {
 					if (! summarizeClasses()) {
                         // not instanceof because we test the exact type and not subclasses
@@ -105,7 +106,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
     public boolean visit(ThrowStatement node) {
         Method meth = this.context.topMethod();
         org.moosetechnology.model.famixjava.famixjavaentities.Exception excepFmx = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) this
-                .referedType(node.getExpression().resolveTypeBinding(), context.topType(), true);
+                .referedType(node.getExpression().resolveTypeBinding(), (ContainerEntity) context.topType(), true);
         if (excepFmx != null) {
             if (! summarizeClasses()) {
                 dico.createFamixThrownException(meth, excepFmx);

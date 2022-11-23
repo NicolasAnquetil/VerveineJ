@@ -176,7 +176,7 @@ public class EntityStack {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends NamedEntity> T lookUpto(Class<T> clazz) {
+	private <T extends TNamedEntity> T lookUpto(Class<T> clazz) {
 		int i=this.stack.size()-1;
 
 		while ( (i >= 0) && (! clazz.isInstance(stack.get(i))) ) {
@@ -272,8 +272,8 @@ public class EntityStack {
 	 * Note: does not check that there is such a class, so could possibly throw an EmptyStackException
 	 * @return the Famix class
 	 */
-	public Type topType() {
-		return this.lookUpto(Type.class);
+	public TType topType() {
+		return this.lookUpto(TType.class);
 	}
 
 	/**

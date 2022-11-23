@@ -613,7 +613,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		else if ( NodeTypeChecker.isSuperMethodInvocation(expr)) {
 			IMethodBinding superBnd = ((SuperMethodInvocation) expr).resolveMethodBinding();
 			if (superBnd != null) {
-				return this.referedType(superBnd.getReturnType(), context.topType(), true);
+				return this.referedType(superBnd.getReturnType(), (ContainerEntity) context.topType(), true);
 			} else {
 				return null;
 			}
@@ -650,7 +650,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 * @return
 	 */
 	private Class superClass() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Type clazz = context.topType();
+		TType clazz = context.topType();
 		Class superC = null;
 		for (TInheritance inh : ((TWithInheritances) clazz).getSuperInheritances()) {
 			if (inh.getSuperclass() instanceof Class) {

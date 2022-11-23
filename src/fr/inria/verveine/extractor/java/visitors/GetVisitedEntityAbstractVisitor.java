@@ -11,6 +11,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
+import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -297,8 +298,8 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
 	private Method ctxtPushInitializerMethod() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Type owner = context.topType();
-		Method fmx = recoverInitializerMethod(owner);
+		TType owner = context.topType();
+		Method fmx = recoverInitializerMethod((TWithMethods)owner);
 		if (fmx == null) {
 			fmx = dico.ensureFamixMethod(null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<>(), /*returnType*/null, owner, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
 		}
@@ -314,7 +315,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Cannot do it with ensureFamixMethod because we have no binding, no parameter, no return type
 	 * on which ensureFamixMethod relies
 	 */
-	private Method recoverInitializerMethod(org.moosetechnology.model.famixjava.famixjavaentities.Type owner) {
+	private Method recoverInitializerMethod(TWithMethods owner) {
 		Method ret = null;
 		if (owner != null) {
 			for (TMethod meth : owner.getMethods()) {

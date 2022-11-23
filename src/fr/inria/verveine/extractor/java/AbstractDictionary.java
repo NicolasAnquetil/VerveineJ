@@ -762,7 +762,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the ImplicitVariable should be persisted in the Famix repository
 	 * @return the FAMIX ImplicitVariable or null in case of a FAMIX error
 	 */
-	public ImplicitVariable ensureFamixImplicitVariable(B key, String name, Type type, Method owner, boolean persistIt) {
+	public ImplicitVariable ensureFamixImplicitVariable(B key, String name, TType type, Method owner, boolean persistIt) {
 		ImplicitVariable fmx;
 		fmx = ensureFamixEntity(ImplicitVariable.class, key, name, persistIt);
 		fmx.setParentBehaviouralEntity(owner);
