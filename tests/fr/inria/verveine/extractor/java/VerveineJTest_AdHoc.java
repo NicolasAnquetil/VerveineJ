@@ -593,7 +593,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testMultipleSignatures() {
 		parse(new String[]{"test_src/ad_hoc/MultipleSignatures.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class throwable = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Throwable");
+		org.moosetechnology.model.famixjava.famixjavaentities.Exception throwable = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "Throwable");
 		assertNotNull(throwable);
 		assertEquals(2, throwable.getMethods().size()); // printStackTrace() & printStackTrace(PrintWriter)
 
