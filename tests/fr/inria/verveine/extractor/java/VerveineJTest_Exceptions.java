@@ -32,7 +32,7 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         Method meth = detectFamixElement( Method.class, "lire");
         assertNotNull(meth);
 
-        org.moosetechnology.model.famixjava.famixjavaentities.Class excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ReadException");
+        org.moosetechnology.model.famixjava.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "ReadException");
         assertNotNull(excepClass);
 
         assertEquals(1, meth.getDeclaredExceptions().size());
@@ -50,7 +50,7 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         org.moosetechnology.model.famixjava.famixjavaentities.Exception exT = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) firstElt(meth.getThrownExceptions());
         assertSame(meth, firstElt(exT.getDeclaringEntities()));
 
-        org.moosetechnology.model.famixjava.famixjavaentities.Class excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ReadException");
+        org.moosetechnology.model.famixjava.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "ReadException");
         assertSame(excepClass, exT);
     }
 
@@ -63,7 +63,7 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         org.moosetechnology.model.famixjava.famixjavaentities.Exception exC = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) firstElt(meth.getCaughtExceptions());
         assertSame(meth, firstElt(exC.getDeclaringEntities()));
 
-        org.moosetechnology.model.famixjava.famixjavaentities.Class excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "IOException");
+        org.moosetechnology.model.famixjava.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "IOException");
         assertSame(excepClass, exC);
     }
 

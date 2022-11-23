@@ -71,7 +71,7 @@ public abstract class VerveineJTest_Basic {
         return repo.all(clazz);
     }
 
-    public <T extends NamedEntity> T detectFamixElement(Class<T> clazz, String name) {
+    public <T extends Entity & TNamedEntity> T detectFamixElement(Class<T> clazz, String name) {
         Iterator<T> iter = entitiesOfType(clazz).iterator();
 
         T found;

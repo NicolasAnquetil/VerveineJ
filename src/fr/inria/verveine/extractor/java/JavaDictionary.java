@@ -622,11 +622,18 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return ensureFamixClass(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
 	}
 
-		/**
-	 * helper method, we know the type exists, ensureFamixClass will recover it
+	/**
+	 * helper method, we know the type exists, ensureFamixInterface will recover it
 	 */
 	public Interface getFamixInterface(ITypeBinding bnd, String name, ContainerEntity owner) {
 		return ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
+	}
+
+	/**
+	 * helper method, we know the type exists, ensureFamixInterface will recover it
+	 */
+	public Exception getFamixException(ITypeBinding bnd, String name, ContainerEntity owner) {
+		return ensureFamixException(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
 	}
 
 	/**

@@ -10,6 +10,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TMethod;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,11 +100,13 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Can only be a class or interface declaration
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
-	protected Type visitTypeDeclaration(TypeDeclaration node) {
+	protected TType visitTypeDeclaration(TypeDeclaration node) {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
-		Type fmx;
+		TType fmx;
 		if(bnd.isInterface()) {
 			fmx = dico.getFamixInterface(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
+		} else if (dico.isThrowable(bnd)) {
+			fmx = dico.getFamixException(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		} else {
 			fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		}
