@@ -1258,7 +1258,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * @param candidate -- a Famix Entity (regular Method or AnnotationTypeAttribute)
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private boolean matchAndMapMethod(IMethodBinding bnd, String sig, TType retTyp, ContainerEntity owner, NamedEntity candidate) {
+	private boolean matchAndMapMethod(IMethodBinding bnd, String sig, TType retTyp, TSourceEntity owner, NamedEntity candidate) {
 		if (! (candidate instanceof Method) ) {
 			return false;
 		}
@@ -1468,13 +1468,13 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * @param candidateOwner
 	 * @return a {@link CheckResult}
 	 */
-	private CheckResult matchAndMapOwnerAsType(ITypeBinding typBnd, NamedEntity owner, ContainerEntity candidateOwner) {
+	private CheckResult matchAndMapOwnerAsType(ITypeBinding typBnd, TSourceEntity owner, ContainerEntity candidateOwner) {
 		if ((typBnd != null) || ((owner != null) && (owner instanceof Type))) {
 			if (!(candidateOwner instanceof Type)) {
 				return CheckResult.FAIL;
 			}
 
-			ContainerEntity ownerOwner = (owner != null) ? Util.belongsToOf(owner) : null;
+			ContainerEntity ownerOwner = (owner != null) ? Util.belongsToOf((Entity) owner) : null;
 			String ownerName = (owner != null) ? ((Type) owner).getName() : null;
 
 			if (matchAndMapType(typBnd, ownerName, ownerOwner, candidateOwner)) {
@@ -1675,7 +1675,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (Method candidate : this.getEntityByName(Method.class, name)) {
-			if (matchAndMapMethod(bnd, sig, ret, (ContainerEntity) owner, candidate)) {
+			if (matchAndMapMethod(bnd, sig, ret, owner, candidate)) {
 				fmx = candidate;
 				break;
 			}
