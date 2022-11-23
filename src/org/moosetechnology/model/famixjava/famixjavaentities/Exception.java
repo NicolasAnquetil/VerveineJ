@@ -7,10 +7,13 @@ import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
 import org.moosetechnology.model.famixjava.famixreplication.Replica;
+import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstance;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
+import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
 import org.moosetechnology.model.famixjava.famixtraits.TClass;
 import org.moosetechnology.model.famixjava.famixtraits.TComment;
 import org.moosetechnology.model.famixjava.famixtraits.TException;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
 import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
@@ -24,6 +27,7 @@ import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAnnotationInstances;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 import org.moosetechnology.model.famixjava.famixtraits.TWithExceptions;
@@ -35,7 +39,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Exception")
-public class Exception extends Entity implements TClass, TEntityMetaLevelDependency, TException, TInvocationsReceiver, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
+public class Exception extends Entity implements TWithAnnotationInstances, TWithTypes, TClass, TCanImplement, TEntityMetaLevelDependency, TException, TInvocationsReceiver, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
 
     private Collection<TAttribute> attributes; 
 
@@ -53,6 +57,8 @@ public class Exception extends Entity implements TClass, TEntityMetaLevelDepende
 
     private String name;
     
+    private Collection<TImplementation> interfaceImplementations; 
+
     private Number numberOfLinesOfCode;
     
     private TPackage parentPackage;
@@ -69,8 +75,11 @@ public class Exception extends Entity implements TClass, TEntityMetaLevelDepende
 
     private TWithTypes typeContainer;
     
-    private Collection<TTypedEntity> typedEntities; 
+    private Collection<TTypedEntity> typedEntities;
 
+    private Collection<TAnnotationInstance> annotationInstances;
+
+    private Collection<TType> types;
 
 
     @FameProperty(name = "attributes", opposite = "parentType", derived = true)
@@ -863,8 +872,168 @@ public class Exception extends Entity implements TClass, TEntityMetaLevelDepende
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
-    
 
+    // Manually added
+
+    @FameProperty(name = "interfaceImplementations", opposite = "implementingClass", derived = true)
+    public Collection<TImplementation> getInterfaceImplementations() {
+        if (interfaceImplementations == null) {
+            interfaceImplementations = new MultivalueSet<TImplementation>() {
+                @Override
+                protected void clearOpposite(TImplementation e) {
+                    e.setImplementingClass(null);
+                }
+                @Override
+                protected void setOpposite(TImplementation e) {
+                    e.setImplementingClass(Exception.this);
+                }
+            };
+        }
+        return interfaceImplementations;
+    }
+    
+    public void setInterfaceImplementations(Collection<? extends TImplementation> interfaceImplementations) {
+        this.getInterfaceImplementations().clear();
+        this.getInterfaceImplementations().addAll(interfaceImplementations);
+    }                    
+    
+        
+    public void addInterfaceImplementations(TImplementation one) {
+        this.getInterfaceImplementations().add(one);
+    }   
+    
+    public void addInterfaceImplementations(TImplementation one, TImplementation... many) {
+        this.getInterfaceImplementations().add(one);
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }   
+    
+    public void addInterfaceImplementations(Iterable<? extends TImplementation> many) {
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }   
+                
+    public void addInterfaceImplementations(TImplementation[] many) {
+        for (TImplementation each : many)
+            this.getInterfaceImplementations().add(each);
+    }
+    
+    public int numberOfInterfaceImplementations() {
+        return getInterfaceImplementations().size();
+    }
+
+    public boolean hasInterfaceImplementations() {
+        return !getInterfaceImplementations().isEmpty();
+    }
+
+
+    @FameProperty(name = "annotationInstances", opposite = "annotatedEntity", derived = true)
+    public Collection<TAnnotationInstance> getAnnotationInstances() {
+        if (annotationInstances == null) {
+            annotationInstances = new MultivalueSet<TAnnotationInstance>() {
+                @Override
+                protected void clearOpposite(TAnnotationInstance e) {
+                    e.setAnnotatedEntity(null);
+                }
+                @Override
+                protected void setOpposite(TAnnotationInstance e) {
+                    e.setAnnotatedEntity(Exception.this);
+                }
+            };
+        }
+        return annotationInstances;
+    }
+    
+    public void setAnnotationInstances(Collection<? extends TAnnotationInstance> annotationInstances) {
+        this.getAnnotationInstances().clear();
+        this.getAnnotationInstances().addAll(annotationInstances);
+    }                    
+    
+        
+    public void addAnnotationInstances(TAnnotationInstance one) {
+        this.getAnnotationInstances().add(one);
+    }   
+    
+    public void addAnnotationInstances(TAnnotationInstance one, TAnnotationInstance... many) {
+        this.getAnnotationInstances().add(one);
+        for (TAnnotationInstance each : many)
+            this.getAnnotationInstances().add(each);
+    }   
+    
+    public void addAnnotationInstances(Iterable<? extends TAnnotationInstance> many) {
+        for (TAnnotationInstance each : many)
+            this.getAnnotationInstances().add(each);
+    }   
+                
+    public void addAnnotationInstances(TAnnotationInstance[] many) {
+        for (TAnnotationInstance each : many)
+            this.getAnnotationInstances().add(each);
+    }
+
+    public int numberOfAnnotationInstances() {
+        return getAnnotationInstances().size();
+    }
+
+    public boolean hasAnnotationInstances() {
+        return !getAnnotationInstances().isEmpty();
+    }
+
+    @FameProperty(name = "numberOfAnnotationInstances", derived = true)
+    public Number getNumberOfAnnotationInstances() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+
+    @FameProperty(name = "types", opposite = "typeContainer", derived = true)
+    public Collection<TType> getTypes() {
+        if (types == null) {
+            types = new MultivalueSet<TType>() {
+                @Override
+                protected void clearOpposite(TType e) {
+                    e.setTypeContainer(null);
+                }
+                @Override
+                protected void setOpposite(TType e) {
+                    e.setTypeContainer(Exception.this);
+                }
+            };
+        }
+        return types;
+    }
+    
+    public void setTypes(Collection<? extends TType> types) {
+        this.getTypes().clear();
+        this.getTypes().addAll(types);
+    }                    
+    
+        
+    public void addTypes(TType one) {
+        this.getTypes().add(one);
+    }   
+    
+    public void addTypes(TType one, TType... many) {
+        this.getTypes().add(one);
+        for (TType each : many)
+            this.getTypes().add(each);
+    }   
+    
+    public void addTypes(Iterable<? extends TType> many) {
+        for (TType each : many)
+            this.getTypes().add(each);
+    }   
+                
+    public void addTypes(TType[] many) {
+        for (TType each : many)
+            this.getTypes().add(each);
+    }
+    
+    public int numberOfTypes() {
+        return getTypes().size();
+    }
+
+    public boolean hasTypes() {
+        return !getTypes().isEmpty();
+    }     
 
 }
 

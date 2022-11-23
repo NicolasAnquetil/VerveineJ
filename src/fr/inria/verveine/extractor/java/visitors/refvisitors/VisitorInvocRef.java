@@ -81,7 +81,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		if ((!summarizeClasses())) {
 
 			String typName;
-			org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
+			TType fmx;
 
 			if (node.getAnonymousClassDeclaration() != null) {
 				ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node.getAnonymousClassDeclaration());
@@ -90,7 +90,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			} else {
 
 				Type clazz = node.getType();
-				fmx = (org.moosetechnology.model.famixjava.famixjavaentities.Type) referedType(clazz, (ContainerEntity) context.top(), true);
+				fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 				// create an invocation to the constructor
 				if (fmx == null) {
@@ -492,7 +492,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		// field.msg()
 		if (NodeTypeChecker.isFieldAccess(expr)) {
 			IVariableBinding bnd = ((FieldAccess) expr).resolveFieldBinding();
-			NamedEntity fld = dico.getEntityByKey(bnd);
+			NamedEntity fld = (NamedEntity) dico.getEntityByKey(bnd);
 			/*StructuralEntity fld = ensureAccessedStructEntity(bnd, ((FieldAccess) expr).getName().getIdentifier(),
 					/*type* /null, /*owner* /null, /*accessor* /null);*/
 			return fld;
@@ -519,11 +519,11 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			NamedEntity ret = null;
 			if (bnd.getKind() == IBinding.TYPE) {
 				// msg() is a static method of Name so name should be a class, except if its an Enum
-				ret = dico.getEntityByKey(bnd);
+				ret = (NamedEntity) dico.getEntityByKey(bnd);
 			}
 
 			if (bnd.getKind() == IBinding.VARIABLE) {
-				return dico.getEntityByKey(bnd);
+				return (NamedEntity) dico.getEntityByKey(bnd);
 			}
 
 			return ret;
@@ -541,7 +541,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// super.field.msg()
 		if ( NodeTypeChecker.isSuperFieldAccess(expr)) {
-			return dico.getEntityByKey(((SuperFieldAccess) expr).resolveFieldBinding());
+			return (NamedEntity) dico.getEntityByKey(((SuperFieldAccess) expr).resolveFieldBinding());
 			/*return ensureAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(),
 					((SuperFieldAccess) expr).getName().getIdentifier(), /*typ* /null, /*owner* /null, /*accessor* /null);*/
 		}

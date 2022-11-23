@@ -12,6 +12,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TAssociation;
 import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
 import org.moosetechnology.model.famixjava.famixtraits.TImplementable;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 
 import java.util.Collection;
@@ -77,7 +78,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
 		if ((fmx != null) && (bnd != null)) {
 			// --------------- implicit superclass java.lang.Enum<> cannot use ensureInheritances(bnd,fmx)
-			Type sup;
+			TType sup;
 			ITypeBinding supbnd = null;
 			if (bnd != null) {
 				supbnd = bnd.getSuperclass();
@@ -154,7 +155,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 		// --------------- superclass
 		if (!bnd.isInterface()) {
 			ITypeBinding supbnd = bnd.getSuperclass();
-			Type t;
+			TType t;
 			if (supbnd != null) {
 				t = dico.ensureFamixType(supbnd, /*persistIt)*/true);
 			} else {

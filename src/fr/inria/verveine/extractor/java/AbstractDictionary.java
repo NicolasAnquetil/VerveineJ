@@ -41,16 +41,16 @@ public class AbstractDictionary<B> {
 	/**
 	 * A dictionary to map a key (provided by the user) to FAMIX Entity
 	 */
-	protected Map<B,NamedEntity> keyToEntity;
+	protected Map<B,TNamedEntity> keyToEntity;
 	/**
 	 * A reverse dictionary (see {@link AbstractDictionary#keyToEntity}) to find the key of an entity.
 	 */
-	protected Map<NamedEntity,B> entityToKey;
+	protected Map<TNamedEntity,B> entityToKey;
 
 	/**
 	 * Another dictionary to map a name to FAMIX Entities with this name
 	 */
-	protected Map<String,Collection<NamedEntity>> nameToEntity;
+	protected Map<String,Collection<TNamedEntity>> nameToEntity;
 
 	/**
 	 * Yet another dictionary for implicit variables ('self' and 'super')
@@ -76,9 +76,9 @@ public class AbstractDictionary<B> {
 	public AbstractDictionary(Repository famixRepo) {
 		this.famixRepo = famixRepo;
 		
-		this.keyToEntity = new Hashtable<B,NamedEntity>();
-		this.entityToKey = new Hashtable<NamedEntity,B>();
-		this.nameToEntity = new Hashtable<String,Collection<NamedEntity>>();
+		this.keyToEntity = new Hashtable<B,TNamedEntity>();
+		this.entityToKey = new Hashtable<TNamedEntity,B>();
+		this.nameToEntity = new Hashtable<String,Collection<TNamedEntity>>();
 		this.typeToImpVar = new Hashtable<Type,ImplicitVars>();
 		
 		if (! this.famixRepo.isEmpty()) {
@@ -108,10 +108,10 @@ public class AbstractDictionary<B> {
 		}
 	}
 
-	protected void mapEntityToName(String name, NamedEntity ent) {
-		Collection<NamedEntity> l_ent = nameToEntity.get(name);
+	protected void mapEntityToName(String name, TNamedEntity ent) {
+		Collection<TNamedEntity> l_ent = nameToEntity.get(name);
 		if (l_ent == null) {
-			l_ent = new LinkedList<NamedEntity>();
+			l_ent = new LinkedList<TNamedEntity>();
 		}
 		l_ent.add(ent);
 		nameToEntity.put(name, l_ent);
@@ -123,14 +123,14 @@ public class AbstractDictionary<B> {
 		entityToKey.remove(ent);
 		keyToEntity.remove(key);
 
-		Collection<NamedEntity> l_ent = nameToEntity.get(ent.getName());
+		Collection<TNamedEntity> l_ent = nameToEntity.get(ent.getName());
 		l_ent.remove(ent);
 
 		famixRepo.getElements().remove(ent);
 	}
 	
-	protected void mapEntityToKey(B key, NamedEntity ent) {
-		NamedEntity old = keyToEntity.get(key);
+	protected void mapEntityToKey(B key, TNamedEntity ent) {
+		TNamedEntity old = keyToEntity.get(key);
 		if (old != null) {
 			entityToKey.remove(old);
 		}
@@ -145,12 +145,12 @@ public class AbstractDictionary<B> {
 	 * @return the Collection of Famix Entities with the given name and class (possibly empty)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends NamedEntity> Collection<T> getEntityByName(Class<T> fmxClass, String name) {
+	public <T extends TNamedEntity> Collection<T> getEntityByName(Class<T> fmxClass, String name) {
 		Collection<T> ret = new LinkedList<T>();
-		Collection<NamedEntity> l_name = nameToEntity.get(name);
+		Collection<TNamedEntity> l_name = nameToEntity.get(name);
 		
 		if (l_name != null ) {
-			for (NamedEntity obj : l_name) {
+			for (TNamedEntity obj : l_name) {
 				if (fmxClass.isInstance(obj)) {
 					ret.add((T) obj);
 				}
@@ -168,7 +168,7 @@ public class AbstractDictionary<B> {
 	 * @param key -- the key
 	 * @return the Famix Entity associated to the binding or null if not found
 	 */
-	public NamedEntity getEntityByKey(B key) {
+	public TNamedEntity getEntityByKey(B key) {
 		if (key == null) {
 			return null;
 		}
@@ -194,7 +194,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Entity should be persisted in the Famix repository
 	 * @return the FAMIX Entity or null in case of a FAMIX error
 	 */
-	protected <T extends NamedEntity> T createFamixEntity(Class<T> fmxClass, String name, boolean persistIt) {
+	protected <T extends TNamedEntity & TSourceEntity> T createFamixEntity(Class<T> fmxClass, String name, boolean persistIt) {
 		T fmx = null;
 
 		if (name == null) {
@@ -233,7 +233,7 @@ public class AbstractDictionary<B> {
 	 * @return the FAMIX Entity or null if <b>bnd</b> was null or in case of a FAMIX error
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T extends NamedEntity> T ensureFamixEntity(Class<T> fmxClass, B bnd, String name, boolean persistIt) {
+	protected <T extends TNamedEntity & TSourceEntity> T ensureFamixEntity(Class<T> fmxClass, B bnd, String name, boolean persistIt) {
 		T fmx = null;
 		if (bnd != null) {
 			fmx = (T) getEntityByKey(bnd);
@@ -289,6 +289,20 @@ public class AbstractDictionary<B> {
 	 */
 	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClass(B key, String name, ContainerEntity owner, boolean persistIt) {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, key, name, persistIt);
+		fmx.setTypeContainer(owner);
+		return fmx;
+	}
+
+		/**
+	 * Returns a FAMIX Exception with the given <b>name</b>, creating it if it does not exist yet.
+	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
+	 * @param name -- the name of the FAMIX Method (MUST NOT be null, but this is not checked)
+	 * @param owner -- type defining the method (should not be null, but it will work if it is) 
+	 * @param persistIt -- whether the Class should be persisted in the Famix repository
+	 * @return the FAMIX Class or null in case of a FAMIX error
+	 */
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception ensureFamixException(B key, String name, ContainerEntity owner, boolean persistIt) {
+		org.moosetechnology.model.famixjava.famixjavaentities.Exception fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
 	}
@@ -426,11 +440,11 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Method should be persisted in the Famix repository
 	 * @return the FAMIX Method or null in case of a FAMIX error
 	 */
-	public Method ensureFamixMethod(B key, String name, String sig, Type ret, Type owner, boolean persistIt) {
+	public Method ensureFamixMethod(B key, String name, String sig, TType ret, TType owner, boolean persistIt) {
 		Method fmx = ensureFamixEntity(Method.class, key, name, persistIt);
 		fmx.setSignature(sig);
 		fmx.setDeclaredType(ret);
-		fmx.setParentType(owner);
+		fmx.setParentType((TWithMethods) owner);
 		return fmx;
 	}
 
@@ -571,7 +585,7 @@ public class AbstractDictionary<B> {
 	 * @param prev -- previous reference relationship in the same context
 	 * @return the FamixReference
 	 */
-	public Reference addFamixReference(Method src, Type tgt, TAssociation prev) {
+	public Reference addFamixReference(Method src, TType tgt, TAssociation prev) {
 		if ( (src == null) || (tgt == null) ) {
 			return null;
 		}

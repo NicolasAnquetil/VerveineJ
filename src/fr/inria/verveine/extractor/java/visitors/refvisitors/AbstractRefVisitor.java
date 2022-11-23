@@ -84,9 +84,8 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	/**
 	 * Same as {@link AbstractRefVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
-	protected TType
-	referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Type fmxTyp = null;
+	protected TType referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
+		org.moosetechnology.model.famixjava.famixtraits.TType fmxTyp = null;
 
 		if (bnd == null) {
 			return null;

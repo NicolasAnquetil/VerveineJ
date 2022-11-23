@@ -63,7 +63,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		visitClassInstanceCreation(node);
 		if (node.getAnonymousClassDeclaration() == null) {
 			Type clazz = node.getType();
-			org.moosetechnology.model.famixjava.famixjavaentities.Type fmx = (org.moosetechnology.model.famixjava.famixjavaentities.Type) referedType(clazz, (ContainerEntity) context.top(), true);
+			org.moosetechnology.model.famixjava.famixtraits.TType fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
 			if (! summarizeClasses()) {
 				ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
