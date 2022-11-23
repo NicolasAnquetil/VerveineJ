@@ -9,6 +9,7 @@ import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
 
@@ -296,7 +297,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	// UTILITY METHODS
 
-	private TStructuralEntity createStructuralEntity(StructuralEntityKinds structKind, VariableDeclaration varDecl, NamedEntity owner) {
+	private TStructuralEntity createStructuralEntity(StructuralEntityKinds structKind, VariableDeclaration varDecl, TNamedEntity owner) {
 		TStructuralEntity fmx;
 		IVariableBinding bnd = varDecl.resolveBinding();
 		String name = varDecl.getName().getIdentifier();

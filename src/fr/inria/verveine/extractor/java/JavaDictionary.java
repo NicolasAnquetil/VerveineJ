@@ -221,7 +221,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return super.ensureFamixType(bnd, name, owner, alwaysPersist);
 	}
 
-	private boolean isThrowable(ITypeBinding bnd) {
+	public boolean isThrowable(ITypeBinding bnd) {
 		if (bnd == null) {
 			return false;
 		}
