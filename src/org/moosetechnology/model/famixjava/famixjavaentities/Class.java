@@ -42,7 +42,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 @FameDescription("Class")
 public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanImplement, TClass, TClassMetrics, TEntityMetaLevelDependency, THasVisibility, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
 
-    private Boolean isInterface;
+    private Boolean isInterface = false;
     
     private Collection<TAttribute> attributes; 
 
@@ -52,11 +52,11 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
 
     private Collection<TImplementation> interfaceImplementations; 
 
-    private Boolean isAbstract;
+    private Boolean isAbstract = false;
     
-    private Boolean isClassSide;
+    private Boolean isClassSide = false;
     
-    private Boolean isFinal;
+    private Boolean isFinal = false;
     
     private Boolean isStub;
     
