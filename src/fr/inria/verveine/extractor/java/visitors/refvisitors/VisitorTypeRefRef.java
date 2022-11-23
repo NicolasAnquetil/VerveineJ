@@ -193,9 +193,9 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	}
 
 	public boolean visit(InstanceofExpression node) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Type fmx = null;
+		org.moosetechnology.model.famixjava.famixtraits.TType fmx = null;
 		Type clazz = node.getRightOperand();
-		fmx = (org.moosetechnology.model.famixjava.famixjavaentities.Type) referedType(clazz, (ContainerEntity) context.top(), true);
+		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 		Reference ref = null;
 		if (summarizeClasses()) {

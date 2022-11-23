@@ -634,17 +634,17 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Collection<TReference> refs = m.getOutgoingReferences();
 		assertEquals(2, refs.size());
 
-		Type referred;
+		TType referred;
 		Iterator<TReference> iter = refs.iterator();
 
-		referred = (Type) iter.next().getReferredType();
+		referred = (TType) iter.next().getReferredType();
 		if (referred.getName().equals("IOException")) {
-		    referred = (Type) iter.next().getReferredType();
+		    referred = (TType) iter.next().getReferredType();
 		    assertEquals("Planet", referred.getName());
         }
         else {
 		    assertEquals("Planet", referred.getName());
-		    referred = (Type) iter.next().getReferredType();
+		    referred = (TType) iter.next().getReferredType();
 		    assertEquals("IOException", referred.getName());
 
         }
