@@ -12,6 +12,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
 
 import java.util.List;
 
@@ -304,7 +305,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 		switch (structKind) {
 			case PARAMETER:	fmx = dico.ensureFamixParameter(bnd, name, (Method) owner, /*persistIt*/! summarizeClasses());										break;
-			case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (org.moosetechnology.model.famixjava.famixjavaentities.Type) owner, /*persistIt*/! summarizeClasses());	break;
+			case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (TType) owner, /*persistIt*/! summarizeClasses());	break;
 			case LOCALVAR: 	fmx = dico.ensureFamixLocalVariable(bnd, name, (Method) owner, /*persistIt*/! summarizeClasses());									break;
 			default:		fmx = null;
 		}

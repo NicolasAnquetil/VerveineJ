@@ -273,7 +273,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Type should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public Type ensureFamixType(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public Type ensureFamixType(B key, String name, TWithTypes owner, boolean persistIt) {
 		Type fmx = ensureFamixEntity(Type.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -457,7 +457,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Attribute should be persisted in the Famix repository
 	 * @return the FAMIX Attribute or null in case of a FAMIX error
 	 */
-	public Attribute ensureFamixAttribute(B key, String name, Type type, Type owner, boolean persistIt) {
+	public Attribute ensureFamixAttribute(B key, String name, Type type, TType owner, boolean persistIt) {
 		Attribute fmx = ensureFamixEntity(Attribute.class, key, name, persistIt);
 		fmx.setParentType((TWithAttributes) owner);
 		fmx.setDeclaredType(type);

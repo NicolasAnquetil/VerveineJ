@@ -7,6 +7,7 @@ import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
 
@@ -57,7 +58,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	 * @param isClass we are sure that the type is actually a class
 	 * @return a famix type or null
 	 */
-	protected TType referedType(Type typ, ContainerEntity ctxt, boolean isClass) {
+	protected TType referedType(Type typ, TNamedEntity ctxt, boolean isClass) {
 		if (typ == null) {
 			return null;
 		} else if (typ.resolveBinding() != null) {
@@ -84,7 +85,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	/**
 	 * Same as {@link AbstractRefVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
-	protected TType referedType(ITypeBinding bnd, ContainerEntity ctxt, boolean isClass) {
+	protected TType referedType(ITypeBinding bnd, TNamedEntity ctxt, boolean isClass) {
 		org.moosetechnology.model.famixjava.famixtraits.TType fmxTyp = null;
 
 		if (bnd == null) {
@@ -112,9 +113,9 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 			if (bnd == parameterizableBnd) {
 				// JDT bug?
-				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, /*owner*/ctxt, persistClass(null));
+				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (ContainerEntity) /*owner*/ctxt, persistClass(null));
 			} else {
-				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, /*owner*/ctxt, persistClass(bnd));
+				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (ContainerEntity) /*owner*/ctxt, persistClass(bnd));
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {

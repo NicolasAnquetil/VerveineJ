@@ -304,7 +304,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      *     SingleVariableDeclaration VariableDeclarationFragment
 	 */
 	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
-		setVariablesDeclaredType(fragments, referedType(declType, (ContainerEntity) context.topType(), false));
+		setVariablesDeclaredType(fragments, referedType(declType, context.topType(), false));
 		for (VariableDeclaration varDecl : fragments) {
 			varDecl.accept(this);
 		}
