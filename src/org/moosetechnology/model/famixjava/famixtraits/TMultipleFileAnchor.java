@@ -9,7 +9,7 @@ import java.util.*;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TMultipleFileAnchor")
-public interface TMultipleFileAnchor  {
+public interface TMultipleFileAnchor extends TSourceAnchor {
 
         @FameProperty(name = "fileAnchors")
     public Collection<TFileAnchor> getFileAnchors();

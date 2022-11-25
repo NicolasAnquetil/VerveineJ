@@ -29,7 +29,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 public class Type extends ContainerEntity implements TEntityMetaLevelDependency, TNamedEntity, TParameterizedTypeUser, TReferenceable, TSourceEntity, TType, TWithMethods, TWithTypeAliases {
 
     private ContainerEntity container;
-    
+
     private Collection<TWithParameterizedTypeUsers> argumentsInParameterizedTypes; 
 
     private Collection<TReference> incomingReferences; 
@@ -58,7 +58,7 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
     public void setContainer(ContainerEntity container) {
         this.container = container;
     }
-    
+
     @FameProperty(name = "isInnerClass", derived = true)
     public Boolean getIsInnerClass() {
         // TODO: this is a derived property, implement this method manually.
@@ -330,12 +330,6 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
     
     @FameProperty(name = "numberOfLinesOfCodeWithMoreThanOneCharacter", derived = true)
     public Number getNumberOfLinesOfCodeWithMoreThanOneCharacter() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfMessageSends", derived = true)
-    public Number getNumberOfMessageSends() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

@@ -593,7 +593,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testMultipleSignatures() {
 		parse(new String[]{"test_src/ad_hoc/MultipleSignatures.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class throwable = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Throwable");
+		org.moosetechnology.model.famixjava.famixjavaentities.Exception throwable = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "Throwable");
 		assertNotNull(throwable);
 		assertEquals(2, throwable.getMethods().size()); // printStackTrace() & printStackTrace(PrintWriter)
 
@@ -634,17 +634,17 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Collection<TReference> refs = m.getOutgoingReferences();
 		assertEquals(2, refs.size());
 
-		Type referred;
+		TType referred;
 		Iterator<TReference> iter = refs.iterator();
 
-		referred = (Type) iter.next().getReferredType();
+		referred = (TType) iter.next().getReferredType();
 		if (referred.getName().equals("IOException")) {
-		    referred = (Type) iter.next().getReferredType();
+		    referred = (TType) iter.next().getReferredType();
 		    assertEquals("Planet", referred.getName());
         }
         else {
 		    assertEquals("Planet", referred.getName());
-		    referred = (Type) iter.next().getReferredType();
+		    referred = (TType) iter.next().getReferredType();
 		    assertEquals("IOException", referred.getName());
 
         }

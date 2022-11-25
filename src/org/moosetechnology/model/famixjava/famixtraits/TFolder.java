@@ -9,7 +9,7 @@ import java.util.*;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TFolder")
-public interface TFolder  {
+public interface TFolder extends TFileSystemEntity {
 
         @FameProperty(name = "numberOfFiles", derived = true)
     public Number getNumberOfFiles();

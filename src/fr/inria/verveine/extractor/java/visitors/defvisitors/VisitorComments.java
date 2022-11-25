@@ -294,7 +294,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 			// recover the famix entity
 			switch (structuralKind) {
 			case ATTRIBUTE:
-				fmx = dico.getFamixAttribute(bnd, name, context.topType());
+				fmx = dico.getFamixAttribute(bnd, name, (Type) context.topType());
 				if (!((TSourceEntity) fmx).getIsStub()) {
 					// if it is a stub, it might have been created by the getFamixXXX just above
 					// or something very strange happened

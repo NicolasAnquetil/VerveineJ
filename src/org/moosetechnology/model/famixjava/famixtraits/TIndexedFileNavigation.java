@@ -8,7 +8,7 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TIndexedFileNavigation")
-public interface TIndexedFileNavigation  {
+public interface TIndexedFileNavigation extends TFileAnchor {
 
         @FameProperty(name = "startPos")
     public Number getStartPos();

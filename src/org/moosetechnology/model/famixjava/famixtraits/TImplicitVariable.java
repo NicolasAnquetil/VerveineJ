@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Traits")
 @FameDescription("TImplicitVariable")
-public interface TImplicitVariable  {
+public interface TImplicitVariable extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TStructuralEntity, TTypedEntity, TAccessible {
 
         @FameProperty(name = "parentBehaviouralEntity", opposite = "implicitVariables", container = true)
     public TWithImplicitVariables getParentBehaviouralEntity();

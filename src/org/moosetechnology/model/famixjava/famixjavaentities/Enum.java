@@ -478,12 +478,6 @@ public class Enum extends Type implements TEntityMetaLevelDependency, TEnum, THa
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfMessageSends", derived = true)
-    public Number getNumberOfMessageSends() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfMethods", derived = true)
     public Number getNumberOfMethods() {
         // TODO: this is a derived property, implement this method manually.

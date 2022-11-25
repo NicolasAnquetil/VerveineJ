@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDepen
 
 @FamePackage("Famix-Traits")
 @FameDescription("TAssociation")
-public interface TAssociation  {
+public interface TAssociation extends TAssociationMetaLevelDependency, TSourceEntity {
 
         @FameProperty(name = "next", opposite = "previous", derived = true)
     public TAssociation getNext();

@@ -81,7 +81,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		if ((!summarizeClasses())) {
 
 			String typName;
-			org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
+			TType fmx;
 
 			if (node.getAnonymousClassDeclaration() != null) {
 				ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node.getAnonymousClassDeclaration());
@@ -492,7 +492,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		// field.msg()
 		if (NodeTypeChecker.isFieldAccess(expr)) {
 			IVariableBinding bnd = ((FieldAccess) expr).resolveFieldBinding();
-			NamedEntity fld = dico.getEntityByKey(bnd);
+			NamedEntity fld = (NamedEntity) dico.getEntityByKey(bnd);
 			/*StructuralEntity fld = ensureAccessedStructEntity(bnd, ((FieldAccess) expr).getName().getIdentifier(),
 					/*type* /null, /*owner* /null, /*accessor* /null);*/
 			return fld;
@@ -519,11 +519,11 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			NamedEntity ret = null;
 			if (bnd.getKind() == IBinding.TYPE) {
 				// msg() is a static method of Name so name should be a class, except if its an Enum
-				ret = dico.getEntityByKey(bnd);
+				ret = (NamedEntity) dico.getEntityByKey(bnd);
 			}
 
 			if (bnd.getKind() == IBinding.VARIABLE) {
-				return dico.getEntityByKey(bnd);
+				return (NamedEntity) dico.getEntityByKey(bnd);
 			}
 
 			return ret;
@@ -541,7 +541,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// super.field.msg()
 		if ( NodeTypeChecker.isSuperFieldAccess(expr)) {
-			return dico.getEntityByKey(((SuperFieldAccess) expr).resolveFieldBinding());
+			return (NamedEntity) dico.getEntityByKey(((SuperFieldAccess) expr).resolveFieldBinding());
 			/*return ensureAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(),
 					((SuperFieldAccess) expr).getName().getIdentifier(), /*typ* /null, /*owner* /null, /*accessor* /null);*/
 		}
@@ -613,7 +613,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		else if ( NodeTypeChecker.isSuperMethodInvocation(expr)) {
 			IMethodBinding superBnd = ((SuperMethodInvocation) expr).resolveMethodBinding();
 			if (superBnd != null) {
-				return this.referedType(superBnd.getReturnType(), context.topType(), true);
+				return this.referedType(superBnd.getReturnType(), (ContainerEntity) context.topType(), true);
 			} else {
 				return null;
 			}
@@ -650,7 +650,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 * @return
 	 */
 	private Class superClass() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Type clazz = context.topType();
+		TType clazz = context.topType();
 		Class superC = null;
 		for (TInheritance inh : ((TWithInheritances) clazz).getSuperInheritances()) {
 			if (inh.getSuperclass() instanceof Class) {

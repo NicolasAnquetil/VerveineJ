@@ -8,6 +8,7 @@ import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisit
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 
@@ -61,9 +62,18 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
-		org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
+		org.moosetechnology.model.famixjava.famixtraits.TType fmx;
 		if (bnd.isInterface()) {
 			fmx = dico.ensureFamixInterface(
+				bnd, 
+				/*name*/node.getName().getIdentifier(), 
+				(ContainerEntity) 
+				/*owner*/context.top(), 
+				/*isGeneric*/tparams.size()>0, 
+				node.getModifiers(), 
+				/*alwaysPersist?*/persistIt);
+		} else if (dico.isThrowable(bnd)) {
+			fmx = dico.ensureFamixException(
 				bnd, 
 				/*name*/node.getName().getIdentifier(), 
 				(ContainerEntity) 
@@ -567,7 +577,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			}
 		}
 		if (ctxtMeth == null) {
-			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), context.topType(),
+			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), (Type) context.topType(),
 					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!summarizeClasses());
 			ctxtMeth.setIsStub(false);
 			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE

@@ -6,6 +6,7 @@ import org.junit.Assume;
 import org.junit.Test;
 import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixjavaentities.Exception;
 import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
@@ -70,7 +71,7 @@ public abstract class VerveineJTest_Basic {
         return repo.all(clazz);
     }
 
-    public <T extends NamedEntity> T detectFamixElement(Class<T> clazz, String name) {
+    public <T extends Entity & TNamedEntity> T detectFamixElement(Class<T> clazz, String name) {
         Iterator<T> iter = entitiesOfType(clazz).iterator();
 
         T found;

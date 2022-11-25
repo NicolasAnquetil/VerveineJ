@@ -149,7 +149,7 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 				}
 
 				// add the annotation instance to the Famix entity, may be if fmx==null we should not even create the AnnotationInstanceType ?
-				fmx = dico.getEntityByKey(bnd);
+				fmx = (NamedEntity) dico.getEntityByKey(bnd);
 				if ( (fmx != null) && (! summarizeClasses()) ) {
 					dico.addFamixAnnotationInstance(fmx, annType, annAtts);
 				}

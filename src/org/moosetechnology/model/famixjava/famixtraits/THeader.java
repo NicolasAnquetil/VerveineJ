@@ -8,7 +8,7 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("THeader")
-public interface THeader  {
+public interface THeader extends TFileSystemEntity, TFile {
 
         @FameProperty(name = "headerOwner", opposite = "header")
     public TWithHeaders getHeaderOwner();

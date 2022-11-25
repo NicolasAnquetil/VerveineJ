@@ -8,7 +8,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Traits")
 @FameDescription("TPrimitiveType")
-public interface TPrimitiveType  {
+public interface TPrimitiveType extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TReferenceable, TType {
 
     
 

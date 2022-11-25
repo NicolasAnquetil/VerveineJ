@@ -8,7 +8,7 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TWithClasses")
-public interface TWithClasses  {
+public interface TWithClasses extends TWithTypes {
 
         @FameProperty(name = "numberOfClasses", derived = true)
     public Number getNumberOfClasses();

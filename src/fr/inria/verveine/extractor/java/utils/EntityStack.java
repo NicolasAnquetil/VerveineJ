@@ -1,6 +1,8 @@
 package fr.inria.verveine.extractor.java.utils;
 
 import org.moosetechnology.model.famixjava.famixjavaentities.Package;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 
 import java.lang.Class;
@@ -15,7 +17,7 @@ public class EntityStack {
 	public static final int EMPTY_CYCLO = 0;
 	public static final int EMPTY_NOS = 0;
 
-	private Stack<NamedEntity> stack;
+	private Stack<TNamedEntity> stack;
 
 	/**
 	 * Empties the context stack of Famix classes
@@ -75,7 +77,7 @@ public class EntityStack {
 	 * Pushes an entity on top of the "context stack"
 	 * @param e -- the entity
 	 */
-	public void push(NamedEntity e) {
+	public void push(TNamedEntity e) {
 		stack.push(e);
 	}
 
@@ -91,7 +93,7 @@ public class EntityStack {
 	 * Pushes a Famix Type on top of the "context type stack"
 	 * @param t -- the FamixType
 	 */
-	public void pushType(Type t) {
+	public void pushType(TType t) {
 		push(t);
 	}
 
@@ -123,7 +125,7 @@ public class EntityStack {
 	 * Empties the context stack of package and associated classes
 	 */
 	public void clearPckg() {
-		stack = new Stack<NamedEntity>();
+		stack = new Stack<TNamedEntity>();
 	}
 
 	private class MetricHolder extends NamedEntity {
@@ -159,8 +161,8 @@ public class EntityStack {
 	// READ FROM THE STACK
 
 	@SuppressWarnings("unchecked")
-	private <T extends NamedEntity> T popUpto(Class<T> clazz) {
-		NamedEntity ent = null;
+	private <T extends TNamedEntity> T popUpto(Class<T> clazz) {
+		TNamedEntity ent = null;
 		while ((!stack.isEmpty()) && (!clazz.isInstance(ent))) {
 			ent = this.pop();
 		}
@@ -174,7 +176,7 @@ public class EntityStack {
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends NamedEntity> T lookUpto(Class<T> clazz) {
+	private <T extends TNamedEntity> T lookUpto(Class<T> clazz) {
 		int i=this.stack.size()-1;
 
 		while ( (i >= 0) && (! clazz.isInstance(stack.get(i))) ) {
@@ -189,12 +191,12 @@ public class EntityStack {
 		}
 	}
 
-	public NamedEntity pop() {
+	public TNamedEntity pop() {
 		if (stack.isEmpty()) {
 			return null;
 		}
 		else {
-			NamedEntity e = stack.pop();
+			TNamedEntity e = stack.pop();
 			if (e instanceof MetricHolder) {
 				return stack.pop();
 			}
@@ -241,12 +243,12 @@ public class EntityStack {
 	 * Note: does not check that there is such an entity
 	 * @return the Famix entity
 	 */
-	public NamedEntity top() {
+	public TNamedEntity top() {
 		if (stack.isEmpty()) {
 			return null;
 		}
 		else {
-			NamedEntity e = stack.peek();
+			TNamedEntity e = stack.peek();
 			if (e instanceof MetricHolder) {
 				return ((MetricHolder) e).getEntity();
 			}
@@ -270,8 +272,8 @@ public class EntityStack {
 	 * Note: does not check that there is such a class, so could possibly throw an EmptyStackException
 	 * @return the Famix class
 	 */
-	public Type topType() {
-		return this.lookUpto(Type.class);
+	public TType topType() {
+		return this.lookUpto(TType.class);
 	}
 
 	/**

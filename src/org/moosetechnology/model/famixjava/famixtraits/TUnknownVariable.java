@@ -8,7 +8,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Traits")
 @FameDescription("TUnknownVariable")
-public interface TUnknownVariable  {
+public interface TUnknownVariable extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TStructuralEntity, TTypedEntity, TAccessible {
 
     
 

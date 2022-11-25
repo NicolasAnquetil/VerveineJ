@@ -16,6 +16,5 @@ public interface TNamedEntity  {
     public void setName(String name);
 
 
-
 }
 
