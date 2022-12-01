@@ -184,10 +184,10 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		if (bnd.isInterface()) {
-			return this.ensureFamixInterface(bnd, name, (ContainerEntity) owner, /*isGeneric*/bnd.isParameterizedType(), modifiers, alwaysPersist);
+			return this.ensureFamixInterface(bnd, name, (ContainerEntity) owner, /*isGeneric*/bnd.isParameterizedType() || bnd.isRawType(), modifiers, alwaysPersist);
 		}
 
-		if (bnd.isParameterizedType()) {
+		if (bnd.isParameterizedType() || bnd.isRawType()) {
 			return this.ensureFamixParameterizedType(bnd, name, /*generic*/null, (ContainerEntity) ctxt, alwaysPersist);
 		}
 		if (isThrowable(bnd)) {
@@ -1122,7 +1122,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// checking names
-		if ( (bnd != null) && (bnd.isParameterizedType()) ) {
+		if ( (bnd != null) && (bnd.isParameterizedType() || bnd.isRawType()) ) {
 			name = bnd.getErasure().getName();
 		}
 		else if (bnd != null) {
@@ -1163,7 +1163,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 		// check owners with bnd
 		// type is a Parameterized type
-		if (bnd.isParameterizedType() && (candidate instanceof ParameterizedType)) {
+		if ((bnd.isParameterizedType() || bnd.isRawType()) && (candidate instanceof ParameterizedType)) {
 			return matchAndMapTypeOwner(bnd, owner, (Type) candidate);
 		}
 
