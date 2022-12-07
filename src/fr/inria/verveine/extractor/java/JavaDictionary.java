@@ -122,7 +122,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return ensureFamixType(bnd, /*ctxt*/null, alwaysPersist);
 	}
 
-	public TType ensureFamixType(ITypeBinding bnd, ContainerEntity context, boolean alwaysPersist) {
+	public TType ensureFamixType(ITypeBinding bnd, TNamedEntity context, boolean alwaysPersist) {
 		int modifiers = (bnd != null) ? bnd.getModifiers() : UNKNOWN_MODIFIERS;
 		return ensureFamixType(bnd, /*name*/null, /*owner*/null, context, modifiers, alwaysPersist);
 	}
@@ -1645,7 +1645,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 						delayedRetTyp = true;
 					}
 					else {
-						ret = this.ensureFamixType(retTypBnd, /*ctxt*/(ContainerEntity) owner, /*alwaysPersist?*/persistIt);
+						ret = this.ensureFamixType(retTypBnd, (TNamedEntity) /*ctxt*/owner, /*alwaysPersist?*/persistIt);
 					}
 				}
 			}

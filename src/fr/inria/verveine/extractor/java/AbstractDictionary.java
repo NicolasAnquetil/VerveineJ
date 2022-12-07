@@ -848,7 +848,7 @@ public class AbstractDictionary<B> {
 		return fmx;
 	}
 
-	public Type searchTypeInContext(String name, ContainerEntity ctxt) {
+	public <T extends TNamedEntity & TWithTypes> Type searchTypeInContext(String name, T ctxt) {
 		if (ctxt == null) {
 			return null;
 		}
