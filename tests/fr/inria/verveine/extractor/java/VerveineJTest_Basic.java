@@ -167,7 +167,7 @@ public abstract class VerveineJTest_Basic {
 		found = false;
 		for (TStructuralEntity e : repo.all(TStructuralEntity.class)) {
 			if (!((TSourceEntity) e).getIsStub()) {
-				assertNotNull("a StructuralEntity '" + ((TNamedEntity) e).getName() + "' does not belong to anything", Util.belongsToOf((Entity) e));
+				assertNotNull("a StructuralEntity '" + ((TNamedEntity) e).getName() + "' does not belong to anything", Util.belongsToOf(e));
 				found = true;
 			}
 		}

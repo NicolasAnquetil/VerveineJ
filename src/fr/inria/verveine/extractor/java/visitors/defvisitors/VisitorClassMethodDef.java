@@ -9,7 +9,9 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
+import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
 import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
+import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 
 import java.security.MessageDigest;
@@ -204,7 +206,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 //		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
+		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (TWithTypes) context.top());
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
@@ -275,7 +277,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				bnd, 
 				node.getName().getIdentifier(), 
 				paramTypes, 
-				/*owner*/context.topType(), 
+				(TWithMethods) /*owner*/context.topType(), 
 				node.getModifiers(), 
 				/*persitIt*/!summarizeClasses());
 

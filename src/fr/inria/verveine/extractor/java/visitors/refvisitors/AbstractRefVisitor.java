@@ -51,7 +51,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 		}
 	}
 
-	/**
+/**
 	 * Ensures the proper creation of a FamixType for JDT typ in the given context.
 	 * Useful for parameterizedTypes, or classInstance.
 	 *
@@ -59,14 +59,29 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	 * @return a famix type or null
 	 */
 	protected TType referedType(Type typ, TNamedEntity ctxt, boolean isClass) {
+		return referedType(typ, ctxt, isClass, false);
+	}
+
+	/**
+	 * Ensures the proper creation of a FamixType for JDT typ in the given context.
+	 * Useful for parameterizedTypes, or classInstance.
+	 *
+	 * @param isClass we are sure that the type is actually a class
+	 * @return a famix type or null
+	 */
+	protected TType referedType(Type typ, TNamedEntity ctxt, boolean isClass, boolean isExcep) {
 		if (typ == null) {
 			return null;
 		} else if (typ.resolveBinding() != null) {
 			return this.referedType(typ.resolveBinding(), ctxt, isClass);
 		}
 		// from here, we assume the owner is the context
-		else if (isClass) {
+		else if (isClass && !isExcep) {
 			return dico.ensureFamixClass(null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false,
+					JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+		} else if (isExcep) {
+			// return ensure FamixException
+			return dico.ensureFamixException(null, findTypeName(typ), (ContainerEntity) /*owner*/ctxt, /*isGeneric*/false,
 					JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 		} else {
 			while (typ.isArrayType()) {

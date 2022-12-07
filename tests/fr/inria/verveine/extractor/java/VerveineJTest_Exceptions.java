@@ -79,4 +79,14 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         assertEquals("T", exD.getName());
     }
 
+    @Test
+    public void testExceptionCanHaveInnerEnumerationExceptions() {
+        org.moosetechnology.model.famixjava.famixjavaentities.Enum typeEnum = detectFamixElement( org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "Type");
+        assertNotNull(typeEnum);
+
+        org.moosetechnology.model.famixjava.famixjavaentities.Exception localException = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "LocalException");
+        assertNotNull(localException);
+
+    }
+
 }

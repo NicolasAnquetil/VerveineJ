@@ -287,7 +287,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Class should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClass(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClass(B key, String name, TWithTypes owner, boolean persistIt) {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -301,7 +301,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Class should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Exception ensureFamixException(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception ensureFamixException(B key, String name, TWithTypes owner, boolean persistIt) {
 		org.moosetechnology.model.famixjava.famixjavaentities.Exception fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -373,7 +373,7 @@ public class AbstractDictionary<B> {
 		return fmx;
 	}
 
-	public Enum ensureFamixEnum(B key, String name,	ContainerEntity owner, boolean persistIt) {
+	public Enum ensureFamixEnum(B key, String name,	TWithTypes owner, boolean persistIt) {
 		Enum fmx = ensureFamixEntity(Enum.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -440,11 +440,11 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Method should be persisted in the Famix repository
 	 * @return the FAMIX Method or null in case of a FAMIX error
 	 */
-	public Method ensureFamixMethod(B key, String name, String sig, TType ret, TType owner, boolean persistIt) {
+	public Method ensureFamixMethod(B key, String name, String sig, TType ret, TWithMethods owner, boolean persistIt) {
 		Method fmx = ensureFamixEntity(Method.class, key, name, persistIt);
 		fmx.setSignature(sig);
 		fmx.setDeclaredType(ret);
-		fmx.setParentType((TWithMethods) owner);
+		fmx.setParentType(owner);
 		return fmx;
 	}
 
@@ -457,9 +457,9 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Attribute should be persisted in the Famix repository
 	 * @return the FAMIX Attribute or null in case of a FAMIX error
 	 */
-	public Attribute ensureFamixAttribute(B key, String name, Type type, TType owner, boolean persistIt) {
+	public Attribute ensureFamixAttribute(B key, String name, Type type, TWithAttributes owner, boolean persistIt) {
 		Attribute fmx = ensureFamixEntity(Attribute.class, key, name, persistIt);
-		fmx.setParentType((TWithAttributes) owner);
+		fmx.setParentType( owner);
 		fmx.setDeclaredType(type);
 		return fmx;
 	}

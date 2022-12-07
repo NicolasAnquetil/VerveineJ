@@ -294,7 +294,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		String name = context.topMethod().getName();
 		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
-				/*paramTypes*/null, /*retType*/null, /*owner*/context.topType(), modifiers,
+				/*paramTypes*/null, /*retType*/null, (TWithMethods) /*owner*/context.topType(), modifiers,
 				/*persistIt*/!summarizeClasses());
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either
@@ -402,7 +402,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			if (sender != null) {
 				int modifiers = (calledBnd != null) ? calledBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 				if ((receiver != null) && (receiver instanceof TStructuralEntity)) {
-					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, methOwner,
+					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, (TWithMethods) methOwner,
 							modifiers, /*persistIt*/!summarizeClasses());
 				} else {
 					org.moosetechnology.model.famixjava.famixtraits.TType owner;
@@ -413,7 +413,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null,
-							/*owner*/owner, modifiers, /*persistIt*/!summarizeClasses());
+							(TWithMethods) /*owner*/owner, modifiers, /*persistIt*/!summarizeClasses());
 				}
 				
 				if (! summarizeClasses()) {
