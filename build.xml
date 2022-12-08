@@ -43,7 +43,7 @@
 	</target>
  
 	<!-- Creates Javadoc -->
-	<target name="docs" depends="compile">
+	<target name="docs" depends="compile,jar">
 		<javadoc sourcepath="${src.dir}" destdir="${docs.dir}">
 			<classpath>
 				<fileset dir="${dist.dir}">
