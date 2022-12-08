@@ -2,12 +2,8 @@ package exceptions;
 
 import LocalException.Type;
 
-public class UcThemeLog  {
+public class SomeClassThatUsesException {
 
-	/*
-	 * (non-Javadoc)
-	 * @see fr.sedit.core.log.usecases.IUcThemeLog#downloadBusLogsFiles()
-	 */
 	@Override
 	public String method(){
 		try {
