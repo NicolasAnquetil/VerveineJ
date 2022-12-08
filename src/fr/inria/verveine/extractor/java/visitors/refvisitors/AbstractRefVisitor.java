@@ -129,9 +129,9 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 			if (bnd == parameterizableBnd) {
 				// JDT bug?
-				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (TWithParameterizedTypes) /*owner*/ctxt, persistClass(null));
+				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(null));
 			} else {
-				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (TWithParameterizedTypes) /*owner*/ctxt, persistClass(bnd));
+				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(bnd));
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {

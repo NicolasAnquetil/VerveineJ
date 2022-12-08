@@ -135,14 +135,14 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * @param ctxt -- context of use of the type
 	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 */
-	public TType ensureFamixType(ITypeBinding bnd, String name, TWithTypes owner, TWithTypes ctxt, int modifiers, boolean alwaysPersist) {
+	public <T extends TNamedEntity & TWithTypes> TType ensureFamixType(ITypeBinding bnd, String name, TWithTypes owner, TWithTypes ctxt, int modifiers, boolean alwaysPersist) {
 		TType fmx = null;
 
 		if (bnd == null) {
 			if (name == null) {
 				return null;
 			}
-			fmx = searchTypeInContext(name, (ContainerEntity) ctxt); // WildCard Types don't have binding
+			fmx = searchTypeInContext(name, (T) ctxt); // WildCard Types don't have binding
 			if (fmx != null) {
 				return fmx;
 			}
@@ -184,14 +184,14 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		if (bnd.isInterface()) {
-			return this.ensureFamixInterface(bnd, name, (ContainerEntity) owner, /*isGeneric*/bnd.isParameterizedType() || bnd.isRawType(), modifiers, alwaysPersist);
+			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/bnd.isParameterizedType() || bnd.isRawType(), modifiers, alwaysPersist);
 		}
 
 		if (bnd.isParameterizedType() || bnd.isRawType()) {
-			return this.ensureFamixParameterizedType(bnd, name, /*generic*/null, (ContainerEntity) ctxt, alwaysPersist);
+			return this.ensureFamixParameterizedType(bnd, name, /*generic*/null, ctxt, alwaysPersist);
 		}
 		if (isThrowable(bnd)) {
-			return this.ensureFamixException(bnd, name, (ContainerEntity) owner, /*isGeneric*/false, modifiers, alwaysPersist);
+			return this.ensureFamixException(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
 		}
 		if (bnd.isClass()) {
 			return this.ensureFamixClass(bnd, name, (TNamedEntity) owner, /*isGeneric*/false, modifiers, alwaysPersist);
@@ -675,7 +675,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * e.g. see {@link JavaDictionary#ensureFamixClass}
 	 */
-	public <T extends TWithTypes & TNamedEntity> ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, TWithParameterizedTypes generic, TWithParameterizedTypes owner, boolean alwaysPersist) {
+	public <T extends TWithTypes & TNamedEntity> ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, TWithParameterizedTypes generic, TWithTypes owner, boolean alwaysPersist) {
 		ParameterizedType fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -711,7 +711,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// --------------- owner
-		owner = (TWithParameterizedTypes) ((Type) generic).getTypeContainer();
+		owner = ((Type) generic).getTypeContainer();
 		/* Old behavior, see issue 868
 		   if (owner == null) {
 			if (bnd == null) {
