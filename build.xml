@@ -6,6 +6,7 @@
 	<property name="testsrc.dir"  location="tests" />
 	<property name="build.dir"    location="bin" />
 	<property name="docs.dir"     location="docs" />
+	<property name="javadoc.dir"     location="${dist.dir}/javadoc" />
 	<property name="dist.dir"     location="lib" />
 	<property name="verveine.jar" location="${dist.dir}/verveine.extractor.java.jar" />
 	<property name="tests.jar"    location="${dist.dir}/verveine.extractor.java.tests.jar" />
@@ -14,7 +15,7 @@
 	<!-- Deletes the existing build, docs and dist directory-->
 	<target name="clean">
 		<delete dir="${build.dir}" />
-		<delete dir="${docs.dir}" />
+		<delete dir="${javadoc.dir}" />
 		<delete file="${verveine.jar}" />
 	</target>
 
@@ -22,6 +23,7 @@
 	<target name="makedir">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${docs.dir}" />
+		<mkdir dir="${javadoc.dir}" />
 		<mkdir dir="${test.report.dir}" />
 	</target>
 
@@ -44,11 +46,12 @@
  
 	<!-- Creates Javadoc -->
 	<target name="docs" depends="compile">
-		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
-			<!-- Define which files / directory should get included, we include all -->
-			<fileset dir="${src.dir}">
-				<include name="**" />
-			</fileset>
+		<javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
 		</javadoc>
 	</target>
 

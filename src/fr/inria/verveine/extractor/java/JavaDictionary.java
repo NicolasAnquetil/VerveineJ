@@ -675,7 +675,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * e.g. see {@link JavaDictionary#ensureFamixClass}
 	 */
-	public ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, TWithParameterizedTypes generic, ContainerEntity owner, boolean alwaysPersist) {
+	public <T extends TWithTypes & TNamedEntity> ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, TWithParameterizedTypes generic, TWithParameterizedTypes owner, boolean alwaysPersist) {
 		ParameterizedType fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -711,7 +711,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// --------------- owner
-		owner = (ContainerEntity) ((Type) generic).getTypeContainer();
+		owner = (TWithParameterizedTypes) ((Type) generic).getTypeContainer();
 		/* Old behavior, see issue 868
 		   if (owner == null) {
 			if (bnd == null) {
@@ -724,7 +724,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (ParameterizedType candidate : getEntityByName(ParameterizedType.class, name) ) {
-			if ( matchAndMapType(bnd, name, owner, candidate) ) {
+			if ( matchAndMapType(bnd, name, (T) owner, candidate) ) {
 				fmx = candidate;
 				break;
 			}
@@ -733,7 +733,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		// --------------- create
 		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
-			fmx = super.ensureFamixParameterizedType(bnd, name, generic, owner, persistIt);
+			fmx = super.ensureFamixParameterizedType(bnd, name, generic, (TWithTypes) owner, persistIt);
 		}
 
 		// --------------- stub: same as ParameterizableClass

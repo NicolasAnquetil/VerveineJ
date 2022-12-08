@@ -101,7 +101,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	/**
 	 * Same as {@link AbstractRefVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
-	protected TType referedType(ITypeBinding bnd, TNamedEntity ctxt, boolean isClass) {
+	protected  TType referedType(ITypeBinding bnd, TNamedEntity ctxt, boolean isClass) {
 		org.moosetechnology.model.famixjava.famixtraits.TType fmxTyp = null;
 
 		if (bnd == null) {
@@ -129,9 +129,9 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 			if (bnd == parameterizableBnd) {
 				// JDT bug?
-				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (ContainerEntity) /*owner*/ctxt, persistClass(null));
+				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (TWithParameterizedTypes) /*owner*/ctxt, persistClass(null));
 			} else {
-				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (ContainerEntity) /*owner*/ctxt, persistClass(bnd));
+				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (TWithParameterizedTypes) /*owner*/ctxt, persistClass(bnd));
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
