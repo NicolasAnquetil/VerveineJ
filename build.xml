@@ -6,7 +6,6 @@
 	<property name="testsrc.dir"  location="tests" />
 	<property name="build.dir"    location="bin" />
 	<property name="docs.dir"     location="docs" />
-	<property name="javadoc.dir"     location="${dist.dir}/javadoc" />
 	<property name="dist.dir"     location="lib" />
 	<property name="verveine.jar" location="${dist.dir}/verveine.extractor.java.jar" />
 	<property name="tests.jar"    location="${dist.dir}/verveine.extractor.java.tests.jar" />
@@ -15,7 +14,7 @@
 	<!-- Deletes the existing build, docs and dist directory-->
 	<target name="clean">
 		<delete dir="${build.dir}" />
-		<delete dir="${javadoc.dir}" />
+		<delete dir="${docs.dir}" />
 		<delete file="${verveine.jar}" />
 	</target>
 
@@ -23,7 +22,6 @@
 	<target name="makedir">
 		<mkdir dir="${build.dir}" />
 		<mkdir dir="${docs.dir}" />
-		<mkdir dir="${javadoc.dir}" />
 		<mkdir dir="${test.report.dir}" />
 	</target>
 
@@ -46,7 +44,7 @@
  
 	<!-- Creates Javadoc -->
 	<target name="docs" depends="compile">
-		<javadoc sourcepath="${src.dir}" destdir="${javadoc.dir}">
+		<javadoc sourcepath="${src.dir}" destdir="${docs.dir}">
 			<classpath>
 				<fileset dir="${dist.dir}">
   				  <include name="*.jar"/>
