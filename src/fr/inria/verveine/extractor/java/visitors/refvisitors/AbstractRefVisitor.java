@@ -8,6 +8,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TParameterizedTypeUser;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
@@ -123,9 +124,9 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 			TWithParameterizedTypes generic;
 			if(parameterizableBnd.isInterface()) {
-				generic = (ParameterizableInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+				generic = (TWithParameterizedTypes) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
 			} else {
-				generic = (ParameterizableClass) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+				generic = (TWithParameterizedTypes) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
 			}
 			if (bnd == parameterizableBnd) {
 				// JDT bug?
@@ -135,9 +136,9 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
-				org.moosetechnology.model.famixjava.famixjavaentities.Type fmxTArg = (org.moosetechnology.model.famixjava.famixjavaentities.Type) this.referedType(targ, ctxt, false);
+				TType fmxTArg = this.referedType(targ, ctxt, false);
 				if ((fmxTArg != null) && persistClass(targ)) {
-					((org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType) fmxTyp).addArguments(fmxTArg);
+					((org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType) fmxTyp).addArguments((TParameterizedTypeUser) fmxTArg);
 				}
 			}
 		} else {
