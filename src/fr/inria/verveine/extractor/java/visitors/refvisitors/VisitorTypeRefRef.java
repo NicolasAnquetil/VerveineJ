@@ -6,8 +6,10 @@ import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
 import org.moosetechnology.model.famixjava.famixjavaentities.Reference;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 
 import java.util.List;
 
@@ -286,7 +288,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	    if (this.searchTypeRef) {
 			IBinding bnd = node.resolveBinding();
 			if ((bnd != null) && (bnd.getKind() == IBinding.TYPE)) {
-				org.moosetechnology.model.famixjava.famixjavaentities.Type referred = (org.moosetechnology.model.famixjava.famixjavaentities.Type) referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+				org.moosetechnology.model.famixjava.famixtraits.TType referred = (org.moosetechnology.model.famixjava.famixtraits.TType) referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
 				Reference ref = dico.addFamixReference((Method) context.top(), referred, context.getLastReference());
 				context.setLastReference(ref);
 				if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {
@@ -303,8 +305,8 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      * VariableDeclaration ::=
      *     SingleVariableDeclaration VariableDeclarationFragment
 	 */
-	private boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
-		setVariablesDeclaredType(fragments, referedType(declType, context.topType(), false));
+	private <T extends TWithTypes & TNamedEntity> boolean visitVariableDeclaration(List<VariableDeclaration> fragments, Type declType) {
+		setVariablesDeclaredType(fragments, referedType(declType, (T) context.topType(), false));
 		for (VariableDeclaration varDecl : fragments) {
 			varDecl.accept(this);
 		}

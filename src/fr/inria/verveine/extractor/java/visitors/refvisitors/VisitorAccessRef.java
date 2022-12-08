@@ -12,6 +12,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 
 import java.util.List;
 
@@ -482,7 +483,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if (bnd.isEnumConstant()) {
 			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/! summarizeClasses());
 		} else if (bnd.isField()) {
-			accessed = dico.ensureFamixAttribute(bnd, name, typ, (org.moosetechnology.model.famixjava.famixjavaentities.Type) owner,
+			accessed = dico.ensureFamixAttribute(bnd, name, typ, (TWithAttributes) owner,
 					/*persistIt*/! summarizeClasses());
 			if (summarizeClasses()) {
 				if (!(((Attribute) accessed).getDeclaredType() instanceof PrimitiveType)) {

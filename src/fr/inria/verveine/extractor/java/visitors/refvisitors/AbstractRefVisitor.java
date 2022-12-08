@@ -10,6 +10,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInte
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
+import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 
 /**
  * A collection of useful utility methods that are needed in various ref visitors
@@ -58,7 +59,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	 * @param isClass we are sure that the type is actually a class
 	 * @return a famix type or null
 	 */
-	protected TType referedType(Type typ, TNamedEntity ctxt, boolean isClass) {
+	protected <T extends TWithTypes & TNamedEntity> TType referedType(Type typ, T ctxt, boolean isClass) {
 		return referedType(typ, ctxt, isClass, false);
 	}
 
@@ -69,7 +70,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	 * @param isClass we are sure that the type is actually a class
 	 * @return a famix type or null
 	 */
-	protected TType referedType(Type typ, TNamedEntity ctxt, boolean isClass, boolean isExcep) {
+	protected <T extends TWithTypes & TNamedEntity> TType referedType(Type typ, T ctxt, boolean isClass, boolean isExcep) {
 		if (typ == null) {
 			return null;
 		} else if (typ.resolveBinding() != null) {
@@ -140,7 +141,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 				}
 			}
 		} else {
-			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, ctxt, bnd.getModifiers(), /*alwaysPersist?*/persistClass(bnd));
+			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, (TWithTypes) ctxt, bnd.getModifiers(), /*alwaysPersist?*/persistClass(bnd));
 		}
 
 		return fmxTyp;

@@ -165,7 +165,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) t, fmx, lastInheritance);
 
 			for (ITypeBinding intbnd : bnd.getInterfaces()) {
-				TImplementable interfac = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true);
+				TImplementable interfac = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(TWithTypes) context.top(), /*persistIt)*/true);
 				// If "implementor" is an interface, then relation is an inheritance
 				if(fmx instanceof Interface ) {
 					dico.ensureFamixInheritance((Interface)interfac, fmx, lastInheritance);
