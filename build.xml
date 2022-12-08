@@ -44,11 +44,12 @@
  
 	<!-- Creates Javadoc -->
 	<target name="docs" depends="compile">
-		<javadoc packagenames="src" sourcepath="${src.dir}" destdir="${docs.dir}">
-			<!-- Define which files / directory should get included, we include all -->
-			<fileset dir="${src.dir}">
-				<include name="**" />
-			</fileset>
+		<javadoc sourcepath="${src.dir}" destdir="${docs.dir}">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
 		</javadoc>
 	</target>
 

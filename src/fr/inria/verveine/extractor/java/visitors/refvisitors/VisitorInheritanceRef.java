@@ -14,6 +14,7 @@ import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
 import org.moosetechnology.model.famixjava.famixtraits.TImplementable;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
+import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -74,7 +75,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
 	public boolean visit(EnumDeclaration node) {
 		ITypeBinding bnd = node.resolveBinding();
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
+		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (TWithTypes) context.top());
 
 		if ((fmx != null) && (bnd != null)) {
 			// --------------- implicit superclass java.lang.Enum<> cannot use ensureInheritances(bnd,fmx)
@@ -164,7 +165,7 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) t, fmx, lastInheritance);
 
 			for (ITypeBinding intbnd : bnd.getInterfaces()) {
-				TImplementable interfac = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(ContainerEntity) context.top(), /*persistIt)*/true);
+				TImplementable interfac = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(TWithTypes) context.top(), /*persistIt)*/true);
 				// If "implementor" is an interface, then relation is an inheritance
 				if(fmx instanceof Interface ) {
 					dico.ensureFamixInheritance((Interface)interfac, fmx, lastInheritance);

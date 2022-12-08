@@ -90,7 +90,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
         if (meth != null) {
             org.moosetechnology.model.famixjava.famixjavaentities.Exception excepFmx = null;
             if ( NodeTypeChecker.isSimpleType(excepClass) || NodeTypeChecker.isQualifiedType(excepClass) ) {
-                excepFmx = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) referedType(excepClass, meth, true);
+                excepFmx = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) referedType(excepClass, meth, true, true);
             }
             if (excepFmx != null) {
                 if (! summarizeClasses()) {

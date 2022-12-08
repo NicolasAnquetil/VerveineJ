@@ -6,7 +6,7 @@ set ROOT=%~dp0%
 set BASELIB=%ROOT%lib
 
 rem JVM options e.g. -Xmx2500m to augment maximum memory size of the vm to 2.5Go.
-set JOPT="-Xmx2500m"
+set JOPT="-Xmx16000m"
 rem Verveine option
 rem set VOPT="."
 

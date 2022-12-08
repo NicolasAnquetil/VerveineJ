@@ -65,17 +65,17 @@ public class Util {
 		}
 	}
 
-	public static void recursivelySetIsStub(TSourceEntity fmx, boolean b) {
+	public static  <T extends TSourceEntity & TNamedEntity> void recursivelySetIsStub(T fmx, boolean b) {
 		TSourceEntity owner;
 		fmx.setIsStub(b);
-		owner = belongsToOf((Entity) fmx);
+		owner = belongsToOf(fmx);
 		if ((owner != null) && (owner.getIsStub() != b)) {
-			recursivelySetIsStub(owner, b);
+			recursivelySetIsStub((T) owner, b);
 		}
 
 	}
 
-	public static <T extends TSourceEntity & TNamedEntity> T belongsToOf(Entity entity) {
+	public static <T extends TNamedEntity, X extends TNamedEntity> X belongsToOf(T entity) {
 		Collection<PropertyDescription> propertyDescriptions = ((MetaDescription) metamodel.getDescription(entity.getClass())).allProperties()
 				.stream().filter(PropertyDescription::isContainer).collect(Collectors.toList());
 		for (PropertyDescription propertyDescription : propertyDescriptions) {
@@ -83,7 +83,7 @@ public class Util {
 				java.lang.reflect.Method method = entity.getClass().getMethod("get" + capitalizeString(propertyDescription.getName()));
 				T containerEntity = (T) method.invoke(entity);
 				if (containerEntity != null) {
-					return containerEntity;
+					return (X) containerEntity;
 				}
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();

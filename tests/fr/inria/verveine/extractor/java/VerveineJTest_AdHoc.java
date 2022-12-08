@@ -239,12 +239,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 
 	@Test
-	public void testClassWithNoBindingCreatedAsType() {
+	public void testClassWithNoBindingButCanBeIdentifiedAsExceptionImportedAsException() {
 		parse(new String[]{"test_src/ad_hoc/Example.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Type clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Type.class, "BackingStoreException");
+		org.moosetechnology.model.famixjava.famixjavaentities.Exception clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "BackingStoreException");
 		assertNotNull(clazz);
-		assertEquals(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, clazz.getClass());
 	}
 
 	@Test
