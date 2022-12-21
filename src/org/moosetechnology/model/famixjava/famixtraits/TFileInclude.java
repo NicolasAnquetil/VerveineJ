@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDepen
 
 @FamePackage("Famix-Traits")
 @FameDescription("TFileInclude")
-public interface TFileInclude  {
+public interface TFileInclude extends TAssociationMetaLevelDependency, TAssociation, TSourceEntity {
 
         @FameProperty(name = "source", opposite = "outgoingIncludeRelations")
     public TWithFileIncludes getSource();

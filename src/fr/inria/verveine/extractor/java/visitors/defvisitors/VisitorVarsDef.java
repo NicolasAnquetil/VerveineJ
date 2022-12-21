@@ -9,8 +9,11 @@ import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 
 import java.util.List;
 
@@ -289,21 +292,21 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	// "SomeClass.class"
 	public boolean visit(TypeLiteral node) {
 		org.moosetechnology.model.famixjava.famixjavaentities.Type javaMetaClass = dico.getFamixMetaClass(null);
-		dico.ensureFamixAttribute(null, "class", javaMetaClass, javaMetaClass,	/*persistIt*/! summarizeClasses());
+		dico.ensureFamixAttribute(null, "class", javaMetaClass, (TWithAttributes) javaMetaClass,	/*persistIt*/! summarizeClasses());
 
 		return super.visit(node);
 	}
 
 	// UTILITY METHODS
 
-	private TStructuralEntity createStructuralEntity(StructuralEntityKinds structKind, VariableDeclaration varDecl, NamedEntity owner) {
+	private TStructuralEntity createStructuralEntity(StructuralEntityKinds structKind, VariableDeclaration varDecl, TNamedEntity owner) {
 		TStructuralEntity fmx;
 		IVariableBinding bnd = varDecl.resolveBinding();
 		String name = varDecl.getName().getIdentifier();
 
 		switch (structKind) {
 			case PARAMETER:	fmx = dico.ensureFamixParameter(bnd, name, (Method) owner, /*persistIt*/! summarizeClasses());										break;
-			case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (org.moosetechnology.model.famixjava.famixjavaentities.Type) owner, /*persistIt*/! summarizeClasses());	break;
+			case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (TWithAttributes) owner, /*persistIt*/! summarizeClasses());	break;
 			case LOCALVAR: 	fmx = dico.ensureFamixLocalVariable(bnd, name, (Method) owner, /*persistIt*/! summarizeClasses());									break;
 			default:		fmx = null;
 		}

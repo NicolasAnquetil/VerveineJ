@@ -25,12 +25,6 @@ public class NamedEntity extends SourcedEntity implements TEntityMetaLevelDepend
     private Collection<TInvocation> receivingInvocations; 
 
 
-	@Override
-	public String toString() {
-		// mainly for debugging purposes (in Eclipse debugger)
-		return "a " + this.getClass().getSimpleName() + " named: " + this.getName();
-	}
-
 
     @FameProperty(name = "annotationInstances", opposite = "annotatedEntity", derived = true)
     public Collection<TAnnotationInstance> getAnnotationInstances() {

@@ -13,9 +13,7 @@ import org.moosetechnology.model.famixjava.famixtraits.TCanBeClassSide;
 import org.moosetechnology.model.famixjava.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famixjava.famixtraits.TCanImplement;
 import org.moosetechnology.model.famixjava.famixtraits.TClass;
-import org.moosetechnology.model.famixjava.famixtraits.TClassMetrics;
 import org.moosetechnology.model.famixjava.famixtraits.TComment;
-import org.moosetechnology.model.famixjava.famixtraits.TException;
 import org.moosetechnology.model.famixjava.famixtraits.THasVisibility;
 import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
 import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
@@ -34,25 +32,21 @@ import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
-import org.moosetechnology.model.famixjava.famixtraits.TWithExceptions;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
 import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
-import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Class")
-public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanImplement, TClass, TEntityMetaLevelDependency, THasVisibility, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TOODependencyQueries, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithExceptions, TWithInheritances, TWithMethods, org.moosetechnology.model.famixjava.famixjavaentities.TClassMetrics, org.moosetechnology.model.famixjava.famixtraits.TClassMetrics {
+public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanImplement, TClass, TClassMetrics, TEntityMetaLevelDependency, THasVisibility, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
 
     private Boolean isInterface = false;
     
     private Collection<TAttribute> attributes; 
 
     private Collection<TComment> comments; 
-
-    private Collection<TException> exceptions; 
 
     private Collection<TReference> incomingReferences; 
 
@@ -219,57 +213,6 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "exceptions", opposite = "exceptionClass", derived = true)
-    public Collection<TException> getExceptions() {
-        if (exceptions == null) {
-            exceptions = new MultivalueSet<TException>() {
-                @Override
-                protected void clearOpposite(TException e) {
-                    e.setExceptionClass(null);
-                }
-                @Override
-                protected void setOpposite(TException e) {
-                    e.setExceptionClass(Class.this);
-                }
-            };
-        }
-        return exceptions;
-    }
-    
-    public void setExceptions(Collection<? extends TException> exceptions) {
-        this.getExceptions().clear();
-        this.getExceptions().addAll(exceptions);
-    }                    
-    
-        
-    public void addExceptions(TException one) {
-        this.getExceptions().add(one);
-    }   
-    
-    public void addExceptions(TException one, TException... many) {
-        this.getExceptions().add(one);
-        for (TException each : many)
-            this.getExceptions().add(each);
-    }   
-    
-    public void addExceptions(Iterable<? extends TException> many) {
-        for (TException each : many)
-            this.getExceptions().add(each);
-    }   
-                
-    public void addExceptions(TException[] many) {
-        for (TException each : many)
-            this.getExceptions().add(each);
-    }
-    
-    public int numberOfExceptions() {
-        return getExceptions().size();
-    }
-
-    public boolean hasExceptions() {
-        return !getExceptions().isEmpty();
-    }
-
     @FameProperty(name = "fanIn", derived = true)
     public Number getFanIn() {
         // TODO: this is a derived property, implement this method manually.
@@ -428,7 +371,7 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     public void setIsFinal(Boolean isFinal) {
         this.isFinal = isFinal;
     }
-    
+
     @FameProperty(name = "isPackage", derived = true)
     public Boolean getIsPackage() {
         return this.visibility.equals("package");
@@ -448,8 +391,7 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     public Boolean getIsPublic() {
         return this.visibility.equals("public");
     }
-
-
+    
     @FameProperty(name = "isStub")
     public Boolean getIsStub() {
         return isStub;
@@ -555,12 +497,6 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfAttributesInherited", derived = true)
-    public Number getNumberOfAttributesInherited() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfChildren", derived = true)
     public Number getNumberOfChildren() {
         // TODO: this is a derived property, implement this method manually.
@@ -630,38 +566,8 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfLocallyDefinedMethods", derived = true)
-    public Number getNumberOfLocallyDefinedMethods() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfMessageSends", derived = true)
-    public Number getNumberOfMessageSends() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfMethods", derived = true)
     public Number getNumberOfMethods() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfMethodsInHierarchy", derived = true)
-    public Number getNumberOfMethodsInHierarchy() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfMethodsInherited", derived = true)
-    public Number getNumberOfMethodsInherited() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfMethodsOverriden", derived = true)
-    public Number getNumberOfMethodsOverriden() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -892,12 +798,6 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
 
     @FameProperty(name = "tightClassCohesion", derived = true)
     public Number getTightClassCohesion() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "totalNumberOfSubclasses", derived = true)
-    public Number getTotalNumberOfSubclasses() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

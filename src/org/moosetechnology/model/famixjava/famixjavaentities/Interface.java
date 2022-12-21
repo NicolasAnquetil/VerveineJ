@@ -23,13 +23,11 @@ import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
-import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency;
-import org.moosetechnology.model.famixjava.moosequery.TOODependencyQueries;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Interface")
-public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, TEntityMetaLevelDependency, THasVisibility, TImplementable, TInvocationsReceiver, TOODependencyQueries, TPackageable, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
+public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THasVisibility, TImplementable, TInvocationsReceiver, TPackageable, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
 
     private Collection<TAttribute> attributes; 
 
@@ -157,18 +155,6 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, TEn
         return !getComments().isEmpty();
     }
 
-    @FameProperty(name = "fanIn", derived = true)
-    public Number getFanIn() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "fanOut", derived = true)
-    public Number getFanOut() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "hasComments", derived = true)
     public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
@@ -239,12 +225,6 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, TEn
 
     public void setIsClassSide(Boolean isClassSide) {
         this.isClassSide = isClassSide;
-    }
-    
-    @FameProperty(name = "isDead", derived = true)
-    public Boolean getIsDead() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "isFinal")
@@ -343,56 +323,14 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, TEn
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfChildren", derived = true)
-    public Number getNumberOfChildren() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfComments", derived = true)
     public Number getNumberOfComments() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfDeadChildren", derived = true)
-    public Number getNumberOfDeadChildren() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfDirectSubclasses", derived = true)
     public Number getNumberOfDirectSubclasses() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfExternalClients", derived = true)
-    public Number getNumberOfExternalClients() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfExternalProviders", derived = true)
-    public Number getNumberOfExternalProviders() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfInternalClients", derived = true)
-    public Number getNumberOfInternalClients() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfInternalProviders", derived = true)
-    public Number getNumberOfInternalProviders() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfMessageSends", derived = true)
-    public Number getNumberOfMessageSends() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

@@ -6,6 +6,7 @@ import fr.inria.verveine.extractor.java.VerveineJParser;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 
 /**
  * A conveniency class to introduce the {@link #classSummary} flag and a method that uses it.
@@ -30,7 +31,7 @@ public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntity
 				return persistClass(null);
 			} else {
 				// let see if it is a type parameter
-				NamedEntity t = dico.getEntityByKey(bnd);
+				TNamedEntity t = (TNamedEntity) dico.getEntityByKey(bnd);
 				if ((t != null) && (t instanceof ParameterType)) {
 					return false;
 				}

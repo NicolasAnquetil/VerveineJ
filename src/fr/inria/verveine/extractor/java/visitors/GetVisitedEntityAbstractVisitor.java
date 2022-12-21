@@ -10,6 +10,9 @@ import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TMethod;
+import org.moosetechnology.model.famixjava.famixtraits.TType;
+import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
+import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,11 +102,13 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Can only be a class or interface declaration
 	 * Local type: see comment of visit(ClassInstanceCreation node)
 	 */
-	protected Type visitTypeDeclaration(TypeDeclaration node) {
+	protected TType visitTypeDeclaration(TypeDeclaration node) {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
-		Type fmx;
+		TType fmx;
 		if(bnd.isInterface()) {
 			fmx = dico.getFamixInterface(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
+		} else if (dico.isThrowable(bnd)) {
+			fmx = dico.getFamixException(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		} else {
 			fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		}
@@ -158,7 +163,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	protected org.moosetechnology.model.famixjava.famixjavaentities.Enum visitEnumDeclaration(EnumDeclaration node) {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
+		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (TWithTypes) context.top());
 		if (fmx != null) {
 			this.context.pushType(fmx);
 		}
@@ -202,7 +207,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 			paramTypes.add(Util.jdtTypeName(param.getType()));
 		}
 
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*returnType*/null, /*owner*/context.topType(), JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*returnType*/null, (TWithMethods) /*owner*/context.topType(), JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
 
 		context.pushMethod(fmx);  // whether fmx==null or not
 		return fmx;
@@ -294,10 +299,10 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
 	private Method ctxtPushInitializerMethod() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Type owner = context.topType();
-		Method fmx = recoverInitializerMethod(owner);
+		TType owner = context.topType();
+		Method fmx = recoverInitializerMethod((TWithMethods)owner);
 		if (fmx == null) {
-			fmx = dico.ensureFamixMethod(null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<>(), /*returnType*/null, owner, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
+			fmx = dico.ensureFamixMethod(null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<>(), /*returnType*/null, (TWithMethods) owner, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
 		}
 		if (fmx != null) {
 			context.pushMethod(fmx);
@@ -311,7 +316,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 * Cannot do it with ensureFamixMethod because we have no binding, no parameter, no return type
 	 * on which ensureFamixMethod relies
 	 */
-	private Method recoverInitializerMethod(org.moosetechnology.model.famixjava.famixjavaentities.Type owner) {
+	private Method recoverInitializerMethod(TWithMethods owner) {
 		Method ret = null;
 		if (owner != null) {
 			for (TMethod meth : owner.getMethods()) {

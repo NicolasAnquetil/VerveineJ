@@ -9,7 +9,7 @@ import java.util.*;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TFile")
-public interface TFile  {
+public interface TFile extends TFileSystemEntity {
 
         @FameProperty(name = "averageNumberOfCharactersPerLine", derived = true)
     public Number getAverageNumberOfCharactersPerLine();
@@ -31,11 +31,11 @@ public interface TFile  {
 
     public boolean hasEntities();
 
-    @FameProperty(name = "numberOfKiloBytes", derived = true)
-    public Number getNumberOfKiloBytes();
-
     @FameProperty(name = "totalNumberOfLinesOfText", derived = true)
     public Number getTotalNumberOfLinesOfText();
+
+    @FameProperty(name = "numberOfKiloBytes", derived = true)
+    public Number getNumberOfKiloBytes();
 
     @FameProperty(name = "numberOfEmptyLinesOfText", derived = true)
     public Number getNumberOfEmptyLinesOfText();

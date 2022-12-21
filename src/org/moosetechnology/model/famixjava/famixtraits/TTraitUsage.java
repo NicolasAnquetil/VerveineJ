@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDepen
 
 @FamePackage("Famix-Traits")
 @FameDescription("TTraitUsage")
-public interface TTraitUsage  {
+public interface TTraitUsage extends TAssociationMetaLevelDependency, TAssociation, TSourceEntity {
 
         @FameProperty(name = "trait", opposite = "incomingTraitUsages")
     public TTrait getTrait();

@@ -250,25 +250,26 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
     public void setIsFinal(Boolean isFinal) {
         this.isFinal = isFinal;
     }
+    
 
     @FameProperty(name = "isPackage", derived = true)
     public Boolean getIsPackage() {
         return this.visibility.equals("package");
     }
-
+    
     @FameProperty(name = "isPrivate", derived = true)
     public Boolean getIsPrivate() {
         return this.visibility.equals("private");
     }
-
+    
     @FameProperty(name = "isProtected", derived = true)
     public Boolean getIsProtected() {
         return this.visibility.equals("protected");
     }
-
+    
     @FameProperty(name = "isPublic", derived = true)
     public Boolean getIsPublic() {
-        return this.visibility.equals("public");
+        return this.visibility.equals("public"); 
     }
     
     @FameProperty(name = "isStub")
@@ -494,7 +495,7 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
     public void setVisibility(String visibility) {
         this.visibility = visibility;
     }
-
+    
 
 
 }

@@ -41,16 +41,16 @@ public class AbstractDictionary<B> {
 	/**
 	 * A dictionary to map a key (provided by the user) to FAMIX Entity
 	 */
-	protected Map<B,NamedEntity> keyToEntity;
+	protected Map<B,TNamedEntity> keyToEntity;
 	/**
 	 * A reverse dictionary (see {@link AbstractDictionary#keyToEntity}) to find the key of an entity.
 	 */
-	protected Map<NamedEntity,B> entityToKey;
+	protected Map<TNamedEntity,B> entityToKey;
 
 	/**
 	 * Another dictionary to map a name to FAMIX Entities with this name
 	 */
-	protected Map<String,Collection<NamedEntity>> nameToEntity;
+	protected Map<String,Collection<TNamedEntity>> nameToEntity;
 
 	/**
 	 * Yet another dictionary for implicit variables ('self' and 'super')
@@ -76,9 +76,9 @@ public class AbstractDictionary<B> {
 	public AbstractDictionary(Repository famixRepo) {
 		this.famixRepo = famixRepo;
 		
-		this.keyToEntity = new Hashtable<B,NamedEntity>();
-		this.entityToKey = new Hashtable<NamedEntity,B>();
-		this.nameToEntity = new Hashtable<String,Collection<NamedEntity>>();
+		this.keyToEntity = new Hashtable<B,TNamedEntity>();
+		this.entityToKey = new Hashtable<TNamedEntity,B>();
+		this.nameToEntity = new Hashtable<String,Collection<TNamedEntity>>();
 		this.typeToImpVar = new Hashtable<Type,ImplicitVars>();
 		
 		if (! this.famixRepo.isEmpty()) {
@@ -108,10 +108,10 @@ public class AbstractDictionary<B> {
 		}
 	}
 
-	protected void mapEntityToName(String name, NamedEntity ent) {
-		Collection<NamedEntity> l_ent = nameToEntity.get(name);
+	protected void mapEntityToName(String name, TNamedEntity ent) {
+		Collection<TNamedEntity> l_ent = nameToEntity.get(name);
 		if (l_ent == null) {
-			l_ent = new LinkedList<NamedEntity>();
+			l_ent = new LinkedList<TNamedEntity>();
 		}
 		l_ent.add(ent);
 		nameToEntity.put(name, l_ent);
@@ -123,14 +123,14 @@ public class AbstractDictionary<B> {
 		entityToKey.remove(ent);
 		keyToEntity.remove(key);
 
-		Collection<NamedEntity> l_ent = nameToEntity.get(ent.getName());
+		Collection<TNamedEntity> l_ent = nameToEntity.get(ent.getName());
 		l_ent.remove(ent);
 
 		famixRepo.getElements().remove(ent);
 	}
 	
-	protected void mapEntityToKey(B key, NamedEntity ent) {
-		NamedEntity old = keyToEntity.get(key);
+	protected void mapEntityToKey(B key, TNamedEntity ent) {
+		TNamedEntity old = keyToEntity.get(key);
 		if (old != null) {
 			entityToKey.remove(old);
 		}
@@ -145,12 +145,12 @@ public class AbstractDictionary<B> {
 	 * @return the Collection of Famix Entities with the given name and class (possibly empty)
 	 */
 	@SuppressWarnings("unchecked")
-	public <T extends NamedEntity> Collection<T> getEntityByName(Class<T> fmxClass, String name) {
+	public <T extends TNamedEntity> Collection<T> getEntityByName(Class<T> fmxClass, String name) {
 		Collection<T> ret = new LinkedList<T>();
-		Collection<NamedEntity> l_name = nameToEntity.get(name);
+		Collection<TNamedEntity> l_name = nameToEntity.get(name);
 		
 		if (l_name != null ) {
-			for (NamedEntity obj : l_name) {
+			for (TNamedEntity obj : l_name) {
 				if (fmxClass.isInstance(obj)) {
 					ret.add((T) obj);
 				}
@@ -168,7 +168,7 @@ public class AbstractDictionary<B> {
 	 * @param key -- the key
 	 * @return the Famix Entity associated to the binding or null if not found
 	 */
-	public NamedEntity getEntityByKey(B key) {
+	public TNamedEntity getEntityByKey(B key) {
 		if (key == null) {
 			return null;
 		}
@@ -182,7 +182,7 @@ public class AbstractDictionary<B> {
 	 * @param e -- the Named entity
 	 * @return the key associated to this entity or null if none
 	 */
-	public B getEntityKey(NamedEntity e) {
+	public B getEntityKey(TNamedEntity e) {
 		return entityToKey.get(e);
 	}
 
@@ -194,7 +194,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Entity should be persisted in the Famix repository
 	 * @return the FAMIX Entity or null in case of a FAMIX error
 	 */
-	protected <T extends NamedEntity> T createFamixEntity(Class<T> fmxClass, String name, boolean persistIt) {
+	protected <T extends TNamedEntity & TSourceEntity> T createFamixEntity(Class<T> fmxClass, String name, boolean persistIt) {
 		T fmx = null;
 
 		if (name == null) {
@@ -233,7 +233,7 @@ public class AbstractDictionary<B> {
 	 * @return the FAMIX Entity or null if <b>bnd</b> was null or in case of a FAMIX error
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T extends NamedEntity> T ensureFamixEntity(Class<T> fmxClass, B bnd, String name, boolean persistIt) {
+	protected <T extends TNamedEntity & TSourceEntity> T ensureFamixEntity(Class<T> fmxClass, B bnd, String name, boolean persistIt) {
 		T fmx = null;
 		if (bnd != null) {
 			fmx = (T) getEntityByKey(bnd);
@@ -273,7 +273,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Type should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public Type ensureFamixType(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public Type ensureFamixType(B key, String name, TWithTypes owner, boolean persistIt) {
 		Type fmx = ensureFamixEntity(Type.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -287,8 +287,22 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Class should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClass(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClass(B key, String name, TWithTypes owner, boolean persistIt) {
 		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, key, name, persistIt);
+		fmx.setTypeContainer(owner);
+		return fmx;
+	}
+
+		/**
+	 * Returns a FAMIX Exception with the given <b>name</b>, creating it if it does not exist yet.
+	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
+	 * @param name -- the name of the FAMIX Method (MUST NOT be null, but this is not checked)
+	 * @param owner -- type defining the method (should not be null, but it will work if it is) 
+	 * @param persistIt -- whether the Class should be persisted in the Famix repository
+	 * @return the FAMIX Class or null in case of a FAMIX error
+	 */
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception ensureFamixException(B key, String name, TWithTypes owner, boolean persistIt) {
+		org.moosetechnology.model.famixjava.famixjavaentities.Exception fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
 	}
@@ -301,7 +315,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Class should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public Interface ensureFamixInterface(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public Interface ensureFamixInterface(B key, String name, TWithTypes owner, boolean persistIt) {
 		Interface fmx = ensureFamixEntity(Interface.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -314,7 +328,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the ParameterizableClass should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public ParameterizableClass ensureFamixParameterizableClass(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public ParameterizableClass ensureFamixParameterizableClass(B key, String name, TWithTypes owner, boolean persistIt) {
 		ParameterizableClass fmx = ensureFamixEntity(ParameterizableClass.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -327,7 +341,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the ParameterizableInterface should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public ParameterizableInterface ensureFamixParameterizableInterface(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public ParameterizableInterface ensureFamixParameterizableInterface(B key, String name, TWithTypes owner, boolean persistIt) {
 		ParameterizableInterface fmx = ensureFamixEntity(ParameterizableInterface.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -339,7 +353,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the ParameterizableClass should be persisted in the Famix repository
 	 * @return the FAMIX ParameterizableType or null in case of a FAMIX error
 	 */
-	public ParameterizedType ensureFamixParameterizedType(B key, String name, TWithParameterizedTypes generic, ContainerEntity owner, boolean persistIt) {
+	public ParameterizedType ensureFamixParameterizedType(B key, String name, TWithParameterizedTypes generic, TWithTypes owner, boolean persistIt) {
 		ParameterizedType fmx = ensureFamixEntity(ParameterizedType.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		fmx.setParameterizableClass(generic);
@@ -353,13 +367,13 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the ParameterType should be persisted in the Famix repository
 	 * @return the FAMIX ParameterType or null in case of a FAMIX error
 	 */
-	public ParameterType ensureFamixParameterType(B key, String name, ContainerEntity owner, boolean persistIt) {
+	public ParameterType ensureFamixParameterType(B key, String name, TWithTypes owner, boolean persistIt) {
 		ParameterType fmx = ensureFamixEntity(ParameterType.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
 	}
 
-	public Enum ensureFamixEnum(B key, String name,	ContainerEntity owner, boolean persistIt) {
+	public Enum ensureFamixEnum(B key, String name,	TWithTypes owner, boolean persistIt) {
 		Enum fmx = ensureFamixEntity(Enum.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
@@ -426,7 +440,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Method should be persisted in the Famix repository
 	 * @return the FAMIX Method or null in case of a FAMIX error
 	 */
-	public Method ensureFamixMethod(B key, String name, String sig, Type ret, Type owner, boolean persistIt) {
+	public Method ensureFamixMethod(B key, String name, String sig, TType ret, TWithMethods owner, boolean persistIt) {
 		Method fmx = ensureFamixEntity(Method.class, key, name, persistIt);
 		fmx.setSignature(sig);
 		fmx.setDeclaredType(ret);
@@ -443,9 +457,9 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Attribute should be persisted in the Famix repository
 	 * @return the FAMIX Attribute or null in case of a FAMIX error
 	 */
-	public Attribute ensureFamixAttribute(B key, String name, Type type, Type owner, boolean persistIt) {
+	public Attribute ensureFamixAttribute(B key, String name, Type type, TWithAttributes owner, boolean persistIt) {
 		Attribute fmx = ensureFamixEntity(Attribute.class, key, name, persistIt);
-		fmx.setParentType((TWithAttributes) owner);
+		fmx.setParentType( owner);
 		fmx.setDeclaredType(type);
 		return fmx;
 	}
@@ -571,7 +585,7 @@ public class AbstractDictionary<B> {
 	 * @param prev -- previous reference relationship in the same context
 	 * @return the FamixReference
 	 */
-	public Reference addFamixReference(Method src, Type tgt, TAssociation prev) {
+	public Reference addFamixReference(Method src, TType tgt, TAssociation prev) {
 		if ( (src == null) || (tgt == null) ) {
 			return null;
 		}
@@ -651,15 +665,16 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception declared to be thrown
 	 * @return the DeclaredException
 	 */
-	public DeclaredException createFamixDeclaredException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixDeclaredException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
-		DeclaredException decl = new DeclaredException();
-		decl.setExceptionClass(excep);
-		decl.setDefiningEntity(meth);
-		famixRepoAdd(decl);
-		return decl;
+		//org.moosetechnology.model.famixjava.famixjavaentities.Exception decl = new org.moosetechnology.model.famixjava.famixjavaentities.Exception();
+		// decl.setExceptionClass(excep);
+		// excep.getDeclaringEntities().add(meth);
+		// famixRepoAdd(excep);
+		meth.getDeclaredExceptions().add(excep);
+		return excep;
 	}
 
 	/**
@@ -668,15 +683,16 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception caught
 	 * @return the CaughtException
 	 */
-	public CaughtException createFamixCaughtException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixCaughtException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
-		CaughtException decl = new CaughtException();
-		decl.setExceptionClass(excep);
-		decl.setDefiningEntity(meth);
-		famixRepoAdd(decl);
-		return decl;
+		// CaughtException decl = new CaughtException();
+		// decl.setExceptionClass(excep);
+		// decl.setDefiningEntity(meth);
+		// famixRepoAdd(decl);
+		meth.getCaughtExceptions().add(excep);
+		return excep;
 	}
 
 	/**
@@ -687,15 +703,16 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception thrown
 	 * @return the ThrownException
 	 */
-	public ThrownException createFamixThrownException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Class excep) {
+	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixThrownException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
-		ThrownException decl = new ThrownException();
-		decl.setExceptionClass(excep);
-		decl.setDefiningEntity(meth);
-		famixRepoAdd(decl);
-		return decl;
+		// ThrownException decl = new ThrownException();
+		// decl.setExceptionClass(excep);
+		// decl.setDefiningEntity(meth);
+		// famixRepoAdd(decl);
+		meth.getThrownExceptions().add(excep);
+		return excep;
 	}
 
 	///// Special Case: ImplicitVariables /////
@@ -745,7 +762,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the ImplicitVariable should be persisted in the Famix repository
 	 * @return the FAMIX ImplicitVariable or null in case of a FAMIX error
 	 */
-	public ImplicitVariable ensureFamixImplicitVariable(B key, String name, Type type, Method owner, boolean persistIt) {
+	public ImplicitVariable ensureFamixImplicitVariable(B key, String name, TType type, Method owner, boolean persistIt) {
 		ImplicitVariable fmx;
 		fmx = ensureFamixEntity(ImplicitVariable.class, key, name, persistIt);
 		fmx.setParentBehaviouralEntity(owner);
@@ -831,7 +848,7 @@ public class AbstractDictionary<B> {
 		return fmx;
 	}
 
-	public Type searchTypeInContext(String name, ContainerEntity ctxt) {
+	public <T extends TNamedEntity & TWithTypes> Type searchTypeInContext(String name, T ctxt) {
 		if (ctxt == null) {
 			return null;
 		}

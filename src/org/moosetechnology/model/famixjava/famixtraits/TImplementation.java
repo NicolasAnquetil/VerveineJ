@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TAssociationMetaLevelDepen
 
 @FamePackage("Famix-Traits")
 @FameDescription("TImplementation")
-public interface TImplementation  {
+public interface TImplementation extends TAssociationMetaLevelDependency, TAssociation, TSourceEntity {
 
         @FameProperty(name = "interface", opposite = "implementations")
     public TImplementable getMyInterface();

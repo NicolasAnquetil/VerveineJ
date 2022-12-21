@@ -7,10 +7,12 @@ import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
 import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 
 import java.util.List;
 
@@ -397,7 +399,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		ImplicitVariable fmx = dico.ensureFamixImplicitVariable(
 				bnd, 
 				JavaDictionary.SELF_NAME, 
-				this.context.topType(), 
+				(Type) this.context.topType(), 
 				context.topMethod(), 
 				/*persistIt*/! summarizeClasses());
 		if (fmx != null) {
@@ -481,7 +483,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		if (bnd.isEnumConstant()) {
 			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/! summarizeClasses());
 		} else if (bnd.isField()) {
-			accessed = dico.ensureFamixAttribute(bnd, name, typ, (org.moosetechnology.model.famixjava.famixjavaentities.Type) owner,
+			accessed = dico.ensureFamixAttribute(bnd, name, typ, (TWithAttributes) owner,
 					/*persistIt*/! summarizeClasses());
 			if (summarizeClasses()) {
 				if (!(((Attribute) accessed).getDeclaredType() instanceof PrimitiveType)) {
@@ -539,9 +541,12 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			return true;
 		} else if (accessed instanceof EnumValue && ((EnumValue) accessed).getParentEnum() == accessor) {
 			return true;
-		} else if (accessed instanceof GlobalVariable && ((GlobalVariable) accessed).getParentScope() == accessor) {
-			return true;
-		} else if (accessed instanceof ImplicitVariable && ((ImplicitVariable) accessed).getParentBehaviouralEntity() == accessor) {
+		} 
+		// Benoit Verhaeghe: Has been removed between VerveineJ 3.0.0 and VerveineJ 3.0.1
+		// else if (accessed instanceof GlobalVariable && ((GlobalVariable) accessed).getParentScope() == accessor) {
+		// 	return true;
+		// } 
+		else if (accessed instanceof ImplicitVariable && ((ImplicitVariable) accessed).getParentBehaviouralEntity() == accessor) {
 			return true;
 		} else if (accessed instanceof LocalVariable && ((LocalVariable) accessed).getParentBehaviouralEntity() == accessor) {
 			return true;

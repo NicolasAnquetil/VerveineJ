@@ -8,7 +8,7 @@ import ch.akuhn.fame.FameProperty;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TWithStatements")
-public interface TWithStatements  {
+public interface TWithStatements extends TWithReferences, TSourceEntity, TWithAccesses, TWithInvocations {
 
         @FameProperty(name = "numberOfStatements", derived = true)
     public Number getNumberOfStatements();

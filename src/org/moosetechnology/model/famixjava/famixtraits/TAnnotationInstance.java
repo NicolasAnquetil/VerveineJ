@@ -9,7 +9,7 @@ import org.moosetechnology.model.famixjava.moosequery.TEntityMetaLevelDependency
 
 @FamePackage("Famix-Traits")
 @FameDescription("TAnnotationInstance")
-public interface TAnnotationInstance  {
+public interface TAnnotationInstance extends TEntityMetaLevelDependency {
 
         @FameProperty(name = "annotatedEntity", opposite = "annotationInstances")
     public TWithAnnotationInstances getAnnotatedEntity();

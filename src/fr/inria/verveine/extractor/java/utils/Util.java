@@ -10,6 +10,8 @@ import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleType;
 import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -63,25 +65,25 @@ public class Util {
 		}
 	}
 
-	public static void recursivelySetIsStub(ContainerEntity fmx, boolean b) {
-		ContainerEntity owner;
+	public static  <T extends TSourceEntity & TNamedEntity> void recursivelySetIsStub(T fmx, boolean b) {
+		TSourceEntity owner;
 		fmx.setIsStub(b);
 		owner = belongsToOf(fmx);
 		if ((owner != null) && (owner.getIsStub() != b)) {
-			recursivelySetIsStub(owner, b);
+			recursivelySetIsStub((T) owner, b);
 		}
 
 	}
 
-	public static ContainerEntity belongsToOf(Entity entity) {
+	public static <T extends TNamedEntity, X extends TNamedEntity> X belongsToOf(T entity) {
 		Collection<PropertyDescription> propertyDescriptions = ((MetaDescription) metamodel.getDescription(entity.getClass())).allProperties()
 				.stream().filter(PropertyDescription::isContainer).collect(Collectors.toList());
 		for (PropertyDescription propertyDescription : propertyDescriptions) {
 			try {
 				java.lang.reflect.Method method = entity.getClass().getMethod("get" + capitalizeString(propertyDescription.getName()));
-				ContainerEntity containerEntity = (ContainerEntity) method.invoke(entity);
+				T containerEntity = (T) method.invoke(entity);
 				if (containerEntity != null) {
-					return containerEntity;
+					return (X) containerEntity;
 				}
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();

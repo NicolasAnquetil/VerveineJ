@@ -40,9 +40,6 @@ public interface TWithMethods  {
     @FameProperty(name = "numberOfAbstractMethods", derived = true)
     public Number getNumberOfAbstractMethods();
 
-    @FameProperty(name = "numberOfMessageSends", derived = true)
-    public Number getNumberOfMessageSends();
-
 
 
 }
