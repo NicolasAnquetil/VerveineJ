@@ -68,14 +68,14 @@ public class Util {
 	public static  <T extends TSourceEntity & TNamedEntity> void recursivelySetIsStub(T fmx, boolean b) {
 		TSourceEntity owner;
 		fmx.setIsStub(b);
-		owner = belongsToOf(fmx);
+		owner = getOwner(fmx);
 		if ((owner != null) && (owner.getIsStub() != b)) {
 			recursivelySetIsStub((T) owner, b);
 		}
 
 	}
 
-	public static <T extends TNamedEntity, X extends TNamedEntity> X belongsToOf(T entity) {
+	public static <T extends TNamedEntity, X extends TNamedEntity> X getOwner(T entity) {
 		Collection<PropertyDescription> propertyDescriptions = ((MetaDescription) metamodel.getDescription(entity.getClass())).allProperties()
 				.stream().filter(PropertyDescription::isContainer).collect(Collectors.toList());
 		for (PropertyDescription propertyDescription : propertyDescriptions) {

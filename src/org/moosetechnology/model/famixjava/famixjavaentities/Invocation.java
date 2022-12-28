@@ -12,6 +12,7 @@ import org.moosetechnology.model.famixjava.famixtraits.THasSignature;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocable;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
 import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInvocations;

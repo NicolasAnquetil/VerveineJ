@@ -101,7 +101,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			}
 
 			methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
-			Invocation lastInvok = context.getLastInvocation();
+			Invocation lastInvok = (Invocation) context.getLastInvocation();
 			if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
 					&& (lastInvok != null)
 					&& (lastInvok.getSender() == context.topMethod())
@@ -169,7 +169,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	}
 
 	public boolean visit(MethodDeclaration node) {
-		Method fmx = visitMethodDeclaration( node);
+		TMethod fmx = visitMethodDeclaration( node);
 
 		if (fmx != null) {
 			if (node.getBody() != null) {
@@ -230,7 +230,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	public boolean visit(MethodInvocation node) {
 		Expression callingExpr = node.getExpression();
 		
-		NamedEntity receiver = getReceiver(callingExpr);
+		TNamedEntity receiver = getReceiver(callingExpr);
 		IMethodBinding bnd = node.resolveMethodBinding();
 		String calledName = node.getName().getFullyQualifiedName();
 		
@@ -240,7 +240,8 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			methodInvocation(bnd, calledName, receiver, /*owner*/null, node.arguments());
 		}//context
 
-		Invocation lastInvok = context.getLastInvocation();
+		// TODO could be TInvocation but it does not extends THassignature and we need it a bit latter (see 'lastInvok.getSignature()')
+		Invocation lastInvok = (Invocation) context.getLastInvocation();
 		if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
@@ -254,7 +255,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	public boolean visit(SuperMethodInvocation node) {
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
-		NamedEntity receiver = this.dico.ensureFamixImplicitVariable(
+		TNamedEntity receiver = this.dico.ensureFamixImplicitVariable(
 				AbstractDictionary.SUPER_NAME,
 				this.context.topType(), 
 				context.topMethod(), 
@@ -276,7 +277,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			methodInvocation(bnd, calledName, receiver, /*owner*/null, node.arguments());
 		}
 
-		Invocation lastInvok = context.getLastInvocation();
+		Invocation lastInvok = (Invocation) context.getLastInvocation();
 		if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
@@ -293,7 +294,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		int modifiers = (node.resolveConstructorBinding() != null) ? node.resolveConstructorBinding().getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 
 		String name = context.topMethod().getName();
-		Method invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
+		TMethod invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
 				/*paramTypes*/null, /*retType*/null, (TWithMethods) /*owner*/context.topType(), modifiers,
 				/*persistIt*/!summarizeClasses());
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
@@ -313,7 +314,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					context.topMethod(), 
 					/*persistIt=true*/!summarizeClasses());
 			
-			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
+			TInvocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
 			
@@ -371,12 +372,12 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 * @param receiver   of the call, i.e. the object to which the message is sent
 	 * @param methOwner  -- owner of the method invoked. Might be a subtype of the receiver's type
 	 * @param l_args     -- list of the method's parameters
-	 *                   TODO Why are Invocations, Accesses and References not created through a method in JavaDictionnary ?
+	 * TODO Why are Invocations, Accesses and References not created through a method in JavaDictionnary ?
 	 */
-	private Invocation methodInvocation(IMethodBinding calledBnd, String calledName, NamedEntity receiver,
-										org.moosetechnology.model.famixjava.famixtraits.TType methOwner, Collection<Expression> l_args) {
-		Method sender = this.context.topMethod();
-		Method invoked = null;
+	private Invocation methodInvocation(IMethodBinding calledBnd, String calledName, TNamedEntity receiver,
+										TType methOwner, Collection<Expression> l_args) {
+		TMethod sender = this.context.topMethod();
+		TMethod invoked = null;
 		Invocation invok = null;
 
 		if (calledBnd != null) {
@@ -405,10 +406,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, (TWithMethods) methOwner,
 							modifiers, /*persistIt*/!summarizeClasses());
 				} else {
-					org.moosetechnology.model.famixjava.famixtraits.TType owner;
+					TType owner;
 
 					if (receiver != null)
-						owner = (org.moosetechnology.model.famixjava.famixjavaentities.Type) receiver;
+						owner = (TType) receiver;
 					else
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
@@ -428,7 +429,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 						}
 					}
 					signature += ")";
-					invok = dico.addFamixInvocation(sender, invoked, receiver, signature, context.getLastInvocation());
+					invok = dico.addFamixInvocation(sender, invoked, (TInvocationsReceiver) receiver, signature, context.getLastInvocation());
 					//TODO add FileAnchor to Invocation
 					context.setLastInvocation(invok);
 				}
@@ -445,7 +446,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 * @return the Famix Entity or null if could not find it
 	 */
 	@SuppressWarnings("static-access")
-	private NamedEntity getReceiver(Expression expr) {
+	private TNamedEntity getReceiver(Expression expr) {
 		// msg(), same as ThisExpression
 		if (expr == null) {
 			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod(),
@@ -481,7 +482,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		// (cond-expr ? then-expr : else-expr).msg()
 		if ( NodeTypeChecker.isConditionalExpression(expr)) {
 			// can be one or the other (then-expr/else-expr) so we choose one
-			NamedEntity ret = getReceiver(((ConditionalExpression) expr).getThenExpression());
+			TNamedEntity ret = getReceiver(((ConditionalExpression) expr).getThenExpression());
 			if (ret == null) {
 				// can as well try the other
 				ret = getReceiver(((ConditionalExpression) expr).getElseExpression());
@@ -492,7 +493,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		// field.msg()
 		if (NodeTypeChecker.isFieldAccess(expr)) {
 			IVariableBinding bnd = ((FieldAccess) expr).resolveFieldBinding();
-			NamedEntity fld = (NamedEntity) dico.getEntityByKey(bnd);
+			TNamedEntity fld = (TNamedEntity) dico.getEntityByKey(bnd);
 			/*StructuralEntity fld = ensureAccessedStructEntity(bnd, ((FieldAccess) expr).getName().getIdentifier(),
 					/*type* /null, /*owner* /null, /*accessor* /null);*/
 			return fld;
@@ -516,14 +517,14 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			if (bnd == null) {
 				return null;
 			}
-			NamedEntity ret = null;
+			TNamedEntity ret = null;
 			if (bnd.getKind() == IBinding.TYPE) {
 				// msg() is a static method of Name so name should be a class, except if its an Enum
-				ret = (NamedEntity) dico.getEntityByKey(bnd);
+				ret = (TNamedEntity) dico.getEntityByKey(bnd);
 			}
 
 			if (bnd.getKind() == IBinding.VARIABLE) {
-				return (NamedEntity) dico.getEntityByKey(bnd);
+				return (TNamedEntity) dico.getEntityByKey(bnd);
 			}
 
 			return ret;
@@ -541,7 +542,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// super.field.msg()
 		if ( NodeTypeChecker.isSuperFieldAccess(expr)) {
-			return (NamedEntity) dico.getEntityByKey(((SuperFieldAccess) expr).resolveFieldBinding());
+			return (TNamedEntity) dico.getEntityByKey(((SuperFieldAccess) expr).resolveFieldBinding());
 			/*return ensureAccessedStructEntity(((SuperFieldAccess) expr).resolveFieldBinding(),
 					((SuperFieldAccess) expr).getName().getIdentifier(), /*typ* /null, /*owner* /null, /*accessor* /null);*/
 		}
@@ -576,7 +577,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 * @param receiver -- the FAMIX Entity describing the receiver
 	 * @return the Famix Entity or null if could not find it
 	 */
-	private org.moosetechnology.model.famixjava.famixtraits.TType getInvokedMethodOwner(Expression expr, NamedEntity receiver) {
+	private org.moosetechnology.model.famixjava.famixtraits.TType getInvokedMethodOwner(Expression expr, TNamedEntity receiver) {
 		// ((type)expr).msg()
 		if (NodeTypeChecker.isCastExpression(expr)) {
 			Type tcast = ((CastExpression) expr).getType();

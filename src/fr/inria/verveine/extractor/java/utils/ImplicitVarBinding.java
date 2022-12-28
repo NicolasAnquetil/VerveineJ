@@ -4,6 +4,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 
 import fr.inria.verveine.extractor.java.AbstractDictionary;
 import java.util.Hashtable;
@@ -20,33 +21,32 @@ import java.util.Map;
  * @author Anquetil
  */
 public class ImplicitVarBinding implements IBinding {
-	protected Method owner;
+	protected TMethod owner;
 	protected String name;
 	
-	static Map<Method,ImplicitVars> allImplicitVarBnd = new Hashtable<>();
+	static Map<TMethod,ImplicitVars> allImplicitVarBnd = new Hashtable<>();
 
 	/**
 	 * Used to keep the two possible ImplicitVariable for a given class
-	 * @author anquetil
 	 */
 	protected static class ImplicitVars {
 		public ImplicitVarBinding self_iv;
 		public ImplicitVarBinding super_iv;
 	}
 	
-	public static ImplicitVarBinding getInstance(Method owner, String name) {
+	public static ImplicitVarBinding getInstance(TMethod tMethod, String name) {
 		ImplicitVarBinding bnd = null;
-		ImplicitVars vars = allImplicitVarBnd.get(owner);
+		ImplicitVars vars = allImplicitVarBnd.get(tMethod);
 		if (vars == null) {
 			vars = new ImplicitVars();
-			allImplicitVarBnd.put(owner, vars);
+			allImplicitVarBnd.put(tMethod, vars);
 		}
 		else {
 			bnd = (name.equals(AbstractDictionary.SELF_NAME) ? vars.self_iv : vars.super_iv);
 		}
 
 		if (bnd == null) {
-			bnd = new ImplicitVarBinding(owner,name);
+			bnd = new ImplicitVarBinding(tMethod, name);
 			if (name.equals(AbstractDictionary.SELF_NAME)) {
 				vars.self_iv = bnd;
 			}
@@ -58,7 +58,7 @@ public class ImplicitVarBinding implements IBinding {
 		return bnd;
 	}
 
-	protected ImplicitVarBinding(Method owner, String name) {
+	protected ImplicitVarBinding(TMethod owner, String name) {
 		this.owner = owner;
 		this.name = name;
 	}

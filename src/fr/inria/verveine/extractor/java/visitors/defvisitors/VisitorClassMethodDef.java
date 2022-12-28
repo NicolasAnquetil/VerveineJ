@@ -9,6 +9,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
 import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
@@ -337,7 +338,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(Initializer node) {
 		//		System.err.println("TRACE, Visiting Initializer: ");
 
-		Method fmx = createInitBlock();
+		Method fmx = (Method) createInitBlock();
 		// init-block don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create either
 
@@ -563,9 +564,9 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
      *
      * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
-	protected Method createInitBlock() {
+	protected TMethod createInitBlock() {
 		// putting field's initialization code in an INIT_BLOCK_NAME method
-		Method ctxtMeth = this.context.topMethod();
+		TMethod ctxtMeth = this.context.topMethod();
 		if (ctxtMeth != null && !ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
 			ctxtMeth = null;
 		} else {
@@ -594,12 +595,12 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	 * Special method InitBlock may be "created" in various steps,
 	 * mainly when attributes are declared+initialized with the result of a method call.<br>
 	 * In such a case, we need to recover the previous metric values to add to them
-	 * @param fmx -- the InitBlock FamixMethod
+	 * @param ctxtMeth -- the InitBlock FamixMethod
 	 */
-	protected void pushInitBlockMethod(Method fmx) {
-		int nos = (fmx.getNumberOfStatements() == null) ? 0 : fmx.getNumberOfStatements().intValue();
-		int cyclo = (fmx.getCyclomaticComplexity() == null) ? 0 : fmx.getCyclomaticComplexity().intValue();
-		this.context.pushMethod(fmx);
+	protected void pushInitBlockMethod(TMethod ctxtMeth) {
+		int nos = (ctxtMeth.getNumberOfStatements() == null) ? 0 : ctxtMeth.getNumberOfStatements().intValue();
+		int cyclo = (ctxtMeth.getCyclomaticComplexity() == null) ? 0 : ctxtMeth.getCyclomaticComplexity().intValue();
+		this.context.pushMethod(ctxtMeth);
 		if ((nos != 0) || (cyclo != 0)) {
 			context.setTopMethodNOS(nos);
 			context.setTopMethodCyclo(cyclo);
@@ -607,7 +608,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	}
 
 	protected void closeOptionalInitBlock() {
-		Method ctxtMeth = this.context.topMethod();
+		TMethod ctxtMeth = this.context.topMethod();
 		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME))) {
 			closeMethodDeclaration();
 		}
@@ -620,7 +621,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		if (context.topMethod() != null) {
 			int cyclo = context.getTopMethodCyclo();
 			int nos = context.getTopMethodNOS();
-			Method fmx = this.context.popMethod();
+			Method fmx = (Method) this.context.popMethod();
 			if (fmx != null) {
 				fmx.setNumberOfStatements(nos);
 				fmx.setCyclomaticComplexity(cyclo);

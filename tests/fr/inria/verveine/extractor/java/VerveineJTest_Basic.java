@@ -149,7 +149,7 @@ public abstract class VerveineJTest_Basic {
 		boolean found = false;
 		for (Type e : repo.all(Type.class)) {
 			if (!e.getIsStub()) {
-				assertNotNull("a Type '" + e.getName() + "' does not belong to anything", Util.belongsToOf(e));
+				assertNotNull("a Type '" + e.getName() + "' does not belong to anything", Util.getOwner(e));
 				found = true;
 			}
 		}
@@ -158,7 +158,7 @@ public abstract class VerveineJTest_Basic {
 		found = false;
 		for (Method e : repo.all(Method.class)) {
 			if (!e.getIsStub()) {
-				assertNotNull("a BehaviouralEntity '" + e.getName() + "' does not belong to anything", Util.belongsToOf(e));
+				assertNotNull("a BehaviouralEntity '" + e.getName() + "' does not belong to anything", Util.getOwner(e));
 				found = true;
 			}
 		}
@@ -167,7 +167,7 @@ public abstract class VerveineJTest_Basic {
 		found = false;
 		for (TStructuralEntity e : repo.all(TStructuralEntity.class)) {
 			if (!((TSourceEntity) e).getIsStub()) {
-				assertNotNull("a StructuralEntity '" + ((TNamedEntity) e).getName() + "' does not belong to anything", Util.belongsToOf(e));
+				assertNotNull("a StructuralEntity '" + ((TNamedEntity) e).getName() + "' does not belong to anything", Util.getOwner(e));
 				found = true;
 			}
 		}

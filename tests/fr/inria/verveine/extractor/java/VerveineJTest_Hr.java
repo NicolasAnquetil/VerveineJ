@@ -1,15 +1,9 @@
 package fr.inria.verveine.extractor.java;
 
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixtraits.TMethod;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-
-import java.io.File;
-import java.util.Collection;
-
-import static org.junit.Assert.*;
 
 public class VerveineJTest_Hr extends VerveineJTest_Basic {
 
