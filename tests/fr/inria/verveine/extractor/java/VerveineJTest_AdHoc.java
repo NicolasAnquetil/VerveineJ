@@ -183,13 +183,17 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 
 	@ Test
-	public void testStubOwnerAreNotEmpty() {
+	public void testStubContainerAreNotEmpty() {
 		parse(new String[]{"test_src/ad_hoc/Card.java"});
 
 		ParameterizableClass stubClass = detectFamixElement( ParameterizableClass.class, "ArrayList");
 		assertNotNull(stubClass);
 		assertTrue(stubClass.getIsStub());
+		// owner is stored in TypeContainer, not parentPackage :-(
 		assertNull(stubClass.getParentPackage());
+		assertNotNull(stubClass.getTypeContainer());
+		assertEquals(Package.class, stubClass.getTypeContainer().getClass());
+		assertEquals("util", ((TNamedEntity)stubClass.getTypeContainer()).getName());
 	}
 
 	@Test
