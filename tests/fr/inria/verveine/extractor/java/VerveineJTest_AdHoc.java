@@ -550,6 +550,8 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(3, l_meth.size());
 		for (Method meth : l_meth) {
 			assertEquals(JavaDictionary.INIT_BLOCK_NAME+"()", meth.getSignature());
+			assertFalse(meth.getIsDead());
+
 			if (((TNamedEntity)meth.getParentType()).getName().equals("Card")) {
 				assertEquals(5, meth.getOutgoingInvocations().size());
 			}
