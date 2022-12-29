@@ -69,8 +69,10 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     private Boolean isClassSide = false;
     
     private Boolean isFinal = false;
-    
+
     private Boolean isStub;
+
+    private Boolean isDead;
     
     private Boolean isSynchronized;
     
@@ -98,7 +100,10 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
 
     private String visibility;
     
-
+@Override
+public String toString() {
+	return "Method(" + signature + ")";
+}
 
     @FameProperty(name = "clientBehaviours", derived = true)
     public Collection<Method> getClientBehaviours() {
@@ -582,8 +587,11 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
+        return isDead;  
+    }
+
+    public void setIsDead(Boolean isDead) {
+        this.isDead = isDead;
     }
     
     @FameProperty(name = "isFinal")
