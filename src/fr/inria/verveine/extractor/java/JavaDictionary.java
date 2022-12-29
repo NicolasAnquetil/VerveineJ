@@ -1258,7 +1258,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * @param candidate -- a Famix Entity (regular Method or AnnotationTypeAttribute)
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
-	private  <T extends TWithTypes & TNamedEntity & TSourceEntity> boolean matchAndMapMethod(IMethodBinding bnd, String sig, TType retTyp, T owner, NamedEntity candidate) {
+	private  boolean matchAndMapMethod(IMethodBinding bnd, String sig, TType retTyp, TNamedEntity owner, NamedEntity candidate) {
 		if (! (candidate instanceof Method) ) {
 			return false;
 		}
@@ -1300,7 +1300,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 					if ( ((Method) candidate).getDeclaredType() == null ) {
 						return false;
 					}
-					else if (! matchAndMapType(bnd.getReturnType(), null, null, (NamedEntity) ((Method) candidate).getDeclaredType()) ) {
+					else if (! matchAndMapType(bnd.getReturnType(), null, null, ((Method) candidate).getDeclaredType()) ) {
 						return false;
 					}
 					// else OK for now
@@ -1315,7 +1315,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 				} else { // (ret != null)  i.e. not a constructor
 					if (((Method) candidate).getDeclaredType() == null) {
 						return false;
-					} else if (!matchAndMapType(null, retTyp.getName(), (T) Util.getOwner(retTyp), (NamedEntity) ((Method) candidate).getDeclaredType())) {
+					} else if (!matchAndMapType(null, retTyp.getName(), Util.getOwner(retTyp), (NamedEntity) ((Method) candidate).getDeclaredType())) {
 						return false;
 					}
 					// else OK for now
@@ -1577,7 +1577,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * Params: see {@link AbstractDictionary#ensureFamixMethod(Object, String, String, Type, Type, boolean)}.
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public  <T extends TWithTypes & TNamedEntity & TSourceEntity> Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, TType ret, TWithMethods owner, int modifiers, boolean persistIt) {
+	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, TType ret, TWithMethods owner, int modifiers, boolean persistIt) {
 		Method fmx = null;
 		String sig;
 		boolean delayedRetTyp;
@@ -1675,7 +1675,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 		// --------------- recover from name ?
 		for (Method candidate : this.getEntityByName(Method.class, name)) {
-			if (matchAndMapMethod(bnd, sig, ret, (T) owner, candidate)) {
+			if (matchAndMapMethod(bnd, sig, ret, (TNamedEntity) owner, candidate)) {
 				fmx = candidate;
 				break;
 			}
