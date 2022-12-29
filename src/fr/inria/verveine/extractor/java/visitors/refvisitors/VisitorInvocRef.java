@@ -524,7 +524,8 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			}
 
 			if (bnd.getKind() == IBinding.VARIABLE) {
-				return (TNamedEntity) dico.getEntityByKey(bnd);
+				// a bit convoluted, but sometimes 'bnd' is not directly the binding of the variable's declaration from which the Famix entity was created
+				return (TNamedEntity) dico.getEntityByKey(((IVariableBinding)bnd).getVariableDeclaration());
 			}
 
 			return ret;
