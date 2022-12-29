@@ -10,6 +10,7 @@ import org.moosetechnology.model.famixjava.famixjavaentities.Exception;
 import org.moosetechnology.model.famixjava.famixjavaentities.Method;
 import org.moosetechnology.model.famixjava.famixjavaentities.Package;
 import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 
 import java.util.List;
@@ -85,7 +86,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 
     @Override
     public boolean visit(CatchClause node) {
-        Method meth = this.context.topMethod();
+        Method meth = (Method) this.context.topMethod();
         Type excepClass = node.getException().getType();
         if (meth != null) {
             org.moosetechnology.model.famixjava.famixjavaentities.Exception excepFmx = null;
@@ -104,7 +105,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 
     @Override
     public boolean visit(ThrowStatement node) {
-        Method meth = this.context.topMethod();
+        Method meth = (Method) this.context.topMethod();
         org.moosetechnology.model.famixjava.famixjavaentities.Exception excepFmx = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) this
                 .referedType(node.getExpression().resolveTypeBinding(), (ContainerEntity) context.topType(), true);
         if (excepFmx != null) {

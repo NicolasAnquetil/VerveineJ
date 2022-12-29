@@ -61,7 +61,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	 * @return a famix type or null
 	 */
 	protected <T extends TWithTypes & TNamedEntity> TType referedType(Type typ, T ctxt, boolean isClass) {
-		return referedType(typ, ctxt, isClass, false);
+		return referedType(typ, ctxt, isClass, /*isExcep*/false);
 	}
 
 	/**
@@ -115,7 +115,8 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 		}
 		name = bnd.getName();
 
-		if (bnd.isParameterizedType()) {
+		if ( bnd.isParameterizedType() ) {
+			// remove type parameters from the name even for parameterized interfaces
 			int i = name.indexOf('<');
 			if (i > 0) {
 				name = name.substring(0, i);
@@ -124,16 +125,16 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 			TWithParameterizedTypes generic;
 			if(parameterizableBnd.isInterface()) {
-				generic = (TWithParameterizedTypes) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+				generic = (ParameterizableInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
 			} else {
 				generic = (TWithParameterizedTypes) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
 			}
-			if (bnd == parameterizableBnd) {
-				// JDT bug?
-				fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(null));
-			} else {
+			// not creating parameterized interfaces here
+			//if (bnd == parameterizableBnd) {
+			//	fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(null));
+			//} else {
 				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(bnd));
-			}
+			//}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
 				TType fmxTArg = this.referedType(targ, ctxt, false);

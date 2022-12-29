@@ -83,6 +83,11 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     private String visibility;
     
 
+@Override
+public String toString() {
+	return "Class(" + name + ")";
+}
+
 
     @FameProperty(name = "isIgnored", derived = true)
     public Collection<Boolean> getIsIgnored() {

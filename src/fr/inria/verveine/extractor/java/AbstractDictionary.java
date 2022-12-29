@@ -470,7 +470,7 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the LocalVariable should be persisted in the Famix repository
 	 * @return the FAMIX LocalVariable or null in case of a FAMIX error
 	 */
-	public LocalVariable ensureFamixLocalVariable(B key, String name, Type type, Method owner, boolean persistIt) {
+	public LocalVariable ensureFamixLocalVariable(B key, String name, TType type, TWithLocalVariables owner, boolean persistIt) {
 		LocalVariable fmx = ensureFamixEntity(LocalVariable.class, key, name, persistIt);
 		fmx.setParentBehaviouralEntity(owner);
 		fmx.setDeclaredType(type);
@@ -513,13 +513,13 @@ public class AbstractDictionary<B> {
 	 * Creates and returns a FAMIX Parameter and associates it with a BehaviouralEntity
 	 * @param name -- the name of the parameter
 	 * @param type -- the type of the parameter
-	 * @param owner -- the entity concerned by this parameter
+	 * @param tMethod -- the entity concerned by this parameter
 	 * @param persistIt -- whether the Parameter should be persisted in the Famix repository
 	 * @return the FAMIX parameter
 	 */
-	public Parameter createFamixParameter(B key, String name, Type type, Method owner, boolean persistIt) {
+	public Parameter createFamixParameter(B key, String name, Type type, TMethod tMethod, boolean persistIt) {
 		Parameter fmx = ensureFamixEntity(Parameter.class, key, name, persistIt);
-		fmx.setParentBehaviouralEntity(owner);
+		fmx.setParentBehaviouralEntity(tMethod);
 		fmx.setDeclaredType(type);
 		
 		return fmx;
@@ -609,20 +609,20 @@ public class AbstractDictionary<B> {
 
 	/**
 	 * Returns a Famix Invocation between two Famix Entities creating it if needed
-	 * @param sender of the invocation
+	 * @param tMethod of the invocation
 	 * @param invoked -- method invoked
 	 * @param receiver of the invocation
 	 * @param signature -- i.e. actual invocation code
 	 * @param prev -- previous invocation relationship in the same context
 	 * @return the FamixInvocation
 	 */
-	public Invocation addFamixInvocation(Method sender, Method invoked, NamedEntity receiver, String signature, TAssociation prev) {
-		if ( (sender == null) || (invoked == null) ) {
+	public Invocation addFamixInvocation(TMethod tMethod, TMethod invoked, TInvocationsReceiver receiver, String signature, TAssociation prev) {
+		if ( (tMethod == null) || (invoked == null) ) {
 			return null;
 		}
 		Invocation invok = new Invocation();
 		invok.setReceiver(receiver);
-		invok.setSender(sender);
+		invok.setSender(tMethod);
 		invok.setSignature((signature == null) ? invoked.getSignature() : signature);
 		invok.addCandidates(invoked);
 		chainPrevNext(prev,invok);
@@ -639,7 +639,7 @@ public class AbstractDictionary<B> {
 	 * @param prev -- previous access relationship in the same context
 	 * @return the FamixAccess
 	 */
-	public Access addFamixAccess(Method accessor, TStructuralEntity var, boolean isWrite, TAssociation prev) {
+	public Access addFamixAccess(TWithAccesses accessor, TStructuralEntity var, boolean isWrite, TAssociation prev) {
 		if ( (accessor == null) || (var == null) ) {
 			return null;
 		}
@@ -758,14 +758,14 @@ public class AbstractDictionary<B> {
 	 * If this ImplicitVariable does not exist yet, it is created
 	 * @param name -- the name of the FAMIX ImplicitVariable (should be Dictionary.SELF_NAME or Dictionary.SUPER_NAME)
 	 * @param type -- the Famix Type for this ImplicitVariable (should not be null)
-	 * @param owner -- the ContainerEntity where the implicit variable appears (should be a method inside <b>type</b>)
+	 * @param tMethod -- the ContainerEntity where the implicit variable appears (should be a method inside <b>type</b>)
 	 * @param persistIt -- whether the ImplicitVariable should be persisted in the Famix repository
 	 * @return the FAMIX ImplicitVariable or null in case of a FAMIX error
 	 */
-	public ImplicitVariable ensureFamixImplicitVariable(B key, String name, TType type, Method owner, boolean persistIt) {
+	public ImplicitVariable ensureFamixImplicitVariable(B key, String name, TType type, TMethod tMethod, boolean persistIt) {
 		ImplicitVariable fmx;
 		fmx = ensureFamixEntity(ImplicitVariable.class, key, name, persistIt);
-		fmx.setParentBehaviouralEntity(owner);
+		fmx.setParentBehaviouralEntity(tMethod);
 		return fmx;
 	}
 
@@ -859,7 +859,7 @@ public class AbstractDictionary<B> {
 			}
 		}
 		
-		return searchTypeInContext(name, Util.belongsToOf(ctxt));
+		return searchTypeInContext(name, Util.getOwner(ctxt));
 	}
 
 }

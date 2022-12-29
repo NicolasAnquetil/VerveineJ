@@ -1,7 +1,13 @@
 package fr.inria.verveine.extractor.java.utils;
 
 import org.moosetechnology.model.famixjava.famixjavaentities.Package;
+import org.moosetechnology.model.famixjava.famixtraits.TAccess;
+import org.moosetechnology.model.famixjava.famixtraits.TAnnotationTypeAttribute;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TPackage;
+import org.moosetechnology.model.famixjava.famixtraits.TReference;
 import org.moosetechnology.model.famixjava.famixtraits.TType;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
 
@@ -31,40 +37,40 @@ public class EntityStack {
 	/**
 	 * last Invocation registered to set the previous/next
 	 */
-	Invocation lastInvocation = null;
+	TInvocation lastInvocation = null;
 
 	/**
 	 * last Access registered to set the previous/next
 	 */
-	Access lastAccess = null;
+	TAccess lastAccess = null;
 	
 	/**
 	 * last Reference registered to set the previous/next
 	 */
-	Reference lastReference = null;
+	TReference lastReference = null;
 	
-	public Access getLastAccess() {
+	public TAccess getLastAccess() {
 		return lastAccess;
 	}
 
-	public void setLastAccess(Access lastAccess) {
+	public void setLastAccess(TAccess lastAccess) {
 		this.lastAccess = lastAccess;
 	}
 
-	public Reference getLastReference() {
+	public TReference getLastReference() {
 		return lastReference;
 	}
 
-	public void setLastReference(Reference lastReference) {
+	public void setLastReference(TReference lastReference) {
 		this.lastReference = lastReference;
 	}
 
-	public Invocation getLastInvocation() {
+	public TInvocation getLastInvocation() {
 		return lastInvocation;
 	}
 
-	public void setLastInvocation(Invocation lastInvocation) {
-		this.lastInvocation = lastInvocation;
+	public void setLastInvocation(TInvocation invok) {
+		this.lastInvocation = invok;
 	}
 
 	public EntityStack() {
@@ -85,7 +91,7 @@ public class EntityStack {
 	 * Sets the Famix Package on top of the "context stack"
 	 * @param e -- the Famix Package
 	 */
-	public void pushPckg(Package e) {
+	public void pushPckg(TPackage e) {
 		push(e);
 	}
 
@@ -102,7 +108,7 @@ public class EntityStack {
 	 * Adds also a special entity to hold the metrics for the method
 	 * @param e -- the Famix method
 	 */
-	public void pushMethod(Method e) {
+	public void pushMethod(TMethod e) {
 		push(e);
 		push( new MetricHolder(e) );
 	}
@@ -112,12 +118,12 @@ public class EntityStack {
 	 * Adds also a special entity to hold the metrics for the BehaviouralEntity
 	 * @param e -- the Famix BehaviouralEntity
 	 */
-	public void pushBehaviouralEntity(Method e) {
+	public void pushBehaviouralEntity(TMethod e) {
 		push(e);
 		push( new MetricHolder(e) );
 	}
 
-	public void pushAnnotationMember(AnnotationTypeAttribute fmx) {
+	public void pushAnnotationMember(TAnnotationTypeAttribute fmx) {
 		push(fmx);
 	}
 
@@ -131,10 +137,10 @@ public class EntityStack {
 	private class MetricHolder extends NamedEntity {
 		private int metric_cyclo = EMPTY_CYCLO;  // Cyclomatic Complexity
 		private int metric_nos = EMPTY_NOS;      // Number Of Statements
-		private final Method ent;
+		private final TMethod ent;
 
-		protected MetricHolder(Method ent) {
-			this.ent = ent;
+		protected MetricHolder(TMethod e) {
+			this.ent = e;
 		}
 
 		protected int getCyclo() {
@@ -153,7 +159,7 @@ public class EntityStack {
 			this.metric_nos = metric_nos;
 		}
 
-		protected Method getEntity() {
+		protected TMethod getEntity() {
 			return ent;
 		}
 	}
@@ -212,7 +218,7 @@ public class EntityStack {
 	 * Note: does not check that there is such a namespace
 	 * @return the Famix method
 	 */
-	public Package popPckg() {
+	public TPackage popPckg() {
 		return this.popUpto(Package.class);
 	}
 
@@ -221,7 +227,7 @@ public class EntityStack {
 	 * Note: does not check that there is such a type, so could possibly throw an EmptyStackException
 	 * @return the Famix class
 	 */
-	public Type popType() {
+	public TType popType() {
 		return this.popUpto(Type.class);
 	}
 
@@ -230,11 +236,11 @@ public class EntityStack {
 	 * Note: does not check that there is such a class or method, so could possibly throw an Exception
 	 * @return the Famix method
 	 */
-	public Method popMethod() {
+	public TMethod popMethod() {
 		return this.popUpto(Method.class);
 	}
 	
-	public AnnotationTypeAttribute popAnnotationMember() {
+	public TAnnotationTypeAttribute popAnnotationMember() {
 		return this.popUpto(AnnotationTypeAttribute.class);
 	}
 
@@ -263,7 +269,7 @@ public class EntityStack {
 	 * Note: does not check that there is such a package
 	 * @return the Famix namespace
 	 */
-	public Package topPckg() {
+	public TPackage topPckg() {
 		return this.lookUpto(Package.class);
 	}
 
@@ -281,7 +287,7 @@ public class EntityStack {
 	 * Note: does not check that there is such a BehaviouralEntity, so could possibly throw an EmptyStackException
 	 * @return the Famix BehaviouralEntity
 	 */
-	public Method topBehaviouralEntity() {
+	public TMethod topBehaviouralEntity() {
 		return this.lookUpto(Method.class);
 	}
 
@@ -290,11 +296,11 @@ public class EntityStack {
 	 * Note: does not check that there is such a class or method, so could possibly throw an EmptyStackException
 	 * @return the Famix method
 	 */
-	public Method topMethod() {
+	public TMethod topMethod() {
 		return this.lookUpto(Method.class);
 	}
 
-	public AnnotationTypeAttribute topAnnotationMember() {
+	public TAnnotationTypeAttribute topAnnotationMember() {
 		return this.lookUpto(AnnotationTypeAttribute.class);
 	}
 
