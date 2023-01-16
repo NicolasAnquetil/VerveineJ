@@ -125,16 +125,16 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 			TWithParameterizedTypes generic;
 			if(parameterizableBnd.isInterface()) {
-				generic = (ParameterizableInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+				generic = (TWithParameterizedTypes) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
 			} else {
 				generic = (TWithParameterizedTypes) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
 			}
 			// not creating parameterized interfaces here
-			//if (bnd == parameterizableBnd) {
+			if (bnd == parameterizableBnd) {
 			//	fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(null));
-			//} else {
+			} else {
 				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(bnd));
-			//}
+			}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
 				TType fmxTArg = this.referedType(targ, ctxt, false);

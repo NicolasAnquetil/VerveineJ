@@ -124,6 +124,8 @@ public class VerveineJOptions {
 	 */
 	protected boolean prettyPrint = false;
 
+	private boolean checkMode;
+
 	public VerveineJOptions() {
 		this.classSummary = false;
 		this.allLocals = false;
@@ -132,6 +134,7 @@ public class VerveineJOptions {
 		this.incrementalParsing = false;
 		this.outputFileName = null;
 		this.outputFormat = MSE_OUTPUT_FORMAT;
+		this.checkMode = false;
 	}
 
 	public void setOptions( String[] args) {
@@ -195,6 +198,8 @@ public class VerveineJOptions {
 			allLocals = true;
 		} else if (arg.equals("-prettyPrint")) {
 			prettyPrint = true;
+		} else if (arg.equals("-check")) {
+			checkMode = true; 
 		} else if ((arg.charAt(0) == '-') && (arg.endsWith("cp"))) {
 			classPathOptions = setOptionClassPath(classPathOptions, args, i);
 			argumentsTreated++;
@@ -532,6 +537,11 @@ public class VerveineJOptions {
 		collectJavaFiles(argPath, sourceFiles);
 	
 		return sourceFiles.toArray( new String[sourceFiles.size()] );
+	}
+
+
+	public boolean onlyCheck() {
+		return checkMode;
 	}
 
 

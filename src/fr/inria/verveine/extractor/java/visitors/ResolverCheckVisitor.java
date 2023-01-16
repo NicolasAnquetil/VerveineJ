@@ -3,10 +3,28 @@ package fr.inria.verveine.extractor.java.visitors;
 
 import java.util.List;
 
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.ASTVisitor;
+import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
+import org.eclipse.jdt.core.dom.ClassInstanceCreation;
+import org.eclipse.jdt.core.dom.FieldDeclaration;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.ParameterizedType;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
+import org.eclipse.jdt.core.dom.Type;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclaration;
+import org.eclipse.jdt.core.dom.VariableDeclarationExpression;
+import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 
-import fr.inria.verveine.extractor.java.utils.Util;
-
+/**
+ * This is a simple visitor that checks that some of the main entities declarations have a binding in JDT (ie. <code>node.resolveBinding() != null</code>).
+ * This is important because if an entity has no binding, then its uses can not be resolved.
+ * This means for example that in <code>public ClassA aMethod( ClassB aParameter) { ... some code; }</code> if <code>ClassA</code> or <code>ClassB</code> have no binding,
+ * then the <code>aMethod</code> itself has no binding and JDT is not be able to resolve invocations to it
+ * 
+ * To use simply call verveineJ normally with option <code>-check</code>.
+ * Note: this option prevents creating any entity
+ */
 public class ResolverCheckVisitor extends ASTVisitor {
 
 	@Override

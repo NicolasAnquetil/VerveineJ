@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.FileASTRequestor;
 
 import ch.akuhn.fame.Repository;
+import fr.inria.verveine.extractor.java.visitors.ResolverCheckVisitor;
 import fr.inria.verveine.extractor.java.visitors.defvisitors.VisitorClassMethodDef;
 import fr.inria.verveine.extractor.java.visitors.defvisitors.VisitorComments;
 import fr.inria.verveine.extractor.java.visitors.defvisitors.VisitorPackageDef;
@@ -53,22 +54,34 @@ public class FamixRequestor extends FileASTRequestor {
 
 		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
-			ast.accept(new VisitorPackageDef(famixDictionnary, options));
-			ast.accept(new VisitorClassMethodDef(famixDictionnary, options));
-			ast.accept(new VisitorVarsDef(famixDictionnary, options));
-			ast.accept(new VisitorComments(famixDictionnary, options));
-
-			ast.accept(new VisitorInheritanceRef(famixDictionnary, options));
-			ast.accept(new VisitorTypeRefRef(famixDictionnary, options));
-			ast.accept(new VisitorAccessRef(famixDictionnary, options));
-			ast.accept(new VisitorInvocRef(famixDictionnary, options));
-			ast.accept(new VisitorAnnotationRef(famixDictionnary, options));
-			ast.accept(new VisitorExceptionRef(famixDictionnary, options));
-
+				if (options.onlyCheck()) {
+					runCheckVisitor(ast);
+				}
+				else {
+					runAllVisitors(ast);
+				}
 		} catch (Exception err) {
 			err.printStackTrace();
 			System.err.println("*** " + getVisitorName(err, path) + " got exception: '" + err + "' while processing file: " + path);
 		}
+	}
+
+	protected void runCheckVisitor(CompilationUnit ast) {
+		ast.accept(new ResolverCheckVisitor());
+	}
+
+	protected void runAllVisitors(CompilationUnit ast) {
+		ast.accept(new VisitorPackageDef(famixDictionnary, options));
+		ast.accept(new VisitorClassMethodDef(famixDictionnary, options));
+		ast.accept(new VisitorVarsDef(famixDictionnary, options));
+		ast.accept(new VisitorComments(famixDictionnary, options));
+
+		ast.accept(new VisitorInheritanceRef(famixDictionnary, options));
+		ast.accept(new VisitorTypeRefRef(famixDictionnary, options));
+		ast.accept(new VisitorAccessRef(famixDictionnary, options));
+		ast.accept(new VisitorInvocRef(famixDictionnary, options));
+		ast.accept(new VisitorAnnotationRef(famixDictionnary, options));
+		ast.accept(new VisitorExceptionRef(famixDictionnary, options));
 	}
 
 	private String getVisitorName(Exception err, String path) {
