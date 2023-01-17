@@ -6,11 +6,11 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstance;
-import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixtraits.TAnnotationInstance;
+import org.moosetechnology.model.famix.famixtraits.TAttribute;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import java.io.File;
 import java.lang.Exception;
@@ -62,7 +62,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		}
 
 		// Class annotation
-		org.moosetechnology.model.famixjava.famixjavaentities.Class cl = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "SimpleBean");
+		org.moosetechnology.model.famix.famixjavaentities.Class cl = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "SimpleBean");
 		assertNotNull(cl);
 		assertEquals(2, cl.getAnnotationInstances().size());
 		for (TAnnotationInstance a : cl.getAnnotationInstances()) {

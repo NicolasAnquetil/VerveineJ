@@ -3,9 +3,9 @@ package fr.inria.verveine.extractor.java;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.ImplicitVariable;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixjavaentities.ImplicitVariable;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import java.util.Collection;
 

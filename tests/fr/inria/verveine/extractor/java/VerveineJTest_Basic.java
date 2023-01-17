@@ -4,13 +4,12 @@ import ch.akuhn.fame.Repository;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.junit.Assume;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Exception;
-import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixtraits.TAttribute;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixtraits.TStructuralEntity;
 
 import java.lang.Class;
 import java.util.AbstractMap;
@@ -183,7 +182,7 @@ public abstract class VerveineJTest_Basic {
 		for ( Method m : repo.all(Method.class)) {
 			Type parent = (Type) m.getParentType();
 			if ((parent != null) &&
-					(!(parent instanceof org.moosetechnology.model.famixjava.famixjavaentities.Enum)) &&   // for enums some methods are implicit
+					(!(parent instanceof org.moosetechnology.model.famix.famixjavaentities.Enum)) &&   // for enums some methods are implicit
 					(!m.getName().equals(parent.getName())) &&   // for constructors are implicit
 					(!m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) &&
 					(parent.getSourceAnchor() != null)) {
@@ -219,7 +218,7 @@ public abstract class VerveineJTest_Basic {
 		*/
 
 		// Object
-		org.moosetechnology.model.famixjava.famixjavaentities.Class obj = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME);
+		org.moosetechnology.model.famix.famixjavaentities.Class obj = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME);
 		assertNotNull(obj);
 		assertSame(javaLang, obj.getTypeContainer());
 		assertEquals(0, obj.getSuperInheritances().size());
@@ -241,7 +240,7 @@ public abstract class VerveineJTest_Basic {
 		assertEquals(0, serial.getSuperInheritances().size());
 		*/
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class str = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "String");
+		org.moosetechnology.model.famix.famixjavaentities.Class str = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "String");
 		assertNotNull(str);
 		assertSame(javaLang, str.getTypeContainer());
 		/*stubs no longer have inheritance
@@ -260,7 +259,7 @@ public abstract class VerveineJTest_Basic {
 	public void testSystemClass() {
 		Assume.assumeTrue(testsToRun[4]);
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class syst = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "System");
+		org.moosetechnology.model.famix.famixjavaentities.Class syst = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "System");
 		assertNotNull(syst);
 		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
 		Package javaLang = detectFamixElement(Package.class, javaLangName);

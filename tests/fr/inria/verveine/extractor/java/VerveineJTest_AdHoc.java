@@ -7,10 +7,10 @@ package fr.inria.verveine.extractor.java;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Enum;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixtraits.*;
 
 import java.io.File;
 import java.lang.Exception;
@@ -134,7 +134,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 
 		// get calling method in InvokWithFullPath
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "InvokWithFullPath");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "InvokWithFullPath");
 		meth = (Method) firstElt(clazz.getMethods());
 
 		// get called method in InvokWithFullPath
@@ -148,11 +148,11 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testDeclaredTypeOfExternalEnum() {
 		parse(new String[] {"test_src/ad_hoc/ExternalEnum.java", "test_src/ad_hoc/AClassThatUseExternalEnum.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class aClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "AClassThatUseExternalEnum");
+		org.moosetechnology.model.famix.famixjavaentities.Class aClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "AClassThatUseExternalEnum");
 		assertNotNull(aClass);
 
 		
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum externalEnum = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "ExternalEnum");
+		org.moosetechnology.model.famix.famixjavaentities.Enum externalEnum = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "ExternalEnum");
 		assertNotNull(externalEnum);
 		assertEquals("ExternalEnum", externalEnum.getName());
 
@@ -169,7 +169,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testStubConstructor() {
 		parse(new String[]{"test_src/ad_hoc/DefaultConstructor.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class stubClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "JFrame");
+		org.moosetechnology.model.famix.famixjavaentities.Class stubClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "JFrame");
 		assertNotNull(stubClass);
 
 		// test outgoing invocation to constructor
@@ -256,7 +256,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testClassWithNoBindingButCanBeIdentifiedAsExceptionImportedAsException() {
 		parse(new String[]{"test_src/ad_hoc/Example.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Exception clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "BackingStoreException");
+		org.moosetechnology.model.famix.famixjavaentities.Exception clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "BackingStoreException");
 		assertNotNull(clazz);
 	}
 
@@ -298,7 +298,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testArrayListMatthias() {
 		parse(new String[]{"test_src/ad_hoc/Bla.java"});
 
-		assertEquals(7, entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable, ConstantDesc, Constable
+		assertEquals(7, entitiesOfType(org.moosetechnology.model.famix.famixjavaentities.Class.class).size()); // Bla, Object, String, List, ArrayList, Arrays,Comparable,Serializable,CharSequence, AbstractList, AbstractCollection, Collection, Cloneable, RandomAccess, Iterable, ConstantDesc, Constable
 		assertEquals(3, entitiesOfType(ParameterizableClass.class).size());
 		
 		// compute all interfaces used by the 3 types String, ArrayList, Arrays
@@ -365,15 +365,15 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testEnumDecl() {
 		parse(new String[]{"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class javaLangEnum = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Enum");
+		org.moosetechnology.model.famix.famixjavaentities.Class javaLangEnum = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Enum");
 		assertNotNull(javaLangEnum);
 		assertEquals("lang", Util.getOwner(javaLangEnum).getName());
 		assertEquals(ParameterizableClass.class, javaLangEnum.getClass());
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class card = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Card");
+		org.moosetechnology.model.famix.famixjavaentities.Class card = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Card");
 		assertNotNull(card);
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum rk = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "Rank");
+		org.moosetechnology.model.famix.famixjavaentities.Enum rk = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Rank");
 		assertNotNull(rk);
 		assertEquals("Rank", rk.getName());
 		assertEquals(13, rk.getEnumValues().size());
@@ -389,7 +389,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals("NINE", nine.getName());
 		assertSame(rk, nine.getParentEnum());
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum st = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "Suit");
+		org.moosetechnology.model.famix.famixjavaentities.Enum st = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Suit");
 		assertNotNull(st);
 		assertEquals("Suit", st.getName());
 		assertEquals(1, st.getSuperInheritances().size());
@@ -416,7 +416,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 			}
 		}
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum pl = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "Planet");
+		org.moosetechnology.model.famix.famixjavaentities.Enum pl = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Planet");
 		assertNotNull(pl);
 		assertEquals("Planet", pl.getName());
 		assertEquals(1, pl.getSuperInheritances().size());
@@ -448,7 +448,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		}
 		assertTrue("Did not find CUBS EnumValue in Suit Enum", foundClubs);
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum pl = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "Planet");
+		org.moosetechnology.model.famix.famixjavaentities.Enum pl = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Planet");
 		assertNotNull(pl);
 
 		assertEquals(8, pl.getEnumValues().size());
@@ -587,7 +587,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		Method meth = detectFamixElement(Method.class, "methodWrongOwner");
 		assertNotNull(meth);
 
-		assertEquals(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "SuperWrongOwner"), meth.getParentType());
+		assertEquals(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "SuperWrongOwner"), meth.getParentType());
 	}
 	
 	@Test
@@ -608,7 +608,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testMultipleSignatures() {
 		parse(new String[]{"test_src/ad_hoc/MultipleSignatures.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Exception throwable = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "Throwable");
+		org.moosetechnology.model.famix.famixjavaentities.Exception throwable = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "Throwable");
 		assertNotNull(throwable);
 		assertEquals(2, throwable.getMethods().size()); // printStackTrace() & printStackTrace(PrintWriter)
 
@@ -669,7 +669,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testPublicStaticInnerClass() {
 		parse(new String[]{"test_src/ad_hoc/StaticInnerClass.java"});
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ThisIsTheStaticInnerClass");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "ThisIsTheStaticInnerClass");
 		assertNotNull(clazz);
 
 		assertTrue(clazz.getIsPublic());

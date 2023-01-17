@@ -18,36 +18,36 @@ import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Access;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationInstance;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationType;
-import org.moosetechnology.model.famixjava.famixjavaentities.Attribute;
-import org.moosetechnology.model.famixjava.famixjavaentities.Comment;
-import org.moosetechnology.model.famixjava.famixjavaentities.Implementation;
-import org.moosetechnology.model.famixjava.famixjavaentities.ImplicitVariable;
-import org.moosetechnology.model.famixjava.famixjavaentities.IndexedFileAnchor;
-import org.moosetechnology.model.famixjava.famixjavaentities.Inheritance;
-import org.moosetechnology.model.famixjava.famixjavaentities.Interface;
-import org.moosetechnology.model.famixjava.famixjavaentities.Invocation;
-import org.moosetechnology.model.famixjava.famixjavaentities.LocalVariable;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
-import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
-import org.moosetechnology.model.famixjava.famixjavaentities.SourceAnchor;
-import org.moosetechnology.model.famixjava.famixtraits.TAccess;
-import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstance;
-import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
-import org.moosetechnology.model.famixjava.famixtraits.TComment;
-import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
-import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
-import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
-import org.moosetechnology.model.famixjava.famixtraits.TMethod;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TParameter;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixjavaentities.Access;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationInstance;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationType;
+import org.moosetechnology.model.famix.famixjavaentities.Attribute;
+import org.moosetechnology.model.famix.famixjavaentities.Comment;
+import org.moosetechnology.model.famix.famixjavaentities.Implementation;
+import org.moosetechnology.model.famix.famixjavaentities.ImplicitVariable;
+import org.moosetechnology.model.famix.famixjavaentities.IndexedFileAnchor;
+import org.moosetechnology.model.famix.famixjavaentities.Inheritance;
+import org.moosetechnology.model.famix.famixjavaentities.Interface;
+import org.moosetechnology.model.famix.famixjavaentities.Invocation;
+import org.moosetechnology.model.famix.famixjavaentities.LocalVariable;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixjavaentities.Parameter;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizableClass;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famix.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famix.famixjavaentities.SourceAnchor;
+import org.moosetechnology.model.famix.famixtraits.TAccess;
+import org.moosetechnology.model.famix.famixtraits.TAnnotationInstance;
+import org.moosetechnology.model.famix.famixtraits.TAttribute;
+import org.moosetechnology.model.famix.famixtraits.TComment;
+import org.moosetechnology.model.famix.famixtraits.TImplementation;
+import org.moosetechnology.model.famix.famixtraits.TInheritance;
+import org.moosetechnology.model.famix.famixtraits.TInvocation;
+import org.moosetechnology.model.famix.famixtraits.TMethod;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TParameter;
+import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
 
 /**
  * @author Nicolas Anquetil
@@ -121,7 +121,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		Collection<java.lang.Class<?>> lanModelJavaClasses = allJavaSuperClasses(LAN_MODEL_JAVA_CLASSES_USED);
 		assertEquals(
 				lanModelJavaClasses.size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
-				entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
+				entitiesOfType(org.moosetechnology.model.famix.famixjavaentities.Class.class).size());
 
 		assertEquals(
 				allInterfacesFromClasses(LAN_MODEL_JAVA_CLASSES_USED).size() + 1,  // add IPrinter
@@ -152,13 +152,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testClassProperties() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz;
 
 		Package pckg = detectFamixElement(Package.class, "lan");
 		assertNotNull(pckg);
 		assertEquals("lan", pckg.getName());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node");
 		assertNotNull(clazz);
 		assertEquals("Node", clazz.getName());
 		assertEquals(11, clazz.numberOfMethods());
@@ -166,7 +166,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(pckg, clazz.getTypeContainer());
 		assertFalse(clazz.getIsInterface());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class,
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class,
 				"SingleDestinationAddress");
 		assertNotNull(clazz);
 		assertEquals("SingleDestinationAddress", clazz.getName());
@@ -175,8 +175,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(pckg, clazz.getTypeContainer());
 		assertFalse(clazz.getIsInterface());
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class outputServ = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "OutputServer");
+		org.moosetechnology.model.famix.famixjavaentities.Class outputServ = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "OutputServer");
 		assertNotNull(outputServ);
 		assertEquals("OutputServer", outputServ.getName());
 		assertEquals(4, outputServ.getMethods().size());
@@ -200,20 +200,20 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(0, interfacePrinter.numberOfAttributes());
 		assertSame(pckg, interfacePrinter.getTypeContainer());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "XPrinter");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "XPrinter");
 		assertNotNull(clazz);
 		assertEquals("XPrinter", clazz.getName());
 		assertEquals(2, clazz.numberOfMethods());
 		assertEquals(1, clazz.numberOfAttributes());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "PrintServer"),
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "PrintServer"),
 				clazz.getTypeContainer());
 		assertFalse(clazz.getIsInterface());
 	}
 
 	@Test
 	public void testAnonymous() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "_Anonymous(IPrinter)");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "_Anonymous(IPrinter)");
 		assertNotNull(clazz);
 		assertEquals("_Anonymous(IPrinter)", clazz.getName());
 		assertEquals(2, clazz.numberOfMethods()); // the method print and the stub constructor
@@ -261,45 +261,45 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(javaLang, javaDictionary.ensureFamixPackageJavaLang(null));
 		assertTrue(javaLang.getIsStub());
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class obj = javaDictionary.ensureFamixClassObject(null);
+		org.moosetechnology.model.famix.famixjavaentities.Class obj = javaDictionary.ensureFamixClassObject(null);
 		assertEquals(JavaDictionary.OBJECT_NAME, obj.getName());
 		assertSame(obj, javaDictionary.ensureFamixClassObject(null));
 		assertEquals(0, obj.getSuperInheritances().size());
 		assertSame(javaLang, obj.getTypeContainer());
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = javaDictionary.ensureFamixClassStubOwner();
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx = javaDictionary.ensureFamixClassStubOwner();
 		assertEquals(JavaDictionary.STUB_METHOD_CONTAINER_NAME, fmx.getName());
 		assertSame(fmx, javaDictionary.ensureFamixClassStubOwner());
 	}
 
 	@Test
 	public void testInheritance() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz;
 		Collection<TInheritance> superInheritances;
 		Inheritance inh = null;
 		Collection<TInheritance> inherits;
 		Collection<TImplementation> implementations;
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "PrintServer");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "PrintServer");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(1, superInheritances.size());
 		inh = (Inheritance) firstElt(superInheritances);
 		assertSame(clazz, inh.getSubclass());
 		assertSame(
-				detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "OutputServer"),
+				detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "OutputServer"),
 				inh.getSuperclass());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node");
 		assertNotNull(clazz);
 		superInheritances = clazz.getSuperInheritances();
 		assertEquals(1, superInheritances.size());
 		inh = (Inheritance) firstElt(superInheritances);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class,
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class,
 				JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "XPrinter");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "XPrinter");
 		assertNotNull(clazz);
 		inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size()); // superInheritances: Object (in this order)
@@ -321,7 +321,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(clazz, inh.getSubclass());
 		assertNull(inh.getPrevious());
 		assertSame(inh, inh.getNext().getPrevious());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 
 		assertSame(inh.getNext(), implem);
 		assertSame(implem.getPrevious(), inh);
@@ -341,7 +341,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(mweb);
 		assertEquals("methodWithEmptyBody", mweb.getName());
 		assertEquals("methodWithEmptyBody()", mweb.getSignature());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node"),
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node"),
 				mweb.getParentType());
 		assertSame(detectFamixElement(PrimitiveType.class, "void"), mweb.getDeclaredType());
 
@@ -349,12 +349,12 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(em);
 		assertEquals("equalsMultiple", em.getName());
 		assertEquals("equalsMultiple(AbstractDestinationAddress)", em.getSignature());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class,
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class,
 				"SingleDestinationAddress"), em.getParentType());
 		assertSame(detectFamixElement(PrimitiveType.class, "boolean"), em.getDeclaredType());
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "FileServer");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "FileServer");
 		assertNotNull(clazz);
 		Method n = null;
 		for (TMethod tm : clazz.getMethods()) {
@@ -367,9 +367,9 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertNotNull(n);
 		assertEquals("name", n.getName());
 		assertEquals("name()", n.getSignature());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "FileServer"),
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "FileServer"),
 				n.getParentType());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "String"),
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "String"),
 				n.getDeclaredType());
 
 		// constructors
@@ -387,8 +387,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testFieldType() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node");
 		assertNotNull(clazz);
 		Collection<TAttribute> l_atts = clazz.getAttributes();
 		assertEquals(2, l_atts.size());
@@ -400,7 +400,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			} else if (a.getName().equals("name")) {
 				assertSame(clazz, a.getParentType());
 				assertSame(
-						detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "String"),
+						detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "String"),
 						a.getDeclaredType());
 			} else {
 				fail("Unknown attribute: " + a.getName());
@@ -421,21 +421,21 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertTrue(pckgLang.getIsStub());
 
 		// stub "Object" exists and is inside "lang" package
-		org.moosetechnology.model.famixjava.famixjavaentities.Class
+		org.moosetechnology.model.famix.famixjavaentities.Class
 			clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Object");
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "Object");
 		assertNotNull(clazz);
 		assertTrue(clazz.getIsStub());
 		assertSame(pckgLang, clazz.getTypeContainer());
 
 		// stub "String" exists and is inside "lang" package
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "String");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "String");
 		assertNotNull(clazz);
 		assertTrue(clazz.getIsStub());
 		assertSame(pckgLang, clazz.getTypeContainer());
 
 		// "Node" is not stub
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsStub());
 
@@ -447,8 +447,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testParameter() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class nodeClass = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
+		org.moosetechnology.model.famix.famixjavaentities.Class nodeClass = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node");
 		assertNotNull(nodeClass);
 		Collection<TMethod> methods = nodeClass.getMethods();
 		assertFalse("No methods in Node class !", methods.isEmpty());
@@ -483,7 +483,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			assertTrue(p.getName().equals("contents") || p.getName().equals("rv"));
 			if (p.getName().equals("contents")) {
 				assertSame(
-						detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "String"),
+						detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "String"),
 						p.getDeclaredType());
 			} else if (p.getName().equals("rv")) {
 				assertSame(detectFamixElement(PrimitiveType.class, "boolean"), p.getDeclaredType());
@@ -496,8 +496,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testImplicitVar() {
 		boolean testRan = false;
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "SingleDestinationAddress");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
 		Collection<TMethod> methods = clazz.getMethods();
 		for (TMethod tm : methods) {
@@ -517,7 +517,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertTrue("Method SingleDestinationAddress.isDestinationFor() not found", testRan);
 
 		testRan = false;
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "WorkStation");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "WorkStation");
 		assertNotNull(clazz);
 		methods = clazz.getMethods();
 		for (TMethod tm : methods) {
@@ -539,8 +539,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testInvocation() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class nodeClass = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
+		org.moosetechnology.model.famix.famixjavaentities.Class nodeClass = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node");
 		assertNotNull(nodeClass);
 		Collection<TMethod> methods = nodeClass.getMethods();
 		assertFalse("No method found in Node !", methods.isEmpty());
@@ -595,8 +595,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		}
 		assertTrue("No interesting invocation found", testRan);
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class sdaClass = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "SingleDestinationAddress");
+		org.moosetechnology.model.famix.famixjavaentities.Class sdaClass = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "SingleDestinationAddress");
 		assertNotNull(sdaClass);
 		methods = sdaClass.getMethods();
 		assertFalse("No method found in SingleDestinationAddress !", methods.isEmpty());
@@ -621,7 +621,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 					assertSame(detectFamixElement(Method.class, "equalsSingle"), inv.getSender());
 					assertNull(inv.getReceiver());
 					assertSame(
-							detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class,
+							detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class,
 									"String"),
 							((Method) firstElt(inv.getCandidates())).getParentType());
 				} else {
@@ -729,8 +729,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testSourceAnchors() {
 		SourceAnchor anc = null;
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "XPrinter");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "XPrinter");
 		assertNotNull(clazz);
 
 		anc = (SourceAnchor) clazz.getSourceAnchor();
@@ -746,7 +746,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			assertEquals(528, ((IndexedFileAnchor) anc).getEndPos());
 		}
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node");
 		assertNotNull(clazz);
 
 		anc = (SourceAnchor) clazz.getSourceAnchor();
@@ -801,8 +801,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testModifiers() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "OutputServer");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "OutputServer");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsInterface());
 		assertTrue(clazz.getIsAbstract());
@@ -840,8 +840,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	@Test
 	public void testComment() {
 		// testing javadoc
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "SingleDestinationAddress");
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "SingleDestinationAddress");
 		assertNotNull(clazz);
 		Collection<TComment> cmts = clazz.getComments();
 		assertEquals(2, cmts.size()); // file javaDoc + class javaDoc
@@ -875,7 +875,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		}
 
 		// testing the non javadoc comments (those that are treated)
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "WorkStation");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "WorkStation");
 		assertNotNull(clazz);
 		Attribute a = (Attribute) firstElt(clazz.getAttributes());
 		assertEquals("type", a.getName());
@@ -895,7 +895,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(3, lMeths.size());
 		for (Method m : lMeths) {
 			assertNotNull(m);
-			org.moosetechnology.model.famixjava.famixjavaentities.Class owner = (org.moosetechnology.model.famixjava.famixjavaentities.Class) m
+			org.moosetechnology.model.famix.famixjavaentities.Class owner = (org.moosetechnology.model.famix.famixjavaentities.Class) m
 					.getParentType();
 			assertNotNull(owner);
 			if (owner.getName().equals("OutputServer")) {
@@ -915,15 +915,15 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testAnnotation() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz;
 		Collection<TAnnotationInstance> annInstances;
 
 		AnnotationType annType = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.AnnotationType.class, "Override");
+				org.moosetechnology.model.famix.famixjavaentities.AnnotationType.class, "Override");
 		assertNotNull(annType);
 		assertEquals("Override", annType.getName());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "PrintServer");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "PrintServer");
 		assertNotNull(clazz);
 		Collection<TMethod> methods = clazz.getMethods();
 		assertFalse("No method found in PrintServer", methods.isEmpty());
@@ -940,7 +940,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				assertEquals(0, annInstances.size());
 			}
 		}
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class,
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class,
 				"SingleDestinationAddress");
 		assertNotNull(clazz);
 		methods = clazz.getMethods();

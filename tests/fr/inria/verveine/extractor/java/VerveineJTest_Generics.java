@@ -12,18 +12,18 @@ import java.util.stream.Stream;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
-import org.moosetechnology.model.famixjava.famixjavaentities.Type;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TParameter;
-import org.moosetechnology.model.famixjava.famixtraits.TParameterizedType;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
+import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.Parameter;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizableClass;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famix.famixjavaentities.Type;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TParameter;
+import org.moosetechnology.model.famix.famixtraits.TParameterizedType;
+import org.moosetechnology.model.famix.famixtraits.TType;
 
 public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
@@ -111,7 +111,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(refedArrList);
         assertEquals("ArrayList", refedArrList.getName());
 
-        org.moosetechnology.model.famixjava.famixjavaentities.Class arrList = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "ArrayList");
+        org.moosetechnology.model.famix.famixjavaentities.Class arrList = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "ArrayList");
         assertNotNull(arrList);
         assertEquals(arrList, refedArrList.getParameterizableClass());
         assertEquals(arrList.getContainer(), refedArrList.getContainer());

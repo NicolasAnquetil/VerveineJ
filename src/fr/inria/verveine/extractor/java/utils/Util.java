@@ -8,10 +8,10 @@ import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.QualifiedType;
 import org.eclipse.jdt.core.dom.SimpleType;
-import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
-import org.moosetechnology.model.famixjava.famixjavaentities.Entity;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famix.famixjavaentities.Entity;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;

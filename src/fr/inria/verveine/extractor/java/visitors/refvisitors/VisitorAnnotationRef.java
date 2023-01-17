@@ -4,10 +4,10 @@ import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationInstanceAttribute;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationType;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationTypeAttribute;
-import org.moosetechnology.model.famixjava.famixjavaentities.NamedEntity;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationInstanceAttribute;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationType;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute;
+import org.moosetechnology.model.famix.famixjavaentities.NamedEntity;
 
 import java.util.ArrayList;
 import java.util.Collection;

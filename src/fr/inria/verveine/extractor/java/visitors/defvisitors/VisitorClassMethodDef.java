@@ -45,16 +45,16 @@ import org.eclipse.jdt.core.dom.TypeParameter;
 import org.eclipse.jdt.core.dom.VariableDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationType;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationTypeAttribute;
-import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
-import org.moosetechnology.model.famixjava.famixtraits.TMethod;
-import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
-import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
-import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationType;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute;
+import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famix.famixtraits.TMethod;
+import org.moosetechnology.model.famix.famixtraits.TWithMethods;
+import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
+import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
@@ -106,7 +106,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
-		org.moosetechnology.model.famixjava.famixtraits.TType fmx;
+		org.moosetechnology.model.famix.famixtraits.TType fmx;
 		if (bnd.isInterface()) {
 			fmx = dico.ensureFamixInterface(
 				bnd, 
@@ -197,7 +197,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		//		System.err.println("TRACE, Visiting AnonymousClassDeclaration");
-		org.moosetechnology.model.famixjava.famixjavaentities.Type fmx;
+		org.moosetechnology.model.famix.famixjavaentities.Type fmx;
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
 		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
@@ -248,7 +248,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 //		System.err.println("TRACE, Visiting EnumDeclaration: "+node.getName().getIdentifier());
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (TWithTypes) context.top());
+		org.moosetechnology.model.famix.famixjavaentities.Enum fmx = dico.ensureFamixEnum(bnd, node.getName().getIdentifier(), (TWithTypes) context.top());
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
