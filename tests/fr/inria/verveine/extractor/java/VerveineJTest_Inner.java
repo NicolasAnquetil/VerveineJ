@@ -7,8 +7,6 @@ import org.moosetechnology.model.famix.famixjavaentities.Class;
 import org.moosetechnology.model.famix.famixjavaentities.Interface;
 import org.moosetechnology.model.famix.famixjavaentities.Invocation;
 import org.moosetechnology.model.famix.famixjavaentities.NamedEntity;
-import org.moosetechnology.model.famix.famixtraits.TInvocation;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import java.io.File;
 import java.util.Collection;

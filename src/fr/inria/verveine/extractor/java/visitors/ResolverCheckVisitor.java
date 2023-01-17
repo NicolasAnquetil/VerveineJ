@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.eclipse.jdt.core.dom.*;
 
-import fr.inria.verveine.extractor.java.utils.Util;
-
 public class ResolverCheckVisitor extends ASTVisitor {
 
 	@Override

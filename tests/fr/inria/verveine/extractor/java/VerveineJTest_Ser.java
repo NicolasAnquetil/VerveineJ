@@ -4,10 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import java.io.File;
-import java.util.Collection;
 
 import static org.junit.Assert.*;
 

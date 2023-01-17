@@ -25,7 +25,10 @@ public class NamedEntity extends SourcedEntity implements TEntityMetaLevelDepend
     
     private Collection<TInvocation> receivingInvocations; 
 
-
+    @Override
+    public String toString() {
+    	return getClass().getSimpleName() + "(" + getName() + ")";
+    }
 
     @FameProperty(name = "annotationInstances", opposite = "annotatedEntity", derived = true)
     public Collection<TAnnotationInstance> getAnnotationInstances() {

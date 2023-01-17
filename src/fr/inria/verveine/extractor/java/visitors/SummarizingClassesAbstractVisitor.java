@@ -2,9 +2,7 @@ package fr.inria.verveine.extractor.java.visitors;
 
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
-import fr.inria.verveine.extractor.java.VerveineJParser;
 import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.moosetechnology.model.famix.famixjavaentities.NamedEntity;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 

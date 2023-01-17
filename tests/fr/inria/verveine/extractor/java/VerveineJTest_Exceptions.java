@@ -3,7 +3,6 @@ package fr.inria.verveine.extractor.java;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
-import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import java.io.File;
 

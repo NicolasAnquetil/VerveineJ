@@ -3,7 +3,6 @@ package fr.inria.verveine.extractor.java.utils;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
-import org.moosetechnology.model.famix.famixjavaentities.Method;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 
 import fr.inria.verveine.extractor.java.AbstractDictionary;

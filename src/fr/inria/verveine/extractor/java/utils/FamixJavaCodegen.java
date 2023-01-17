@@ -42,4 +42,12 @@ public class FamixJavaCodegen {
         puts("done");
     }
 
+    /*
+     * Note: must add this method to org.moosetechnology.model.famix.famixjavaentities.NamedEntity
+     * 
+     * @Override
+     * public String toString() {
+     *   return getClass().getSimpleName() + "(" + getName() + ")";
+     * }
+     */
 }

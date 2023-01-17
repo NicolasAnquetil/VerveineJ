@@ -87,6 +87,7 @@
 			</classpath>
 
 			<formatter type="xml"/>
+			<formatter type="plain" usefile="false" />
 			
 			 <batchtest fork="yes" todir="${test.report.dir}">
 			     <fileset dir="${testsrc.dir}">

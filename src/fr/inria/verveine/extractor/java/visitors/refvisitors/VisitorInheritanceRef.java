@@ -15,9 +15,6 @@ import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 /** A visitor to record inheritance relationships.<br>
  * It is simpler than the other ref visitors
  * @author anquetil
