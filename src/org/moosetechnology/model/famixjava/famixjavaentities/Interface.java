@@ -19,10 +19,12 @@ import org.moosetechnology.model.famixjava.famixtraits.TInvocationsReceiver;
 import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 import org.moosetechnology.model.famixjava.famixtraits.TPackage;
 import org.moosetechnology.model.famixjava.famixtraits.TPackageable;
+import org.moosetechnology.model.famixjava.famixtraits.TParameterizedType;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
 import org.moosetechnology.model.famixjava.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
+import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
 
 
 @FamePackage("Famix-Java-Entities")
@@ -51,8 +53,6 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THa
 
     private String visibility;
     
-
-
     @FameProperty(name = "attributes", opposite = "parentType", derived = true)
     public Collection<TAttribute> getAttributes() {
         if (attributes == null) {
@@ -541,8 +541,6 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THa
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
-    
-
 
 }
 

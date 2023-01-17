@@ -6,7 +6,7 @@ import org.eclipse.jdt.core.dom.*;
  * Checks the type of ASTNodes without having to use instanceof<br>
  * <p>Uses double dispatch (ASTVisitor infrastructure).
  * For this class to work as a "double-dispatcher" and not a visitor, all visit method must return false (see after all static methods.
- * And the actual result is sored in a variable</p>
+ * And the actual result is stored in a variable</p>
  * <p>The testing methods are static and use a singleton visitor</p>
  */
 public class NodeTypeChecker extends ASTVisitor {

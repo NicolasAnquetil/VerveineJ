@@ -53,7 +53,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		endVisitTypeDeclaration(node);
 	}
 
-	/**
+	/** creation of an instance of a class (anonymous or not)
 	 * ClassInstanceCreation ::=
         [ Expression . ]
             new [ < Type { , Type } > ]

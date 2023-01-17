@@ -3,23 +3,51 @@
  */
 package fr.inria.verveine.extractor.java;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
-import java.lang.Exception;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.moosetechnology.model.famixjava.famixjavaentities.Access;
+import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationInstance;
+import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationType;
+import org.moosetechnology.model.famixjava.famixjavaentities.Attribute;
+import org.moosetechnology.model.famixjava.famixjavaentities.Comment;
+import org.moosetechnology.model.famixjava.famixjavaentities.Implementation;
+import org.moosetechnology.model.famixjava.famixjavaentities.ImplicitVariable;
+import org.moosetechnology.model.famixjava.famixjavaentities.IndexedFileAnchor;
+import org.moosetechnology.model.famixjava.famixjavaentities.Inheritance;
+import org.moosetechnology.model.famixjava.famixjavaentities.Interface;
+import org.moosetechnology.model.famixjava.famixjavaentities.Invocation;
+import org.moosetechnology.model.famixjava.famixjavaentities.LocalVariable;
+import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famixjava.famixjavaentities.Package;
+import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
+import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famixjava.famixjavaentities.SourceAnchor;
+import org.moosetechnology.model.famixjava.famixtraits.TAccess;
+import org.moosetechnology.model.famixjava.famixtraits.TAnnotationInstance;
+import org.moosetechnology.model.famixjava.famixtraits.TAttribute;
+import org.moosetechnology.model.famixjava.famixtraits.TComment;
+import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
+import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
+import org.moosetechnology.model.famixjava.famixtraits.TInvocation;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
+import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TParameter;
+import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
 
 /**
  * @author Nicolas Anquetil
@@ -382,44 +410,36 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testStubs() {
-		// int nbTypes = 5; // Object,String,StringBuffer,PrintStream,System
-		// previous version was going up the inheritance hierarchy for stubs. No longer
-		// the case
-		// these class are no longer created:
-		// AbstractStringBuilder,FilterOutputStream,OutputStream,Comparable,Serializable,Flushable,Appendable,CharSequence,Closeable,
-		// +(java7)AutoCloseable}
+		// previous version was going up the inheritance hierarchy for stubs.
+		// This is no longer the case, therefore following classes are no longer created:
+		// AbstractStringBuilder, FilterOutputStream, OutputStream, Comparable, Serializable, Flushable, Appendable,
+		// CharSequence, Closeable, AutoCloseable
 
-		/*
-		 * previous version was going up the inheritance hierarchy for stubs. No longer
-		 * the case
-		 * if ( System.getProperty("java.version").startsWith("1.") &&
-		 * System.getProperty("java.version").charAt(2) >= '7' ) {
-		 * // class Autocloseable starting in Java 7
-		 * nbTypes++;
-		 * }
-		 */
+		// parent package of Object exists and is stub
+		Package pckgLang = detectFamixElement(Package.class, "lang");
+		assertNotNull(pckgLang);
+		assertTrue(pckgLang.getIsStub());
 
-		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME
-				.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
-		Package ns = detectFamixElement(Package.class, javaLangName);
-		assertNotNull(ns);
-		assertTrue(ns.getIsStub());
-
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz = detectFamixElement(
-				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME);
+		// stub "Object" exists and is inside "lang" package
+		org.moosetechnology.model.famixjava.famixjavaentities.Class
+			clazz = detectFamixElement(
+				org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Object");
 		assertNotNull(clazz);
 		assertTrue(clazz.getIsStub());
-		assertSame(ns, clazz.getTypeContainer());
+		assertSame(pckgLang, clazz.getTypeContainer());
 
+		// stub "String" exists and is inside "lang" package
 		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "String");
 		assertNotNull(clazz);
 		assertTrue(clazz.getIsStub());
-		assertSame(ns, clazz.getTypeContainer());
+		assertSame(pckgLang, clazz.getTypeContainer());
 
+		// "Node" is not stub
 		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
 		assertNotNull(clazz);
 		assertFalse(clazz.getIsStub());
 
+		// "<Initializer>" method is not stub
 		Method mth = detectFamixElement(Method.class, "<Initializer>");
 		assertNotNull(mth);
 		assertFalse(mth.getIsStub());

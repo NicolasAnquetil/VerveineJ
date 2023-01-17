@@ -9,9 +9,12 @@ import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
 import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
 import org.moosetechnology.model.famixjava.famixjavaentities.Type;
 import org.moosetechnology.model.famixjava.famixjavaentities.*;
+import org.moosetechnology.model.famixjava.famixtraits.TAccess;
 import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
+import org.moosetechnology.model.famixjava.famixtraits.TMethod;
 import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
 import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
 
 import java.util.List;
@@ -234,11 +237,11 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 
 	public boolean visit(FieldAccess node) {
 	    visitIfNotNull(node.getExpression());
-		Method accessor = this.context.topMethod();
+		TMethod accessor = this.context.topMethod();
 		IVariableBinding bnd = node.resolveFieldBinding();
 		// FIXME if bnd == null we have a problem
 		ensureAccessedStructEntity(bnd, node.getName().getIdentifier(), /*typ*/null, /*owner*/null, accessor);
-		Access lastAccess = context.getLastAccess();
+		TAccess lastAccess = context.getLastAccess();
 		if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc))
 				// check that lastAccess corresponds to current one
 				&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
@@ -255,10 +258,10 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		IBinding bnd = node.resolveBinding();
 		if ( (bnd != null) && (bnd.getKind() == IBinding.VARIABLE) ) {
 			// could be a field or an enumValue
-			Method accessor = this.context.topMethod();
+			TMethod accessor = this.context.topMethod();
 			ensureAccessedStructEntity((IVariableBinding) bnd, node.getName().getIdentifier(), /*typ*/null,
 					/*owner*/null, accessor);
-			Access lastAccess = context.getLastAccess();
+			TAccess lastAccess = context.getLastAccess();
 			if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc))
 					// check that lastAccess corresponds to current one
 					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
@@ -403,11 +406,11 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 				context.topMethod(), 
 				/*persistIt*/! summarizeClasses());
 		if (fmx != null) {
-			Method accessor = this.context.topMethod();
+			TMethod accessor = this.context.topMethod();
 
 			createAccess(accessor, fmx, inAssignmentLHS);
 
-			Access lastAccess = context.getLastAccess();
+			TAccess lastAccess = context.getLastAccess();
 			if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (lastAccess != null) ) {
 				dico.addSourceAnchor(lastAccess, node.getParent(), /*oneLineAnchor*/true);
 			}
@@ -438,10 +441,10 @@ public class VisitorAccessRef extends AbstractRefVisitor {
         IBinding bnd = node.resolveBinding();
         if ( (bnd != null) && (bnd.getKind() == IBinding.VARIABLE) && (context.topMethod() != null) ) {
             // could be a variable, a field, an enumValue, ...
-            Method accessor = this.context.topMethod();
+            TMethod accessor = this.context.topMethod();
             ensureAccessedStructEntity((IVariableBinding) bnd, node.getIdentifier(), /*typ*/null, /*owner*/null,
                     accessor);
-            Access lastAccess = context.getLastAccess();
+            TAccess lastAccess = context.getLastAccess();
             if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
                     // check that lastAccess corresponds to current one
                     && (lastAccess != null) && (lastAccess.getAccessor() == accessor)
@@ -469,7 +472,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	}
 
 	private TStructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name,
-														 org.moosetechnology.model.famixjava.famixjavaentities.Type typ, ContainerEntity owner, Method accessor) {
+														 org.moosetechnology.model.famixjava.famixjavaentities.Type typ, ContainerEntity owner, TMethod accessor) {
 		TStructuralEntity accessed = null;
 
 		if (bnd == null) {
@@ -519,7 +522,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	 * @param accessed -- the variable accessed
 	 * @param isLHS    -- whether the access occurs on the LeftHandSide of an assignement (and therefore is a write access)
 	 */
-	private void createAccess(Method accessor, TStructuralEntity accessed, boolean isLHS) {
+	private void createAccess(TMethod accessor, TStructuralEntity accessed, boolean isLHS) {
 		// create local accesses?
 		if ((accessed != null) && (accessor != null)) {
 			if (summarizeClasses()) {
@@ -531,7 +534,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		}
 	}
 
-	private boolean localVariable(TStructuralEntity accessed, Method accessor) {
+	private boolean localVariable(TStructuralEntity accessed, TMethod accessor) {
 		// TODO see issue 11 (https://github.com/NicolasAnquetil/VerveineJ/issues/11)
 
 		// This is ugly.. but it allows us to not rewrite method in generated code
