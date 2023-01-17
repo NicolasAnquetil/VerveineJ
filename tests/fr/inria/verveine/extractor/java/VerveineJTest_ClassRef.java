@@ -3,8 +3,6 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famix.famixjavaentities.Access;
-import org.moosetechnology.model.famix.famixjavaentities.Class;
 import org.moosetechnology.model.famix.famixjavaentities.Reference;
 
 import java.io.File;

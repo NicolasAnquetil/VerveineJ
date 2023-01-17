@@ -3,6 +3,7 @@
 	<!-- Sets variables which can later be used. -->
 	<!-- The value of a property is accessed via ${} -->
 	<property name="src.dir"      location="src" />
+	<property name="gensrc.dir"   location="gen" />
 	<property name="testsrc.dir"  location="tests" />
 	<property name="build.dir"    location="bin" />
 	<property name="docs.dir"     location="docs" />
@@ -26,6 +27,13 @@
 	</target>
 
 	<target name="compile" depends="clean, makedir">
+		<javac srcdir="${gensrc.dir}" destdir="${build.dir}" source="17" target="17" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
+			<classpath>
+				<fileset dir="${dist.dir}">
+  				  <include name="*.jar"/>
+				</fileset>
+			</classpath>
+		</javac>
 		<javac srcdir="${src.dir}" destdir="${build.dir}" source="17" target="17" includeantruntime="false" debug="true" debuglevel="lines,vars,source">
 			<classpath>
 				<fileset dir="${dist.dir}">
@@ -65,7 +73,7 @@
 	<target name="rebuild">
 		<jar destfile="${verveine.jar}"
 		     basedir="${build.dir}"
-		     includes="fr/inria/verveine/extractor/java/*.class"
+		     includes="**/*.class"
 		/>
 	</target>
 
@@ -78,8 +86,7 @@
 				</fileset>
 			</classpath>
 
-			<formatter type="plain" usefile="false" />
-			<formatter type="plain"/>
+			<formatter type="xml"/>
 			
 			 <batchtest fork="yes" todir="${test.report.dir}">
 			     <fileset dir="${testsrc.dir}">
@@ -98,7 +105,6 @@
   				   <include name="*.jar"/>
 				</fileset>
 			</classpath>
-			<formatter type="plain"/>
 			<formatter type="xml" />
 			
 			 <batchtest fork="yes" todir="${test.report.dir}">
@@ -110,17 +116,7 @@
 		</junit>
 	</target>
 
-	<!-- Run JUnit TestLAN -->
-	<target name="test_lan">
-		<junit printsummary="on" fork="true" haltonfailure="true" haltonerror="true">
-			<classpath>
-				<fileset dir="${dist.dir}">
-  				  <include name="*.jar"/>
-				</fileset>
-			</classpath>
-			<formatter type="plain" />
-			<test name="tests.fr.inria.verveine.extractor.java.VerveineJTest_LanModel" todir="${test.report.dir}" />
-		</junit>
-	</target>
+	<!-- synonym -->
+	<target name="test" depends="junit"/>
 
 </project>
