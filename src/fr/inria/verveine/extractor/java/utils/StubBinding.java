@@ -3,7 +3,6 @@ package fr.inria.verveine.extractor.java.utils;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.*;
-import org.eclipse.jdt.internal.compiler.ast.ConstructorDeclaration;
 
 import java.util.HashMap;
 import java.util.List;

@@ -4,16 +4,16 @@ import ch.akuhn.fame.Repository;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Class;
-import org.moosetechnology.model.famixjava.famixjavaentities.Comment;
-import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
-import org.moosetechnology.model.famixjava.famixjavaentities.Exception;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType;
-import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
-import org.moosetechnology.model.famixjava.famixjavaentities.Type;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Class;
+import org.moosetechnology.model.famix.famixjavaentities.Comment;
+import org.moosetechnology.model.famix.famixjavaentities.Enum;
+import org.moosetechnology.model.famix.famixjavaentities.Exception;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famix.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famix.famixjavaentities.Type;
+import org.moosetechnology.model.famix.famixtraits.*;
 
 import java.util.*;
 
@@ -244,8 +244,8 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	@SuppressWarnings("deprecation")
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClass(ITypeBinding bnd, String name, TNamedEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = null;
+	public org.moosetechnology.model.famix.famixjavaentities.Class ensureFamixClass(ITypeBinding bnd, String name, TNamedEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx = null;
 
 		// --------------- some special cases
 		if (bnd != null) {
@@ -258,7 +258,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// ---------------- to avoid useless computations if we can
-		fmx = (org.moosetechnology.model.famixjava.famixjavaentities.Class) getEntityByKey(bnd);
+		fmx = (org.moosetechnology.model.famix.famixjavaentities.Class) getEntityByKey(bnd);
 		if (fmx != null) {
 			return fmx;
 		}
@@ -300,7 +300,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// --------------- recover from name ?
-		for (org.moosetechnology.model.famixjava.famixjavaentities.Class candidate : this.getEntityByName(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, name)) {
+		for (org.moosetechnology.model.famix.famixjavaentities.Class candidate : this.getEntityByName(org.moosetechnology.model.famix.famixjavaentities.Class.class, name)) {
 			if (matchAndMapClass(bnd, name, (ContainerEntity) owner, candidate)) {
 				fmx = candidate;
 				break;
@@ -350,8 +350,8 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	@SuppressWarnings("deprecation")
-	public <T extends TWithTypes & TNamedEntity> org.moosetechnology.model.famixjava.famixjavaentities.Exception ensureFamixException(ITypeBinding bnd, String name, TWithTypes owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Exception fmx = null;
+	public <T extends TWithTypes & TNamedEntity> org.moosetechnology.model.famix.famixjavaentities.Exception ensureFamixException(ITypeBinding bnd, String name, TWithTypes owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+		org.moosetechnology.model.famix.famixjavaentities.Exception fmx = null;
 
 		// --------------- some special cases
 		if (bnd != null) {
@@ -364,7 +364,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// ---------------- to avoid useless computations if we can
-		fmx = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) getEntityByKey(bnd);
+		fmx = (org.moosetechnology.model.famix.famixjavaentities.Exception) getEntityByKey(bnd);
 		if (fmx != null) {
 			return fmx;
 		}
@@ -402,7 +402,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// --------------- recover from name ?
-		for (org.moosetechnology.model.famixjava.famixjavaentities.Exception candidate : this.getEntityByName(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, name)) {
+		for (org.moosetechnology.model.famix.famixjavaentities.Exception candidate : this.getEntityByName(org.moosetechnology.model.famix.famixjavaentities.Exception.class, name)) {
 			if (matchAndMapClass(bnd, name, (T) owner, candidate)) {
 				fmx = candidate;
 				break;
@@ -755,11 +755,11 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return super.ensureFamixPrimitiveType(bnd, name);
 	}
 
-	public <T extends TWithTypes & TNamedEntity> org.moosetechnology.model.famixjava.famixjavaentities.Enum ensureFamixEnum(ITypeBinding bnd, String name, TWithTypes owner) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = null;
+	public <T extends TWithTypes & TNamedEntity> org.moosetechnology.model.famix.famixjavaentities.Enum ensureFamixEnum(ITypeBinding bnd, String name, TWithTypes owner) {
+		org.moosetechnology.model.famix.famixjavaentities.Enum fmx = null;
 
 		// --------------- to avoid useless computations if we can
-		fmx = (org.moosetechnology.model.famixjava.famixjavaentities.Enum) getEntityByKey(bnd);
+		fmx = (org.moosetechnology.model.famix.famixjavaentities.Enum) getEntityByKey(bnd);
 		if (fmx != null) {
 			return fmx;
 		}
@@ -784,7 +784,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		}
 
 		// --------------- recover from name ?
-		for (org.moosetechnology.model.famixjava.famixjavaentities.Enum candidate : getEntityByName(org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, name)) {
+		for (org.moosetechnology.model.famix.famixjavaentities.Enum candidate : getEntityByName(org.moosetechnology.model.famix.famixjavaentities.Enum.class, name)) {
 			if (matchAndMapType(bnd, name, (T) owner, candidate)) {
 				fmx = candidate;
 				break;
@@ -805,7 +805,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * helper method, we know the type exists, ensureFamixEnum will recover it
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Enum getFamixEnum(ITypeBinding bnd, String name, TWithTypes owner) {
+	public org.moosetechnology.model.famix.famixjavaentities.Enum getFamixEnum(ITypeBinding bnd, String name, TWithTypes owner) {
 		return ensureFamixEnum(bnd, name, owner);
 	}
 
@@ -1197,7 +1197,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * @return whether the binding matches the candidate (if <b>true</b>, the mapping is recorded)
 	 */
 	private boolean matchAndMapClass(ITypeBinding bnd, String name, TNamedEntity owner, TType candidate) {
-		if (!(candidate instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class)) {
+		if (!(candidate instanceof org.moosetechnology.model.famix.famixjavaentities.Class)) {
 			return false;
 		}
 
@@ -2149,8 +2149,8 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 * @param bnd -- a potential binding for the java "Object" class
 	 * @return a Famix class for "Object"
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClassObject(ITypeBinding bnd) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, bnd, OBJECT_NAME);
+	public org.moosetechnology.model.famix.famixjavaentities.Class ensureFamixClassObject(ITypeBinding bnd) {
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famix.famixjavaentities.Class.class, bnd, OBJECT_NAME);
 
 		if (fmx != null) {
 			fmx.setTypeContainer(ensureFamixPackageJavaLang(null));
@@ -2163,10 +2163,10 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	/**
 	 * Ensures the Java meta-class: Class<>
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixMetaClass(ITypeBinding bnd) {
+	public org.moosetechnology.model.famix.famixjavaentities.Class ensureFamixMetaClass(ITypeBinding bnd) {
 		Package javaLang = ensureFamixPackageJavaLang((bnd == null) ? null : bnd.getPackage());
 		// always persist the MetaClass whatever the value of VerveineJParser.classSummary
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC & Modifier.FINAL, /*alwaysPersist?*/true);
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx = this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC & Modifier.FINAL, /*alwaysPersist?*/true);
 
 		if ((fmx != null) && (fmx.getSuperInheritances() == null)) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, null);
@@ -2175,7 +2175,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return fmx;
 	}
 
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class getFamixMetaClass(ITypeBinding bnd) {
+	public org.moosetechnology.model.famix.famixjavaentities.Class getFamixMetaClass(ITypeBinding bnd) {
 		Package javaLang = ensureFamixPackageJavaLang((bnd == null) ? null : bnd.getPackage());
 		return this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, UNKNOWN_MODIFIERS, /*alwaysPersist?*/false);
 	}
@@ -2185,8 +2185,8 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 *
 	 * @return a Famix class
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClassStubOwner() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = super.ensureFamixClassStubOwner();
+	public org.moosetechnology.model.famix.famixjavaentities.Class ensureFamixClassStubOwner() {
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx = super.ensureFamixClassStubOwner();
 		ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
 
 		return fmx;
@@ -2199,8 +2199,8 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	 *
 	 * @return a Famix class
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClassArray() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, null, ARRAYS_NAME);
+	public org.moosetechnology.model.famix.famixjavaentities.Class ensureFamixClassArray() {
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx = ensureFamixUniqEntity(org.moosetechnology.model.famix.famixjavaentities.Class.class, null, ARRAYS_NAME);
 		if (fmx != null) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, /*prev*/null);
 			fmx.setContainer(ensureFamixPackageDefault());

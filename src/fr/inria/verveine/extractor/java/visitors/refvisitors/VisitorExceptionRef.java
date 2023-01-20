@@ -4,14 +4,12 @@ import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Class;
-import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
-import org.moosetechnology.model.famixjava.famixjavaentities.Exception;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterType;
-import org.moosetechnology.model.famixjava.famixtraits.TMethod;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
+import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famix.famixjavaentities.Exception;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
+import org.moosetechnology.model.famix.famixtraits.TType;
 
 import java.util.List;
 
@@ -89,9 +87,9 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
         Method meth = (Method) this.context.topMethod();
         Type excepClass = node.getException().getType();
         if (meth != null) {
-            org.moosetechnology.model.famixjava.famixjavaentities.Exception excepFmx = null;
+            org.moosetechnology.model.famix.famixjavaentities.Exception excepFmx = null;
             if ( NodeTypeChecker.isSimpleType(excepClass) || NodeTypeChecker.isQualifiedType(excepClass) ) {
-                excepFmx = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) referedType(excepClass, meth, true, true);
+                excepFmx = (org.moosetechnology.model.famix.famixjavaentities.Exception) referedType(excepClass, meth, true, true);
             }
             if (excepFmx != null) {
                 if (! summarizeClasses()) {
@@ -106,7 +104,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
     @Override
     public boolean visit(ThrowStatement node) {
         Method meth = (Method) this.context.topMethod();
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception excepFmx = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) this
+        org.moosetechnology.model.famix.famixjavaentities.Exception excepFmx = (org.moosetechnology.model.famix.famixjavaentities.Exception) this
                 .referedType(node.getExpression().resolveTypeBinding(), (ContainerEntity) context.topType(), true);
         if (excepFmx != null) {
             if (! summarizeClasses()) {

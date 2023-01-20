@@ -6,15 +6,14 @@ import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationTypeAttribute;
-import org.moosetechnology.model.famixjava.famixjavaentities.Attribute;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
-import org.moosetechnology.model.famixjava.famixjavaentities.Type;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
-import org.moosetechnology.model.famixjava.famixtraits.TWithComments;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute;
+import org.moosetechnology.model.famix.famixjavaentities.Attribute;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.Parameter;
+import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famix.famixtraits.TWithAttributes;
+import org.moosetechnology.model.famix.famixtraits.TWithComments;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest

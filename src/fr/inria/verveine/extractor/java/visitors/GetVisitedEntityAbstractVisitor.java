@@ -6,13 +6,12 @@ import fr.inria.verveine.extractor.java.utils.EntityStack;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.Type;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.TMethod;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
-import org.moosetechnology.model.famixjava.famixtraits.TWithMethods;
-import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixtraits.TMethod;
+import org.moosetechnology.model.famix.famixtraits.TType;
+import org.moosetechnology.model.famix.famixtraits.TWithMethods;
+import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -119,7 +118,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected void endVisitTypeDeclaration(TypeDeclaration node) {
-		if (context.topType() instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class || context.topType() instanceof Interface) {
+		if (context.topType() instanceof org.moosetechnology.model.famix.famixjavaentities.Class || context.topType() instanceof Interface) {
 			context.pop();
 		}
 		super.endVisit(node);
@@ -139,8 +138,8 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	/**
 	 * See field {@link GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
 	 */
-	protected org.moosetechnology.model.famixjava.famixjavaentities.Class visitAnonymousClassDeclaration(AnonymousClassDeclaration node) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx;
+	protected org.moosetechnology.model.famix.famixjavaentities.Class visitAnonymousClassDeclaration(AnonymousClassDeclaration node) {
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx;
 
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
@@ -152,7 +151,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected void endVisitAnonymousClassDeclaration(AnonymousClassDeclaration node) {
-		if (context.top() instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class) {
+		if (context.top() instanceof org.moosetechnology.model.famix.famixjavaentities.Class) {
 			context.pop();
 		}
 		if (!anonymousSuperTypeName.empty()) {
@@ -160,10 +159,10 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		}
 	}
 
-	protected org.moosetechnology.model.famixjava.famixjavaentities.Enum visitEnumDeclaration(EnumDeclaration node) {
+	protected org.moosetechnology.model.famix.famixjavaentities.Enum visitEnumDeclaration(EnumDeclaration node) {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		org.moosetechnology.model.famixjava.famixjavaentities.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (TWithTypes) context.top());
+		org.moosetechnology.model.famix.famixjavaentities.Enum fmx = dico.getFamixEnum(bnd, node.getName().getIdentifier(), (TWithTypes) context.top());
 		if (fmx != null) {
 			this.context.pushType(fmx);
 		}
@@ -171,7 +170,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected void endVisitEnumDeclaration(EnumDeclaration node) {
-		if (context.top() instanceof org.moosetechnology.model.famixjava.famixjavaentities.Enum) {
+		if (context.top() instanceof org.moosetechnology.model.famix.famixjavaentities.Enum) {
 			this.context.popType();
 		}
 		super.endVisit(node);

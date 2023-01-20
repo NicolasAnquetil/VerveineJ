@@ -4,7 +4,7 @@ import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.EntityStack;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest

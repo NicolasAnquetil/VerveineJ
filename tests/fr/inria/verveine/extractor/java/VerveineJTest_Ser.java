@@ -2,12 +2,10 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixtraits.TMethod;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixtraits.TMethod;
 
 import java.io.File;
-import java.util.Collection;
 
 import static org.junit.Assert.*;
 
@@ -31,7 +29,7 @@ public class VerveineJTest_Ser extends VerveineJTest_Basic {
 
     @Test
     public void testDeclaredExceptions() {
-        org.moosetechnology.model.famixjava.famixjavaentities.Class myServiceImplClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "MyServiceImpl");
+        org.moosetechnology.model.famix.famixjavaentities.Class myServiceImplClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "MyServiceImpl");
         assertNotNull(myServiceImplClass);
         assertEquals(11, myServiceImplClass.getMethods().size());
 

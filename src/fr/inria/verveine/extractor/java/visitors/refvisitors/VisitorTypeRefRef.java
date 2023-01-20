@@ -3,13 +3,13 @@ package fr.inria.verveine.extractor.java.visitors.refvisitors;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.Reference;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
-import org.moosetechnology.model.famixjava.famixtraits.TTypedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
+import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.Reference;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TType;
+import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
+import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 import java.util.List;
 
@@ -65,7 +65,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		visitClassInstanceCreation(node);
 		if (node.getAnonymousClassDeclaration() == null) {
 			Type clazz = node.getType();
-			org.moosetechnology.model.famixjava.famixtraits.TType fmx = referedType(clazz, (ContainerEntity) context.top(), true);
+			org.moosetechnology.model.famix.famixtraits.TType fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
 			if (! summarizeClasses()) {
 				ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
@@ -195,7 +195,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	}
 
 	public boolean visit(InstanceofExpression node) {
-		org.moosetechnology.model.famixjava.famixtraits.TType fmx = null;
+		org.moosetechnology.model.famix.famixtraits.TType fmx = null;
 		Type clazz = node.getRightOperand();
 		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
@@ -288,7 +288,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	    if (this.searchTypeRef) {
 			IBinding bnd = node.resolveBinding();
 			if ((bnd != null) && (bnd.getKind() == IBinding.TYPE)) {
-				org.moosetechnology.model.famixjava.famixtraits.TType referred = (org.moosetechnology.model.famixjava.famixtraits.TType) referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
+				org.moosetechnology.model.famix.famixtraits.TType referred = (org.moosetechnology.model.famix.famixtraits.TType) referedType((ITypeBinding) bnd, (ContainerEntity) context.top(), !((ITypeBinding) bnd).isEnum());
 				Reference ref = dico.addFamixReference((Method) context.top(), referred, context.getLastReference());
 				context.setLastReference(ref);
 				if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {

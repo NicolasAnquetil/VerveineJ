@@ -5,17 +5,15 @@ import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
-import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
-import org.moosetechnology.model.famixjava.famixjavaentities.Type;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.TAccess;
-import org.moosetechnology.model.famixjava.famixtraits.TAccessible;
-import org.moosetechnology.model.famixjava.famixtraits.TMethod;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAccesses;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Enum;
+import org.moosetechnology.model.famix.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famix.famixjavaentities.Type;
+import org.moosetechnology.model.famix.famixtraits.TAccess;
+import org.moosetechnology.model.famix.famixtraits.TMethod;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famix.famixtraits.TWithAttributes;
 
 import java.util.List;
 
@@ -472,7 +470,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	}
 
 	private TStructuralEntity ensureAccessedStructEntity(IVariableBinding bnd, String name,
-														 org.moosetechnology.model.famixjava.famixjavaentities.Type typ, ContainerEntity owner, TMethod accessor) {
+														 org.moosetechnology.model.famix.famixjavaentities.Type typ, ContainerEntity owner, TMethod accessor) {
 		TStructuralEntity accessed = null;
 
 		if (bnd == null) {
@@ -557,7 +555,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			return true;
 		}
 		if (((TNamedEntity) accessor.getParentType()).getName().startsWith(JavaDictionary.ANONYMOUS_NAME_PREFIX)) {
-			return localVariable(accessed, ((Method) ((org.moosetechnology.model.famixjava.famixjavaentities.Type) accessor.getParentType()).getTypeContainer()));
+			return localVariable(accessed, ((Method) ((org.moosetechnology.model.famix.famixjavaentities.Type) accessor.getParentType()).getTypeContainer()));
 		}
 		return false;
 	}

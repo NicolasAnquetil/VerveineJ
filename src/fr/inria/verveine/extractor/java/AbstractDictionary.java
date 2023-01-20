@@ -2,10 +2,11 @@ package fr.inria.verveine.extractor.java;
 
 import ch.akuhn.fame.Repository;
 import fr.inria.verveine.extractor.java.utils.Util;
-import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Enum;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixtraits.*;
 
 import java.lang.Class;
 import java.lang.Exception;
@@ -287,8 +288,8 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Class should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClass(B key, String name, TWithTypes owner, boolean persistIt) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, key, name, persistIt);
+	public org.moosetechnology.model.famix.famixjavaentities.Class ensureFamixClass(B key, String name, TWithTypes owner, boolean persistIt) {
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx = ensureFamixEntity(org.moosetechnology.model.famix.famixjavaentities.Class.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
 	}
@@ -301,8 +302,8 @@ public class AbstractDictionary<B> {
 	 * @param persistIt -- whether the Class should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Exception ensureFamixException(B key, String name, TWithTypes owner, boolean persistIt) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Exception fmx = ensureFamixEntity(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, key, name, persistIt);
+	public org.moosetechnology.model.famix.famixjavaentities.Exception ensureFamixException(B key, String name, TWithTypes owner, boolean persistIt) {
+		org.moosetechnology.model.famix.famixjavaentities.Exception fmx = ensureFamixEntity(org.moosetechnology.model.famix.famixjavaentities.Exception.class, key, name, persistIt);
 		fmx.setTypeContainer(owner);
 		return fmx;
 	}
@@ -665,7 +666,7 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception declared to be thrown
 	 * @return the DeclaredException
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixDeclaredException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
+	public org.moosetechnology.model.famix.famixjavaentities.Exception createFamixDeclaredException(Method meth, org.moosetechnology.model.famix.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
@@ -683,7 +684,7 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception caught
 	 * @return the CaughtException
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixCaughtException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
+	public org.moosetechnology.model.famix.famixjavaentities.Exception createFamixCaughtException(Method meth, org.moosetechnology.model.famix.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
@@ -703,7 +704,7 @@ public class AbstractDictionary<B> {
 	 * @param excep -- the exception thrown
 	 * @return the ThrownException
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Exception createFamixThrownException(Method meth, org.moosetechnology.model.famixjava.famixjavaentities.Exception excep) {
+	public org.moosetechnology.model.famix.famixjavaentities.Exception createFamixThrownException(Method meth, org.moosetechnology.model.famix.famixjavaentities.Exception excep) {
 		if ( (meth == null) || (excep == null) ) {
 			return null;
 		}
@@ -725,7 +726,7 @@ public class AbstractDictionary<B> {
 	 */
 	@Deprecated
 	public ImplicitVariable getImplicitVariableByBinding(B bnd, String iv_name) {
-		return getImplicitVariableByType((org.moosetechnology.model.famixjava.famixjavaentities.Class)getEntityByKey(bnd), iv_name);
+		return getImplicitVariableByType((org.moosetechnology.model.famix.famixjavaentities.Class)getEntityByKey(bnd), iv_name);
 	}
 	
 	/**
@@ -839,8 +840,8 @@ public class AbstractDictionary<B> {
 	 * Creates or recovers a Famix Class to contain the methods stubs (for which we ignore the real owner).
 	 * @return a Famix class
 	 */
-	public org.moosetechnology.model.famixjava.famixjavaentities.Class ensureFamixClassStubOwner() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class fmx =  ensureFamixUniqEntity(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, null, STUB_METHOD_CONTAINER_NAME);
+	public org.moosetechnology.model.famix.famixjavaentities.Class ensureFamixClassStubOwner() {
+		org.moosetechnology.model.famix.famixjavaentities.Class fmx =  ensureFamixUniqEntity(org.moosetechnology.model.famix.famixjavaentities.Class.class, null, STUB_METHOD_CONTAINER_NAME);
 		if (fmx != null) {
 			fmx.setTypeContainer( ensureFamixPackageDefault());
 		}

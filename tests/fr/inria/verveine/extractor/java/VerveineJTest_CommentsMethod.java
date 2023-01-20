@@ -3,8 +3,8 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.IndexedFileAnchor;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.IndexedFileAnchor;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
 
 import java.io.File;
 import java.util.ArrayList;

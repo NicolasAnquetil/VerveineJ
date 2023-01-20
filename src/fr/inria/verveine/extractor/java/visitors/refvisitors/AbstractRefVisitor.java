@@ -4,14 +4,13 @@ import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.ContainerEntity;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TParameterizedTypeUser;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
-import org.moosetechnology.model.famixjava.famixtraits.TWithParameterizedTypes;
-import org.moosetechnology.model.famixjava.famixtraits.TWithTypes;
+import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TParameterizedTypeUser;
+import org.moosetechnology.model.famix.famixtraits.TType;
+import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
+import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 /**
  * A collection of useful utility methods that are needed in various ref visitors
@@ -103,7 +102,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 	 * Same as {@link AbstractRefVisitor#referedType(Type, ContainerEntity, boolean)} but with a type binding as first argument instead of a Type
 	 */
 	protected  TType referedType(ITypeBinding bnd, TNamedEntity ctxt, boolean isClass) {
-		org.moosetechnology.model.famixjava.famixtraits.TType fmxTyp = null;
+		org.moosetechnology.model.famix.famixtraits.TType fmxTyp = null;
 
 		if (bnd == null) {
 			return null;
@@ -139,7 +138,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
 				TType fmxTArg = this.referedType(targ, ctxt, false);
 				if ((fmxTArg != null) && persistClass(targ)) {
-					((org.moosetechnology.model.famixjava.famixjavaentities.ParameterizedType) fmxTyp).addArguments((TParameterizedTypeUser) fmxTArg);
+					((org.moosetechnology.model.famix.famixjavaentities.ParameterizedType) fmxTyp).addArguments((TParameterizedTypeUser) fmxTArg);
 				}
 			}
 		} else {

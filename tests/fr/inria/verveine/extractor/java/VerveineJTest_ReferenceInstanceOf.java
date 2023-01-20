@@ -2,7 +2,7 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Class;
+import org.moosetechnology.model.famix.famixjavaentities.Class;
 
 import java.io.File;
 
@@ -42,7 +42,7 @@ public class VerveineJTest_ReferenceInstanceOf extends VerveineJTest_Basic {
     @Test
     public void testExistingException() {
         parse(new String[]{"-alllocals", "-anchor", "assoc", "test_src/instanceOf"});
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception exception = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class , "SeditException");
+        org.moosetechnology.model.famix.famixjavaentities.Exception exception = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class , "SeditException");
         // From Calculated Expression "hello" and from TypeLiteral String.class
         assertNotNull(exception);
     }

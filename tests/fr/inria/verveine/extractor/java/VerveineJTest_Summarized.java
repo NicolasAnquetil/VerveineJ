@@ -73,26 +73,26 @@ FileServer
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Access;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationInstance;
-import org.moosetechnology.model.famixjava.famixjavaentities.AnnotationType;
-import org.moosetechnology.model.famixjava.famixjavaentities.Attribute;
-import org.moosetechnology.model.famixjava.famixjavaentities.Comment;
-import org.moosetechnology.model.famixjava.famixjavaentities.Implementation;
-import org.moosetechnology.model.famixjava.famixjavaentities.IndexedFileAnchor;
-import org.moosetechnology.model.famixjava.famixjavaentities.Inheritance;
-import org.moosetechnology.model.famixjava.famixjavaentities.Interface;
-import org.moosetechnology.model.famixjava.famixjavaentities.Invocation;
-import org.moosetechnology.model.famixjava.famixjavaentities.LocalVariable;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixjavaentities.Package;
-import org.moosetechnology.model.famixjava.famixjavaentities.Parameter;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableClass;
-import org.moosetechnology.model.famixjava.famixjavaentities.ParameterizableInterface;
-import org.moosetechnology.model.famixjava.famixjavaentities.PrimitiveType;
-import org.moosetechnology.model.famixjava.famixjavaentities.Reference;
-import org.moosetechnology.model.famixjava.famixtraits.TImplementation;
-import org.moosetechnology.model.famixjava.famixtraits.TInheritance;
+import org.moosetechnology.model.famix.famixjavaentities.Access;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationInstance;
+import org.moosetechnology.model.famix.famixjavaentities.AnnotationType;
+import org.moosetechnology.model.famix.famixjavaentities.Attribute;
+import org.moosetechnology.model.famix.famixjavaentities.Comment;
+import org.moosetechnology.model.famix.famixjavaentities.Implementation;
+import org.moosetechnology.model.famix.famixjavaentities.IndexedFileAnchor;
+import org.moosetechnology.model.famix.famixjavaentities.Inheritance;
+import org.moosetechnology.model.famix.famixjavaentities.Interface;
+import org.moosetechnology.model.famix.famixjavaentities.Invocation;
+import org.moosetechnology.model.famix.famixjavaentities.LocalVariable;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.Package;
+import org.moosetechnology.model.famix.famixjavaentities.Parameter;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizableClass;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famix.famixjavaentities.PrimitiveType;
+import org.moosetechnology.model.famix.famixjavaentities.Reference;
+import org.moosetechnology.model.famix.famixtraits.TImplementation;
+import org.moosetechnology.model.famix.famixtraits.TInheritance;
 
 /**
  * @author Nicolas Anquetil
@@ -159,7 +159,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	public void testEntitiesNumber() {
 		assertEquals(
 				allJavaSuperClasses(LAN_MODEL_JAVA_CLASSES_USED).size() + 10,  // FileServer, Node, AbstractDestinationAddress, WorkStation, XPrinter, Packet, PrintServer, SingleDestinationAddress, OutputServer, _Anonymous(IPrinter)
-				entitiesOfType(org.moosetechnology.model.famixjava.famixjavaentities.Class.class).size());
+				entitiesOfType(org.moosetechnology.model.famix.famixjavaentities.Class.class).size());
 
 		assertEquals(
 				allInterfacesFromClasses(LAN_MODEL_JAVA_CLASSES_USED).size() + 1,  // add IPrinter
@@ -210,7 +210,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	@Test
 	public void testInheritance() {
-		org.moosetechnology.model.famixjava.famixjavaentities.Class clazz;
+		org.moosetechnology.model.famix.famixjavaentities.Class clazz;
 		Collection<TInheritance> inherits;
 		Collection<TImplementation> implementations;
 		Inheritance inh = null;
@@ -220,23 +220,23 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		nbInherit += lanModelInterfacesSubtyped().size(); // Subtyping between interfaces is considered inheritance
 		assertEquals(nbInherit, entitiesOfType(Inheritance.class).size()); // one less than in VerveineJTest_LanModel because anonymous class is not created
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "PrintServer");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "PrintServer");
 		assertNotNull(clazz);
 		inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size());
 		inh = (Inheritance) firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "OutputServer"), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "OutputServer"), inh.getSuperclass());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "Node");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Node");
 		assertNotNull(clazz);
 		inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size());
 		inh = (Inheritance) firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 
-		clazz = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, "XPrinter");
+		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "XPrinter");
 		assertNotNull(clazz);
 		inherits = clazz.getSuperInheritances();
 		assertEquals(1, inherits.size()); // superInheritances: Object (in this order)
@@ -256,7 +256,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertSame(clazz, inh.getSubclass());
 		assertNull(inh.getPrevious());
 		assertSame(inh, inh.getNext().getPrevious());
-		assertSame(detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
 
 		assertSame(inh.getNext(), implem);
 		assertSame(implem.getPrevious(), inh);

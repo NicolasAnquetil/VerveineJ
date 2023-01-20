@@ -7,13 +7,12 @@ import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisit
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Enum;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TStructuralEntity;
-import org.moosetechnology.model.famixjava.famixtraits.TType;
-import org.moosetechnology.model.famixjava.famixtraits.TWithAttributes;
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Enum;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixtraits.TStructuralEntity;
+import org.moosetechnology.model.famix.famixtraits.TWithAttributes;
 
 import java.util.List;
 
@@ -291,7 +290,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	// "SomeClass.class"
 	public boolean visit(TypeLiteral node) {
-		org.moosetechnology.model.famixjava.famixjavaentities.Type javaMetaClass = dico.getFamixMetaClass(null);
+		org.moosetechnology.model.famix.famixjavaentities.Type javaMetaClass = dico.getFamixMetaClass(null);
 		dico.ensureFamixAttribute(null, "class", javaMetaClass, (TWithAttributes) javaMetaClass,	/*persistIt*/! summarizeClasses());
 
 		return super.visit(node);

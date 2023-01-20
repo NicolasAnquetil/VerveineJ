@@ -9,9 +9,9 @@ import fr.inria.verveine.extractor.java.utils.Util;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.*;
-import org.moosetechnology.model.famixjava.famixjavaentities.Class;
-import org.moosetechnology.model.famixjava.famixjavaentities.*;
-import org.moosetechnology.model.famixjava.famixtraits.*;
+import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Class;
+import org.moosetechnology.model.famix.famixtraits.*;
 
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	/**
 	 * Useful to keep the FamixType created in the specific case of "new SomeClass().someMethod()"
 	 */
-	private final org.moosetechnology.model.famixjava.famixjavaentities.Type classInstanceCreated = null;
+	private final org.moosetechnology.model.famix.famixjavaentities.Type classInstanceCreated = null;
 
 	/**
 	 * The source code of the visited AST.
@@ -265,7 +265,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		if (bnd == null) {
 			Iterator<TInheritance> iter = ((TWithInheritances) this.context.topType()).getSuperInheritances().iterator();
-			org.moosetechnology.model.famixjava.famixtraits.TType superClass = (TType) iter.next().getSuperclass();
+			org.moosetechnology.model.famix.famixtraits.TType superClass = (TType) iter.next().getSuperclass();
 			/* This code does not seem to do anything worthwhile
 			  while ((superClass instanceof org.moosetechnology.model.famixjava.famixjavaentities.Class)
 					&& (((org.moosetechnology.model.famixjava.famixjavaentities.Class) superClass).getIsInterface())
@@ -578,7 +578,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 * @param receiver -- the FAMIX Entity describing the receiver
 	 * @return the Famix Entity or null if could not find it
 	 */
-	private org.moosetechnology.model.famixjava.famixtraits.TType getInvokedMethodOwner(Expression expr, TNamedEntity receiver) {
+	private org.moosetechnology.model.famix.famixtraits.TType getInvokedMethodOwner(Expression expr, TNamedEntity receiver) {
 		// ((type)expr).msg()
 		if (NodeTypeChecker.isCastExpression(expr)) {
 			Type tcast = ((CastExpression) expr).getType();
@@ -636,8 +636,8 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 						}*/
 			else if (receiver instanceof TTypedEntity) {
 				return ((TTypedEntity) receiver).getDeclaredType();
-			} else if (receiver instanceof org.moosetechnology.model.famixjava.famixjavaentities.Type) {
-				return (org.moosetechnology.model.famixjava.famixjavaentities.Type) receiver;
+			} else if (receiver instanceof org.moosetechnology.model.famix.famixjavaentities.Type) {
+				return (org.moosetechnology.model.famix.famixjavaentities.Type) receiver;
 			}
 			// ... what else ?
 			else {

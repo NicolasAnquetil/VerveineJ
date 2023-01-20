@@ -2,8 +2,7 @@ package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.moosetechnology.model.famixjava.famixjavaentities.Method;
-import org.moosetechnology.model.famixjava.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixjavaentities.Method;
 
 import java.io.File;
 
@@ -32,11 +31,11 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         Method meth = detectFamixElement( Method.class, "lire");
         assertNotNull(meth);
 
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "ReadException");
+        org.moosetechnology.model.famix.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "ReadException");
         assertNotNull(excepClass);
 
         assertEquals(1, meth.getDeclaredExceptions().size());
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception exD = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) firstElt(meth.getDeclaredExceptions());
+        org.moosetechnology.model.famix.famixjavaentities.Exception exD = (org.moosetechnology.model.famix.famixjavaentities.Exception) firstElt(meth.getDeclaredExceptions());
         assertSame(meth, firstElt(exD.getDeclaringEntities()));
         assertSame(excepClass, exD);
     }
@@ -47,10 +46,10 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         assertNotNull(meth);
 
         assertEquals(1, meth.getThrownExceptions().size());
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception exT = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) firstElt(meth.getThrownExceptions());
+        org.moosetechnology.model.famix.famixjavaentities.Exception exT = (org.moosetechnology.model.famix.famixjavaentities.Exception) firstElt(meth.getThrownExceptions());
         assertSame(meth, firstElt(exT.getThrowingEntities()));
 
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "ReadException");
+        org.moosetechnology.model.famix.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "ReadException");
         assertSame(excepClass, exT);
     }
 
@@ -60,10 +59,10 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         assertNotNull(meth);
 
         assertEquals(1,meth.getCaughtExceptions().size());
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception exC = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) firstElt(meth.getCaughtExceptions());
+        org.moosetechnology.model.famix.famixjavaentities.Exception exC = (org.moosetechnology.model.famix.famixjavaentities.Exception) firstElt(meth.getCaughtExceptions());
         assertSame(meth, firstElt(exC.getCatchingEntities()));
 
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "IOException");
+        org.moosetechnology.model.famix.famixjavaentities.Exception excepClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "IOException");
         assertSame(excepClass, exC);
     }
 
@@ -74,17 +73,17 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 
 //        assertEquals(0, meth.getParentType().getTypes().size());
         assertEquals(1, meth.getDeclaredExceptions().size());
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception exD = (org.moosetechnology.model.famixjava.famixjavaentities.Exception) firstElt(meth.getDeclaredExceptions());
+        org.moosetechnology.model.famix.famixjavaentities.Exception exD = (org.moosetechnology.model.famix.famixjavaentities.Exception) firstElt(meth.getDeclaredExceptions());
         assertSame(meth, firstElt(exD.getDeclaringEntities()));
         assertEquals("T", exD.getName());
     }
 
     @Test
     public void testExceptionCanHaveInnerEnumerationExceptions() {
-        org.moosetechnology.model.famixjava.famixjavaentities.Enum typeEnum = detectFamixElement( org.moosetechnology.model.famixjava.famixjavaentities.Enum.class, "Type");
+        org.moosetechnology.model.famix.famixjavaentities.Enum typeEnum = detectFamixElement( org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Type");
         assertNotNull(typeEnum);
 
-        org.moosetechnology.model.famixjava.famixjavaentities.Exception localException = detectFamixElement(org.moosetechnology.model.famixjava.famixjavaentities.Exception.class, "LocalException");
+        org.moosetechnology.model.famix.famixjavaentities.Exception localException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "LocalException");
         assertNotNull(localException);
 
     }
