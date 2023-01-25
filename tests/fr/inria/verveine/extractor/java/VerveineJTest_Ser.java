@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.Interface;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixtraits.TImplementable;
+import org.moosetechnology.model.famix.famixtraits.TImplementation;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 
 import static org.junit.Assert.*;
@@ -51,6 +53,16 @@ public class VerveineJTest_Ser extends VerveineJTest_Basic {
 
         assertEquals( 1, subIntfc.getSuperInheritances().size() );
         assertEquals(superIntfc, firstElt(subIntfc.getSuperInheritances()).getSuperclass() );
+    }
+    
+    @Test
+    public void testImplementStub() {
+        org.moosetechnology.model.famix.famixjavaentities.Class launcherClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Launcher");
+        assertNotNull(launcherClass);
+        assertEquals(launcherClass.getInterfaceImplementations().size(), 1);
+        for (TImplementation interface1 : launcherClass.getInterfaceImplementations()) {
+            assertEquals(((Interface) interface1.getMyInterface()).getName(), "WebMvcConfigurer");
+        }
     }
 
 
