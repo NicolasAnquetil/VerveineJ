@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -59,8 +58,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(DEFAULT_OUTPUT_FILE).delete();
-        VerveineJParser parser = new VerveineJParser();
+        parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         parser.configure( new String[] {"test_src/generics"});
         parser.parse();

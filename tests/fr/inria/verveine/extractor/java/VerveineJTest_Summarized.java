@@ -145,7 +145,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 				"test_src/LANModel/moose/lan/" + file
 		};
 
-		VerveineJParser parser = new VerveineJParser();
+		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 		parser.configure(args);
 		parser.parse();

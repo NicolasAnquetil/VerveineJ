@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.*;
 import org.moosetechnology.model.famix.famixtraits.*;
 
-import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 
@@ -21,8 +20,7 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(DEFAULT_OUTPUT_FILE).delete();
-        VerveineJParser parser = new VerveineJParser();
+        parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         if (isWindows()){
             parser.configure( new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar;test_src/annotations/lib/stripes-1.5.5.jar", "test_src/annotations"});
@@ -30,7 +28,6 @@ public class verveineJTest_Annotations extends VerveineJTest_Basic {
             parser.configure( new String[] {"-cp" , "test_src/annotations/lib/jboss-interceptors-api_1.1_spec-1.0.1.Final-redhat-2.jar:test_src/annotations/lib/stripes-1.5.5.jar", "test_src/annotations"});
         }
         parser.parse();
-        //	parser.emitMSE(VerveineJParser.OUTPUT_FILE);
     }
 
     @Test

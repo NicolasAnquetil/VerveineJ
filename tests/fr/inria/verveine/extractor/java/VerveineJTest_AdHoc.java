@@ -730,4 +730,20 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertTrue( attribute.getIsFinal());
 	}
 
+    // @Test
+    public void testCreateInheritanceForStubSuperInterface() {
+    	parse(new String[] {"test_src/ad_hoc/Example.java"});
+    
+    	org.moosetechnology.model.famix.famixjavaentities.Class subClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Example");
+        assertNotNull(subClass);
+        assertFalse(subClass.getIsStub());
+
+        org.moosetechnology.model.famix.famixjavaentities.Class superClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "AbstractUIPlugin");
+        assertNotNull(superClass);
+        assertTrue(superClass.getIsStub());
+
+        assertEquals( 1, subClass.getSuperInheritances().size() );
+        assertEquals(superClass, firstElt(subClass.getSuperInheritances()).getSuperclass() );
+    }
+
 }
