@@ -10,9 +10,9 @@ import java.util.Collection;
 
 import static org.junit.Assert.*;
 
-public class verveineJTest_Annotations extends VerveineJTest_Basic {
+public class VerveineJTest_Annotations extends VerveineJTest_Basic {
 
-	public verveineJTest_Annotations() {
+	public VerveineJTest_Annotations() {
 	    super(false);
     }
     /**

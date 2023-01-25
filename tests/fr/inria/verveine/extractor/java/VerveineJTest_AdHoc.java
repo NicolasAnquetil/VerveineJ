@@ -730,7 +730,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertTrue( attribute.getIsFinal());
 	}
 
-    // @Test
+    @Test
     public void testCreateInheritanceForStubSuperInterface() {
     	parse(new String[] {"test_src/ad_hoc/Example.java"});
     
