@@ -26,10 +26,12 @@ git clone git@github.com:moosetechnology/VerveineJ.git
 
 ## Running it
 
-The simplest command is
+There is a docker version at: [https://hub.docker.com/repository/docker/badetitou/verveinej/general](https://hub.docker.com/repository/docker/badetitou/verveinej/general) (thanks to Benoît Verhaeghe for this).
+
+Otherwise, on the command line, the simplest command is
 
 ```sh
-verveinej.sh <java-source-directory>
+./verveinej.sh <java-source-directory>
 ```
 
 It will create an `output.mse` (JSON format also available) file with the model extracted from the \<java-source-directory\>
