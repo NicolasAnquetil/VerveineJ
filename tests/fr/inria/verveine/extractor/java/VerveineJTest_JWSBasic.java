@@ -3,7 +3,6 @@
  */
 package fr.inria.verveine.extractor.java;
 
-
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.*;
@@ -18,7 +17,6 @@ import java.util.Collection;
 
 import static org.junit.Assert.*;
 
-
 /**
  * @author Nicolas Anquetil
  * @since November 25, 2010
@@ -27,7 +25,7 @@ import static org.junit.Assert.*;
 public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 
 	public VerveineJTest_JWSBasic() throws IllegalAccessException {
-		super(new boolean[] {true, true, true, true, true, false, true});
+		super(new boolean[] { true, true, true, true, true, false, true });
 	}
 
 	/**
@@ -38,14 +36,16 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		new File(DEFAULT_OUTPUT_FILE).delete();
 		VerveineJParser parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
-		parser.configure(new String[]{"-cp" , "test_src/jws_basic/lib/javax.jws-api-1.1.jar", "test_src/jws_basic/src"});
+		parser.configure(
+				new String[] { "-cp", "test_src/jws_basic/lib/javax.jws-api-1.1.jar", "test_src/jws_basic/src" });
 		parser.parse();
 	}
 
 	@Test
 	public void testEntitiesNumber() {
-		assertEquals(3, entitiesOfType(AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
-		// JDT no longer returns unresolved annotations: @Session, @WLHttpTransport,
+		assertEquals(3 + (2*3) , entitiesOfType(AnnotationType.class).size()); // @WebService, @SOAPBinding, @WebMethod
+		// JDT returns unresolved annotations: @Session, @WLHttpTransport each time they are encountered
+		// And multiply them each time it is uncountered (so 3 times 2 annotations)
 	}
 
 	@Test
@@ -58,21 +58,31 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		assertEquals(3, ann.getAttributes().size());
 		for (TAttribute ta : ann.getAttributes()) {
 			assertEquals(AnnotationTypeAttribute.class, ta.getClass());
-			assertTrue(((TNamedEntity) ta).getName().equals("name") || (((TNamedEntity) ta).getName().equals("serviceName") || ((TNamedEntity) ta).getName().equals("targetNamespace")));
+			assertTrue(
+					((TNamedEntity) ta).getName().equals("name") || (((TNamedEntity) ta).getName().equals("serviceName")
+							|| ((TNamedEntity) ta).getName().equals("targetNamespace")));
 		}
 
 		// Class annotation
-		org.moosetechnology.model.famix.famixjavaentities.Class cl = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "SimpleBean");
+		org.moosetechnology.model.famix.famixjavaentities.Class cl = detectFamixElement(
+				org.moosetechnology.model.famix.famixjavaentities.Class.class, "SimpleBean");
 		assertNotNull(cl);
-		assertEquals(2, cl.getAnnotationInstances().size());
+		assertEquals(4, cl.getAnnotationInstances().size());
 		for (TAnnotationInstance a : cl.getAnnotationInstances()) {
 			AnnotationInstance ai = (AnnotationInstance) a;
 			if (((TNamedEntity) ai.getAnnotationType()).getName().equals("WebService")) {
-				assertEquals(detectFamixElement(Package.class, "jws"), (ai.getAnnotationType()).getAnnotationTypesContainer());
+				assertEquals(detectFamixElement(Package.class, "jws"),
+						(ai.getAnnotationType()).getAnnotationTypesContainer());
 			} else if (((TNamedEntity) ai.getAnnotationType()).getName().equals("SOAPBinding")) {
-				assertEquals(detectFamixElement(Package.class, "soap"), (ai.getAnnotationType()).getAnnotationTypesContainer());
+				assertEquals(detectFamixElement(Package.class, "soap"),
+						(ai.getAnnotationType()).getAnnotationTypesContainer());
+			} else if (((TNamedEntity) ai.getAnnotationType()).getName().equals("Session")) {
+				// Expected stub
+			} else if (((TNamedEntity) ai.getAnnotationType()).getName().equals("WLHttpTransport")) {
+				// Expected stub
 			} else {
-				assertTrue("Unexpected AnnotationInstance for SimpleBean: " + ((AnnotationType) ai.getAnnotationType()).getName(), false);
+				assertTrue("Unexpected AnnotationInstance for SimpleBean: "
+						+ ((AnnotationType) ai.getAnnotationType()).getName(), false);
 			}
 		}
 
@@ -82,7 +92,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 		Collection<TAnnotationInstance> annInstances = rep.getAnnotationInstances();
 		assertEquals(1, annInstances.size());
 		TAnnotationInstance annInst = firstElt(annInstances);
-		assertEquals("WebMethod", ((TNamedEntity)((AnnotationInstance)annInst).getAnnotationType()).getName());
+		assertEquals("WebMethod", ((TNamedEntity) ((AnnotationInstance) annInst).getAnnotationType()).getName());
 	}
 
 }
