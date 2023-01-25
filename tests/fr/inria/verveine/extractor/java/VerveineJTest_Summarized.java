@@ -110,49 +110,22 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(DEFAULT_OUTPUT_FILE).delete();  // delete old MSE file
-		String[] files = new String[]{
-				"AbstractDestinationAddress.java",
-				"Node.java",
-				"Packet.java",
-				"SingleDestinationAddress.java",
-				"WorkStation.java",
-				"server/FileServer.java",
-				"server/IPrinter.java",
-				"server/OutputServer.java",
-				"server/PrintServer.java"
-		};
-
-
-		// separate parsing of each source file --------
-		for (String f : files) {
-			parseFile(f);
-		}
-
-	}
-
-	/**
-	 * Parses the file received in parameter independently from any other
-	 * The "separate parsing" mechanism should ensure that linkages are appropriately done
-	 * @param file -- name of the file to parse
-	 */
-	private void parseFile(String file) {
 		String[] args = new String[] {
 				"-summary",
-				"-i",
-				"-cp",
-				"test_src/LANModel/",
-				"test_src/LANModel/moose/lan/" + file
+				"-format", "json",
+				"test_src/LANModel"
 		};
+
+		new File(DEFAULT_OUTPUT_FILE).delete();  // delete old MSE file
+		System.gc(); // In Windows free the link to the file. Must be used for incremental parsing tests
 
 		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 		parser.configure(args);
 		parser.parse();
-
-		new File(DEFAULT_OUTPUT_FILE).delete();  // delete old MSE file
-		System.gc(); // In Windows free the link to the file. Must be used for incremental parsing tests
+		
 		parser.exportModel();  // to create a new one
+
 	}
 
 	@Test
