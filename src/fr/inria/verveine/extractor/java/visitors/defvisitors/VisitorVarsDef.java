@@ -1,6 +1,5 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import fr.inria.verveine.extractor.java.AbstractDictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
@@ -267,13 +266,13 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	}
 
 	public boolean visit(SuperMethodInvocation node) {
-		dico.ensureFamixImplicitVariable(AbstractDictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeClasses());
+		dico.ensureFamixImplicitVariable(JavaDictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeClasses());
 		return super.visit(node);
 	}
 
 	public boolean visit(ConstructorInvocation node) {
 		if (! summarizeClasses()) {
-			dico.ensureFamixImplicitVariable(AbstractDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt=true*/! summarizeClasses());
+			dico.ensureFamixImplicitVariable(JavaDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt=true*/! summarizeClasses());
 		}
 
 		return super.visit(node);
@@ -282,7 +281,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	public boolean visit(SuperConstructorInvocation node) {
 		// access to "super" ???
 		if (! summarizeClasses()) {
-			dico.ensureFamixImplicitVariable(AbstractDictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt=true*/! summarizeClasses());
+			dico.ensureFamixImplicitVariable(JavaDictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt=true*/! summarizeClasses());
 		}
 
 		return super.visit(node);

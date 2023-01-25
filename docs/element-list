@@ -1,0 +1,5 @@
+fr.inria.verveine.extractor.java
+fr.inria.verveine.extractor.java.utils
+fr.inria.verveine.extractor.java.visitors
+fr.inria.verveine.extractor.java.visitors.defvisitors
+fr.inria.verveine.extractor.java.visitors.refvisitors

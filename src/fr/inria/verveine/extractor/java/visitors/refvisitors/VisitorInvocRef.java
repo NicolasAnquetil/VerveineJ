@@ -1,6 +1,5 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.AbstractDictionary;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
@@ -256,7 +255,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	public boolean visit(SuperMethodInvocation node) {
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		TNamedEntity receiver = this.dico.ensureFamixImplicitVariable(
-				AbstractDictionary.SUPER_NAME,
+				JavaDictionary.SUPER_NAME,
 				this.context.topType(), 
 				context.topMethod(), 
 				/*persistIt*/!summarizeClasses());
@@ -309,7 +308,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				signature = signature.substring(0, signature.length() - 1);
 			}
 			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(
-					AbstractDictionary.SELF_NAME, 
+					JavaDictionary.SELF_NAME, 
 					context.topType(), 
 					context.topMethod(), 
 					/*persistIt=true*/!summarizeClasses());
@@ -347,7 +346,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				signature = signature.substring(0, signature.length() - 1);
 			}
 			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(
-					AbstractDictionary.SUPER_NAME, 
+					JavaDictionary.SUPER_NAME, 
 					context.topType(), 
 					context.topMethod(), 
 					/*persistIt=true*/!summarizeClasses());
@@ -555,7 +554,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// this.msg()
 		if ( NodeTypeChecker.isThisExpression(expr)) {
-			return this.dico.ensureFamixImplicitVariable(AbstractDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeClasses());
+			return this.dico.ensureFamixImplicitVariable(JavaDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeClasses());
 		}
 
 		// type.class.msg()
@@ -607,7 +606,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// "string".msg()
 		else if ( NodeTypeChecker.isStringLiteral(expr)) {
-			return dico.ensureFamixType(null, "String", dico.ensureFamixPackageJavaLang(null),
+			return dico.ensureFamixType(/*binding*/null, "String", dico.ensureFamixPackageJavaLang(null), /*context*/null, JavaDictionary.UNKNOWN_MODIFIERS,
 					/*alwaysPersist?*/true); // creating FamixClass java.lang.String
 		}
 

@@ -8,7 +8,6 @@ import org.moosetechnology.model.famix.famixjavaentities.Interface;
 import org.moosetechnology.model.famix.famixjavaentities.Invocation;
 import org.moosetechnology.model.famix.famixjavaentities.NamedEntity;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
@@ -27,7 +26,6 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(DEFAULT_OUTPUT_FILE).delete();
         parser = new VerveineJParser();
         repo = parser.getFamixRepo();
     }
@@ -35,7 +33,6 @@ public class VerveineJTest_Inner extends VerveineJTest_Basic {
 	private void parse(String[] sources) {
         parser.configure(sources);
         parser.parse();
-        parser.exportModel();
     }
 
     @Test

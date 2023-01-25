@@ -8,8 +8,6 @@ import org.moosetechnology.model.famix.famixtraits.TImplementable;
 import org.moosetechnology.model.famix.famixtraits.TImplementation;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 
-import java.io.File;
-
 import static org.junit.Assert.*;
 
 public class VerveineJTest_Ser extends VerveineJTest_Basic {
@@ -23,8 +21,7 @@ public class VerveineJTest_Ser extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(DEFAULT_OUTPUT_FILE).delete();
-        VerveineJParser parser = new VerveineJParser();
+        parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         parser.configure( new String[] {"test_src/ser"});
         parser.parse();
@@ -44,6 +41,20 @@ public class VerveineJTest_Ser extends VerveineJTest_Basic {
         }        
     }
 
+    @Test
+    public void testCreateInheritanceForStubSuperInterface() {
+        Interface subIntfc = detectFamixElement(Interface.class, "UseCaseIntf");
+        assertNotNull(subIntfc);
+        assertFalse(subIntfc.getIsStub());
+
+        Interface superIntfc = detectFamixElement(Interface.class, "Remote");
+        assertNotNull(superIntfc);
+        assertTrue(superIntfc.getIsStub());
+
+        assertEquals( 1, subIntfc.getSuperInheritances().size() );
+        assertEquals(superIntfc, firstElt(subIntfc.getSuperInheritances()).getSuperclass() );
+    }
+    
     @Test
     public void testImplementStub() {
         org.moosetechnology.model.famix.famixjavaentities.Class launcherClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Launcher");

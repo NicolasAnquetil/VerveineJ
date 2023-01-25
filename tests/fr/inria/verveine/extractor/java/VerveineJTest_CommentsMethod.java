@@ -6,7 +6,6 @@ import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.IndexedFileAnchor;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +24,6 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(DEFAULT_OUTPUT_FILE).delete();
         parser = new VerveineJParser();
         repo = parser.getFamixRepo();
     }
@@ -33,12 +31,12 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
 	private void parse(String[] sources) {
         parser.configure(sources);
         parser.parse();
-        parser.exportModel(DEFAULT_OUTPUT_FILE);
     }
 
     @Test
     public void testStartPosSourceAnchorMethod() {
         parse(new String[] {"test_src/comments"});
+
         List<Method> methods  = new ArrayList<>();
         methods.addAll(entitiesOfType(Method.class));
         methods.sort((o1, o2) -> ((Integer) ((IndexedFileAnchor) o1.getSourceAnchor()).getStartPos().intValue()).compareTo(((IndexedFileAnchor) o2.getSourceAnchor()).getStartPos().intValue()));

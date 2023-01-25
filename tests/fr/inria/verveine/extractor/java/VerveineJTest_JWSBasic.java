@@ -11,7 +11,6 @@ import org.moosetechnology.model.famix.famixtraits.TAnnotationInstance;
 import org.moosetechnology.model.famix.famixtraits.TAttribute;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
-import java.io.File;
 import java.lang.Exception;
 import java.util.Collection;
 
@@ -33,8 +32,7 @@ public class VerveineJTest_JWSBasic extends VerveineJTest_Basic {
 	 */
 	@Before
 	public void setUp() throws Exception {
-		new File(DEFAULT_OUTPUT_FILE).delete();
-		VerveineJParser parser = new VerveineJParser();
+		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 		parser.configure(
 				new String[] { "-cp", "test_src/jws_basic/lib/javax.jws-api-1.1.jar", "test_src/jws_basic/src" });

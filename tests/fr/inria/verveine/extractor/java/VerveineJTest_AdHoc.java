@@ -202,7 +202,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 		ParameterizableClass dico = null;
 		for (ParameterizableClass d : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
-			if (Util.getOwner(d).getName().equals(AbstractDictionary.DEFAULT_PCKG_NAME)) {
+			if (Util.getOwner(d).getName().equals(JavaDictionary.DEFAULT_PCKG_NAME)) {
 				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
 				dico = d;
 				break;
@@ -729,5 +729,21 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertTrue( attribute.getIsVolatile());
 		assertTrue( attribute.getIsFinal());
 	}
+
+    @Test
+    public void testCreateInheritanceForStubSuperInterface() {
+    	parse(new String[] {"test_src/ad_hoc/Example.java"});
+    
+    	org.moosetechnology.model.famix.famixjavaentities.Class subClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Example");
+        assertNotNull(subClass);
+        assertFalse(subClass.getIsStub());
+
+        org.moosetechnology.model.famix.famixjavaentities.Class superClass = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "AbstractUIPlugin");
+        assertNotNull(superClass);
+        assertTrue(superClass.getIsStub());
+
+        assertEquals( 1, subClass.getSuperInheritances().size() );
+        assertEquals(superClass, firstElt(subClass.getSuperInheritances()).getSuperclass() );
+    }
 
 }
