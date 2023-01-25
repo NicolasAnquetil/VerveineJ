@@ -123,8 +123,13 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 	}
 
 	public TType ensureFamixType(ITypeBinding bnd, TWithTypes context, boolean alwaysPersist) {
-		int modifiers = (bnd != null) ? bnd.getModifiers() : UNKNOWN_MODIFIERS;
+		int modifiers = extractModifierOfTypeFrom(bnd);
 		return ensureFamixType(bnd, /*name*/null, /*owner*/null, context, modifiers, alwaysPersist);
+	}
+
+	private int extractModifierOfTypeFrom(ITypeBinding bnd) {
+		int modifiers = (bnd != null) ? bnd.getModifiers() : UNKNOWN_MODIFIERS;
+		return modifiers;
 	}
 
 	/**
@@ -527,7 +532,8 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 	protected void ensureImplementedInterfaces(ITypeBinding bnd, TType fmx, TWithTypes owner, TAssociation lastAssociation, boolean alwaysPersist) {
 		for (ITypeBinding intbnd : bnd.getInterfaces()) {
-			TType superTyp = ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist);
+			TType superTyp = this.ensureFamixInterface(intbnd, null, owner, /*isGeneric*/intbnd.isParameterizedType() || intbnd.isRawType(), extractModifierOfTypeFrom(intbnd), alwaysPersist);
+			// TType superTyp = ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist);
 			if (bnd.isInterface()) {
 				lastAssociation = ensureFamixInheritance((TWithInheritances)superTyp, (TWithInheritances)fmx, lastAssociation);
 			}
@@ -576,7 +582,10 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 		return tmp;
 	}
 
-	public TType asException(TType excepFmx) {
+	public Exception asException(TType excepFmx) {
+		if (excepFmx instanceof Exception) {
+			return (Exception) excepFmx;
+		};
 		Exception tmp = null;
 		IBinding key = null;
 		try {

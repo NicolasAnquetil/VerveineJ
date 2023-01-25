@@ -95,7 +95,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 	@ Test
 	public void testConstructorInvocations() {
-		parse(new String[] {"test_src/ad_hoc/DefaultConstructor.java", "test_src/ad_hoc/InvokWithFullPath.java"});
+		parse(new String[] {"test_src/ad_hoc/DefaultConstructor.java", "test_src/ad_hoc/InvokWithFullPath.java", "test_src/ad_hoc/annotations/Book.java"});
 
 		Method meth = detectFamixElement( Method.class, "methodWithClassScope");
 		assertNotNull(meth);
