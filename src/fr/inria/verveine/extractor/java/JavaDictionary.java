@@ -532,8 +532,14 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 	protected void ensureImplementedInterfaces(ITypeBinding bnd, TType fmx, TWithTypes owner, TAssociation lastAssociation, boolean alwaysPersist) {
 		for (ITypeBinding intbnd : bnd.getInterfaces()) {
-			TType superTyp = this.ensureFamixInterface(intbnd, null, owner, /*isGeneric*/intbnd.isParameterizedType() || intbnd.isRawType(), extractModifierOfTypeFrom(intbnd), alwaysPersist);
-			// TType superTyp = ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist);
+			TType superTyp;
+			if(intbnd.isParameterizedType() || intbnd.isRawType()) {
+				superTyp = this.ensureFamixParameterizedType(intbnd, null, /*generic*/null, null, alwaysPersist);
+			} else {
+				superTyp = this.ensureFamixInterface(intbnd, null, null, /*isGeneric*/intbnd.isParameterizedType() || intbnd.isRawType(), extractModifierOfTypeFrom(intbnd), alwaysPersist);
+			}
+			// superTyp = ensureFamixType(intbnd, /*ctxt*/owner, alwaysPersist);
+			// TType superTyp = this.ensureFamixInterface(intbnd, null, owner, /*isGeneric*/intbnd.isParameterizedType() || intbnd.isRawType(), extractModifierOfTypeFrom(intbnd), alwaysPersist);
 			if (bnd.isInterface()) {
 				lastAssociation = ensureFamixInheritance((TWithInheritances)superTyp, (TWithInheritances)fmx, lastAssociation);
 			}
