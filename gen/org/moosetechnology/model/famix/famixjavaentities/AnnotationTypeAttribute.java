@@ -130,17 +130,17 @@ public class AnnotationTypeAttribute extends NamedEntity implements TAccessible,
         annotationTypeAttribute.getAnnotationAttributeInstances().add(this);
     }
     
-    @FameProperty(name = "comments", opposite = "container", derived = true)
+    @FameProperty(name = "comments", opposite = "commentedEntity", derived = true)
     public Collection<TComment> getComments() {
         if (comments == null) {
             comments = new MultivalueSet<TComment>() {
                 @Override
                 protected void clearOpposite(TComment e) {
-                    e.setContainer(null);
+                    e.setCommentedEntity(null);
                 }
                 @Override
                 protected void setOpposite(TComment e) {
-                    e.setContainer(AnnotationTypeAttribute.this);
+                    e.setCommentedEntity(AnnotationTypeAttribute.this);
                 }
             };
         }

@@ -13,25 +13,24 @@ import ch.akuhn.fame.FameProperty;
 @FameDescription("Comment")
 public class Comment extends SourcedEntity implements TComment {
 
-    private TWithComments container;
+    private TWithComments commentedEntity;
     
     private String content;
     
 
-
-    @FameProperty(name = "container", opposite = "comments")
-    public TWithComments getContainer() {
-        return container;
+    @FameProperty(name = "commentedEntity", opposite = "comments")
+    public TWithComments getCommentedEntity() {
+        return commentedEntity;
     }
 
-    public void setContainer(TWithComments container) {
-        if (this.container != null) {
-            if (this.container.equals(container)) return;
-            this.container.getComments().remove(this);
+    public void setCommentedEntity(TWithComments commentedEntity) {
+        if (this.commentedEntity != null) {
+            if (this.commentedEntity.equals(commentedEntity)) return;
+            this.commentedEntity.getComments().remove(this);
         }
-        this.container = container;
-        if (container == null) return;
-        container.getComments().add(this);
+        this.commentedEntity = commentedEntity;
+        if (commentedEntity == null) return;
+        commentedEntity.getComments().add(this);
     }
     
     @FameProperty(name = "content")
