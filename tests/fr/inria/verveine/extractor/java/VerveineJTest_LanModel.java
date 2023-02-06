@@ -16,13 +16,16 @@ import java.io.File;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.Access;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationInstance;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationType;
 import org.moosetechnology.model.famix.famixjavaentities.Attribute;
+import org.moosetechnology.model.famix.famixjavaentities.Class;
 import org.moosetechnology.model.famix.famixjavaentities.Comment;
+import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famix.famixjavaentities.Implementation;
 import org.moosetechnology.model.famix.famixjavaentities.ImplicitVariable;
 import org.moosetechnology.model.famix.famixjavaentities.IndexedFileAnchor;
@@ -105,7 +108,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 				"test_src/LANModel/moose/lan/" + file
 		};
 
-		VerveineJParser parser = new VerveineJParser();
+		parser = new VerveineJParser();
 		repo = parser.getFamixRepo();
 		parser.configure(args);
 		parser.parse();
@@ -250,11 +253,16 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	}
 
 	@Test
-	public void testNamedEntities() {
+	public void testEntitiesWithoutKeyAreDuplicated() {
 		JavaDictionary javaDictionary = new JavaDictionary(repo);
 
-		assertNotSame(javaDictionary.ensureFamixClass(null, A_CLASS_NAME, null, /* persistIt */true),
-				javaDictionary.ensureFamixClass(null, A_CLASS_NAME, null, /* persistIt */true));
+		assertNotSame(javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, JavaDictionary.UNKNOWN_MODIFIERS, /* persistIt */true),
+				javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, JavaDictionary.UNKNOWN_MODIFIERS, /* persistIt */true));
+	}
+
+	@Test
+	public void testNamedEntities() {
+		JavaDictionary javaDictionary = new JavaDictionary(repo);
 
 		Package javaLang = javaDictionary.ensureFamixPackageJavaLang(null);
 		assertEquals(JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());

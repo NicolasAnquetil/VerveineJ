@@ -397,6 +397,13 @@ public class VerveineJOptions {
 	public void configureJDTParser(ASTParser jdtParser) {
 		jdtParser.setEnvironment(classPathOptions, /*sourcepathEntries*/argPath.toArray(new String[0]), /*encodings*/null, /*includeRunningVMBootclasspath*/true);
 		jdtParser.setResolveBindings(true);
+		/**
+		 *  Incremental parsing should not activate Binding recovery because using this option with incremental parsing
+		 * will result in lot of stubs in the model that would have been resolved later
+		 * */ 
+		if (!incrementalParsing) {
+			jdtParser.setBindingsRecovery(true);
+		}
 		jdtParser.setKind(ASTParser.K_COMPILATION_UNIT);
 		
 		Map<String, String> javaCoreOptions = JavaCore.getOptions();

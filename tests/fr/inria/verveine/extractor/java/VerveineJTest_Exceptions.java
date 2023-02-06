@@ -4,8 +4,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
 
-import java.io.File;
-
 import static org.junit.Assert.*;
 
 public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
@@ -19,8 +17,7 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
      */
     @Before
     public void setUp() throws Exception {
-        new File(DEFAULT_OUTPUT_FILE).delete();
-        VerveineJParser parser = new VerveineJParser();
+        parser = new VerveineJParser();
         repo = parser.getFamixRepo();
         parser.configure( new String[] {"test_src/exceptions"});
         parser.parse();
