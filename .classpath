@@ -15,6 +15,7 @@
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="lib" path="lib/akuhn-util-r28011.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.text_3.12.100.v20220506-1404.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.core.contenttype_3.6.0.v20170207-1037.jar"/>
 	<classpathentry kind="lib" path="lib/org.eclipse.core.jobs_3.9.1.v20170714-0547.jar"/>

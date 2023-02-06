@@ -159,7 +159,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				// if there is a type parameter, then fmx will be a Famix ParameterizableClass
 				// note: owner of the ParameterType is the ParameterizableClass
 				ParameterType fmxParam = dico.ensureFamixParameterType(tp.resolveBinding(),
-						tp.getName().getIdentifier(), (TWithParameterizedTypes) fmx, /*persistIt*/! summarizeClasses());
+						tp.getName().getIdentifier(), (TWithParameterizedTypes) fmx, /*persistIt*/! summarizeModel());
 				if (fmxParam != null) {
 					fmxParam.setIsStub(false);
 				}
@@ -208,7 +208,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 					/*owner*/context.top(), 
 					/*isGeneric*/false, 
 					modifiers, 
-					/*alwaysPersist?*/!summarizeClasses());
+					/*alwaysPersist?*/!summarizeModel());
 		} else {
 			fmx = this.dico.ensureFamixClass(
 					bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), 
@@ -216,13 +216,13 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 					/*owner*/context.top(), 
 					/*isGeneric*/false, 
 					modifiers, 
-					/*alwaysPersist?*/!summarizeClasses());
+					/*alwaysPersist?*/!summarizeModel());
 		}
 
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
-			if (! summarizeClasses()) {
+			if (! summarizeModel()) {
 				if (options.withAnchors()) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
@@ -321,7 +321,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				paramTypes, 
 				(TWithMethods) /*owner*/context.topType(), 
 				node.getModifiers(), 
-				/*persitIt*/!summarizeClasses());
+				/*persitIt*/!summarizeModel());
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
@@ -333,7 +333,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				fmx.setKind(JavaDictionary.CONSTRUCTOR_KIND_MARKER);
 			}
 
-			if (!summarizeClasses()) {
+			if (!summarizeModel()) {
 				if (options.withAnchors()) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
@@ -384,7 +384,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		if (fmx != null) {
             dico.setMethodModifiers(fmx, node.getModifiers());
-			if (!summarizeClasses()) {
+			if (!summarizeModel()) {
 				if (options.withAnchors()) {
 					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 				}
@@ -622,7 +622,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		}
 		if (ctxtMeth == null) {
 			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), (TWithMethods) context.topType(),
-					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!summarizeClasses());
+					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!summarizeModel());
 			ctxtMeth.setIsStub(false);
 			ctxtMeth.setIsDead(false);
 			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE

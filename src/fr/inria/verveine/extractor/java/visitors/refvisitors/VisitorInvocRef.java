@@ -78,7 +78,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 */
 	public boolean visit(ClassInstanceCreation node) {
 		visitClassInstanceCreation(node);
-		if ((!summarizeClasses())) {
+		if ((!summarizeModel())) {
 
 			String typName;
 			TType fmx;
@@ -259,7 +259,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				AbstractDictionary.SUPER_NAME,
 				this.context.topType(), 
 				context.topMethod(), 
-				/*persistIt*/!summarizeClasses());
+				/*persistIt*/!summarizeModel());
 		IMethodBinding bnd = node.resolveMethodBinding();
 		String calledName = node.getName().getFullyQualifiedName();
 
@@ -296,11 +296,11 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		String name = context.topMethod().getName();
 		TMethod invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
 				/*paramTypes*/null, /*retType*/null, (TWithMethods) /*owner*/context.topType(), modifiers,
-				/*persistIt*/!summarizeClasses());
+				/*persistIt*/!summarizeModel());
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either
 
-		if (!summarizeClasses()) {
+		if (!summarizeModel()) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -312,7 +312,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					AbstractDictionary.SELF_NAME, 
 					context.topType(), 
 					context.topMethod(), 
-					/*persistIt=true*/!summarizeClasses());
+					/*persistIt=true*/!summarizeModel());
 			
 			TInvocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
@@ -335,10 +335,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 //            invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), superC.getName(),  /*paramsType*/(Collection<String>) null, superC, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
 //        }
 //        else {
-		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!summarizeClasses());
+		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!summarizeModel());
 //        }
 
-		if ( (invoked != null) && (! summarizeClasses()) ) {
+		if ( (invoked != null) && (! summarizeModel()) ) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -350,7 +350,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					AbstractDictionary.SUPER_NAME, 
 					context.topType(), 
 					context.topMethod(), 
-					/*persistIt=true*/!summarizeClasses());
+					/*persistIt=true*/!summarizeModel());
 			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
@@ -404,7 +404,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				int modifiers = (calledBnd != null) ? calledBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
 				if ((receiver != null) && (receiver instanceof TStructuralEntity)) {
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, (TWithMethods) methOwner,
-							modifiers, /*persistIt*/!summarizeClasses());
+							modifiers, /*persistIt*/!summarizeModel());
 				} else {
 					TType owner;
 
@@ -414,10 +414,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null,
-							(TWithMethods) /*owner*/owner, modifiers, /*persistIt*/!summarizeClasses());
+							(TWithMethods) /*owner*/owner, modifiers, /*persistIt*/!summarizeModel());
 				}
 				
-				if (! summarizeClasses()) {
+				if (! summarizeModel()) {
 					String signature = calledName + "(";
 					boolean first = true;
 					for (Expression a : l_args) {
@@ -450,7 +450,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		// msg(), same as ThisExpression
 		if (expr == null) {
 			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod(),
-					/*persistIt*/!summarizeClasses());
+					/*persistIt*/!summarizeModel());
 		}
 
 		// array[i].msg()
@@ -555,7 +555,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// this.msg()
 		if ( NodeTypeChecker.isThisExpression(expr)) {
-			return this.dico.ensureFamixImplicitVariable(AbstractDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeClasses());
+			return this.dico.ensureFamixImplicitVariable(AbstractDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeModel());
 		}
 
 		// type.class.msg()

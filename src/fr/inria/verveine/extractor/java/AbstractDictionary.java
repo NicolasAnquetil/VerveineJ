@@ -217,7 +217,7 @@ public class AbstractDictionary<B> {
 			
 			if (persistIt) {
 				// put new entity in Famix repository
-				this.famixRepo.add(fmx);
+				famixRepoAdd((Entity) fmx);
 			}
 		}
 
@@ -235,10 +235,13 @@ public class AbstractDictionary<B> {
 	 */
 	@SuppressWarnings("unchecked")
 	protected <T extends TNamedEntity & TSourceEntity> T ensureFamixEntity(Class<T> fmxClass, B bnd, String name, boolean persistIt) {
-		T fmx = null;
+		T fmx = null; 
 		if (bnd != null) {
 			fmx = (T) getEntityByKey(bnd);
 			if (fmx != null) {
+				if (persistIt && (! famixRepo.all(fmxClass).contains(fmx)) ) {
+					famixRepoAdd((Entity) fmx);
+				}
 				return fmx;
 			}
 		}
@@ -258,11 +261,11 @@ public class AbstractDictionary<B> {
 
 	/**
 	 * Adds an already created Entity to the FAMIX repository
-	 * Used mainly for non-NamedEntity, for example relationships
+	 * Also used for non-NamedEntity, for example relationships
 	 * @param e -- the FAMIX entity to add to the repository
 	 */
-	public void famixRepoAdd(Entity e) {
-		this.famixRepo.add(e);
+	public void famixRepoAdd(Entity fmx) {
+		this.famixRepo.add(fmx);
 	}
 
 	///// ensure Famix Entities /////

@@ -2021,7 +2021,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 			
 			cmt = new Comment();
 			addSourceAnchor(cmt, jCmt, /*oneLineAnchor*/jCmt.isLineComment());
-			this.famixRepo.add(cmt);
+			famixRepoAdd(cmt);
 			cmt.setContainer(fmx);
 		}
 
@@ -2074,7 +2074,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 			fa.setFileName((String) ((CompilationUnit)node).getProperty(SOURCE_FILENAME_PROPERTY));
 			fmx.setSourceAnchor(fa);
-			famixRepo.add(fa);
+			famixRepoAdd(fa);
 		}
 
 		return fa;
@@ -2114,7 +2114,7 @@ public class JavaDictionary extends AbstractDictionary<IBinding> {
 
 			fa.setFileName((String) node.getRoot().getProperty(SOURCE_FILENAME_PROPERTY));
 			fmx.setSourceAnchor(fa);
-			famixRepo.add(fa);
+			famixRepoAdd(fa);
 		}
 
 		return fa;

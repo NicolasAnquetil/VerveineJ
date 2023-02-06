@@ -1,8 +1,10 @@
 package fr.inria.verveine.extractor.java.utils;
 
 import ch.akuhn.fame.MetaRepository;
+import ch.akuhn.fame.Repository;
 import ch.akuhn.fame.fm3.MetaDescription;
 import ch.akuhn.fame.fm3.PropertyDescription;
+import ch.akuhn.fame.internal.RepositoryVisitor.UnknownElementError;
 import fr.inria.verveine.extractor.java.JavaDictionary;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.LambdaExpression;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
 public class Util {
 
 	public static MetaRepository metamodel;
+
+public static Repository repo = null;
 
 	/**
 	 * helper to "normalize" lambda names
@@ -96,6 +100,10 @@ public class Util {
 		} catch (Exception e) {
 		}
 		return retStr;
+	}
+
+	public static void traceUnknownElementError(UnknownElementError err) {
+		err.printStackTrace(); // repo.all(org.moosetechnology.model.famix.famixjavaentities.Method.class).size()
 	}
 }
 

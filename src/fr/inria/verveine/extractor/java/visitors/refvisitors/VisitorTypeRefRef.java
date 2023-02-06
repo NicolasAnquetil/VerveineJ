@@ -67,7 +67,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			Type clazz = node.getType();
 			org.moosetechnology.model.famix.famixtraits.TType fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
-			if (! summarizeClasses()) {
+			if (! summarizeModel()) {
 				ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
 				context.setLastReference(ref);
 			}
@@ -200,7 +200,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 		Reference ref = null;
-		if (summarizeClasses()) {
+		if (summarizeModel()) {
 			//ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
 		} else {
 			ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());

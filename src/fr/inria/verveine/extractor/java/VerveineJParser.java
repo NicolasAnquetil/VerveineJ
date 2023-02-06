@@ -3,6 +3,7 @@ package fr.inria.verveine.extractor.java;
 import ch.akuhn.fame.Repository;
 import ch.akuhn.fame.internal.RepositoryVisitor.UnknownElementError;
 import fr.inria.verveine.extractor.java.utils.Util;
+
 import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.moosetechnology.model.famix.famixjavaentities.Entity;
@@ -168,7 +169,17 @@ public class VerveineJParser {
 		try {
 			Writer writer = new BufferedWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8));
 			if (this.options.outputFormat.equalsIgnoreCase(VerveineJOptions.MSE_OUTPUT_FORMAT)) {
-				famixRepo.exportMSE(writer);
+				try {
+					Util.repo = famixRepo;
+					famixRepo.exportMSE(writer);
+				}
+				catch (UnknownElementError err) {
+            		System.err.println("** UnknownElementException while exporting Famix repository.\n" +
+            				"  This might happen when an entity inside the repository refers to an entity outside the repository\n");
+            		if (options.withDebug()) {
+            			Util.traceUnknownElementError(err);
+            		}
+				}
 			} else if (this.options.outputFormat.equalsIgnoreCase(VerveineJOptions.JSON_OUTPUT_FORMAT)) {
 				if (this.options.prettyPrint) {
 					famixRepo.exportPrettyJSON(writer);

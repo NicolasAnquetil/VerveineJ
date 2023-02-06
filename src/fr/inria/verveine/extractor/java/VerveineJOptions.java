@@ -124,6 +124,11 @@ public class VerveineJOptions {
 	 */
 	protected boolean prettyPrint = false;
 
+	/**
+	 * with additional tracing for debugging 
+	 */
+	protected boolean debugging;
+
 	public VerveineJOptions() {
 		this.classSummary = false;
 		this.allLocals = false;
@@ -132,6 +137,7 @@ public class VerveineJOptions {
 		this.incrementalParsing = false;
 		this.outputFileName = null;
 		this.outputFormat = MSE_OUTPUT_FORMAT;
+		this.debugging = false;
 	}
 
 	public void setOptions( String[] args) {
@@ -220,6 +226,9 @@ public class VerveineJOptions {
 			}
 		} else if (arg.equals("-i")) {
 			incrementalParsing = true;
+		}
+		else if (arg.equals("-debugging")) {
+				debugging = true;
 		} else {
 			throw new IllegalArgumentException("** Unrecognized option: " + arg);
 		}
@@ -547,8 +556,12 @@ public class VerveineJOptions {
 		return allLocals;
 	}
 
-	public boolean summarizeClasses() {
+	public boolean summarizeModel() {
 		return classSummary;
+	}
+
+	public boolean withDebug() {
+		return debugging;
 	}
 
 }

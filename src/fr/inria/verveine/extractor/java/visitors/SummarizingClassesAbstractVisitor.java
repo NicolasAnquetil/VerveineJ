@@ -17,11 +17,15 @@ public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntity
 	}
 
 	/**
-	 * if {@link #classSummary} is true, we persist only classes that are not defined in methods.
+	 * if we are not summarizing the model, we persist only classes that are not defined in methods and stub types.
 	 * @param bnd -- ITypeBinding for the class that we are checking, might be null and in this case, we check whether there is no method at the top of the context
 	 * @return whether to persist the class or its members
 	 */
 	protected boolean persistClass(ITypeBinding bnd) {
+		if (! summarizeModel()) {
+			return true;
+		}
+
 		if (bnd != null) {
 			if (bnd.isParameterizedType()) {
 				// parameterized types seem to never belong to a method even when they are created within one
@@ -34,10 +38,10 @@ public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntity
 					return false;
 				}
 				// finally, the "normal" case
-				return (! summarizeClasses()) || (bnd.getDeclaringMethod() == null);
+				return (bnd.getDeclaringMethod() == null);
 			}
 		} else {
-			return (! summarizeClasses()) || (context.topMethod() == null);
+			return (context.topMethod() == null);
 		}
 	
 	}
@@ -45,7 +49,7 @@ public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntity
 	/**
 	 * Syntactic sugar: whether to summarize classes or not
 	 */
-	protected boolean summarizeClasses() {
-		return options.summarizeClasses();
+	protected boolean summarizeModel() {
+		return options.summarizeModel();
 	}
 }
