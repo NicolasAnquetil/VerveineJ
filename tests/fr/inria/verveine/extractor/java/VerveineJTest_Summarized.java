@@ -252,7 +252,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 			int length = 0;
 			int minLen = 0;
 			assertNotNull(c);
-			assertNotNull("Empty container for Comment", c.getContainer());
+			assertNotNull("Empty container for Comment", c.getCommentedEntity());
 			IndexedFileAnchor anc = (IndexedFileAnchor) c.getSourceAnchor();
 			length = (int)anc.getEndPos() - (int)anc.getStartPos();
 			// length of comments may vary slightly from one file to the other

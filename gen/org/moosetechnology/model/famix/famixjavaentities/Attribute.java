@@ -69,17 +69,17 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
         
-    @FameProperty(name = "comments", opposite = "container", derived = true)
+    @FameProperty(name = "comments", opposite = "commentedEntity", derived = true)
     public Collection<TComment> getComments() {
         if (comments == null) {
             comments = new MultivalueSet<TComment>() {
                 @Override
                 protected void clearOpposite(TComment e) {
-                    e.setContainer(null);
+                    e.setCommentedEntity(null);
                 }
                 @Override
                 protected void setOpposite(TComment e) {
-                    e.setContainer(Attribute.this);
+                    e.setCommentedEntity(Attribute.this);
                 }
             };
         }

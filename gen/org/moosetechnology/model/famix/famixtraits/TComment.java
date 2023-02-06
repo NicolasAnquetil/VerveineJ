@@ -10,10 +10,10 @@ import ch.akuhn.fame.FameProperty;
 @FameDescription("TComment")
 public interface TComment  {
 
-        @FameProperty(name = "container", opposite = "comments")
-    public TWithComments getContainer();
+    @FameProperty(name = "commentedEntity", opposite = "comments")
+    public TWithComments getCommentedEntity ();
 
-    public void setContainer(TWithComments container);
+    public void setCommentedEntity(TWithComments commentedEntity);
 
     @FameProperty(name = "content")
     public String getContent();

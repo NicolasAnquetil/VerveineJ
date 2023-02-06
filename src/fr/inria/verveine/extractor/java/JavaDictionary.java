@@ -417,7 +417,7 @@ public class JavaDictionary {
 		if ( (cmt != null) && (owner != null) ) {
 			fmx = new Comment();
 			fmx.setContent(cmt);
-			fmx.setContainer((TWithComments) owner);
+			fmx.setCommentedEntity((TWithComments) owner);
 			this.famixRepo.add(fmx);
 		}
 		return fmx;
@@ -2781,7 +2781,7 @@ public class JavaDictionary {
 			cmt = new Comment();
 			addSourceAnchor(cmt, jCmt, /*oneLineAnchor*/jCmt.isLineComment());
 			famixRepoAdd(cmt);
-			cmt.setContainer(fmx);
+			cmt.setCommentedEntity(fmx);
 		}
 
 		return cmt;

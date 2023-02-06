@@ -14,7 +14,7 @@ public interface TWithComments  {
         @FameProperty(name = "hasComments", derived = true)
     public Boolean getHasComments();
 
-    @FameProperty(name = "comments", opposite = "container", derived = true)
+    @FameProperty(name = "comments", opposite = "commentedEntity", derived = true)
     public Collection<TComment> getComments();
 
     public void setComments(Collection<? extends TComment> comments);

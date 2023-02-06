@@ -113,17 +113,17 @@ public class AnnotationType extends Type implements TAnnotationType, THasVisibil
         return !getAttributes().isEmpty();
     }
 
-    @FameProperty(name = "comments", opposite = "container", derived = true)
+    @FameProperty(name = "comments", opposite = "commentedEntity", derived = true)
     public Collection<TComment> getComments() {
         if (comments == null) {
             comments = new MultivalueSet<TComment>() {
                 @Override
                 protected void clearOpposite(TComment e) {
-                    e.setContainer(null);
+                    e.setCommentedEntity(null);
                 }
                 @Override
                 protected void setOpposite(TComment e) {
-                    e.setContainer(AnnotationType.this);
+                    e.setCommentedEntity(AnnotationType.this);
                 }
             };
         }
