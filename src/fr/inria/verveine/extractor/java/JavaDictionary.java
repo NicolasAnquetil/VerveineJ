@@ -2255,16 +2255,14 @@ public class JavaDictionary {
 	}
 
 	public Method ensureFamixMethod(IMethodBinding bnd, boolean persistIt) {
-		int modifiers = UNKNOWN_MODIFIERS;
-		if (bnd != null) {
-			modifiers = bnd.getModifiers();
-		}
-
-		return ensureFamixMethod(bnd, /*name*/null, /*paramsType*/(Collection<String>)null, /*returnType*/null, /*owner*/null, modifiers, persistIt);
-	}
-
-	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, TWithMethods owner, int modifiers, boolean persistIt) {
-		return ensureFamixMethod(bnd, name, paramTypes, /*returnType*/null, owner,modifiers, persistIt);
+		return ensureFamixMethod(
+				bnd,
+				/*name*/null,
+				/*paramsType*/(Collection<String>)null,
+				/*returnType*/null,
+				/*owner*/null,
+				(bnd == null) ? UNKNOWN_MODIFIERS : bnd.getModifiers(),
+				persistIt);
 	}
 
 	/**

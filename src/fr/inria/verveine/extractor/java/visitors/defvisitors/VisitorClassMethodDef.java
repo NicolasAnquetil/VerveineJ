@@ -319,6 +319,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				bnd, 
 				node.getName().getIdentifier(), 
 				paramTypes, 
+				/*returnType*/null, 
 				(TWithMethods) /*owner*/context.topType(), 
 				node.getModifiers(), 
 				/*persitIt*/!summarizeModel());
@@ -621,8 +622,14 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			}
 		}
 		if (ctxtMeth == null) {
-			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), (TWithMethods) context.topType(),
-					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!summarizeModel());
+			ctxtMeth = dico.ensureFamixMethod(
+					(IMethodBinding) null,
+					JavaDictionary.INIT_BLOCK_NAME,
+					new ArrayList<String>(),
+					/*returnType*/null,
+					(TWithMethods) context.topType(),
+					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS,
+					/*persistIt*/!summarizeModel());
 			ctxtMeth.setIsStub(false);
 			ctxtMeth.setIsDead(false);
 			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
