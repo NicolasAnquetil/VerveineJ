@@ -1,9 +1,5 @@
 package fr.inria.verveine.extractor.java;
 
-import ch.akuhn.fame.Repository;
-import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
-import fr.inria.verveine.extractor.java.utils.Util;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
@@ -12,7 +8,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jdt.core.dom.*;
+import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.IPackageBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.IVariableBinding;
+import org.eclipse.jdt.core.dom.MethodDeclaration;
+import org.eclipse.jdt.core.dom.Modifier;
 import org.moosetechnology.model.famix.famixjavaentities.Access;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationInstance;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationInstanceAttribute;
@@ -44,9 +48,7 @@ import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
 import org.moosetechnology.model.famix.famixjavaentities.PrimitiveType;
 import org.moosetechnology.model.famix.famixjavaentities.Reference;
 import org.moosetechnology.model.famix.famixjavaentities.SourceAnchor;
-import org.moosetechnology.model.famix.famixjavaentities.SourcedEntity;
 import org.moosetechnology.model.famix.famixjavaentities.Type;
-import org.moosetechnology.model.famix.famixjavaentities.UnknownVariable;
 import org.moosetechnology.model.famix.famixtraits.TAccessible;
 import org.moosetechnology.model.famix.famixtraits.TAssociation;
 import org.moosetechnology.model.famix.famixtraits.TCanBeClassSide;
@@ -73,11 +75,15 @@ import org.moosetechnology.model.famix.famixtraits.TWithMethods;
 import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
+import ch.akuhn.fame.Repository;
+import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
+import fr.inria.verveine.extractor.java.utils.Util;
+
 /**
  * A {@link fr.inria.verveine.extractor.java.AbstractDictionary} specialized for Java
  * @author anquetil
  */
-public class JavaDictionary {
+public class EntityDictionary {
 
 	/**
 	 * A property added to CompilationUnits to record the name of the source file they belong to.
@@ -162,7 +168,7 @@ public class JavaDictionary {
 	/** Constructor taking a FAMIX repository
 	 * @param famixRepo
 	 */
-	public JavaDictionary(Repository famixRepo) {
+	public EntityDictionary(Repository famixRepo) {
 			this.famixRepo = famixRepo;
 			
 			this.keyToEntity = new Hashtable<IBinding,TNamedEntity>();
@@ -1568,7 +1574,7 @@ public class JavaDictionary {
 	}
 
 	/**
-	 * e.g. see {@link JavaDictionary#ensureFamixClass}
+	 * e.g. see {@link EntityDictionary#ensureFamixClass}
 	 */
 	public AnnotationType ensureFamixAnnotationType(ITypeBinding bnd, String name, ContainerEntity owner, boolean alwaysPersist) {
 		AnnotationType fmx = null;
@@ -2080,9 +2086,9 @@ public class JavaDictionary {
 		// <anArray>.length field?
 		if (name.equals("length")) {
 			boolean isArrayLengthField = ((bnd != null) && (bnd.getDeclaringClass() == null)) ||
-										 ((bnd == null) && (owner.getName().equals(JavaDictionary.ARRAYS_NAME)));
+										 ((bnd == null) && (owner.getName().equals(EntityDictionary.ARRAYS_NAME)));
 			if (isArrayLengthField) {
-				if (candidateOwner.getName().equals(JavaDictionary.ARRAYS_NAME)) {
+				if (candidateOwner.getName().equals(EntityDictionary.ARRAYS_NAME)) {
 					conditionalMapToKey(bnd, candidate);
 					return true;
 				}

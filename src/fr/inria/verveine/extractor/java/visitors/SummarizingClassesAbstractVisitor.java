@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
@@ -12,7 +12,7 @@ import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
  */
 public abstract class SummarizingClassesAbstractVisitor extends GetVisitedEntityAbstractVisitor {
 
-	public SummarizingClassesAbstractVisitor(JavaDictionary dico, VerveineJOptions options) {
+	public SummarizingClassesAbstractVisitor(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 	}
 

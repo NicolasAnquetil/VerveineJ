@@ -202,7 +202,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 
 		ParameterizableClass dico = null;
 		for (ParameterizableClass d : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
-			if (Util.getOwner(d).getName().equals(JavaDictionary.DEFAULT_PCKG_NAME)) {
+			if (Util.getOwner(d).getName().equals(EntityDictionary.DEFAULT_PCKG_NAME)) {
 				// note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
 				dico = d;
 				break;
@@ -479,7 +479,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		for (TMethod tm : pl.getMethods()) {
 			Method m = (Method) tm;
 			if ( m.getName().equals("Planet") || m.getName().equals("main") || m.getName().equals("sillyArrayAssignement")
-					|| m.getName().equals(JavaDictionary.INIT_BLOCK_NAME) ) {
+					|| m.getName().equals(EntityDictionary.INIT_BLOCK_NAME) ) {
 				assertEquals(0, m.getIncomingInvocations().size());
 			}
 			else if ( m.getName().equals("mass") || m.getName().equals("surfaceWeight") || m.getName().equals("toString") ) {
@@ -546,10 +546,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testStaticInitializationBlock() {
 		parse(new String[] {"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java", "test_src/ad_hoc/InvokWithFullPath.java", "test_src/ad_hoc/DefaultConstructor.java"});
 
-		Collection<Method> l_meth = entitiesNamed( Method.class, JavaDictionary.INIT_BLOCK_NAME);
+		Collection<Method> l_meth = entitiesNamed( Method.class, EntityDictionary.INIT_BLOCK_NAME);
 		assertEquals(3, l_meth.size());
 		for (Method meth : l_meth) {
-			assertEquals(JavaDictionary.INIT_BLOCK_NAME+"()", meth.getSignature());
+			assertEquals(EntityDictionary.INIT_BLOCK_NAME+"()", meth.getSignature());
 			assertFalse(meth.getIsDead());
 
 			if (((TNamedEntity)meth.getParentType()).getName().equals("Card")) {

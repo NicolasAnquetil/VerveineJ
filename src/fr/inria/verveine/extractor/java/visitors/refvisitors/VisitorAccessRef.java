@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
@@ -32,7 +32,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 
 	private boolean inLambda;
 
-	public VisitorAccessRef(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorAccessRef(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 		this.inLambda = false;
 	}
@@ -210,7 +210,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-	    if (visitFieldDeclaration(node)) {   // true if hasInitializer + recovers JavaDictionary.INIT_BLOCK_NAME method
+	    if (visitFieldDeclaration(node)) {   // true if hasInitializer + recovers EntityDictionary.INIT_BLOCK_NAME method
             visitNodeList(node.fragments());
         }
         return false;
@@ -396,10 +396,10 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 
 	@Override
 	public boolean visit(ThisExpression node) {
-		IBinding bnd = ImplicitVarBinding.getInstance(context.topMethod(), JavaDictionary.SELF_NAME);
+		IBinding bnd = ImplicitVarBinding.getInstance(context.topMethod(), EntityDictionary.SELF_NAME);
 		ImplicitVariable fmx = dico.ensureFamixImplicitVariable(
 				bnd, 
-				JavaDictionary.SELF_NAME, 
+				EntityDictionary.SELF_NAME, 
 				(Type) this.context.topType(), 
 				context.topMethod(), 
 				/*persistIt*/! summarizeModel());
@@ -554,7 +554,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		} else if (accessed instanceof Parameter && ((Parameter) accessed).getParentBehaviouralEntity() == accessor) {
 			return true;
 		}
-		if (((TNamedEntity) accessor.getParentType()).getName().startsWith(JavaDictionary.ANONYMOUS_NAME_PREFIX)) {
+		if (((TNamedEntity) accessor.getParentType()).getName().startsWith(EntityDictionary.ANONYMOUS_NAME_PREFIX)) {
 			return localVariable(accessed, ((Method) ((org.moosetechnology.model.famix.famixjavaentities.Type) accessor.getParentType()).getTypeContainer()));
 		}
 		return false;

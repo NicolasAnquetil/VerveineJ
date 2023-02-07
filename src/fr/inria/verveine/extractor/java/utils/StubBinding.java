@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.utils;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.dom.*;
 
@@ -89,7 +89,7 @@ public class StubBinding implements IBinding, ITypeBinding, IMethodBinding {
 	}
 
     private static String bindingKey(ASTNode node) {
-        String file = (String) ((CompilationUnit)node.getRoot()).getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY);
+        String file = (String) ((CompilationUnit)node.getRoot()).getProperty(EntityDictionary.SOURCE_FILENAME_PROPERTY);
         int pos = node.getStartPosition();
         return file + ":" + pos;
     }
@@ -150,7 +150,7 @@ public class StubBinding implements IBinding, ITypeBinding, IMethodBinding {
 
     @Override
     public int getModifiers() {
-        return JavaDictionary.UNKNOWN_MODIFIERS;
+        return EntityDictionary.UNKNOWN_MODIFIERS;
     }
 
     @Override

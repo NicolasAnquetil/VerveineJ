@@ -16,7 +16,7 @@ import fr.inria.verveine.extractor.java.visitors.defvisitors.VisitorVarsDef;
 
 public class FamixRequestor extends FileASTRequestor {
 
-	protected JavaDictionary famixDictionnary;
+	protected EntityDictionary famixDictionnary;
 
 	protected VerveineJOptions options;
 	
@@ -31,7 +31,7 @@ public class FamixRequestor extends FileASTRequestor {
 
 		this.options = options;
 		initFileMaps(options);
-		this.famixDictionnary = new JavaDictionary(famixRepo);
+		this.famixDictionnary = new EntityDictionary(famixRepo);
 	}
 
 	protected void initFileMaps(VerveineJOptions options) {
@@ -51,7 +51,7 @@ public class FamixRequestor extends FileASTRequestor {
 		String path = relativePath(sourceFilePath);
 		System.out.println("Processing file: " + path);
 
-		ast.setProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY, path);
+		ast.setProperty(EntityDictionary.SOURCE_FILENAME_PROPERTY, path);
 		try {
 			ast.accept(new VisitorPackageDef(famixDictionnary, options));
 			ast.accept(new VisitorClassMethodDef(famixDictionnary, options));

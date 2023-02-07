@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class VisitorExceptionRef extends AbstractRefVisitor {
 
-    public VisitorExceptionRef(JavaDictionary dico, VerveineJOptions options) {
+    public VisitorExceptionRef(EntityDictionary dico, VerveineJOptions options) {
         super(dico, options);
     }
 

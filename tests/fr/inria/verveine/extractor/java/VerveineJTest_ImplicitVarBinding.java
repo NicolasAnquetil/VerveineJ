@@ -35,19 +35,19 @@ public class VerveineJTest_ImplicitVarBinding extends VerveineJTest_Basic {
 
 	@Test
 	public void testUniqForMethod() {
-		assertEquals(getImplicitVar(mth1, JavaDictionary.SELF_NAME), getImplicitVar(mth1, JavaDictionary.SELF_NAME));
-		assertEquals(getImplicitVar(mth1, JavaDictionary.SUPER_NAME), getImplicitVar(mth1, JavaDictionary.SUPER_NAME));
+		assertEquals(getImplicitVar(mth1, EntityDictionary.SELF_NAME), getImplicitVar(mth1, EntityDictionary.SELF_NAME));
+		assertEquals(getImplicitVar(mth1, EntityDictionary.SUPER_NAME), getImplicitVar(mth1, EntityDictionary.SUPER_NAME));
 	}
 
     @Test
 	public void testDiffForMethods() {
-		assertNotEquals(getImplicitVar(mth1, JavaDictionary.SELF_NAME), getImplicitVar(mth2, JavaDictionary.SELF_NAME));
-		assertNotEquals(getImplicitVar(mth1, JavaDictionary.SUPER_NAME), getImplicitVar(mth2, JavaDictionary.SUPER_NAME));
+		assertNotEquals(getImplicitVar(mth1, EntityDictionary.SELF_NAME), getImplicitVar(mth2, EntityDictionary.SELF_NAME));
+		assertNotEquals(getImplicitVar(mth1, EntityDictionary.SUPER_NAME), getImplicitVar(mth2, EntityDictionary.SUPER_NAME));
 	}
 
 	@Test
 	public void testSefDiffSuper() {
-		assertNotEquals(getImplicitVar(mth1, JavaDictionary.SELF_NAME), getImplicitVar(mth1, JavaDictionary.SUPER_NAME));
+		assertNotEquals(getImplicitVar(mth1, EntityDictionary.SELF_NAME), getImplicitVar(mth1, EntityDictionary.SUPER_NAME));
 	}
 
 	@Test

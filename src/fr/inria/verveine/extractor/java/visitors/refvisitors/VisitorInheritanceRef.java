@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
@@ -21,7 +21,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithTypes;
  */
 public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 
-	public VisitorInheritanceRef(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorInheritanceRef(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 	}
 
