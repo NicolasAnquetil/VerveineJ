@@ -80,7 +80,9 @@ import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 
 /**
- * A {@link fr.inria.verveine.extractor.java.AbstractDictionary} specialized for Java
+ * A dictionary of FamixJava entities to help create them and find them back
+ * Entities are mapped to keys which are the "binding" provided by the JDT pars
+ * 
  * @author anquetil
  */
 public class EntityDictionary {
@@ -315,7 +317,7 @@ public class EntityDictionary {
 			
 			if (persistIt) {
 				// put new entity in Famix repository
-				this.famixRepo.add(fmx);
+				famixRepoAdd((Entity) fmx);
 			}
 		}
 
