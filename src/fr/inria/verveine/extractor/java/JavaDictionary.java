@@ -1113,9 +1113,6 @@ public class JavaDictionary {
 
 		if (fmx!=null) {
 			// we just created it or it was not bound, so we make sure it has the right information in it
-			if (bnd != null) {
-				setClassModifiers(fmx, bnd.getDeclaredModifiers());
-			}
 			if (persistIt) {
 				TAssociation lastAssoc = null;
 				Collection<Type> sups = new LinkedList<Type>();
@@ -1217,7 +1214,7 @@ public class JavaDictionary {
 		if (fmx!=null) {
 			// we just created it or it was not bound, so we make sure it has the right information in it
 			if (bnd != null) {
-				setClassModifiers(fmx, bnd.getDeclaredModifiers());
+				setInterfaceModifiers(fmx, bnd.getDeclaredModifiers());
 			}
 			if (persistIt) {
 				TAssociation lastAssociation = null;
@@ -1246,7 +1243,6 @@ public class JavaDictionary {
 			if (excepFmx instanceof TWithAttributes) {
 				tmp.addAttributes(((TWithAttributes) excepFmx).getAttributes());
 			}
-			//tmp.addModifiers(excepFmx.getModifiers());
 
 			if (key != null) {
 				setClassModifiers(tmp, key.getModifiers());
@@ -1287,11 +1283,6 @@ public class JavaDictionary {
 			tmp.addMethods(((TWithMethods) excepFmx).getMethods());
 			if (excepFmx instanceof TWithAttributes) {
 				tmp.addAttributes(((TWithAttributes) excepFmx).getAttributes());
-			}
-			//tmp.addModifiers(excepFmx.getModifiers());
-
-			if (key != null) {
-				setClassModifiers(tmp, key.getModifiers());
 			}
 
 			if (excepFmx instanceof TWithInheritances) {
@@ -2467,10 +2458,7 @@ public class JavaDictionary {
 		setVisibility(fmx, mod);
 	}
 
-	public void setClassModifiers(Exception fmx, int mod) {
-	}
-
-	public void setClassModifiers(Interface fmx, int mod) {
+	public void setInterfaceModifiers(Interface fmx, int mod) {
 		fmx.setIsFinal(Modifier.isFinal(mod));
 		fmx.setIsClassSide(Modifier.isStatic(mod));
 		setVisibility(fmx, mod);
