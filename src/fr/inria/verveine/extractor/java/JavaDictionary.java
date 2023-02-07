@@ -2706,19 +2706,6 @@ public class JavaDictionary {
 		return fmx;
 	}
 
-	/**
-	 * Creates and returns a Famix UnknownVariable.
-	 * @param persistIt  -- whether to persist or not the entity eventually created
-	 */
-	public UnknownVariable createFamixUnknownVariable(Type type, String name, boolean persistIt) {
-//		System.err.println("TRACE -- createFamixUnknownVariable: "+name);
-		UnknownVariable fmx = (UnknownVariable) createFamixEntity(UnknownVariable.class, name, persistIt);
-		if (fmx!=null) {
-			fmx.setDeclaredType(type);
-		}
-		return fmx;
-	}
-
 	public ImplicitVariable ensureFamixImplicitVariable(String name, TType tType, TMethod tMethod, boolean persistIt) {
 		IBinding bnd = ImplicitVarBinding.getInstance(tMethod, name);
 		return ensureFamixImplicitVariable(bnd, name, tType, tMethod, persistIt);
