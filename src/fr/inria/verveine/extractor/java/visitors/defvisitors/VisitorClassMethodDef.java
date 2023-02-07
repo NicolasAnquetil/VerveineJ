@@ -56,7 +56,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithMethods;
 import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
@@ -70,7 +70,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
     protected MessageDigest md5;
 
-    public VisitorClassMethodDef(JavaDictionary dico, VerveineJOptions options) {
+    public VisitorClassMethodDef(EntityDictionary dico, VerveineJOptions options) {
 		super( dico, options);
         try {
             md5 = MessageDigest.getInstance("MD5");
@@ -200,7 +200,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		org.moosetechnology.model.famix.famixjavaentities.Type fmx;
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 
-		int modifiers = (bnd != null) ? bnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
+		int modifiers = (bnd != null) ? bnd.getModifiers() : EntityDictionary.UNKNOWN_MODIFIERS;
 		if (bnd.isInterface()) {
 			fmx = this.dico.ensureFamixInterface(
 					bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), 
@@ -319,6 +319,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				bnd, 
 				node.getName().getIdentifier(), 
 				paramTypes, 
+				/*returnType*/null, 
 				(TWithMethods) /*owner*/context.topType(), 
 				node.getModifiers(), 
 				/*persitIt*/!summarizeModel());
@@ -330,7 +331,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			this.context.pushMethod(fmx);
 
 			if (node.isConstructor()) {
-				fmx.setKind(JavaDictionary.CONSTRUCTOR_KIND_MARKER);
+				fmx.setKind(EntityDictionary.CONSTRUCTOR_KIND_MARKER);
 			}
 
 			if (!summarizeModel()) {
@@ -600,14 +601,14 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	// UTILITY METHODS
 
     /**
-     * REnsures the creation of the fake method: {@link JavaDictionary#INIT_BLOCK_NAME}
+     * REnsures the creation of the fake method: {@link EntityDictionary#INIT_BLOCK_NAME}
      *
      * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
 	protected TMethod createInitBlock() {
 		// putting field's initialization code in an INIT_BLOCK_NAME method
 		Method ctxtMeth = (Method) this.context.topMethod();
-		if (ctxtMeth != null && !ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+		if (ctxtMeth != null && !ctxtMeth.getName().equals(EntityDictionary.INIT_BLOCK_NAME)) {
 			ctxtMeth = null;
 		} else {
 			if (ctxtMeth != null && ctxtMeth.getParentType() != context.topType()) {
@@ -621,8 +622,14 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 			}
 		}
 		if (ctxtMeth == null) {
-			ctxtMeth = dico.ensureFamixMethod((IMethodBinding) null, JavaDictionary.INIT_BLOCK_NAME, new ArrayList<String>(), (TWithMethods) context.topType(),
-					/*modifiers*/JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!summarizeModel());
+			ctxtMeth = dico.ensureFamixMethod(
+					(IMethodBinding) null,
+					EntityDictionary.INIT_BLOCK_NAME,
+					new ArrayList<String>(),
+					/*returnType*/null,
+					(TWithMethods) context.topType(),
+					/*modifiers*/EntityDictionary.UNKNOWN_MODIFIERS,
+					/*persistIt*/!summarizeModel());
 			ctxtMeth.setIsStub(false);
 			ctxtMeth.setIsDead(false);
 			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE
@@ -650,7 +657,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 	protected void closeOptionalInitBlock() {
 		TMethod ctxtMeth = this.context.topMethod();
-		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(JavaDictionary.INIT_BLOCK_NAME))) {
+		if ((ctxtMeth != null) && (ctxtMeth.getName().equals(EntityDictionary.INIT_BLOCK_NAME))) {
 			closeMethodDeclaration();
 		}
 	}

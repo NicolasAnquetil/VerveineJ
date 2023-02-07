@@ -207,7 +207,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(1, inherits.size());
 		inh = (Inheritance) firstElt(inherits);
 		assertSame(clazz, inh.getSubclass());
-		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, EntityDictionary.OBJECT_NAME), inh.getSuperclass());
 
 		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "XPrinter");
 		assertNotNull(clazz);
@@ -229,7 +229,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertSame(clazz, inh.getSubclass());
 		assertNull(inh.getPrevious());
 		assertSame(inh, inh.getNext().getPrevious());
-		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, EntityDictionary.OBJECT_NAME), inh.getSuperclass());
 
 		assertSame(inh.getNext(), implem);
 		assertSame(implem.getPrevious(), inh);

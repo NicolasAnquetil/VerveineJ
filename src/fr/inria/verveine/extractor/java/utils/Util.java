@@ -5,7 +5,7 @@ import ch.akuhn.fame.Repository;
 import ch.akuhn.fame.fm3.MetaDescription;
 import ch.akuhn.fame.fm3.PropertyDescription;
 import ch.akuhn.fame.internal.RepositoryVisitor.UnknownElementError;
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.QualifiedType;
@@ -36,7 +36,7 @@ public static Repository repo = null;
 	 */
 	public static String stringForAnonymousName(String anonymousSuperTypeName, EntityStack context) {
 		String anonSuperTypeName = (anonymousSuperTypeName != null) ? anonymousSuperTypeName : context.topType().getName();
-		return JavaDictionary.ANONYMOUS_NAME_PREFIX + "(" +anonSuperTypeName+")";
+		return EntityDictionary.ANONYMOUS_NAME_PREFIX + "(" +anonSuperTypeName+")";
 	}
 
 	/**
@@ -61,7 +61,7 @@ public static Repository repo = null;
 			if (((org.eclipse.jdt.core.dom.WildcardType) jdtType).isUpperBound()) {
 				return jdtTypeName(((org.eclipse.jdt.core.dom.WildcardType) jdtType).getBound());
 			} else {
-				return JavaDictionary.OBJECT_NAME;
+				return EntityDictionary.OBJECT_NAME;
 			}
 		}
 	}

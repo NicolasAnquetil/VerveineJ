@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
@@ -47,7 +47,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	 */
 	private Javadoc compilUnitComment;
 
-	public VisitorComments(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorComments(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 	}
 	// VISITOR METHODS

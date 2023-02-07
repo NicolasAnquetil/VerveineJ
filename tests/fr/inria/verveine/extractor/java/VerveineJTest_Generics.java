@@ -71,7 +71,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
         ParameterizableClass generic = null;
         for (ParameterizableClass g : entitiesNamed( ParameterizableClass.class, "Dictionary")) {
-            if (((TNamedEntity) g.getTypeContainer()).getName().equals(JavaDictionary.DEFAULT_PCKG_NAME)) {
+            if (((TNamedEntity) g.getTypeContainer()).getName().equals(EntityDictionary.DEFAULT_PCKG_NAME)) {
                 // note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
                 generic = g;
                 break;

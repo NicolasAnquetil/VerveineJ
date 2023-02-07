@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
@@ -17,7 +17,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithTypes;
  */
 public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 
-	public AbstractRefVisitor(JavaDictionary dico, VerveineJOptions options) {
+	public AbstractRefVisitor(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 	}
 
@@ -47,7 +47,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			if (((org.eclipse.jdt.core.dom.WildcardType) t).isUpperBound()) {
 				return findTypeName(((org.eclipse.jdt.core.dom.WildcardType) t).getBound());
 			} else {
-				return JavaDictionary.OBJECT_NAME;
+				return EntityDictionary.OBJECT_NAME;
 			}
 		}
 	}
@@ -79,11 +79,11 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 		// from here, we assume the owner is the context
 		else if (isClass && !isExcep) {
 			return dico.ensureFamixClass(null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false,
-					JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+					EntityDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 		} else if (isExcep) {
 			// return ensure FamixException
 			return dico.ensureFamixException(null, findTypeName(typ), (ContainerEntity) /*owner*/ctxt, /*isGeneric*/false,
-					JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+					EntityDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 		} else {
 			while (typ.isArrayType()) {
 				typ = ((ArrayType) typ).getElementType();
@@ -93,7 +93,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 				return dico.ensureFamixPrimitiveType(null, findTypeName(typ));
 			} else {
 				return dico.ensureFamixType(null, findTypeName(typ), /*owner*/ctxt, /*container*/ctxt,
-						JavaDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+						EntityDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
 			}
 		}
 	}
@@ -121,7 +121,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 				name = name.substring(0, i);
 			}
 			ITypeBinding parameterizableBnd = bnd.getErasure();
-			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
+			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : EntityDictionary.UNKNOWN_MODIFIERS;
 			TWithParameterizedTypes generic;
 			if(parameterizableBnd.isInterface()) {
 				generic = (ParameterizableInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));

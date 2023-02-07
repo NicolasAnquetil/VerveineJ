@@ -86,7 +86,7 @@ public class VerveineJParser {
 	}
 
 	/**
-	 * As explained in JavaDictionary, Namespaces are created with their fully qualified name.
+	 * As explained in EntityDictionary, Namespaces are created with their fully qualified name.
 	 * We need now to give them their simple name
 	 */
 	protected void compressPackagesNames() {

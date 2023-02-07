@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 
-	public VisitorAnnotationRef(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorAnnotationRef(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 	}
 
