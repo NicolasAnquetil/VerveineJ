@@ -49,6 +49,8 @@ import org.moosetechnology.model.famix.famixjavaentities.Type;
 import org.moosetechnology.model.famix.famixjavaentities.UnknownVariable;
 import org.moosetechnology.model.famix.famixtraits.TAccessible;
 import org.moosetechnology.model.famix.famixtraits.TAssociation;
+import org.moosetechnology.model.famix.famixtraits.TCanBeClassSide;
+import org.moosetechnology.model.famix.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famix.famixtraits.TCanImplement;
 import org.moosetechnology.model.famix.famixtraits.TComment;
 import org.moosetechnology.model.famix.famixtraits.THasVisibility;
@@ -2417,6 +2419,33 @@ public class JavaDictionary {
 		return ensureFamixMethod(null, name, /*paramType*/(Collection<String>)null, /*returnType*/null, ensureFamixClassStubOwner(), /*modifiers*/0, false);  // cast needed to desambiguate the call
 	}
 
+	public void setAttributeModifiers(Attribute fmx, int mod) {
+		setCommonModifiers(fmx, mod);
+		fmx.setIsTransient(Modifier.isTransient(mod));
+		fmx.setIsVolatile(Modifier.isVolatile(mod));
+	}
+
+	public void setMethodModifiers(Method fmx, int mod) {
+		setCommonModifiers(fmx, mod);
+		fmx.setIsAbstract(Modifier.isAbstract(mod));
+		fmx.setIsSynchronized(Modifier.isSynchronized(mod));
+	}
+
+	public void setClassModifiers(Class fmx, int mod) {
+		setCommonModifiers(fmx, mod);
+		fmx.setIsAbstract(Modifier.isAbstract(mod));
+	}
+
+	public void setInterfaceModifiers(Interface fmx, int mod) {
+		setCommonModifiers(fmx, mod);
+	}
+
+	private void setCommonModifiers(Entity fmx, int mod) {
+		setVisibility((THasVisibility)fmx, mod);
+		((TCanBeClassSide)fmx).setIsClassSide(Modifier.isStatic(mod));
+		((TCanBeFinal)fmx).setIsFinal(Modifier.isFinal(mod));
+	}
+
 	/**
 	 * Sets the visibility of a FamixNamedEntity
 	 *
@@ -2433,35 +2462,6 @@ public class JavaDictionary {
 		} else {
 			fmx.setVisibility(MODIFIER_PACKAGE);
 		}
-	}
-
-	public void setAttributeModifiers(Attribute fmx, int mod) {
-		setVisibility(fmx, mod);
-		fmx.setIsVolatile(Modifier.isVolatile(mod));
-		fmx.setIsTransient(Modifier.isTransient(mod));
-		fmx.setIsFinal(Modifier.isFinal(mod));
-		fmx.setIsClassSide(Modifier.isStatic(mod));
-	}
-
-	public void setMethodModifiers(Method fmx, int mod) {
-		setVisibility(fmx, mod);
-		fmx.setIsSynchronized(Modifier.isSynchronized(mod));
-		fmx.setIsAbstract(Modifier.isAbstract(mod));
-		fmx.setIsFinal(Modifier.isFinal(mod));
-		fmx.setIsClassSide(Modifier.isStatic(mod));
-	}
-
-	public void setClassModifiers(Class fmx, int mod) {
-		fmx.setIsAbstract(Modifier.isAbstract(mod));
-		fmx.setIsFinal(Modifier.isFinal(mod));
-		fmx.setIsClassSide(Modifier.isStatic(mod));
-		setVisibility(fmx, mod);
-	}
-
-	public void setInterfaceModifiers(Interface fmx, int mod) {
-		fmx.setIsFinal(Modifier.isFinal(mod));
-		fmx.setIsClassSide(Modifier.isStatic(mod));
-		setVisibility(fmx, mod);
 	}
 
 	/**
