@@ -457,6 +457,19 @@ public class JavaDictionary {
 		return implementation;
 	}
 
+	protected void ensureImplementedInterfaces(ITypeBinding bnd, TType fmx, TWithTypes owner, TAssociation lastAssociation, boolean alwaysPersist) {
+		for (ITypeBinding intbnd : bnd.getInterfaces()) {
+			TType superTyp = this.ensureFamixInterface(intbnd, null, null, /*isGeneric*/intbnd.isParameterizedType() || intbnd.isRawType(), extractModifierOfTypeFrom(intbnd), alwaysPersist);
+			if (bnd.isInterface()) {
+				// in Java "subtyping" link between 2 interfaces is call inheritance 
+				lastAssociation = ensureFamixInheritance((TWithInheritances)superTyp, (TWithInheritances)fmx, lastAssociation);
+			}
+			else {
+				lastAssociation = ensureFamixImplementation((TImplementable)superTyp, (TCanImplement)fmx, lastAssociation);
+			}
+		}
+	}
+
 	/**
 	 * Returns a Famix Reference between two Famix Entities creating it if needed.<br>
 	 * If <code>prev == null</code> and a similar reference already exist (same <code>src</code>, same <code>tgt</code>), does not create a new one
@@ -691,7 +704,7 @@ public class JavaDictionary {
 		return fmx;
 	}
 
-	public <T extends TNamedEntity & TWithTypes> Type searchTypeInContext(String name, T ctxt) {
+	public Type searchTypeInContext(String name, TWithTypes ctxt) {
 		if (ctxt == null) {
 			return null;
 		}
@@ -702,7 +715,7 @@ public class JavaDictionary {
 			}
 		}
 		
-		return searchTypeInContext(name, Util.getOwner(ctxt));
+		return searchTypeInContext(name, Util.getOwner((TNamedEntity)ctxt));
 	}
 
 	/**
@@ -782,20 +795,6 @@ public class JavaDictionary {
 		}
 	}
 
-	public TType ensureFamixType(ITypeBinding bnd, boolean alwaysPersist) {
-		return ensureFamixType(bnd, /*ctxt*/null, alwaysPersist);
-	}
-
-	public TType ensureFamixType(ITypeBinding bnd, TWithTypes context, boolean alwaysPersist) {
-		int modifiers = extractModifierOfTypeFrom(bnd);
-		return ensureFamixType(bnd, /*name*/null, /*owner*/null, context, modifiers, alwaysPersist);
-	}
-
-	private int extractModifierOfTypeFrom(ITypeBinding bnd) {
-		int modifiers = (bnd != null) ? bnd.getModifiers() : UNKNOWN_MODIFIERS;
-		return modifiers;
-	}
-
 	/**
 	 * Returns a FAMIX Type with the given <b>name</b>, creating it if it does not exist yet.
 	 * In the second case, sets some default properties: not Abstract, not Final, not Private, not Protected, not Public, not Interface
@@ -805,14 +804,14 @@ public class JavaDictionary {
 	 * @param ctxt -- context of use of the type
 	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 */
-	public <T extends TNamedEntity & TWithTypes> TType ensureFamixType(ITypeBinding bnd, String name, TWithTypes owner, TWithTypes ctxt, int modifiers, boolean alwaysPersist) {
+	public TType ensureFamixType(ITypeBinding bnd, String name, TWithTypes owner, TWithTypes ctxt, int modifiers, boolean alwaysPersist) {
 		TType fmx = null;
 
 		if (bnd == null) {
 			if (name == null) {
 				return null;
 			}
-			fmx = searchTypeInContext(name, (T) ctxt); // WildCard Types don't have binding
+			fmx = searchTypeInContext(name, ctxt); // WildCard Types don't have binding
 			if (fmx != null) {
 				return fmx;
 			}
@@ -894,6 +893,20 @@ public class JavaDictionary {
 		fmx = ensureFamixEntity(Type.class, bnd, name, alwaysPersist);
 		fmx.setTypeContainer(owner);
 		return fmx;
+	}
+
+	public TType ensureFamixType(ITypeBinding bnd, TWithTypes context, boolean alwaysPersist) {
+		int modifiers = extractModifierOfTypeFrom(bnd);
+		return ensureFamixType(bnd, /*name*/null, /*owner*/null, context, modifiers, alwaysPersist);
+	}
+	
+	public TType ensureFamixType(ITypeBinding bnd, boolean alwaysPersist) {
+		return ensureFamixType(bnd, /*ctxt*/null, alwaysPersist);
+	}
+
+	private int extractModifierOfTypeFrom(ITypeBinding bnd) {
+		int modifiers = (bnd != null) ? bnd.getModifiers() : UNKNOWN_MODIFIERS;
+		return modifiers;
 	}
 
 	public boolean isThrowable(ITypeBinding bnd) {
@@ -1215,18 +1228,6 @@ public class JavaDictionary {
 			}
 		}
 		return fmx;
-	}
-
-	protected void ensureImplementedInterfaces(ITypeBinding bnd, TType fmx, TWithTypes owner, TAssociation lastAssociation, boolean alwaysPersist) {
-		for (ITypeBinding intbnd : bnd.getInterfaces()) {
-			TType superTyp = this.ensureFamixInterface(intbnd, null, null, /*isGeneric*/intbnd.isParameterizedType() || intbnd.isRawType(), extractModifierOfTypeFrom(intbnd), alwaysPersist);
-			if (bnd.isInterface()) {
-				lastAssociation = ensureFamixInheritance((TWithInheritances)superTyp, (TWithInheritances)fmx, lastAssociation);
-			}
-			else {
-				lastAssociation = ensureFamixImplementation((TImplementable)superTyp, (TCanImplement)fmx, lastAssociation);
-			}
-		}
 	}
 
 	public TType asClass(TType excepFmx) {
@@ -2417,6 +2418,15 @@ public class JavaDictionary {
 	}
 
 	/**
+	 * Creates or recovers a stub Famix Method
+	 * @param name of the method
+	 * @return the Famix Method
+	 */
+	public Method ensureFamixStubMethod(String name) {
+		return ensureFamixMethod(null, name, /*paramType*/(Collection<String>)null, /*returnType*/null, ensureFamixClassStubOwner(), /*modifiers*/0, false);  // cast needed to desambiguate the call
+	}
+
+	/**
 	 * Sets the visibility of a FamixNamedEntity
 	 *
 	 * @param fmx -- the FamixNamedEntity
@@ -2839,15 +2849,6 @@ public class JavaDictionary {
 		}
 
 		return fa;
-	}
-
-	/**
-	 * Creates or recovers a stub Famix Method
-	 * @param name of the method
-	 * @return the Famix Method
-	 */
-	public Method ensureFamixStubMethod(String name) {
-		return ensureFamixMethod(null, name, /*paramType*/(Collection<String>)null, /*returnType*/null, ensureFamixClassStubOwner(), /*modifiers*/0, false);  // cast needed to desambiguate the call
 	}
 
 	/**
