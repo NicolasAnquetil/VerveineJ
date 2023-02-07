@@ -745,7 +745,7 @@ public class JavaDictionary {
 			 * Because the preferred solution in Moose is to give their simple names to packages, they must be post-processed when
 			 * all is said and done. */
 			fmx = ensureFamixUniqEntity(Package.class, bnd, name);
-			String parentName = removeLastName(name);
+			String parentName = removeLastPartOfPackageName(name);
 			if (parentName.length() > 0) {
 				parent = ensureFamixPackage(null, parentName);
 				// set the parentscope relationship
@@ -2914,7 +2914,7 @@ public class JavaDictionary {
 		return fmx;
 	}
 
-	public String removeLastName(String qualifiedName) {
+	public String removeLastPartOfPackageName(String qualifiedName) {
 		String ret = null;
 		int last = qualifiedName.lastIndexOf('.');
 		if (last > 0) {
