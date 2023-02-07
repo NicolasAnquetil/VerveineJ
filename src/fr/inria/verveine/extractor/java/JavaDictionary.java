@@ -423,21 +423,6 @@ public class JavaDictionary {
 		return fmx;
 	}
 	
-	/**
-	 * Creates and returns a FAMIX Parameter and associates it with a BehaviouralEntity
-	 * @param name -- the name of the parameter
-	 * @param type -- the type of the parameter
-	 * @param tMethod -- the entity concerned by this parameter
-	 * @param persistIt -- whether the Parameter should be persisted in the Famix repository
-	 * @return the FAMIX parameter
-	 */
-	public Parameter createFamixParameter(IBinding key, String name, TMethod tMethod, boolean persistIt) {
-		Parameter fmx = ensureFamixEntity(Parameter.class, key, name, persistIt);
-		fmx.setParentBehaviouralEntity(tMethod);
-		
-		return fmx;
-	}
-	
 	///// ensure Famix Relationships /////
 
 	/**
@@ -2648,7 +2633,8 @@ public class JavaDictionary {
 		}
 
 		if (fmx == null) {
-			fmx = createFamixParameter(bnd, name, tMethod, persistIt);
+			fmx = ensureFamixEntity(Parameter.class, bnd, name, persistIt);
+			fmx.setParentBehaviouralEntity(tMethod);
 		}
 
 		if (fmx != null) {
