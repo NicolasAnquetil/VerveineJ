@@ -405,24 +405,6 @@ public class JavaDictionary {
 		return inst;
 	}
 
-	/**
-	 * Creates and returns a FAMIX Comment and associates it with an Entity (ex: for Javadocs)
-	 * @param cmt -- the content (String) of the comment 
-	 * @param owner -- the entity concerned by this comment
-	 * @return the FAMIX Comment
-	 */
-	public Comment createFamixComment(String cmt, SourcedEntity owner) {
-		Comment fmx = null;
-		
-		if ( (cmt != null) && (owner != null) ) {
-			fmx = new Comment();
-			fmx.setContent(cmt);
-			fmx.setCommentedEntity((TWithComments) owner);
-			this.famixRepo.add(fmx);
-		}
-		return fmx;
-	}
-	
 	///// ensure Famix Relationships /////
 
 	/**
@@ -2758,15 +2740,21 @@ public class JavaDictionary {
 		return fmx;
 	}
 
-	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments fmx) {
+	/**
+	 * Creates and returns a FAMIX Comment and associates it with an Entity (ex: for Javadocs)
+	 * @param jCmt -- the content (String) of the comment 
+	 * @param owner -- the entity that is commented
+	 * @return the FAMIX Comment
+	 */
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner) {
 		Comment cmt = null;
 
-		if ( (jCmt != null) && (fmx != null) && (! commentAlreadyRecorded(fmx, jCmt)) ) {
+		if ( (jCmt != null) && (owner != null) && (! commentAlreadyRecorded(owner, jCmt)) ) {
 			
 			cmt = new Comment();
 			addSourceAnchor(cmt, jCmt, /*oneLineAnchor*/jCmt.isLineComment());
 			famixRepoAdd(cmt);
-			cmt.setCommentedEntity(fmx);
+			cmt.setCommentedEntity(owner);
 		}
 
 		return cmt;
