@@ -431,10 +431,9 @@ public class JavaDictionary {
 	 * @param persistIt -- whether the Parameter should be persisted in the Famix repository
 	 * @return the FAMIX parameter
 	 */
-	public Parameter createFamixParameter(IBinding key, String name, Type type, TMethod tMethod, boolean persistIt) {
+	public Parameter createFamixParameter(IBinding key, String name, TMethod tMethod, boolean persistIt) {
 		Parameter fmx = ensureFamixEntity(Parameter.class, key, name, persistIt);
 		fmx.setParentBehaviouralEntity(tMethod);
-		fmx.setDeclaredType(type);
 		
 		return fmx;
 	}
@@ -2649,7 +2648,7 @@ public class JavaDictionary {
 		}
 
 		if (fmx == null) {
-			fmx = createFamixParameter(bnd, name, /*declaredType*/null, tMethod, persistIt);
+			fmx = createFamixParameter(bnd, name, tMethod, persistIt);
 		}
 
 		if (fmx != null) {
