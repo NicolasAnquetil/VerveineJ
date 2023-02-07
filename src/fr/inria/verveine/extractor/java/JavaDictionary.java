@@ -2455,17 +2455,6 @@ public class JavaDictionary {
 		setVisibility(fmx, mod);
 	}
 
-	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, TWithAttributes owner, boolean persistIt) {
-		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, persistIt);
-	}
-
-	/**
-	 * helper method, we know the var exists, ensureFamixAttribute will recover it
-	 */
-	public Attribute getFamixAttribute(IVariableBinding bnd, String name, TWithAttributes owner) {
-		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, /*persistIt*/false);
-	}
-
 	/**
 	 * Returns a Famix Attribute associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
@@ -2550,6 +2539,17 @@ public class JavaDictionary {
 		return fmx;
 	}
 
+	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, TWithAttributes owner, boolean persistIt) {
+		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, persistIt);
+	}
+
+	/**
+	 * helper method, we know the var exists, ensureFamixAttribute will recover it
+	 */
+	public Attribute getFamixAttribute(IVariableBinding bnd, String name, TWithAttributes owner) {
+		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, /*persistIt*/false);
+	}
+
 	public Parameter ensureFamixParameter(IVariableBinding bnd, String name, Method owner, boolean persistIt) {
 		return ensureFamixParameter(bnd, name, /*declared type*/null, owner, persistIt);
 	}
@@ -2627,17 +2627,6 @@ public class JavaDictionary {
 		return fmx;
 	}
 
-	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, String name, Method owner, boolean persistIt) {
-		return ensureFamixLocalVariable(bnd, name, /*declared type*/null, owner, persistIt);
-	}
-
-	/**
-	 * helper method, we know the var exists, ensureFamixLocalVariable will recover it
-	 */
-	public LocalVariable getFamixLocalVariable(IVariableBinding bnd, String name, TWithLocalVariables owner) {
-		return ensureFamixLocalVariable(bnd, name, /*declared type*/null, owner, /*persistIt*/false);
-	}
-
 	/**
 	 * Returns a Famix LocalVariable associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
@@ -2645,7 +2634,7 @@ public class JavaDictionary {
 	 * @param persistIt  -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if <b>bnd</b> and <b>name</b> are null, or <b>bnd</b> and <b>owner</b> are null, or in case of a Famix error
 	 */
-	public <T extends TWithTypes & TNamedEntity> LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, String name, TType typ, TWithLocalVariables owner, boolean persistIt) {
+	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, String name, TWithLocalVariables owner, boolean persistIt) {
 		LocalVariable fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -2700,15 +2689,16 @@ public class JavaDictionary {
 		if (fmx != null) {
 			// we just created it or it was not bound, so we make sure it has the right information in it
 			fmx.setParentBehaviouralEntity(owner);
-			fmx.setDeclaredType(typ);
 		}
 
 		return fmx;
 	}
 
-	public ImplicitVariable ensureFamixImplicitVariable(String name, TType tType, TMethod tMethod, boolean persistIt) {
-		IBinding bnd = ImplicitVarBinding.getInstance(tMethod, name);
-		return ensureFamixImplicitVariable(bnd, name, tType, tMethod, persistIt);
+	/**
+	 * helper method, we know the var exists, ensureFamixLocalVariable will recover it
+	 */
+	public LocalVariable getFamixLocalVariable(IVariableBinding bnd, String name, TWithLocalVariables owner) {
+		return ensureFamixLocalVariable(bnd, name, owner, /*persistIt*/false);
 	}
 
 	/**
@@ -2725,6 +2715,11 @@ public class JavaDictionary {
 		fmx = ensureFamixEntity(ImplicitVariable.class, key, name, persistIt);
 		fmx.setParentBehaviouralEntity(tMethod);
 		return fmx;
+	}
+
+	public ImplicitVariable ensureFamixImplicitVariable(String name, TType tType, TMethod tMethod, boolean persistIt) {
+		IBinding bnd = ImplicitVarBinding.getInstance(tMethod, name);
+		return ensureFamixImplicitVariable(bnd, name, tType, tMethod, persistIt);
 	}
 
 	/**
