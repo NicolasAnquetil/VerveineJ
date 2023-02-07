@@ -677,18 +677,6 @@ public class JavaDictionary {
 	}
 
 	/**
-	 * Creates or recovers a default Famix Namespace.
-	 * Because this package does not really exist, it has no binding.
-	 *
-	 * @return a Famix Namespace
-	 */
-	public Package ensureFamixPackageDefault() {
-		Package fmx = ensureFamixUniqEntity(Package.class, null, DEFAULT_PCKG_NAME);
-
-		return fmx;
-	}
-
-	/**
 	 * Creates or recovers the Famix Class that will own all stub methods (for which the real owner is unknown)
 	 *
 	 * @return a Famix class
@@ -718,19 +706,7 @@ public class JavaDictionary {
 	}
 
 	/**
-	 * Returns the namespace with {@link AbstractDictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
-	 */
-	public Package getFamixPackageDefault() {
-		Collection<Package> l = getEntityByName(Package.class, DEFAULT_PCKG_NAME);
-		if (l.size() > 0) {
-			return l.iterator().next();
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Returns a Famix Namespace associated with its IPackageBinding and/or fully qualified name.
+	 * Returns a Famix Package associated with its IPackageBinding and/or fully qualified name.
 	 * The Entity is created if it does not exist.
 	 * We assume that Namespaces must be uniq for a given name
 	 * Also creates or recovers recusively it's parent namespaces.<br>
@@ -767,6 +743,43 @@ public class JavaDictionary {
 		}
 
 		return fmx;
+	}
+
+	/**
+	 * Creates or recovers a default Famix Package.
+	 * Because this package does not really exist, it has no binding.
+	 *
+	 * @return a Famix Namespace
+	 */
+	public Package ensureFamixPackageDefault() {
+		Package fmx = ensureFamixUniqEntity(Package.class, null, DEFAULT_PCKG_NAME);
+
+		return fmx;
+	}
+
+	/**
+	 * Creates or recovers a Famix Package for the package of Java class "Object" (i.e. "java.lang").
+	 * Because "Object" is the root of the inheritance tree, it needs to be treated differently.
+	 *
+	 * @param bnd -- a potential binding for the "java.lang" package
+	 * @return a Famix Namespace for "java.lang"
+	 */
+	public Package ensureFamixPackageJavaLang(IPackageBinding bnd) {
+		Package fmx = this.ensureFamixPackage(bnd, OBJECT_PACKAGE_NAME);
+
+		return fmx;
+	}
+
+	/**
+	 * Returns the Package with {@link AbstractDictionary#DEFAULT_PCKG_NAME} or <code>null</code> if not found
+	 */
+	public Package getFamixPackageDefault() {
+		Collection<Package> l = getEntityByName(Package.class, DEFAULT_PCKG_NAME);
+		if (l.size() > 0) {
+			return l.iterator().next();
+		} else {
+			return null;
+		}
 	}
 
 	public TType ensureFamixType(ITypeBinding bnd, boolean alwaysPersist) {
@@ -2839,19 +2852,6 @@ public class JavaDictionary {
 	 */
 	public Method ensureFamixStubMethod(String name) {
 		return ensureFamixMethod(null, name, /*paramType*/(Collection<String>)null, /*returnType*/null, ensureFamixClassStubOwner(), /*modifiers*/0, false);  // cast needed to desambiguate the call
-	}
-
-	/**
-	 * Creates or recovers a Famix Namespace for the package of Java class "Object" (i.e. "java.lang").
-	 * Because "Object" is the root of the inheritance tree, it needs to be treated differently.
-	 *
-	 * @param bnd -- a potential binding for the "java.lang" package
-	 * @return a Famix Namespace for "java.lang"
-	 */
-	public Package ensureFamixPackageJavaLang(IPackageBinding bnd) {
-		Package fmx = this.ensureFamixPackage(bnd, OBJECT_PACKAGE_NAME);
-
-		return fmx;
 	}
 
 	/**
