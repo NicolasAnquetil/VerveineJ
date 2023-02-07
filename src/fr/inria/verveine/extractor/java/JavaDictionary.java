@@ -2561,17 +2561,6 @@ public class JavaDictionary {
 		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, /*persistIt*/false);
 	}
 
-	public Parameter ensureFamixParameter(IVariableBinding bnd, String name, Method owner, boolean persistIt) {
-		return ensureFamixParameter(bnd, name, /*declared type*/null, owner, persistIt);
-	}
-
-	/**
-	 * helper method, we know the var exists, ensureFamixParameter will recover it
-	 */
-	public Parameter getFamixParameter(IVariableBinding bnd, String name, TMethod tMethod) {
-		return ensureFamixParameter(bnd, name, /*declared type*/null, tMethod, /*persistIt*/false);
-	}
-
 	/**
 	 * Returns a Famix Parameter associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
@@ -2636,6 +2625,13 @@ public class JavaDictionary {
 		}
 
 		return fmx;
+	}
+
+	/**
+	 * helper method, we know the var exists, ensureFamixParameter will recover it
+	 */
+	public Parameter getFamixParameter(IVariableBinding bnd, String name, TMethod tMethod) {
+		return ensureFamixParameter(bnd, name, /*declared type*/null, tMethod, /*persistIt*/false);
 	}
 
 	/**

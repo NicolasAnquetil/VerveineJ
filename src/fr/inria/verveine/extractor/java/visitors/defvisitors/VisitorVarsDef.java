@@ -303,7 +303,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		String name = varDecl.getName().getIdentifier();
 
 		switch (structKind) {
-			case PARAMETER:	fmx = dico.ensureFamixParameter(bnd, name, (Method) owner, /*persistIt*/! summarizeModel());										break;
+			case PARAMETER:	fmx = dico.ensureFamixParameter(bnd, name, /*declared type*/null, (Method) owner, /*persistIt*/! summarizeModel());										break;
 			case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (TWithAttributes) owner, /*persistIt*/! summarizeModel());	break;
 			case LOCALVAR: 	fmx = dico.ensureFamixLocalVariable(bnd, name, (Method) owner, /*persistIt*/! summarizeModel());									break;
 			default:		fmx = null;
