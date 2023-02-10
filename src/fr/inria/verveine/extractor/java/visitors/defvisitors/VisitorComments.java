@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
@@ -47,7 +47,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	 */
 	private Javadoc compilUnitComment;
 
-	public VisitorComments(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorComments(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 	}
 	// VISITOR METHODS
@@ -151,7 +151,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		Method fmx = visitMethodDeclaration( node);
 
-		if ( (fmx != null) && (! summarizeClasses()) ){
+		if ( (fmx != null) && (! summarizeModel()) ){
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 
@@ -179,7 +179,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
 		AnnotationTypeAttribute fmx = visitAnnotationTypeMemberDeclaration( node);
-		if ( (fmx != null) && (! summarizeClasses()) ) {
+		if ( (fmx != null) && (! summarizeModel()) ) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 			return super.visit(node);
@@ -196,7 +196,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(Initializer node) {
 		Method fmx = visitInitializer(node);
-		if ( (fmx != null) && (! summarizeClasses()) ) {
+		if ( (fmx != null) && (! summarizeModel()) ) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 			return super.visit(node);
@@ -277,7 +277,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 		TStructuralEntity fmx = null;
 		Comment cmt = null;
 
-		if (summarizeClasses()) {
+		if (summarizeModel()) {
 			return;
 		}
 

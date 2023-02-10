@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.EntityStack;
 import org.eclipse.jdt.core.dom.*;
@@ -15,7 +15,7 @@ public class VisitorPackageDef extends ASTVisitor {
 	/** 
 	 * A dictionary allowing to recover created FAMIX Entities
 	 */
-	protected JavaDictionary dico;
+	protected EntityDictionary dico;
 
 	/**
 	 * A stack that keeps the current definition context (package/class/method)
@@ -27,7 +27,7 @@ public class VisitorPackageDef extends ASTVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 
-	public VisitorPackageDef(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorPackageDef(EntityDictionary dico, VerveineJOptions options) {
 		this.dico = dico;
 		this.context = new EntityStack();
 	}
@@ -36,7 +36,7 @@ public class VisitorPackageDef extends ASTVisitor {
 
 	@Override
 	public boolean visit(CompilationUnit node) {
-		//System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(JavaDictionary.SOURCE_FILENAME_PROPERTY));
+		//System.err.println("TRACE, Visiting CompilationUnit: "+node.getProperty(EntityDictionary.SOURCE_FILENAME_PROPERTY));
 
 		Package fmx;
 		PackageDeclaration pckg = node.getPackage();

@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
@@ -26,7 +26,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	 */
 	private StructuralEntityKinds structuralType;
 
-	public VisitorVarsDef(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorVarsDef(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 	}
 
@@ -212,7 +212,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		}
 
 		// Possible local variables in optional initializer
-		if (visitFieldDeclaration(node)) {  // recovers optional JavaDictionary.INIT_BLOCK_NAME method
+		if (visitFieldDeclaration(node)) {  // recovers optional EntityDictionary.INIT_BLOCK_NAME method
 			structuralType = StructuralEntityKinds.LOCALVAR;
 			for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
 				vardecl.getInitializer().accept(this);
@@ -266,13 +266,13 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	}
 
 	public boolean visit(SuperMethodInvocation node) {
-		dico.ensureFamixImplicitVariable(JavaDictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeClasses());
+		dico.ensureFamixImplicitVariable(EntityDictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeModel());
 		return super.visit(node);
 	}
 
 	public boolean visit(ConstructorInvocation node) {
-		if (! summarizeClasses()) {
-			dico.ensureFamixImplicitVariable(JavaDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt=true*/! summarizeClasses());
+		if (! summarizeModel()) {
+			dico.ensureFamixImplicitVariable(EntityDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt=true*/! summarizeModel());
 		}
 
 		return super.visit(node);
@@ -280,8 +280,8 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 
 	public boolean visit(SuperConstructorInvocation node) {
 		// access to "super" ???
-		if (! summarizeClasses()) {
-			dico.ensureFamixImplicitVariable(JavaDictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt=true*/! summarizeClasses());
+		if (! summarizeModel()) {
+			dico.ensureFamixImplicitVariable(EntityDictionary.SUPER_NAME, context.topType(), context.topMethod(), /*persistIt=true*/! summarizeModel());
 		}
 
 		return super.visit(node);
@@ -290,7 +290,7 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 	// "SomeClass.class"
 	public boolean visit(TypeLiteral node) {
 		org.moosetechnology.model.famix.famixjavaentities.Type javaMetaClass = dico.getFamixMetaClass(null);
-		dico.ensureFamixAttribute(null, "class", javaMetaClass, (TWithAttributes) javaMetaClass,	/*persistIt*/! summarizeClasses());
+		dico.ensureFamixAttribute(null, "class", javaMetaClass, (TWithAttributes) javaMetaClass,	/*persistIt*/! summarizeModel());
 
 		return super.visit(node);
 	}
@@ -303,15 +303,15 @@ public class VisitorVarsDef extends SummarizingClassesAbstractVisitor {
 		String name = varDecl.getName().getIdentifier();
 
 		switch (structKind) {
-			case PARAMETER:	fmx = dico.ensureFamixParameter(bnd, name, (Method) owner, /*persistIt*/! summarizeClasses());										break;
-			case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (TWithAttributes) owner, /*persistIt*/! summarizeClasses());	break;
-			case LOCALVAR: 	fmx = dico.ensureFamixLocalVariable(bnd, name, (Method) owner, /*persistIt*/! summarizeClasses());									break;
+			case PARAMETER:	fmx = dico.ensureFamixParameter(bnd, name, /*declared type*/null, (Method) owner, /*persistIt*/! summarizeModel());										break;
+			case ATTRIBUTE: fmx = dico.ensureFamixAttribute(bnd, name, (TWithAttributes) owner, /*persistIt*/! summarizeModel());	break;
+			case LOCALVAR: 	fmx = dico.ensureFamixLocalVariable(bnd, name, (Method) owner, /*persistIt*/! summarizeModel());									break;
 			default:		fmx = null;
 		}
 
 		if (fmx != null) {
 			((TSourceEntity) fmx).setIsStub(false);
-			if ((! summarizeClasses()) && (options.withAnchors())) {
+			if ((! summarizeModel()) && (options.withAnchors())) {
 				dico.addSourceAnchor((TSourceEntity) fmx, varDecl, /*oneLineAnchor*/true);
 			}
 		}

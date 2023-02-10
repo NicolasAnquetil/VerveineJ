@@ -35,7 +35,7 @@ public class VerveineJTest_Lambdas extends VerveineJTest_Basic {
     public void testLambdaTypedParameter() {
         parse(new String[] {"-alllocals", "test_src/lambdas"});
 
-        Method meth = detectFamixElement( Method.class, JavaDictionary.INIT_BLOCK_NAME);
+        Method meth = detectFamixElement( Method.class, EntityDictionary.INIT_BLOCK_NAME);
         assertNotNull(meth);
 
         LocalVariable seg1 = null;

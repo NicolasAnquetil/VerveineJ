@@ -1,1 +1,0 @@
-packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"fr.inria.verveine.extractor.java"},{"l":"fr.inria.verveine.extractor.java.utils"},{"l":"fr.inria.verveine.extractor.java.visitors"},{"l":"fr.inria.verveine.extractor.java.visitors.defvisitors"},{"l":"fr.inria.verveine.extractor.java.visitors.refvisitors"}];updateSearchResults();

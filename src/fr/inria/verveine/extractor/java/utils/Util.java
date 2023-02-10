@@ -1,9 +1,11 @@
 package fr.inria.verveine.extractor.java.utils;
 
 import ch.akuhn.fame.MetaRepository;
+import ch.akuhn.fame.Repository;
 import ch.akuhn.fame.fm3.MetaDescription;
 import ch.akuhn.fame.fm3.PropertyDescription;
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import ch.akuhn.fame.internal.RepositoryVisitor.UnknownElementError;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import org.eclipse.jdt.core.dom.ArrayType;
 import org.eclipse.jdt.core.dom.LambdaExpression;
 import org.eclipse.jdt.core.dom.QualifiedType;
@@ -19,6 +21,8 @@ public class Util {
 
 	public static MetaRepository metamodel;
 
+public static Repository repo = null;
+
 	/**
 	 * helper to "normalize" lambda names
 	 */
@@ -32,7 +36,7 @@ public class Util {
 	 */
 	public static String stringForAnonymousName(String anonymousSuperTypeName, EntityStack context) {
 		String anonSuperTypeName = (anonymousSuperTypeName != null) ? anonymousSuperTypeName : context.topType().getName();
-		return JavaDictionary.ANONYMOUS_NAME_PREFIX + "(" +anonSuperTypeName+")";
+		return EntityDictionary.ANONYMOUS_NAME_PREFIX + "(" +anonSuperTypeName+")";
 	}
 
 	/**
@@ -57,7 +61,7 @@ public class Util {
 			if (((org.eclipse.jdt.core.dom.WildcardType) jdtType).isUpperBound()) {
 				return jdtTypeName(((org.eclipse.jdt.core.dom.WildcardType) jdtType).getBound());
 			} else {
-				return JavaDictionary.OBJECT_NAME;
+				return EntityDictionary.OBJECT_NAME;
 			}
 		}
 	}
@@ -96,6 +100,10 @@ public class Util {
 		} catch (Exception e) {
 		}
 		return retStr;
+	}
+
+	public static void traceUnknownElementError(UnknownElementError err) {
+		err.printStackTrace(); // repo.all(org.moosetechnology.model.famix.famixjavaentities.Method.class).size()
 	}
 }
 

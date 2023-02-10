@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.EntityStack;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
@@ -38,7 +38,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	/** 
 	 * A dictionary allowing to recover created FAMIX Entities
 	 */
-	protected JavaDictionary dico;
+	protected EntityDictionary dico;
 
 	/**
 	 * The super type of an anonymous declaration is only available (without resorting to bindings) when 
@@ -48,7 +48,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	 */
 	protected Stack<String> anonymousSuperTypeName;
 
-	public GetVisitedEntityAbstractVisitor(JavaDictionary dico, VerveineJOptions options) {
+	public GetVisitedEntityAbstractVisitor(EntityDictionary dico, VerveineJOptions options) {
 		super();
 		this.dico = dico;
 		this.options = options;
@@ -206,7 +206,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 			paramTypes.add(Util.jdtTypeName(param.getType()));
 		}
 
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*returnType*/null, (TWithMethods) /*owner*/context.topType(), JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*returnType*/null, (TWithMethods) /*owner*/context.topType(), EntityDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
 
 		context.pushMethod(fmx);  // whether fmx==null or not
 		return fmx;
@@ -231,7 +231,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	public void endVisitInitializer(Initializer node) {
-		if ( (context.top() instanceof Method) && ( context.top().getName().equals(JavaDictionary.INIT_BLOCK_NAME)) ) {
+		if ( (context.top() instanceof Method) && ( context.top().getName().equals(EntityDictionary.INIT_BLOCK_NAME)) ) {
 			this.context.pop();
 		}
 		super.endVisit(node);
@@ -254,7 +254,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	public void endVisitEnumConstantDeclaration(EnumConstantDeclaration node) {
 		for (Expression expr : (List<Expression>)node.arguments()) {
 			if (expr != null) {
-				context.pop();  // pops the JavaDictionary.INIT_BLOCK_NAME method
+				context.pop();  // pops the EntityDictionary.INIT_BLOCK_NAME method
 				break;
 			}
 		}
@@ -276,7 +276,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	public void endVisitFieldDeclaration(FieldDeclaration node) {
 		for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
 			if (vardecl.getInitializer() != null) {
-				context.pop();  // pops the JavaDictionary.INIT_BLOCK_NAME method
+				context.pop();  // pops the EntityDictionary.INIT_BLOCK_NAME method
 				break;
 			}
 		}
@@ -293,7 +293,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * Recovers the fake method: {@link JavaDictionary#INIT_BLOCK_NAME}
+	 * Recovers the fake method: {@link EntityDictionary#INIT_BLOCK_NAME}
 	 *
 	 * Used in the case of instance/class initializer and initializing expressions of FieldDeclarations and EnumConstantDeclarations
 	 */
@@ -301,7 +301,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		TType owner = context.topType();
 		Method fmx = recoverInitializerMethod((TWithMethods)owner);
 		if (fmx == null) {
-			fmx = dico.ensureFamixMethod(null, JavaDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<>(), /*returnType*/null, (TWithMethods) owner, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
+			fmx = dico.ensureFamixMethod(null, EntityDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<>(), /*returnType*/null, (TWithMethods) owner, EntityDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
 		}
 		if (fmx != null) {
 			context.pushMethod(fmx);
@@ -319,7 +319,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		Method ret = null;
 		if (owner != null) {
 			for (TMethod meth : owner.getMethods()) {
-				if (((Method) meth).getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+				if (((Method) meth).getName().equals(EntityDictionary.INIT_BLOCK_NAME)) {
 					ret = (Method) meth;
 					break;
 				}

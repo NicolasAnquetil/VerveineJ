@@ -5,7 +5,7 @@ import org.eclipse.jdt.core.dom.IAnnotationBinding;
 import org.eclipse.jdt.core.dom.IBinding;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -42,12 +42,12 @@ public class ImplicitVarBinding implements IBinding {
 			allImplicitVarBnd.put(tMethod, vars);
 		}
 		else {
-			bnd = (name.equals(JavaDictionary.SELF_NAME) ? vars.self_iv : vars.super_iv);
+			bnd = (name.equals(EntityDictionary.SELF_NAME) ? vars.self_iv : vars.super_iv);
 		}
 
 		if (bnd == null) {
 			bnd = new ImplicitVarBinding(tMethod, name);
-			if (name.equals(JavaDictionary.SELF_NAME)) {
+			if (name.equals(EntityDictionary.SELF_NAME)) {
 				vars.self_iv = bnd;
 			}
 			else {

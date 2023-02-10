@@ -182,7 +182,7 @@ public abstract class VerveineJTest_Basic {
 			if ((parent != null) &&
 					(!(parent instanceof org.moosetechnology.model.famix.famixjavaentities.Enum)) &&   // for enums some methods are implicit
 					(!m.getName().equals(parent.getName())) &&   // for constructors are implicit
-					(!m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) &&
+					(!m.getName().equals(EntityDictionary.INIT_BLOCK_NAME)) &&
 					(parent.getSourceAnchor() != null)) {
 				assertNotNull("Method '" + m.getName() + "' has no SourceAnchor, whereas its parent '" + parent.getName() + "' has one", m.getSourceAnchor());
 				found = true;
@@ -203,7 +203,7 @@ public abstract class VerveineJTest_Basic {
 		Package java = detectFamixElement(Package.class, "java");
 		assertNotNull(java);
 
-		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
+		String javaLangName = EntityDictionary.OBJECT_PACKAGE_NAME.substring(EntityDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
 		Package javaLang = detectFamixElement(Package.class, javaLangName);
 		assertNotNull(javaLang);
 		assertEquals(java, javaLang.getParentPackage());
@@ -216,7 +216,7 @@ public abstract class VerveineJTest_Basic {
 		*/
 
 		// Object
-		org.moosetechnology.model.famix.famixjavaentities.Class obj = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME);
+		org.moosetechnology.model.famix.famixjavaentities.Class obj = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, EntityDictionary.OBJECT_NAME);
 		assertNotNull(obj);
 		assertSame(javaLang, obj.getTypeContainer());
 		assertEquals(0, obj.getSuperInheritances().size());
@@ -259,7 +259,7 @@ public abstract class VerveineJTest_Basic {
 
 		org.moosetechnology.model.famix.famixjavaentities.Class syst = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "System");
 		assertNotNull(syst);
-		String javaLangName = JavaDictionary.OBJECT_PACKAGE_NAME.substring(JavaDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
+		String javaLangName = EntityDictionary.OBJECT_PACKAGE_NAME.substring(EntityDictionary.OBJECT_PACKAGE_NAME.lastIndexOf('.') + 1);
 		Package javaLang = detectFamixElement(Package.class, javaLangName);
 		assertSame(javaLang, syst.getTypeContainer());
 		boolean found = false;

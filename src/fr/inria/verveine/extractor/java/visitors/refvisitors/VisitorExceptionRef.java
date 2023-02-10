@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import org.eclipse.jdt.core.dom.*;
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class VisitorExceptionRef extends AbstractRefVisitor {
 
-    public VisitorExceptionRef(JavaDictionary dico, VerveineJOptions options) {
+    public VisitorExceptionRef(EntityDictionary dico, VerveineJOptions options) {
         super(dico, options);
     }
 
@@ -61,7 +61,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 		Method fmx = visitMethodDeclaration( node);
 		if (fmx != null) {
 		    for (Type excep : (List<Type>) node.thrownExceptionTypes()) {
-                if (! summarizeClasses()) {
+                if (! summarizeModel()) {
                     Exception excepFmx =  dico.asException(this.referedType(excep, (ContainerEntity) context.topType(), true, true));
                     dico.createFamixDeclaredException(fmx, (Exception) excepFmx);
                 }
@@ -87,7 +87,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
                 excepFmx = dico.asException(referedType(excepClass, meth, true, true));
             }
             if (excepFmx != null) {
-                if (! summarizeClasses()) {
+                if (! summarizeModel()) {
                     dico.createFamixCaughtException(meth, excepFmx);
                 }
             }
@@ -102,7 +102,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
         org.moosetechnology.model.famix.famixjavaentities.Exception excepFmx = dico.asException(this
                 .referedType(node.getExpression().resolveTypeBinding(), (TNamedEntity) context.topType(), true));
         if (excepFmx != null) {
-            if (! summarizeClasses()) {
+            if (! summarizeModel()) {
                 dico.createFamixThrownException(meth, excepFmx);
             }
         }

@@ -186,7 +186,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		for (TMethod tmth : outputServ.getMethods()) {
 			Method mth = (Method) tmth;
 			String nm = mth.getName();
-			assertTrue("Unknown method name: " + nm, nm.equals(JavaDictionary.INIT_BLOCK_NAME) || nm.equals("accept")
+			assertTrue("Unknown method name: " + nm, nm.equals(EntityDictionary.INIT_BLOCK_NAME) || nm.equals("accept")
 					|| nm.equals("canOutput") || nm.equals("output"));
 		}
 		assertEquals(1, outputServ.getAttributes().size());
@@ -254,29 +254,29 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 
 	@Test
 	public void testEntitiesWithoutKeyAreDuplicated() {
-		JavaDictionary javaDictionary = new JavaDictionary(repo);
+		EntityDictionary javaDictionary = new EntityDictionary(repo);
 
-		assertNotSame(javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, JavaDictionary.UNKNOWN_MODIFIERS, /* persistIt */true),
-				javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, JavaDictionary.UNKNOWN_MODIFIERS, /* persistIt */true));
+		assertNotSame(javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, EntityDictionary.UNKNOWN_MODIFIERS, /* persistIt */true),
+				javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, EntityDictionary.UNKNOWN_MODIFIERS, /* persistIt */true));
 	}
 
 	@Test
 	public void testNamedEntities() {
-		JavaDictionary javaDictionary = new JavaDictionary(repo);
+		EntityDictionary javaDictionary = new EntityDictionary(repo);
 
 		Package javaLang = javaDictionary.ensureFamixPackageJavaLang(null);
-		assertEquals(JavaDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());
+		assertEquals(EntityDictionary.OBJECT_PACKAGE_NAME, javaLang.getName());
 		assertSame(javaLang, javaDictionary.ensureFamixPackageJavaLang(null));
 		assertTrue(javaLang.getIsStub());
 
 		org.moosetechnology.model.famix.famixjavaentities.Class obj = javaDictionary.ensureFamixClassObject(null);
-		assertEquals(JavaDictionary.OBJECT_NAME, obj.getName());
+		assertEquals(EntityDictionary.OBJECT_NAME, obj.getName());
 		assertSame(obj, javaDictionary.ensureFamixClassObject(null));
 		assertEquals(0, obj.getSuperInheritances().size());
 		assertSame(javaLang, obj.getTypeContainer());
 
 		org.moosetechnology.model.famix.famixjavaentities.Class fmx = javaDictionary.ensureFamixClassStubOwner();
-		assertEquals(JavaDictionary.STUB_METHOD_CONTAINER_NAME, fmx.getName());
+		assertEquals(EntityDictionary.STUB_METHOD_CONTAINER_NAME, fmx.getName());
 		assertSame(fmx, javaDictionary.ensureFamixClassStubOwner());
 	}
 
@@ -305,7 +305,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		inh = (Inheritance) firstElt(superInheritances);
 		assertSame(clazz, inh.getSubclass());
 		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class,
-				JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+				EntityDictionary.OBJECT_NAME), inh.getSuperclass());
 
 		clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "XPrinter");
 		assertNotNull(clazz);
@@ -329,7 +329,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertSame(clazz, inh.getSubclass());
 		assertNull(inh.getPrevious());
 		assertSame(inh, inh.getNext().getPrevious());
-		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, JavaDictionary.OBJECT_NAME), inh.getSuperclass());
+		assertSame(detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, EntityDictionary.OBJECT_NAME), inh.getSuperclass());
 
 		assertSame(inh.getNext(), implem);
 		assertSame(implem.getPrevious(), inh);
@@ -688,7 +688,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		if (accessor.getName().equals("setServerType")) {
 			assertEquals("FileServer", ((TNamedEntity) accessor.getParentType()).getName());
 		} else {
-			assertEquals(JavaDictionary.INIT_BLOCK_NAME, accessor.getName());
+			assertEquals(EntityDictionary.INIT_BLOCK_NAME, accessor.getName());
 			assertEquals("OutputServer", ((TNamedEntity) accessor.getParentType()).getName());
 		}
 
@@ -822,7 +822,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(4, clazz.getMethods().size());
 		for (TMethod tm : clazz.getMethods()) {
 			Method m = (Method) tm;
-			if (m.getName().equals(JavaDictionary.INIT_BLOCK_NAME)) {
+			if (m.getName().equals(EntityDictionary.INIT_BLOCK_NAME)) {
 				assertFalse(m.getIsPublic());
 			} else {
 				assertTrue(m.getIsPublic());

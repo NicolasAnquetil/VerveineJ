@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
@@ -21,7 +21,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
      */
 	private boolean searchTypeRef;
 
-	public VisitorTypeRefRef(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorTypeRefRef(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 		this.searchTypeRef = false;
 	}
@@ -67,7 +67,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			Type clazz = node.getType();
 			org.moosetechnology.model.famix.famixtraits.TType fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 			Reference ref = null;
-			if (! summarizeClasses()) {
+			if (! summarizeModel()) {
 				ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
 				context.setLastReference(ref);
 			}
@@ -200,7 +200,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 		Reference ref = null;
-		if (summarizeClasses()) {
+		if (summarizeModel()) {
 			//ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
 		} else {
 			ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
@@ -221,7 +221,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		visitFieldDeclaration(node);  // to recover optional JavaDictionary.INIT_BLOCK_NAME method
+		visitFieldDeclaration(node);  // to recover optional EntityDictionary.INIT_BLOCK_NAME method
 		visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());   // to create the TypeRefs
 		return true;
 	}

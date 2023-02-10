@@ -1,6 +1,6 @@
 package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
-import fr.inria.verveine.extractor.java.JavaDictionary;
+import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.NodeTypeChecker;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
@@ -35,7 +35,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 */
 	protected boolean inAssignmentLHS = false;
 
-	public VisitorInvocRef(JavaDictionary dico, VerveineJOptions options) {
+	public VisitorInvocRef(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 	}
 
@@ -77,7 +77,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 */
 	public boolean visit(ClassInstanceCreation node) {
 		visitClassInstanceCreation(node);
-		if ((!summarizeClasses())) {
+		if ((!summarizeModel())) {
 
 			String typName;
 			TType fmx;
@@ -208,7 +208,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
     @SuppressWarnings("unchecked")
     @Override
     public boolean visit(FieldDeclaration node) {
-        visitFieldDeclaration(node);  // to recover optional JavaDictionary.INIT_BLOCK_NAME method
+        visitFieldDeclaration(node);  // to recover optional EntityDictionary.INIT_BLOCK_NAME method
         return true;
     }
 
@@ -255,10 +255,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	public boolean visit(SuperMethodInvocation node) {
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		TNamedEntity receiver = this.dico.ensureFamixImplicitVariable(
-				JavaDictionary.SUPER_NAME,
+				EntityDictionary.SUPER_NAME,
 				this.context.topType(), 
 				context.topMethod(), 
-				/*persistIt*/!summarizeClasses());
+				/*persistIt*/!summarizeModel());
 		IMethodBinding bnd = node.resolveMethodBinding();
 		String calledName = node.getName().getFullyQualifiedName();
 
@@ -290,16 +290,16 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	public boolean visit(ConstructorInvocation node) {
 		// ConstructorInvocation (i.e. 'this(...)' ) happen in constructor, so the name is the same
 		
-		int modifiers = (node.resolveConstructorBinding() != null) ? node.resolveConstructorBinding().getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
+		int modifiers = (node.resolveConstructorBinding() != null) ? node.resolveConstructorBinding().getModifiers() : EntityDictionary.UNKNOWN_MODIFIERS;
 
 		String name = context.topMethod().getName();
 		TMethod invoked = dico.ensureFamixMethod(node.resolveConstructorBinding(), name,
 				/*paramTypes*/null, /*retType*/null, (TWithMethods) /*owner*/context.topType(), modifiers,
-				/*persistIt*/!summarizeClasses());
+				/*persistIt*/!summarizeModel());
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either
 
-		if (!summarizeClasses()) {
+		if (!summarizeModel()) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -308,10 +308,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				signature = signature.substring(0, signature.length() - 1);
 			}
 			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(
-					JavaDictionary.SELF_NAME, 
+					EntityDictionary.SELF_NAME, 
 					context.topType(), 
 					context.topMethod(), 
-					/*persistIt=true*/!summarizeClasses());
+					/*persistIt=true*/!summarizeModel());
 			
 			TInvocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
@@ -331,13 +331,13 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		Method invoked = null;
 
 //		if (superC != null) {
-//            invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), superC.getName(),  /*paramsType*/(Collection<String>) null, superC, JavaDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
+//            invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), superC.getName(),  /*paramsType*/(Collection<String>) null, superC, EntityDictionary.UNKNOWN_MODIFIERS, /*persistIt*/!classSummary);
 //        }
 //        else {
-		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!summarizeClasses());
+		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding(), /*persistIt*/!summarizeModel());
 //        }
 
-		if ( (invoked != null) && (! summarizeClasses()) ) {
+		if ( (invoked != null) && (! summarizeModel()) ) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -346,10 +346,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				signature = signature.substring(0, signature.length() - 1);
 			}
 			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(
-					JavaDictionary.SUPER_NAME, 
+					EntityDictionary.SUPER_NAME, 
 					context.topType(), 
 					context.topMethod(), 
-					/*persistIt=true*/!summarizeClasses());
+					/*persistIt=true*/!summarizeModel());
 			Invocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
@@ -400,10 +400,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			}
 
 			if (sender != null) {
-				int modifiers = (calledBnd != null) ? calledBnd.getModifiers() : JavaDictionary.UNKNOWN_MODIFIERS;
+				int modifiers = (calledBnd != null) ? calledBnd.getModifiers() : EntityDictionary.UNKNOWN_MODIFIERS;
 				if ((receiver != null) && (receiver instanceof TStructuralEntity)) {
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null, (TWithMethods) methOwner,
-							modifiers, /*persistIt*/!summarizeClasses());
+							modifiers, /*persistIt*/!summarizeModel());
 				} else {
 					TType owner;
 
@@ -413,10 +413,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 						owner = methOwner;
 					//  static method called on the class (or null receiver)
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null,
-							(TWithMethods) /*owner*/owner, modifiers, /*persistIt*/!summarizeClasses());
+							(TWithMethods) /*owner*/owner, modifiers, /*persistIt*/!summarizeModel());
 				}
 				
-				if (! summarizeClasses()) {
+				if (! summarizeModel()) {
 					String signature = calledName + "(";
 					boolean first = true;
 					for (Expression a : l_args) {
@@ -449,7 +449,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		// msg(), same as ThisExpression
 		if (expr == null) {
 			return this.dico.ensureFamixImplicitVariable(dico.SELF_NAME, this.context.topType(), context.topMethod(),
-					/*persistIt*/!summarizeClasses());
+					/*persistIt*/!summarizeModel());
 		}
 
 		// array[i].msg()
@@ -554,7 +554,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// this.msg()
 		if ( NodeTypeChecker.isThisExpression(expr)) {
-			return this.dico.ensureFamixImplicitVariable(JavaDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeClasses());
+			return this.dico.ensureFamixImplicitVariable(EntityDictionary.SELF_NAME, context.topType(), context.topMethod(), /*persistIt*/! summarizeModel());
 		}
 
 		// type.class.msg()
@@ -606,7 +606,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 		// "string".msg()
 		else if ( NodeTypeChecker.isStringLiteral(expr)) {
-			return dico.ensureFamixType(/*binding*/null, "String", dico.ensureFamixPackageJavaLang(null), /*context*/null, JavaDictionary.UNKNOWN_MODIFIERS,
+			return dico.ensureFamixType(/*binding*/null, "String", dico.ensureFamixPackageJavaLang(null), /*context*/null, EntityDictionary.UNKNOWN_MODIFIERS,
 					/*alwaysPersist?*/true); // creating FamixClass java.lang.String
 		}
 
@@ -626,10 +626,10 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				return null;
 			}
 			/*			else if (receiver instanceof ImplicitVariable) {
-							if (receiver.getName().equals(JavaDictionary.SELF_NAME)) {
+							if (receiver.getName().equals(EntityDictionary.SELF_NAME)) {
 								return context.topType();
 							}
-							else { // receiver.getName().equals(JavaDictionary.SUPER_NAME)
+							else { // receiver.getName().equals(EntityDictionary.SUPER_NAME)
 								return context.topType().getSuperInheritances().iterator().next().getSuperclass();
 							}
 						}*/
