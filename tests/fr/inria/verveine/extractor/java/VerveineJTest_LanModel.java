@@ -256,8 +256,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 	public void testEntitiesWithoutKeyAreDuplicated() {
 		EntityDictionary javaDictionary = new EntityDictionary(repo);
 
-		assertNotSame(javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, EntityDictionary.UNKNOWN_MODIFIERS, /* persistIt */true),
-				javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, EntityDictionary.UNKNOWN_MODIFIERS, /* persistIt */true));
+		assertNotSame(javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, EntityDictionary.UNKNOWN_MODIFIERS),
+				javaDictionary.ensureFamixClass(null, A_CLASS_NAME, /*owner*/null, /*isGeneric*/false, EntityDictionary.UNKNOWN_MODIFIERS));
 	}
 
 	@Test

@@ -401,8 +401,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 				bnd, 
 				EntityDictionary.SELF_NAME, 
 				(Type) this.context.topType(), 
-				context.topMethod(), 
-				/*persistIt*/! summarizeModel());
+				context.topMethod());
 		if (fmx != null) {
 			TMethod accessor = this.context.topMethod();
 
@@ -482,10 +481,9 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 
 		// could also test: "owner instanceof Enum" in case bnd == null
 		if (bnd.isEnumConstant()) {
-			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner, /*persistIt*/! summarizeModel());
+			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner);
 		} else if (bnd.isField()) {
-			accessed = dico.ensureFamixAttribute(bnd, name, typ, (TWithAttributes) owner,
-					/*persistIt*/! summarizeModel());
+			accessed = dico.ensureFamixAttribute(bnd, name, typ, (TWithAttributes) owner);
 			if (summarizeModel()) {
 				if (!(((Attribute) accessed).getDeclaredType() instanceof PrimitiveType)) {
 					//dico.addFamixReference(findHighestType(accessed.getBelongsTo()),
@@ -500,7 +498,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			}
 		} else if (bnd.isParameter() && (! inLambda)) {
 			if (! summarizeModel()) {
-				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner, summarizeModel());
+				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner);
 			}
 		} else {
 			// it seems it is a variable.

@@ -4,7 +4,7 @@ import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.*;
 import org.moosetechnology.model.famix.famixjavaentities.Package;
@@ -19,7 +19,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithTypes;
  * It is simpler than the other ref visitors
  * @author anquetil
  */
-public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
+public class VisitorInheritanceRef extends GetVisitedEntityAbstractVisitor {
 
 	public VisitorInheritanceRef(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
@@ -81,11 +81,11 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 				supbnd = bnd.getSuperclass();
 			}
 			if (supbnd != null) {
-				sup = dico.ensureFamixType(supbnd, /*alwaysPersist*/true);
+				sup = dico.ensureFamixType(supbnd);
 			} else {
 				Package javaLang = dico.ensureFamixPackageJavaLang(null);
-				ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/javaLang, /*isGeneric*/true, /*modifiers*/Modifier.ABSTRACT & Modifier.PUBLIC, /*alwaysPersist*/true);
-				sup = dico.ensureFamixParameterizedType(/*bnd*/null, /*name*/"Enum", generic, /*ctxt*/(ContainerEntity) context.top(), /*alwaysPersist*/true);
+				ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/javaLang, /*isGeneric*/true, /*modifiers*/Modifier.ABSTRACT & Modifier.PUBLIC);
+				sup = dico.ensureFamixParameterizedType(/*bnd*/null, /*name*/"Enum", generic, /*ctxt*/(ContainerEntity) context.top());
 			}
 			dico.ensureFamixInheritance((TWithInheritances) sup, fmx, /*lastInheritance*/null);
 
@@ -154,14 +154,14 @@ public class VisitorInheritanceRef extends SummarizingClassesAbstractVisitor {
 			ITypeBinding supbnd = bnd.getSuperclass();
 			TType t;
 			if (supbnd != null) {
-				t = dico.ensureFamixType(supbnd, /*persistIt)*/true);
+				t = dico.ensureFamixType(supbnd);
 			} else {
 				t = dico.ensureFamixClassObject(null);
 			}
 			lastInheritance = dico.ensureFamixInheritance((TWithInheritances) t, fmx, lastInheritance);
 
 			for (ITypeBinding intbnd : bnd.getInterfaces()) {
-				TImplementable interfac = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(TWithTypes) context.top(), /*persistIt)*/true);
+				TImplementable interfac = (TImplementable) dico.ensureFamixType(intbnd, /*ctxt*/(TWithTypes) context.top());
 				// If "implementor" is an interface, then relation is an inheritance
 				if(fmx instanceof Interface ) {
 					dico.ensureFamixInheritance((Interface)interfac, fmx, lastInheritance);

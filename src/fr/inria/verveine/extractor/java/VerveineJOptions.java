@@ -51,21 +51,6 @@ public class VerveineJOptions {
 	public static final String DEFAULT_CODE_VERSION = JavaCore.VERSION_9;
 
 	/**
-	 * TODO remove ?
-	 * Whether to summarize collected information at the level of classes or produce everything.
-	 * Summarizing at the level of classes does not produce Method, Attributes, or Accesses, Invocation.<br>
-	 * Note: classSummary => not allLocals
-	 * <p>The general idea is that we create entities (Attribute, Method) "normally", but we don't persist them in the repository.
-	 * Then all associations to these entities need to be uplifted as references between their respective classes
-	 * e.g. "A.m1() invokes B.m2()" is uplifted to "A references B".</p>
-	 * <p>This is actually a dangerous business, because creating entities outside the repository (e.g. an attribute) that have links
-	 * to entities inside (e.g. the Type of the attribute) the repository can lead to errors.
-	 * More exactly, the problems occur when the entity inside links back to the entity outside.
-	 * And since all association are bidirectional, it can happen very easily.</p>
-	 */
-	protected boolean classSummary;
-
-	/**
 	 * Whether to output all local variables (even those with primitive type) or not (default is not).<br>
 	 * Note: allLocals => not classSummary
 	 */
@@ -130,7 +115,6 @@ public class VerveineJOptions {
 	protected boolean debugging;
 
 	public VerveineJOptions() {
-		this.classSummary = false;
 		this.allLocals = false;
 		this.codeVers = null;
 		this.anchors = null;
@@ -192,12 +176,7 @@ public class VerveineJOptions {
 		}
 		else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
 			setCodeVersion(arg);
-		}
-		else if (arg.equals("-summary")) {
-			classSummary = true;
-			allLocals = false;
 		} else if (arg.equals("-alllocals")) {
-			classSummary = false;
 			allLocals = true;
 		} else if (arg.equals("-prettyPrint")) {
 			prettyPrint = true;
@@ -561,10 +540,6 @@ public class VerveineJOptions {
 
 	public boolean withLocals() {
 		return allLocals;
-	}
-
-	public boolean summarizeModel() {
-		return classSummary;
 	}
 
 	public boolean withDebug() {
