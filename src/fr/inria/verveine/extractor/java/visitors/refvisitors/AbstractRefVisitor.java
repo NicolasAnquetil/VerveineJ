@@ -2,7 +2,7 @@ package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
@@ -15,7 +15,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 /**
  * A collection of useful utility methods that are needed in various ref visitors
  */
-public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
+public class AbstractRefVisitor extends GetVisitedEntityAbstractVisitor {
 
 	public AbstractRefVisitor(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
@@ -79,11 +79,11 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 		// from here, we assume the owner is the context
 		else if (isClass && !isExcep) {
 			return dico.ensureFamixClass(null, findTypeName(typ), /*owner*/ctxt, /*isGeneric*/false,
-					EntityDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+					EntityDictionary.UNKNOWN_MODIFIERS);
 		} else if (isExcep) {
 			// return ensure FamixException
 			return dico.ensureFamixException(null, findTypeName(typ), (ContainerEntity) /*owner*/ctxt, /*isGeneric*/false,
-					EntityDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+					EntityDictionary.UNKNOWN_MODIFIERS);
 		} else {
 			while (typ.isArrayType()) {
 				typ = ((ArrayType) typ).getElementType();
@@ -93,7 +93,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 				return dico.ensureFamixPrimitiveType(null, findTypeName(typ));
 			} else {
 				return dico.ensureFamixType(null, findTypeName(typ), /*owner*/ctxt, /*container*/ctxt,
-						EntityDictionary.UNKNOWN_MODIFIERS, /*alwaysPersist?*/persistClass(typ.resolveBinding()));
+						EntityDictionary.UNKNOWN_MODIFIERS);
 			}
 		}
 	}
@@ -124,15 +124,15 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : EntityDictionary.UNKNOWN_MODIFIERS;
 			TWithParameterizedTypes generic;
 			if(parameterizableBnd.isInterface()) {
-				generic = (ParameterizableInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+				generic = (ParameterizableInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers);
 			} else {
-				generic = (TWithParameterizedTypes) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers, /*alwaysPersist?*/persistClass(parameterizableBnd));
+				generic = (TWithParameterizedTypes) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers);
 			}
 			// not creating parameterized interfaces here
 			//if (bnd == parameterizableBnd) {
 			//	fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(null));
 			//} else {
-				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(bnd));
+				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (TWithTypes) /*owner*/ctxt);
 			//}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
@@ -142,7 +142,7 @@ public class AbstractRefVisitor extends SummarizingClassesAbstractVisitor {
 				}
 			}
 		} else {
-			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, (TWithTypes) ctxt, bnd.getModifiers(), /*alwaysPersist?*/persistClass(bnd));
+			fmxTyp = dico.ensureFamixType(bnd, name, /*owner*/null, (TWithTypes) ctxt, bnd.getModifiers());
 		}
 
 		return fmxTyp;
