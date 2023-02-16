@@ -269,18 +269,14 @@ public class VisitorVarsDef extends GetVisitedEntityAbstractVisitor {
 	}
 
 	public boolean visit(ConstructorInvocation node) {
-		if (! summarizeModel()) {
-			dico.ensureFamixImplicitVariable(EntityDictionary.SELF_NAME, context.topType(), context.topMethod());
-		}
+		dico.ensureFamixImplicitVariable(EntityDictionary.SELF_NAME, context.topType(), context.topMethod());
 
 		return super.visit(node);
 	}
 
 	public boolean visit(SuperConstructorInvocation node) {
 		// access to "super" ???
-		if (! summarizeModel()) {
-			dico.ensureFamixImplicitVariable(EntityDictionary.SUPER_NAME, context.topType(), context.topMethod());
-		}
+		dico.ensureFamixImplicitVariable(EntityDictionary.SUPER_NAME, context.topType(), context.topMethod());
 
 		return super.visit(node);
 	}
@@ -309,7 +305,7 @@ public class VisitorVarsDef extends GetVisitedEntityAbstractVisitor {
 
 		if (fmx != null) {
 			((TSourceEntity) fmx).setIsStub(false);
-			if ((! summarizeModel()) && (options.withAnchors())) {
+			if (options.withAnchors()) {
 				dico.addSourceAnchor((TSourceEntity) fmx, varDecl, /*oneLineAnchor*/true);
 			}
 		}

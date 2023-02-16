@@ -484,22 +484,13 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 			accessed = dico.ensureFamixEnumValue(bnd, name, (Enum) owner);
 		} else if (bnd.isField()) {
 			accessed = dico.ensureFamixAttribute(bnd, name, typ, (TWithAttributes) owner);
-			if (summarizeModel()) {
-				if (!(((Attribute) accessed).getDeclaredType() instanceof PrimitiveType)) {
-					//dico.addFamixReference(findHighestType(accessed.getBelongsTo()),
-					//		findHighestType(accessed.getDeclaredType()), /*lastReference*/null);
-				}
-			}
-
 			if ((accessed != null) && (((Attribute) accessed).getParentType() == null)
 					&& (((Attribute) accessed).getName().equals("length"))) {
 				// special case: length attribute of arrays in Java
 				((Attribute) accessed).setParentType(dico.ensureFamixClassArray());
 			}
 		} else if (bnd.isParameter() && (! inLambda)) {
-			if (! summarizeModel()) {
-				accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner);
-			}
+			accessed = dico.ensureFamixParameter(bnd, name, typ, (Method) owner);
 		} else {
 			// it seems it is a variable.
 			// if it is not already defined, we assume we are not interested
@@ -521,9 +512,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	private void createAccess(TMethod accessor, TStructuralEntity accessed, boolean isLHS) {
 		// create local accesses?
 		if ((accessed != null) && (accessor != null)) {
-			if (summarizeModel()) {
-				//dico.addFamixReference(findHighestType(accessor), findHighestType(accessed), /*lastReference*/null);
-			} else if (options.withLocals() || (! localVariable(accessed, accessor)) ) {
+			if (options.withLocals() || (! localVariable(accessed, accessor)) ) {
 				context.setLastAccess(
 						dico.addFamixAccess(accessor, (TStructuralEntity) accessed, /*isWrite*/isLHS, context.getLastAccess()));
 			}

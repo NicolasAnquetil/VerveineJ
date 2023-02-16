@@ -54,7 +54,7 @@ public class VisitorInheritanceRef extends GetVisitedEntityAbstractVisitor {
 		ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node);
 		org.moosetechnology.model.famix.famixjavaentities.Class fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity) context.top());
 
-		if ((fmx != null) && (bnd != null) && (!summarizeModel())) {
+		if ((fmx != null) && (bnd != null)) {
 			ensureInheritances(bnd, fmx);
 
 			this.context.pushType(fmx);
