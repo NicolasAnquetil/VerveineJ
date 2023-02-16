@@ -323,10 +323,8 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 				fmx.setKind(EntityDictionary.CONSTRUCTOR_KIND_MARKER);
 			}
 
-			if (!summarizeModel()) {
-				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
-				}
+			if (options.withAnchors()) {
+				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 
 			if (node.getBody() != null) {
@@ -374,10 +372,8 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 
 		if (fmx != null) {
             dico.setMethodModifiers(fmx, node.getModifiers());
-			if (!summarizeModel()) {
-				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
-				}
+            if (options.withAnchors()) {
+            	dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
 			}
 
 			if (node.getBody() != null) {

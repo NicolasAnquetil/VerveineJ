@@ -75,38 +75,35 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 	 *             [ AnonymousClassDeclaration ]
 	 */
 	public boolean visit(ClassInstanceCreation node) {
+		String typName;
+		TType fmx;
+		
 		visitClassInstanceCreation(node);
-		if ((!summarizeModel())) {
 
-			String typName;
-			TType fmx;
+		if (node.getAnonymousClassDeclaration() != null) {
+			ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node.getAnonymousClassDeclaration());
+			fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity) context.top());
+			typName = fmx.getName();
+		} else {
+			Type clazz = node.getType();
+			fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
-			if (node.getAnonymousClassDeclaration() != null) {
-				ITypeBinding bnd = (ITypeBinding) StubBinding.getDeclarationBinding(node.getAnonymousClassDeclaration());
-				fmx = this.dico.getFamixClass(bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), /*owner*/(ContainerEntity) context.top());
-				typName = fmx.getName();
+			// create an invocation to the constructor
+			if (fmx == null) {
+				typName = findTypeName(clazz);
 			} else {
-
-				Type clazz = node.getType();
-				fmx = referedType(clazz, (ContainerEntity) context.top(), true);
-
-				// create an invocation to the constructor
-				if (fmx == null) {
-					typName = findTypeName(clazz);
-				} else {
-					typName = fmx.getName();
-				}
+				typName = fmx.getName();
 			}
+		}
 
-			methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
-			Invocation lastInvok = (Invocation) context.getLastInvocation();
-			if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
-					&& (lastInvok != null)
-					&& (lastInvok.getSender() == context.topMethod())
-					&& (lastInvok.getReceiver() == null)
-					&& (lastInvok.getSignature().startsWith(typName))) {
-				dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
-			}
+		methodInvocation(node.resolveConstructorBinding(), typName, /*receiver*/null, /*methOwner*/fmx, node.arguments());
+		Invocation lastInvok = (Invocation) context.getLastInvocation();
+		if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc)
+				&& (lastInvok != null)
+				&& (lastInvok.getSender() == context.topMethod())
+				&& (lastInvok.getReceiver() == null)
+				&& (lastInvok.getSignature().startsWith(typName))) {
+			dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
 		}
 		return super.visit(node);
 	}
@@ -296,26 +293,24 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		// constructor don't have return type so no need to create a reference from this class to the "declared return type" class when classSummary is TRUE
 		// also no parameters specified here, so no references to create for them either
 
-		if (!summarizeModel()) {
-			String signature = node.toString();
-			if (signature.endsWith("\n")) {
-				signature = signature.substring(0, signature.length() - 1);
-			}
-			if (signature.endsWith(";")) {
-				signature = signature.substring(0, signature.length() - 1);
-			}
-			ImplicitVariable receiver = dico.ensureFamixImplicitVariable(
-					EntityDictionary.SELF_NAME, 
-					context.topType(), 
-					context.topMethod());
+		String signature = node.toString();
+		if (signature.endsWith("\n")) {
+			signature = signature.substring(0, signature.length() - 1);
+		}
+		if (signature.endsWith(";")) {
+			signature = signature.substring(0, signature.length() - 1);
+		}
+		ImplicitVariable receiver = dico.ensureFamixImplicitVariable(
+				EntityDictionary.SELF_NAME, 
+				context.topType(), 
+				context.topMethod());
+
+		TInvocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
+				context.getLastInvocation());
+		context.setLastInvocation(invok);
 			
-			TInvocation invok = dico.addFamixInvocation(context.topMethod(), invoked, receiver, signature,
-					context.getLastInvocation());
-			context.setLastInvocation(invok);
-			
-			if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc) && (invok != null)) {
-				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
-			}
+		if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc) && (invok != null)) {
+			dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
 		}
 
 		return super.visit(node);
@@ -333,7 +328,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		    invoked = this.dico.ensureFamixMethod(node.resolveConstructorBinding());
 //        }
 
-		if ( (invoked != null) && (! summarizeModel()) ) {
+		if (invoked != null) {
 			String signature = node.toString();
 			if (signature.endsWith("\n")) {
 				signature = signature.substring(0, signature.length() - 1);
@@ -411,22 +406,20 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 							(TWithMethods) /*owner*/owner, modifiers);
 				}
 				
-				if (! summarizeModel()) {
-					String signature = calledName + "(";
-					boolean first = true;
-					for (Expression a : l_args) {
-						if (first) {
-							signature += a.toString();
-							first = false;
-						} else {
-							signature += "," + a.toString();
-						}
+				String signature = calledName + "(";
+				boolean first = true;
+				for (Expression a : l_args) {
+					if (first) {
+						signature += a.toString();
+						first = false;
+					} else {
+						signature += "," + a.toString();
 					}
-					signature += ")";
-					invok = dico.addFamixInvocation(sender, invoked, (TInvocationsReceiver) receiver, signature, context.getLastInvocation());
-					//TODO add FileAnchor to Invocation
-					context.setLastInvocation(invok);
 				}
+				signature += ")";
+				invok = dico.addFamixInvocation(sender, invoked, (TInvocationsReceiver) receiver, signature, context.getLastInvocation());
+				//TODO add FileAnchor to Invocation
+				context.setLastInvocation(invok);
 			}
 		}
 

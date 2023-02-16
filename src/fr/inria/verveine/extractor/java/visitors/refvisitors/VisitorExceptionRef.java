@@ -61,10 +61,8 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 		Method fmx = visitMethodDeclaration( node);
 		if (fmx != null) {
 		    for (Type excep : (List<Type>) node.thrownExceptionTypes()) {
-                if (! summarizeModel()) {
-                    Exception excepFmx =  dico.asException(this.referedType(excep, (ContainerEntity) context.topType(), true, true));
-                    dico.createFamixDeclaredException(fmx, (Exception) excepFmx);
-                }
+		    	Exception excepFmx =  dico.asException(this.referedType(excep, (ContainerEntity) context.topType(), true, true));
+		    	dico.createFamixDeclaredException(fmx, (Exception) excepFmx);
             }
 			return super.visit(node);
 		} else {
@@ -87,9 +85,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
                 excepFmx = dico.asException(referedType(excepClass, meth, true, true));
             }
             if (excepFmx != null) {
-                if (! summarizeModel()) {
-                    dico.createFamixCaughtException(meth, excepFmx);
-                }
+            	dico.createFamixCaughtException(meth, excepFmx);
             }
         }
 
@@ -102,9 +98,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
         org.moosetechnology.model.famix.famixjavaentities.Exception excepFmx = dico.asException(this
                 .referedType(node.getExpression().resolveTypeBinding(), (TNamedEntity) context.topType(), true));
         if (excepFmx != null) {
-            if (! summarizeModel()) {
-                dico.createFamixThrownException(meth, excepFmx);
-            }
+        	dico.createFamixThrownException(meth, excepFmx);
         }
         return super.visit(node);
     }

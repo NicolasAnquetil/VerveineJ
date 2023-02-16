@@ -346,11 +346,4 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		return anonymousSuperTypeName.empty() ? null : anonymousSuperTypeName.peek();
 	}
 
-	protected boolean summarizeModel() {
-		return false;
-	}
-
-	protected boolean persistClass(Object object) {
-		return true;
-	}
 }

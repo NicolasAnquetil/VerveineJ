@@ -137,7 +137,7 @@ public class AbstractRefVisitor extends GetVisitedEntityAbstractVisitor {
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
 				TType fmxTArg = this.referedType(targ, ctxt, false);
-				if ((fmxTArg != null) && persistClass(targ)) {
+				if (fmxTArg != null) {
 					((org.moosetechnology.model.famix.famixjavaentities.ParameterizedType) fmxTyp).addArguments((TParameterizedTypeUser) fmxTArg);
 				}
 			}
