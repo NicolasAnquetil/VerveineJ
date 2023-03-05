@@ -109,36 +109,48 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		assertEquals(3, entitiesOfType(LocalVariable.class).size());  // nom, num, e
 		assertEquals(8, entitiesOfType(Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom + 4 "this"
 	}
-
+	
 	@Test
 	public void testAlllocals() {
 		// works in team with testNotAlllocals
 		parse(new String[]{"-alllocals", "test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
-
+		
 		assertEquals(5, entitiesOfType( LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
-        int accessReadClient = 0;
-        int accessLire = 0;
-        int accessSetNum = 0;
-        int accessGetNum = 0;
-        int accessSetNom = 0;
-        int accessGetNom = 0;
-        for (Access acc : entitiesOfType( Access.class)) {
-            switch (((TNamedEntity)acc.getAccessor()).getName()) {
-                case "ReadClient": accessReadClient++; break;
-                case "lire": accessLire++; break;
-                case "getNum": accessGetNum++; break;
-                case "setNum": accessSetNum++; break;
-                case "getNom": accessGetNom++; break;
-                case "setNom": accessSetNom++; break;
-                default: fail("Unknown accessor name: " + ((TNamedEntity)acc.getAccessor()).getName()); break;
-            }
-        }
-        assertEquals(4, accessReadClient);
-        assertEquals(20, accessLire);
-        assertEquals(1, accessGetNum);
-        assertEquals(3, accessSetNum);
-        assertEquals(1, accessGetNom);
-        assertEquals(3, accessSetNom);
+		int accessReadClient = 0;
+		int accessLire = 0;
+		int accessSetNum = 0;
+		int accessGetNum = 0;
+		int accessSetNom = 0;
+		int accessGetNom = 0;
+		for (Access acc : entitiesOfType( Access.class)) {
+			switch (((TNamedEntity)acc.getAccessor()).getName()) {
+			case "ReadClient": accessReadClient++; break;
+			case "lire": accessLire++; break;
+			case "getNum": accessGetNum++; break;
+			case "setNum": accessSetNum++; break;
+			case "getNom": accessGetNom++; break;
+			case "setNom": accessSetNom++; break;
+			default: fail("Unknown accessor name: " + ((TNamedEntity)acc.getAccessor()).getName()); break;
+			}
+		}
+		assertEquals(4, accessReadClient);
+		assertEquals(20, accessLire);
+		assertEquals(1, accessGetNum);
+		assertEquals(3, accessSetNum);
+		assertEquals(1, accessGetNom);
+		assertEquals(3, accessSetNom);
+	}
+
+	@Test
+	public void testCommentsText() {
+		parse(new String[]{"-commenttext", "test_src/ad_hoc/Example.java"});
+
+		assertEquals(3, entitiesOfType(Comment.class).size());  // 1 block comment, 3 javadoc, 1 end-of-line comment
+		for (Comment cmt : entitiesOfType(Comment.class)) {
+			assertNull(cmt.getSourceAnchor());
+			assertNotNull( cmt.getContent());
+			assertFalse(cmt.getContent().isEmpty());
+		}
 	}
 
 	@Test

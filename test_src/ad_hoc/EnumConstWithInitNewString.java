@@ -1,6 +1,6 @@
 package ad_hoc;
 /*
- * A test copied from jdt2mse (I beleive) that happenned to break verveinej
+ * A test copied from jdt2mse (I believe) that happenned to break verveinej
  */
 public enum EnumConstWithInitNewString {
 

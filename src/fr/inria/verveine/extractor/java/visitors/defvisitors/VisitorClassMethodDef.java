@@ -151,7 +151,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 			if (persistIt) {
 				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+					dico.addSourceAnchor(fmx, node);
 				}
 			}
 
@@ -224,7 +224,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 			if (! summarizeModel()) {
 				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+					dico.addSourceAnchor(fmx, node);
 				}
 			}
 			this.context.pushType(fmx);
@@ -254,7 +254,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 			this.context.pushType(fmx);
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 			return super.visit(node);
 		} else {
@@ -275,7 +275,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 
 			context.pushType(fmx);
@@ -336,7 +336,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 			if (!summarizeModel()) {
 				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+					dico.addSourceAnchor(fmx, node);
 				}
 			}
 
@@ -387,7 +387,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
             dico.setMethodModifiers(fmx, node.getModifiers());
 			if (!summarizeModel()) {
 				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+					dico.addSourceAnchor(fmx, node);
 				}
 			}
 
@@ -453,7 +453,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 
 			context.pushAnnotationMember(fmx);

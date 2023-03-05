@@ -106,7 +106,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					&& (lastInvok.getSender() == context.topMethod())
 					&& (lastInvok.getReceiver() == null)
 					&& (lastInvok.getSignature().startsWith(typName))) {
-				dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
+				dico.addSourceAnchor(lastInvok, node);
 			}
 		}
 		return super.visit(node);
@@ -245,7 +245,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
-			dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
+			dico.addSourceAnchor(lastInvok, node);
 		}
 
 		return super.visit(node);
@@ -281,7 +281,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 				// check that lastInvocation correspond to current one
 				&& (lastInvok != null) && (lastInvok.getSender() == context.topMethod())
 				&& (lastInvok.getReceiver() == receiver) && (lastInvok.getSignature().startsWith(calledName))) {
-			dico.addSourceAnchor(lastInvok, node, /*oneLineAnchor*/true);
+			dico.addSourceAnchor(lastInvok, node);
 		}
 		
 		return super.visit(node);
@@ -318,7 +318,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 			context.setLastInvocation(invok);
 			
 			if ( options.withAnchors(VerveineJOptions.AnchorOptions.assoc) && (invok != null)) {
-				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
+				dico.addSourceAnchor(invok, node);
 			}
 		}
 
@@ -354,7 +354,7 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 					context.getLastInvocation());
 			context.setLastInvocation(invok);
 			if (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) {
-				dico.addSourceAnchor(invok, node, /*oneLineAnchor*/true);
+				dico.addSourceAnchor(invok, node);
 			}
 		}
 

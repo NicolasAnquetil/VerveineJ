@@ -73,7 +73,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			}
 
 			if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {
-				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+				dico.addSourceAnchor(ref, node);
 			}
 		}
 		return super.visit(node);
@@ -206,7 +206,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
 			context.setLastReference(ref);
     		if (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) {
-	    		dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+	    		dico.addSourceAnchor(ref, node);
 		    }
         }
 
@@ -292,7 +292,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 				Reference ref = dico.addFamixReference((Method) context.top(), referred, context.getLastReference());
 				context.setLastReference(ref);
 				if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {
-					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					dico.addSourceAnchor(ref, node);
 				}
 			}
 		}

@@ -76,7 +76,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 			if (compilUnitComment != null) {
-				dico.createFamixComment(compilUnitComment, fmx);
+				dico.createFamixComment(compilUnitComment, fmx, options.commentsAsText());
 				compilUnitComment = null;  // in case there are several types defined in the compilation unit
 			}
 			return super.visit(node);
@@ -269,7 +269,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 		}
 
 		if (cmt != null) {
-		    dico.createFamixComment(cmt, fmx);
+		    dico.createFamixComment(cmt, fmx, options.commentsAsText());
         }
     }
 
@@ -300,7 +300,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 					// or something very strange happened
 					// Anyway we cannot have a comment on a stub
 
-					dico.createFamixComment(cmt, (Attribute) fmx);
+					dico.createFamixComment(cmt, (Attribute) fmx, options.commentsAsText());
 				}
 				break;
 
@@ -311,7 +311,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 					// or something very strange happened
 					// Anyway we cannot have a comment on a stub
 
-					dico.createFamixComment(cmt, (Parameter) fmx);
+					dico.createFamixComment(cmt, (Parameter) fmx, options.commentsAsText());
 				}
 				break;
 
