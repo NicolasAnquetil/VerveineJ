@@ -2741,16 +2741,16 @@ public class EntityDictionary {
 	 * Creates and returns a FAMIX Comment and associates it with an Entity (ex: for Javadocs)
 	 * @param jCmt -- the content (String) of the comment 
 	 * @param owner -- the entity that is commented
-	 * @param inlineComment TODO
+	 * @param commentText -- whether to export the source anchor of the comment (position in file) or its content (string)
 	 * @return the FAMIX Comment
 	 */
-	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner, boolean inlineComment) {
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner, boolean commentText) {
 		Comment cmt = null;
 
 		if ( (jCmt != null) && (owner != null) && (! commentAlreadyRecorded(owner, jCmt)) ) {
 			
 			cmt = new Comment();
-			if (inlineComment) {
+			if (commentText) {
 				IndexedFileAnchor position = createIndexedFileAnchor(jCmt);
 				if (position != null) {
 					cmt.setContent(

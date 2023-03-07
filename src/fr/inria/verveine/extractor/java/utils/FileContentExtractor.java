@@ -3,6 +3,7 @@ package fr.inria.verveine.extractor.java.utils;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A utility to read the content of files.
@@ -24,11 +25,12 @@ public class FileContentExtractor {
 		return getFileContent(start, end);
 	}
 
-	protected static void openFile(String filename) {
+	protected static void openFile(String fname) {
 		try {
-			openedFile = new RandomAccessFile( filename, "r");
+			openedFile = new RandomAccessFile( fname, "r");
+			filename = fname; 
 		} catch (FileNotFoundException e) {
-			System.err.println("Error opening "+filename+" for reading");
+			System.err.println("Error opening "+fname+" for reading");
 		}
 	}
 
@@ -45,13 +47,13 @@ public class FileContentExtractor {
 	protected static String getFileContent( int start, int end) {
 		byte buffer[] = new byte[ end-start+1];
 		try {
-			openedFile.seek(start);
+			openedFile.seek(start - 1);  // moose position start at 1, Java at 0
 			int ret = openedFile.read(buffer);
 			if (ret < end-start+1) {
 				System.err.println("missing bytes, read "+ret+" instead of "+(end-start+1));
 				return "";
 			}
-			return buffer.toString();
+			return new String(buffer, StandardCharsets.UTF_8);
 			
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -143,13 +143,14 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 
 	@Test
 	public void testCommentsText() {
-		parse(new String[]{"-commenttext", "test_src/ad_hoc/Example.java"});
+		parse(new String[]{"-commenttext", "test_src/comments"});
 
-		assertEquals(3, entitiesOfType(Comment.class).size());  // 1 block comment, 3 javadoc, 1 end-of-line comment
+		assertEquals(13, entitiesOfType(Comment.class).size());
 		for (Comment cmt : entitiesOfType(Comment.class)) {
 			assertNull(cmt.getSourceAnchor());
 			assertNotNull( cmt.getContent());
-			assertFalse(cmt.getContent().isEmpty());
+			assertEquals('/', cmt.getContent().charAt(0));
+			System.out.println(cmt.getContent());
 		}
 	}
 

@@ -5,6 +5,9 @@ import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+
+import java.util.List;
+
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute;
 import org.moosetechnology.model.famix.famixjavaentities.Attribute;
@@ -16,36 +19,38 @@ import org.moosetechnology.model.famix.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famix.famixtraits.TWithComments;
 
 /**
- * AST Visitor that defines all the (Famix) entities of interest
- * Famix entities are stored in a Map along with the IBindings to which they correspond
- */
-/**
+ * A class to collect all comments.
+ * Some important details on comment in JDT:
+ * <ul>
+ * <li>only JavaDoc comment are associated to any entity node in the AST (the entity immediately after the javadoc)</li>
+ * <li>line and block comment are recorded in a list, but we have to decide to what entity they will be associated.
+ *   We put them in the method containing them or in the method or attribute immediately after them if they are outside a method</li>
+ * <li>content (text) of block or line comments is not stored, only their position and length.
+ *   We have to recover them from the source file</li> 
+ * </ul>
+ * 
+ * This class assumes the AST is visited in the file position order of the nodes (nodes appearing first in the file
+ * are visited first).
+ * It visit the AST in parallel with "visiting" the list of comments and for each comment,
+ * <ul>
+ * <li>if it is a JavaDoc, gets its associated node</li>
+ * <li>if not javadoc, finds out if it is in a method or not
+ * 	<ul>
+ *  <li>if not, it find the class, method, or attribute that comes immediately after the comment</li>
+ *  <li>if in a method, it associates the comment to this method</li>
+ *  </ul>
+ * </ul>
+ * 
  * @author anquetil
- *
  */
 public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	/**
-	 * Needed to recover the regular comments
+	 * list of all comments
 	 */
-	private CompilationUnit astRoot;
+	protected List<Comment> allComments;
 
-	/**
-	 * Contains a possible JavaDoc comment for a famix entity declared.
-	 *<br>
-	 * Needed because in the case of variables, javadoc may not be easily accessible from the AST node  
-	 */
-	private Javadoc entityJavadoc;
-
-	/**
-	 * set in parent of structuralEntity declaration to indicate what kind of structuralEntity it is
-	 */
-	private StructuralEntityKinds structuralType;
-
-	/**
-	 * if Compilation unit has a comment, then add it to the type
-	 */
-	private Javadoc compilUnitComment;
+	protected int nextComment;
 
 	public VisitorComments(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
@@ -54,8 +59,14 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(CompilationUnit node) {
-		visitCompilationUnit(node);
-		astRoot = node;
+		allComments = node.getCommentList();
+		if (allComments.size() == 0) {
+			// no comment, not visiting
+			return false;
+		}
+		else {
+			nextComment = 0;
+		}
 		return super.visit(node);
 	}
 
@@ -64,25 +75,15 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 		endVisitCompilationUnit(node);
 	}
 
-	public boolean visit(PackageDeclaration node) {
-		compilUnitComment = node.getJavadoc();
-		return false; // no need to visit children of the declaration
-	}
-
 	@Override
 	public boolean visit(TypeDeclaration node) {
+		Comment cmt;
 		TWithComments fmx = (TWithComments) visitTypeDeclaration(node);
-		if (fmx != null) {
-			entityJavadoc = node.getJavadoc();
-			commentOnEntity(node, fmx);
-			if (compilUnitComment != null) {
-				dico.createFamixComment(compilUnitComment, fmx, options.commentsAsText());
-				compilUnitComment = null;  // in case there are several types defined in the compilation unit
-			}
-			return super.visit(node);
-		} else {
-			return false;
+
+		while ( (cmt = commentBefore(node)) != null) {
+			dico.createFamixComment(cmt, fmx, options.commentsAsText());
 		}
+		return super.visit(node);
 	}
 
 	@Override
@@ -91,20 +92,12 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	}
 
 	/**
-	 * Sets field {@link GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
-	 */
-	@Override
-	public boolean visit(ClassInstanceCreation node) {
-		visitClassInstanceCreation( node);
-		return super.visit(node);
-	}
-
-	/**
 	 * Uses field {@link  GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
 	 */
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
 		if (visitAnonymousClassDeclaration( node) != null) {
+			hasCommentsBefore(node);
 			return super.visit(node);
 		}
 		else {
@@ -150,18 +143,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		Method fmx = visitMethodDeclaration( node);
-
-		if ( (fmx != null) && (! summarizeModel()) ){
-			entityJavadoc = node.getJavadoc();
-			commentOnEntity(node, fmx);
-
-			structuralType = StructuralEntityKinds.PARAMETER;
-			entityJavadoc = null;  // no javadoc on parameters
-
-			return super.visit(node);
-		} else {
-			return false;
-		}
+		return super.visit(node);
 	}
 
 	@Override
@@ -169,46 +151,14 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 		endVisitMethodDeclaration(node);
 	}
 
-	@Override
-	public boolean visit(Block node) {
-		structuralType = StructuralEntityKinds.LOCALVAR;
-		entityJavadoc = null;  // no javadoc on local variables
-
-		return super.visit(node);
-	}
-
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
 		AnnotationTypeAttribute fmx = visitAnnotationTypeMemberDeclaration( node);
-		if ( (fmx != null) && (! summarizeModel()) ) {
-			entityJavadoc = node.getJavadoc();
-			commentOnEntity(node, fmx);
 			return super.visit(node);
-		} else {
-			return false;
-		}
 	}
 
 	public void endVisit(AnnotationTypeMemberDeclaration node) {
 		this.context.popAnnotationMember();
 		super.endVisit(node);
-	}
-
-	@Override
-	public boolean visit(Initializer node) {
-		Method fmx = visitInitializer(node);
-		if ( (fmx != null) && (! summarizeModel()) ) {
-			entityJavadoc = node.getJavadoc();
-			commentOnEntity(node, fmx);
-			return super.visit(node);
-		}
-		else {
-			return false;
-		}
-	}
-
-	@Override
-	public void endVisit(Initializer node) {
-		endVisitInitializer(node);
 	}
 
 /*
@@ -220,133 +170,18 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		structuralType = StructuralEntityKinds.ATTRIBUTE;
-		entityJavadoc = node.getJavadoc();
-
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(VariableDeclarationExpression node) {
-		structuralType = StructuralEntityKinds.LOCALVAR;
-
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(VariableDeclarationStatement node) {
-		structuralType = StructuralEntityKinds.LOCALVAR;
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(VariableDeclarationFragment node) {
-		commentOnStructuralEntity(node, structuralType);
-
-		return super.visit(node);
-	}
-
-	@Override
-	public boolean visit(SingleVariableDeclaration node) {
-		commentOnStructuralEntity(node, structuralType);
 
 		return super.visit(node);
 	}
 
 	// UTILITY METHODS
 
-    protected void commentOnEntity(ASTNode node, TWithComments fmx) {
-		Comment cmt = null;
-
-		if (fmx == null) {
-			return;
-        }
-
-		if (entityJavadoc != null) {
-			cmt = entityJavadoc;
-		} else {
-			cmt = nodeOptionalComment(node);
-		}
-
-		if (cmt != null) {
-		    dico.createFamixComment(cmt, fmx, options.commentsAsText());
-        }
-    }
-
-	protected void commentOnStructuralEntity(VariableDeclaration node, StructuralEntityKinds structuralKind) {
-		TStructuralEntity fmx = null;
-		Comment cmt = null;
-
-		if (summarizeModel()) {
-			return;
-		}
-
-		if (entityJavadoc != null) {
-			cmt = entityJavadoc;
-		} else {
-			cmt = variableOptionalComment(node, structuralKind);
-		}
-
-		if (cmt != null) {
-			IVariableBinding bnd = node.resolveBinding();
-			String name = node.getName().getIdentifier();
-
-			// recover the famix entity
-			switch (structuralKind) {
-			case ATTRIBUTE:
-				fmx = dico.getFamixAttribute(bnd, name, (TWithAttributes) context.topType());
-				if (!((TSourceEntity) fmx).getIsStub()) {
-					// if it is a stub, it might have been created by the getFamixXXX just above
-					// or something very strange happened
-					// Anyway we cannot have a comment on a stub
-
-					dico.createFamixComment(cmt, (Attribute) fmx, options.commentsAsText());
-				}
-				break;
-
-			case PARAMETER:
-				fmx = dico.getFamixParameter(bnd, name, context.topMethod());
-				if (!((TSourceEntity) fmx).getIsStub()) {
-					// if it is a stub, it might have been created by the getFamixXXX just above
-					// or something very strange happened
-					// Anyway we cannot have a comment on a stub
-
-					dico.createFamixComment(cmt, (Parameter) fmx, options.commentsAsText());
-				}
-				break;
-
-			case LOCALVAR:
-				fmx = dico.getFamixLocalVariable(bnd, name, context.topMethod());
-				break;
-
-			default:
-				break;
-			}
-		}
+	/**
+	 * whether the <code>nextComment</code> to treat is before <code>node</code>
+	 */
+	protected boolean hasCommentsBefore(AnonymousClassDeclaration node) {
+		Comment cmt = allComments.get(nextComment);
+		return node.getStartPosition() >= (cmt.getStartPosition() + cmt.getLength());
 	}
-
-	private Comment variableOptionalComment(ASTNode node, StructuralEntityKinds structuralKind) {
-		switch (structuralKind) {
-			case ATTRIBUTE:
-			case LOCALVAR:
-				return nodeOptionalComment(node.getParent());
-
-			case PARAMETER:
-				return nodeOptionalComment(node);
-
-            default:
-                return null;
-		}
-	}
-
-	private Comment nodeOptionalComment(ASTNode node) {
-        int iCmt = astRoot.firstLeadingCommentIndex(node);
-        if (iCmt > -1) {
-            return (Comment) astRoot.getCommentList().get(iCmt);
-        }
-        else {
-            return null;
-        }
-    }
 
 }

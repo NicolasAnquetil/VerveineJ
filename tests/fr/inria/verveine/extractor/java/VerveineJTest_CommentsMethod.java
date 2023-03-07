@@ -42,6 +42,7 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
         methods.sort((o1, o2) -> ((Integer) ((IndexedFileAnchor) o1.getSourceAnchor()).getStartPos().intValue()).compareTo(((IndexedFileAnchor) o2.getSourceAnchor()).getStartPos().intValue()));
         assertEquals(10, methods.size());
         if(isWindows()){
+        	// TODO comments changed, need to update values for Windows
             assertEquals(58, ((IndexedFileAnchor) methods.get(0).getSourceAnchor()).getStartPos().intValue());
             assertEquals(152, ((IndexedFileAnchor) methods.get(1).getSourceAnchor()).getStartPos().intValue());
             assertEquals(269, ((IndexedFileAnchor) methods.get(2).getSourceAnchor()).getStartPos().intValue());
@@ -55,12 +56,12 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
             assertEquals(53, ((IndexedFileAnchor) methods.get(0).getSourceAnchor()).getStartPos().intValue());
             assertEquals(142, ((IndexedFileAnchor) methods.get(1).getSourceAnchor()).getStartPos().intValue());
             assertEquals(252, ((IndexedFileAnchor) methods.get(2).getSourceAnchor()).getStartPos().intValue());
-            assertEquals(321, ((IndexedFileAnchor) methods.get(3).getSourceAnchor()).getStartPos().intValue());
-            assertEquals(391, ((IndexedFileAnchor) methods.get(4).getSourceAnchor()).getStartPos().intValue());
-            assertEquals(535, ((IndexedFileAnchor) methods.get(5).getSourceAnchor()).getStartPos().intValue());
-            assertEquals(602, ((IndexedFileAnchor) methods.get(6).getSourceAnchor()).getStartPos().intValue());
-            assertEquals(718, ((IndexedFileAnchor) methods.get(7).getSourceAnchor()).getStartPos().intValue());
-            assertEquals(859, ((IndexedFileAnchor) methods.get(8).getSourceAnchor()).getStartPos().intValue());
+            assertEquals(333, ((IndexedFileAnchor) methods.get(3).getSourceAnchor()).getStartPos().intValue());
+            assertEquals(407, ((IndexedFileAnchor) methods.get(4).getSourceAnchor()).getStartPos().intValue());
+            assertEquals(563, ((IndexedFileAnchor) methods.get(5).getSourceAnchor()).getStartPos().intValue());
+            assertEquals(634, ((IndexedFileAnchor) methods.get(6).getSourceAnchor()).getStartPos().intValue());
+            assertEquals(763, ((IndexedFileAnchor) methods.get(7).getSourceAnchor()).getStartPos().intValue());
+            assertEquals(917, ((IndexedFileAnchor) methods.get(8).getSourceAnchor()).getStartPos().intValue());
         }
     }
 
@@ -72,6 +73,7 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
         methods.sort(Comparator.comparing(o -> ((IndexedFileAnchor) o.getSourceAnchor()).getEndPos().intValue()));
         assertEquals(10, methods.size());
         if(isWindows()){
+        	// TODO comments changed, need to update values for Windows
             assertEquals(110, ((IndexedFileAnchor) methods.get(0).getSourceAnchor()).getEndPos().intValue());
             assertEquals(209, ((IndexedFileAnchor) methods.get(1).getSourceAnchor()).getEndPos().intValue());
             assertEquals(333, ((IndexedFileAnchor) methods.get(2).getSourceAnchor()).getEndPos().intValue());
@@ -84,13 +86,13 @@ public class VerveineJTest_CommentsMethod extends VerveineJTest_Basic {
         } else {
             assertEquals(103, ((IndexedFileAnchor) methods.get(0).getSourceAnchor()).getEndPos().intValue());
             assertEquals(197, ((IndexedFileAnchor) methods.get(1).getSourceAnchor()).getEndPos().intValue());
-            assertEquals(314, ((IndexedFileAnchor) methods.get(2).getSourceAnchor()).getEndPos().intValue());
-            assertEquals(369, ((IndexedFileAnchor) methods.get(3).getSourceAnchor()).getEndPos().intValue());
-            assertEquals(465, ((IndexedFileAnchor) methods.get(4).getSourceAnchor()).getEndPos().intValue());
-            assertEquals(595, ((IndexedFileAnchor) methods.get(5).getSourceAnchor()).getEndPos().intValue());
-            assertEquals(662, ((IndexedFileAnchor) methods.get(6).getSourceAnchor()).getEndPos().intValue());
-            assertEquals(786, ((IndexedFileAnchor) methods.get(7).getSourceAnchor()).getEndPos().intValue());
-            assertEquals(937, ((IndexedFileAnchor) methods.get(8).getSourceAnchor()).getEndPos().intValue());
+            assertEquals(326, ((IndexedFileAnchor) methods.get(2).getSourceAnchor()).getEndPos().intValue());
+            assertEquals(385, ((IndexedFileAnchor) methods.get(3).getSourceAnchor()).getEndPos().intValue());
+            assertEquals(493, ((IndexedFileAnchor) methods.get(4).getSourceAnchor()).getEndPos().intValue());
+            assertEquals(627, ((IndexedFileAnchor) methods.get(5).getSourceAnchor()).getEndPos().intValue());
+            assertEquals(707, ((IndexedFileAnchor) methods.get(6).getSourceAnchor()).getEndPos().intValue());
+            assertEquals(844, ((IndexedFileAnchor) methods.get(7).getSourceAnchor()).getEndPos().intValue());
+            assertEquals(1008, ((IndexedFileAnchor) methods.get(8).getSourceAnchor()).getEndPos().intValue());
         }
     }
 
