@@ -7,3 +7,4 @@ testrep/*
 out/
 /bin/
 .project
+.settings

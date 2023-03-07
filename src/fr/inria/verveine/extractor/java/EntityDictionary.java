@@ -48,6 +48,7 @@ import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
 import org.moosetechnology.model.famix.famixjavaentities.PrimitiveType;
 import org.moosetechnology.model.famix.famixjavaentities.Reference;
 import org.moosetechnology.model.famix.famixjavaentities.SourceAnchor;
+import org.moosetechnology.model.famix.famixjavaentities.SourceTextAnchor;
 import org.moosetechnology.model.famix.famixjavaentities.Type;
 import org.moosetechnology.model.famix.famixtraits.TAccessible;
 import org.moosetechnology.model.famix.famixtraits.TAssociation;
@@ -76,6 +77,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 import ch.akuhn.fame.Repository;
+import fr.inria.verveine.extractor.java.utils.FileContentExtractor;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 
@@ -2667,35 +2669,32 @@ public class EntityDictionary {
 	 * Creates and returns a FAMIX Comment and associates it with an Entity (ex: for Javadocs)
 	 * @param jCmt -- the content (String) of the comment 
 	 * @param owner -- the entity that is commented
+	 * @param commentText -- whether to export the source anchor of the comment (position in file) or its content (string)
 	 * @return the FAMIX Comment
 	 */
-	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner) {
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner, boolean commentText) {
 		Comment cmt = null;
 
-		if ( (jCmt != null) && (owner != null) && (! commentAlreadyRecorded(owner, jCmt)) ) {
+		if ( (jCmt != null) && (owner != null) ) {
 			
 			cmt = new Comment();
-			addSourceAnchor(cmt, jCmt, /*oneLineAnchor*/jCmt.isLineComment());
+			if (commentText) {
+				IndexedFileAnchor position = createIndexedFileAnchor(jCmt);
+				if (position != null) {
+					cmt.setContent(
+							FileContentExtractor.getFileContent(position.getFileName(),
+							(int)position.getStartPos(),
+							(int)position.getEndPos()) );
+				}
+			}
+			else {
+				addSourceAnchor(cmt, jCmt);
+			}
 			famixRepoAdd(cmt);
 			cmt.setCommentedEntity(owner);
 		}
 
 		return cmt;
-	}
-
-	private boolean commentAlreadyRecorded(TWithComments fmx, org.eclipse.jdt.core.dom.Comment jCmt) {
-		int startPos = jCmt.getStartPosition();
-		boolean found = false;
-
-		for (TComment cmt : fmx.getComments()) {
-			Comment cmt2 = (Comment)cmt;
-			if (((IndexedFileAnchor)cmt2.getSourceAnchor()).getStartPos().intValue() == startPos) {
-				found = true;
-				break;
-			}
-		}
-
-		return found;
 	}
 
 	/**
@@ -2707,27 +2706,11 @@ public class EntityDictionary {
 	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some TAssociation happening within <b>ast</b>
 	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null)
 	 */
-	public SourceAnchor addSourceAnchor(TSourceEntity fmx, ASTNode node, boolean oneLineAnchor) {
+	public SourceAnchor addSourceAnchor(TSourceEntity fmx, ASTNode node) {
 		IndexedFileAnchor fa = null;
 
-		if ((fmx != null) && (node != null)) {
-			// position in source file
-			int beg = node.getStartPosition() + 1; // Java starts at 0, Moose at 1
-			int end = beg + node.getLength() - 1;
-
-			// find source Compilation Unit
-			// there is a special case for the JDT Comment Nodes
-			if (node instanceof org.eclipse.jdt.core.dom.Comment) {
-				node = ((org.eclipse.jdt.core.dom.Comment) node).getAlternateRoot();
-			} else {
-				node = node.getRoot();
-			}
-
-			fa = new IndexedFileAnchor();
-			((IndexedFileAnchor)fa).setStartPos(beg);
-			((IndexedFileAnchor)fa).setEndPos(end);
-
-			fa.setFileName((String) ((CompilationUnit)node).getProperty(SOURCE_FILENAME_PROPERTY));
+		fa = createIndexedFileAnchor(node);
+		if ((fmx != null) && (fa != null)) {
 			fmx.setSourceAnchor(fa);
 			famixRepoAdd(fa);
 		}
@@ -2736,21 +2719,15 @@ public class EntityDictionary {
 	}
 
 	/**
-	 * Adds location information to a Famix Entity.
-	 * Location informations are: <b>name</b> of the source file and <b>line</b> position in this file. They are found in the JDT ASTNode: ast.
-	 * This method also creates some basic links between the entity and others (e.g. declaring container, return type, ...)
-	 * @param fmx -- Famix Entity to add the anchor to
-	 * @param node -- JDT ASTNode, where the information is extracted
-	 * @param oneLineAnchor -- whether to consider that endLine = beginLine (oneLineAnchor) or not. Created to add anchor to some TAssociation happening within <b>ast</b>
-	 * @return the Famix SourceAnchor added to fmx. May be null in case of incorrect parameter ('fmx' or 'ast' == null)
+	 * Special case of  {@linkplain #addSourceAnchor(TSourceEntity, ASTNode)} to add location information to a Famix Method.
 	 */
-	public SourceAnchor addSourceAnchor(Method fmx, MethodDeclaration node, boolean oneLineAnchor) {
+	public SourceAnchor addSourceAnchor(Method fmx, MethodDeclaration node) {
 		IndexedFileAnchor fa = null;
 
-		if ((fmx != null) && (node != null)) {
-			// position in source file
+		fa = createIndexedFileAnchor(node);
+		if ((fmx != null) && (fa != null)) {
 
-			//Collect the possible beginner
+			// may change the positions
 			List<ASTNode> methodDeclarationModifiers = new ArrayList<>();
 			methodDeclarationModifiers.addAll(node.modifiers());
 			if (node.getName() != null) {
@@ -2762,15 +2739,44 @@ public class EntityDictionary {
 			int beg = (methodDeclarationModifiers.stream().mapToInt(el -> el.getStartPosition()).min().getAsInt()) + 1;
 			int end = node.getStartPosition() + node.getLength();
 
-
-			fa = new IndexedFileAnchor();
 			((IndexedFileAnchor)fa).setStartPos(beg);
 			((IndexedFileAnchor)fa).setEndPos(end);
 
-			fa.setFileName((String) node.getRoot().getProperty(SOURCE_FILENAME_PROPERTY));
 			fmx.setSourceAnchor(fa);
 			famixRepoAdd(fa);
 		}
+
+		return fa;
+	}
+
+	/**
+	 * Gets the file name holding <code>node</code> and its start and end positions in the file.
+	 * Information returned in the form of an IndexedFileAnchor
+	 */
+	protected IndexedFileAnchor createIndexedFileAnchor(ASTNode node) {
+		IndexedFileAnchor fa;
+		
+		if (node == null) {
+			return null;
+		}
+
+		// position in source file
+		int beg = node.getStartPosition() + 1; // Java starts at 0, Moose at 1
+		int end = beg + node.getLength() - 1;
+
+		// find source Compilation Unit
+		// there is a special case for the JDT Comment Nodes
+		if (node instanceof org.eclipse.jdt.core.dom.Comment) {
+			node = ((org.eclipse.jdt.core.dom.Comment) node).getAlternateRoot();
+		} else {
+			node = node.getRoot();
+		}
+
+		fa = new IndexedFileAnchor();
+		((IndexedFileAnchor)fa).setStartPos(beg);
+		((IndexedFileAnchor)fa).setEndPos(end);
+
+		fa.setFileName((String) ((CompilationUnit)node).getProperty(SOURCE_FILENAME_PROPERTY));
 
 		return fa;
 	}

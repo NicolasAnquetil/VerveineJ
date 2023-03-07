@@ -125,9 +125,8 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * See field {@link TotoVisitor#anonymousSuperTypeName}<br>
-	 * We could test if it is a local type (inner/anonymous) and not define it in case it does not make any reference
-	 * to anything outside its owner class. But it would be a lot of work for probably little gain.
+	 * Creation of an instance of an anonymous class, ie. <code>new AnonymousClassDeclaration</code><br>
+	 * See also field {@link GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
 	 */
 	protected void visitClassInstanceCreation(ClassInstanceCreation node) {
 		if (node.getAnonymousClassDeclaration() != null) {
@@ -136,7 +135,8 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * See field {@link TotoVisitor#anonymousSuperTypeName}
+	 * The body of an anonymous class declaration appears within a ClassInstanceCreation<br>
+	 * See also field {@link GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
 	 */
 	protected org.moosetechnology.model.famix.famixjavaentities.Class visitAnonymousClassDeclaration(AnonymousClassDeclaration node) {
 		org.moosetechnology.model.famix.famixjavaentities.Class fmx;
@@ -261,7 +261,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
     @SuppressWarnings("unchecked")
-    public boolean visitFieldDeclaration(FieldDeclaration node) {
+    public boolean hasInitBlock(FieldDeclaration node) {
         boolean hasInitBlock = false;
         for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
             if (vardecl.getInitializer() != null) {
