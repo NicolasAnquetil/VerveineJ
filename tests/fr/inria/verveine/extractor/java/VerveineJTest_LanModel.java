@@ -869,7 +869,13 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		}
 		assertNotNull(anc);
 
-		Method meth = detectFamixElement(Method.class, "isDestinationFor");
+		Method meth = null;
+		for (TMethod m : clazz.getMethods()) {
+			if (m.getName().equals("isDestinationFor")) {
+				meth = (Method) m;
+				break;
+			}
+		}
 		assertNotNull(meth);
 		cmts = meth.getComments();
 		assertEquals(1, cmts.size());
