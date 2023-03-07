@@ -4,7 +4,6 @@ import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute;
 import org.moosetechnology.model.famix.famixjavaentities.Attribute;
@@ -23,7 +22,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithComments;
  * @author anquetil
  *
  */
-public class VisitorComments extends SummarizingClassesAbstractVisitor {
+public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 
 	/**
 	 * Needed to recover the regular comments
@@ -91,7 +90,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	}
 
 	/**
-	 * Sets field {@link GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
+	 * Sets field {@link TotoVisitor#anonymousSuperTypeName}
 	 */
 	@Override
 	public boolean visit(ClassInstanceCreation node) {
@@ -100,7 +99,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	}
 
 	/**
-	 * Uses field {@link  GetVisitedEntityAbstractVisitor#anonymousSuperTypeName}
+	 * Uses field {@link  TotoVisitor#anonymousSuperTypeName}
 	 */
 	@Override
 	public boolean visit(AnonymousClassDeclaration node) {
@@ -151,7 +150,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		Method fmx = visitMethodDeclaration( node);
 
-		if ( (fmx != null) && (! summarizeModel()) ){
+		if (fmx != null) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 
@@ -179,7 +178,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
 		AnnotationTypeAttribute fmx = visitAnnotationTypeMemberDeclaration( node);
-		if ( (fmx != null) && (! summarizeModel()) ) {
+		if (fmx != null) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 			return super.visit(node);
@@ -196,7 +195,7 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(Initializer node) {
 		Method fmx = visitInitializer(node);
-		if ( (fmx != null) && (! summarizeModel()) ) {
+		if (fmx != null) {
 			entityJavadoc = node.getJavadoc();
 			commentOnEntity(node, fmx);
 			return super.visit(node);
@@ -276,10 +275,6 @@ public class VisitorComments extends SummarizingClassesAbstractVisitor {
 	protected void commentOnStructuralEntity(VariableDeclaration node, StructuralEntityKinds structuralKind) {
 		TStructuralEntity fmx = null;
 		Comment cmt = null;
-
-		if (summarizeModel()) {
-			return;
-		}
 
 		if (entityJavadoc != null) {
 			cmt = entityJavadoc;

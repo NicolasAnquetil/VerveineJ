@@ -99,6 +99,7 @@ import org.moosetechnology.model.famix.famixtraits.TInheritance;
  * @since May 28, 2010
  *
  */
+@Ignore
 public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 
 	public VerveineJTest_Summarized() throws IllegalAccessException {
