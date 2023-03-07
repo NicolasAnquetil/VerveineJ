@@ -194,7 +194,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	/**
-	 * Local type: same as {@link GetVisitedEntityAbstractVisitor#visitClassInstanceCreation(ClassInstanceCreation)}, 
+	 * Local type: same as {@link TotoVisitor#visitClassInstanceCreation(ClassInstanceCreation)}, 
 	 * we create it even if it is a local method because their are too many ways it can access external things
 	 */
 	@SuppressWarnings("unchecked")
@@ -206,7 +206,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 			paramTypes.add(Util.jdtTypeName(param.getType()));
 		}
 
-		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*returnType*/null, (TWithMethods) /*owner*/context.topType(), EntityDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
+		Method fmx = dico.ensureFamixMethod(bnd, node.getName().getIdentifier(), paramTypes, /*returnType*/null, (TWithMethods) /*owner*/context.topType(), EntityDictionary.UNKNOWN_MODIFIERS);
 
 		context.pushMethod(fmx);  // whether fmx==null or not
 		return fmx;
@@ -301,7 +301,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		TType owner = context.topType();
 		Method fmx = recoverInitializerMethod((TWithMethods)owner);
 		if (fmx == null) {
-			fmx = dico.ensureFamixMethod(null, EntityDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<>(), /*returnType*/null, (TWithMethods) owner, EntityDictionary.UNKNOWN_MODIFIERS, /*persistIt*/false);
+			fmx = dico.ensureFamixMethod(null, EntityDictionary.INIT_BLOCK_NAME, /*paramTypes*/new ArrayList<>(), /*returnType*/null, (TWithMethods) owner, EntityDictionary.UNKNOWN_MODIFIERS);
 		}
 		if (fmx != null) {
 			context.pushMethod(fmx);
@@ -345,4 +345,5 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	protected String getAnonymousSuperTypeName() {
 		return anonymousSuperTypeName.empty() ? null : anonymousSuperTypeName.peek();
 	}
+
 }

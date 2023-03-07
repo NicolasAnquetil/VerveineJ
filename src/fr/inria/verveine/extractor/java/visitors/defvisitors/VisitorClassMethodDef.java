@@ -60,13 +60,13 @@ import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 
 /**
  * AST Visitor that defines all the (Famix) entities of interest
  * Famix entities are stored in a Map along with the IBindings to which they correspond
  */
-public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
+public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 
     protected MessageDigest md5;
 
@@ -104,7 +104,6 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		List<TypeParameter> tparams = (List<TypeParameter>) node.typeParameters();
 
-		boolean persistIt = persistClass(bnd);
 		// may be could use this.refereredType instead of dico.ensureFamixClass ?
 		org.moosetechnology.model.famix.famixtraits.TType fmx;
 		if (bnd.isInterface()) {
@@ -114,8 +113,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				(ContainerEntity) 
 				/*owner*/context.top(), 
 				/*isGeneric*/tparams.size()>0, 
-				node.getModifiers(), 
-				/*alwaysPersist?*/persistIt);
+				node.getModifiers());
 		} else if (dico.isThrowable(bnd)) {
 			fmx = dico.ensureFamixException(
 				bnd, 
@@ -123,8 +121,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				(ContainerEntity) 
 				/*owner*/context.top(), 
 				/*isGeneric*/tparams.size()>0, 
-				node.getModifiers(), 
-				/*alwaysPersist?*/persistIt);
+				node.getModifiers());
 		} else {
 			fmx = dico.ensureFamixClass(
 					bnd, 
@@ -132,8 +129,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 					(ContainerEntity) 
 					/*owner*/context.top(), 
 					/*isGeneric*/tparams.size()>0, 
-					node.getModifiers(), 
-					/*alwaysPersist?*/persistIt);
+					node.getModifiers());
 		}
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
@@ -149,17 +145,15 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 			this.context.pushType(fmx);
 
-			if (persistIt) {
-				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node);
-				}
+			if (options.withAnchors()) {
+				dico.addSourceAnchor(fmx, node);
 			}
 
 			for (TypeParameter tp : tparams) {
 				// if there is a type parameter, then fmx will be a Famix ParameterizableClass
 				// note: owner of the ParameterType is the ParameterizableClass
 				ParameterType fmxParam = dico.ensureFamixParameterType(tp.resolveBinding(),
-						tp.getName().getIdentifier(), (TWithParameterizedTypes) fmx, /*persistIt*/! summarizeModel());
+						tp.getName().getIdentifier(), (TWithParameterizedTypes) fmx);
 				if (fmxParam != null) {
 					fmxParam.setIsStub(false);
 				}
@@ -207,25 +201,21 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 					(ContainerEntity) 
 					/*owner*/context.top(), 
 					/*isGeneric*/false, 
-					modifiers, 
-					/*alwaysPersist?*/!summarizeModel());
+					modifiers);
 		} else {
 			fmx = this.dico.ensureFamixClass(
 					bnd, Util.stringForAnonymousName(getAnonymousSuperTypeName(), context), 
 					(ContainerEntity) 
 					/*owner*/context.top(), 
 					/*isGeneric*/false, 
-					modifiers, 
-					/*alwaysPersist?*/!summarizeModel());
+					modifiers);
 		}
 
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 
-			if (! summarizeModel()) {
-				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node);
-				}
+			if (options.withAnchors()) {
+				dico.addSourceAnchor(fmx, node);
 			}
 			this.context.pushType(fmx);
 			return super.visit(node);
@@ -271,7 +261,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 	@Override
 	public boolean visit(AnnotationTypeDeclaration node) {
 		ITypeBinding bnd = node.resolveBinding();
-		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top(), persistClass(bnd));
+		AnnotationType fmx = dico.ensureFamixAnnotationType(bnd, node.getName().getIdentifier(), (ContainerEntity) context.top());
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 			if (options.withAnchors()) {
@@ -321,8 +311,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				paramTypes, 
 				/*returnType*/null, 
 				(TWithMethods) /*owner*/context.topType(), 
-				node.getModifiers(), 
-				/*persitIt*/!summarizeModel());
+				node.getModifiers());
 
 		if (fmx != null) {
 			fmx.setIsStub(false);
@@ -334,10 +323,8 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 				fmx.setKind(EntityDictionary.CONSTRUCTOR_KIND_MARKER);
 			}
 
-			if (!summarizeModel()) {
-				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node);
-				}
+			if (options.withAnchors()) {
+				dico.addSourceAnchor(fmx, node);
 			}
 
 			if (node.getBody() != null) {
@@ -385,10 +372,8 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 
 		if (fmx != null) {
             dico.setMethodModifiers(fmx, node.getModifiers());
-			if (!summarizeModel()) {
-				if (options.withAnchors()) {
-					dico.addSourceAnchor(fmx, node);
-				}
+            if (options.withAnchors()) {
+            	dico.addSourceAnchor(fmx, node);
 			}
 
 			if (node.getBody() != null) {
@@ -449,7 +434,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 		IMethodBinding bnd = node.resolveBinding();
 
 		// note"Annotatin members looks like methods but they are closer to attributes
-		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType(), persistClass(null));
+		AnnotationTypeAttribute fmx = dico.ensureFamixAnnotationTypeAttribute(bnd, node.getName().getIdentifier(), (AnnotationType) context.topType());
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			if (options.withAnchors()) {
@@ -628,8 +613,7 @@ public class VisitorClassMethodDef extends SummarizingClassesAbstractVisitor {
 					new ArrayList<String>(),
 					/*returnType*/null,
 					(TWithMethods) context.topType(),
-					/*modifiers*/EntityDictionary.UNKNOWN_MODIFIERS,
-					/*persistIt*/!summarizeModel());
+					/*modifiers*/EntityDictionary.UNKNOWN_MODIFIERS);
 			ctxtMeth.setIsStub(false);
 			ctxtMeth.setIsDead(false);
 			// initialization block doesn't have return type so no need to create a reference from its class to the "declared return type" class when classSummary is TRUE

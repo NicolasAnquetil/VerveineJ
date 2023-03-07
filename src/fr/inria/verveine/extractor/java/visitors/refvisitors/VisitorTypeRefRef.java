@@ -66,11 +66,8 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		if (node.getAnonymousClassDeclaration() == null) {
 			Type clazz = node.getType();
 			org.moosetechnology.model.famix.famixtraits.TType fmx = referedType(clazz, (ContainerEntity) context.top(), true);
-			Reference ref = null;
-			if (! summarizeModel()) {
-				ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
-				context.setLastReference(ref);
-			}
+			Reference ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
+			context.setLastReference(ref);
 
 			if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {
 				dico.addSourceAnchor(ref, node);
@@ -200,14 +197,11 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		fmx = referedType(clazz, (ContainerEntity) context.top(), true);
 
 		Reference ref = null;
-		if (summarizeModel()) {
-			//ref = dico.addFamixReference(findHighestType(context.top()), findHighestType(fmx), /*lastReference*/null);
-		} else {
-			ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
-			context.setLastReference(ref);
-    		if (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) {
-	    		dico.addSourceAnchor(ref, node);
-		    }
+
+		ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
+		context.setLastReference(ref);
+		if (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) {
+			dico.addSourceAnchor(ref, node);
         }
 
 		return super.visit(node);

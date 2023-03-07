@@ -2,7 +2,7 @@ package fr.inria.verveine.extractor.java.visitors.refvisitors;
 
 import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
+import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationInstanceAttribute;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationType;
@@ -23,10 +23,10 @@ import java.util.List;
  * </ul></p>
  * <p>This visitor is different from the other in that it works with the binding.
  * So, for example, there is no need to keep the stack of declared entities.
- * Yet it still inherits from SummarizingClassesAbstractVisitor to know if we should summarize model at the level of classes</p>
+ * Yet it still inherits from GetVisitedEntityAbstractVisitor to know if we should summarize model at the level of classes</p>
  * @author anquetil
  */
-public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
+public class VisitorAnnotationRef extends GetVisitedEntityAbstractVisitor {
 
 	public VisitorAnnotationRef(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
@@ -138,7 +138,7 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 		if (bnd != null) {
 			for (IAnnotationBinding annBnd : bnd.getAnnotations()) {
 				// create type of the annotation
-				AnnotationType annType = dico.ensureFamixAnnotationType(annBnd.getAnnotationType(), /*name*/null, /*owner*/null, ! summarizeModel());
+				AnnotationType annType = dico.ensureFamixAnnotationType(annBnd.getAnnotationType(), /*name*/null, /*owner*/null);
 
 				// create all parameters of the annotation instance
 				Collection<AnnotationInstanceAttribute> annAtts = new ArrayList<AnnotationInstanceAttribute>();
@@ -150,7 +150,7 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 
 				// add the annotation instance to the Famix entity, may be if fmx==null we should not even create the AnnotationInstanceType ?
 				fmx = (NamedEntity) dico.getEntityByKey(bnd);
-				if ( (fmx != null) && (! summarizeModel()) ) {
+				if (fmx != null) {
 					dico.addFamixAnnotationInstance(fmx, annType, annAtts);
 				}
 			}
@@ -186,8 +186,7 @@ public class VisitorAnnotationRef extends SummarizingClassesAbstractVisitor {
 		AnnotationTypeAttribute annoAtt = dico.ensureFamixAnnotationTypeAttribute(
 				annPV.getMethodBinding(), 
 				/*name*/annPV.getName(), 
-				/*owner*/annType, 
-				/*persistIt*/!summarizeModel());
+				/*owner*/annType);
 		return( dico.createFamixAnnotationInstanceAttribute(annoAtt, attFamixVal) );
 	}
 

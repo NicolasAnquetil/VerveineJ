@@ -4,10 +4,7 @@ import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
-import fr.inria.verveine.extractor.java.visitors.SummarizingClassesAbstractVisitor;
-
 import java.util.List;
-
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute;
 import org.moosetechnology.model.famix.famixjavaentities.Attribute;
@@ -43,7 +40,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithComments;
  * 
  * @author anquetil
  */
-public class VisitorComments extends SummarizingClassesAbstractVisitor {
+public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 
 	/**
 	 * list of all comments

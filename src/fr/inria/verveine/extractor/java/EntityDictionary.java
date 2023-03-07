@@ -291,13 +291,12 @@ public class EntityDictionary {
 
 	/**
 	 * Creates and returns a FAMIX Entity of the type <b>fmxjava.lang.Class</b>.
-	 * The Entity is always created (see {@link AbstractDictionary#ensureFamixEntity(Class, Object, String, boolean)}).
+	 * The Entity is always created (see {@link AbstractDictionary#ensureFamixEntity(Class, Object, String)}).
 	 * @param fmxClass -- the FAMIX class of the instance to create
 	 * @param name -- the name of the new instance must not be null (and this is not tested)
-	 * @param persistIt -- whether the Entity should be persisted in the Famix repository
 	 * @return the FAMIX Entity or null in case of a FAMIX error
 	 */
-	protected <T extends TNamedEntity & TSourceEntity> T createFamixEntity(java.lang.Class<T> fmxClass, String name, boolean persistIt) {
+	protected <T extends TNamedEntity & TSourceEntity> T createFamixEntity(java.lang.Class<T> fmxClass, String name) {
 		T fmx = null;
 
 		if (name == null) {
@@ -317,10 +316,8 @@ public class EntityDictionary {
 
 			mapEntityToName(name, fmx);
 			
-			if (persistIt) {
-				// put new entity in Famix repository
-				famixRepoAdd((Entity) fmx);
-			}
+			// put new entity in Famix repository
+			famixRepoAdd((Entity) fmx);
 		}
 
 		return fmx;
@@ -332,11 +329,10 @@ public class EntityDictionary {
 	 * @param fmxClass -- the FAMIX class of the instance to create
 	 * @param bnd -- the binding to map to the new instance
 	 * @param name -- the name of the new instance (used if <tt>bnd == null</tt>)
-	 * @param persistIt -- whether the Entity should be persisted in the Famix repository
 	 * @return the FAMIX Entity or null if <b>bnd</b> was null or in case of a FAMIX error
 	 */
 	@SuppressWarnings("unchecked")
-	protected <T extends TNamedEntity & TSourceEntity> T ensureFamixEntity(java.lang.Class<T> fmxClass, IBinding bnd, String name, boolean persistIt) {
+	protected <T extends TNamedEntity & TSourceEntity> T ensureFamixEntity(java.lang.Class<T> fmxClass, IBinding bnd, String name) {
 		T fmx = null;
 		if (bnd != null) {
 			fmx = (T) getEntityByKey(bnd);
@@ -349,7 +345,7 @@ public class EntityDictionary {
 		// e.g. 2 parameters of 2 different methods but having the same name
 		// so we cannot recover just from the name
 
-		fmx = createFamixEntity(fmxClass, name, persistIt);
+		fmx = createFamixEntity(fmxClass, name);
 		if ( (bnd != null) && (fmx != null) ) {
 			keyToEntity.put(bnd, fmx);
 			entityToKey.put(fmx, bnd);
@@ -372,24 +368,22 @@ public class EntityDictionary {
 	 * Returns a FAMIX ParameterizableClass with the given <b>name</b>, creating it if it does not exist yet
 	 * In the second case, sets some default properties: not Abstract, not Final, not Private, not Protected, not Public, not Interface
 	 * @param name -- the name of the FAMIX Class
-	 * @param persistIt -- whether the ParameterizableClass should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public ParameterizableClass ensureFamixParameterizableClass(IBinding key, String name, TWithTypes owner, boolean persistIt) {
-		ParameterizableClass fmx = ensureFamixEntity(ParameterizableClass.class, key, name, persistIt);
+	public ParameterizableClass ensureFamixParameterizableClass(IBinding key, String name, TWithTypes owner) {
+		ParameterizableClass fmx = ensureFamixEntity(ParameterizableClass.class, key, name);
 		fmx.setTypeContainer(owner);
 		return fmx;
 	}
 
-		/**
+	/**
 	 * Returns a FAMIX ParameterizableInterface with the given <b>name</b>, creating it if it does not exist yet
 	 * In the second case, sets some default properties: not Abstract, not Final, not Private, not Protected, not Public, not Interface
 	 * @param name -- the name of the FAMIX Class
-	 * @param persistIt -- whether the ParameterizableInterface should be persisted in the Famix repository
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public ParameterizableInterface ensureFamixParameterizableInterface(IBinding key, String name, TWithTypes owner, boolean persistIt) {
-		ParameterizableInterface fmx = ensureFamixEntity(ParameterizableInterface.class, key, name, persistIt);
+	public ParameterizableInterface ensureFamixParameterizableInterface(IBinding key, String name, TWithTypes owner) {
+		ParameterizableInterface fmx = ensureFamixEntity(ParameterizableInterface.class, key, name);
 		fmx.setTypeContainer(owner);
 		return fmx;
 	}
@@ -469,9 +463,9 @@ public class EntityDictionary {
 		return implementation;
 	}
 
-	protected void ensureImplementedInterfaces(ITypeBinding bnd, TType fmx, TWithTypes owner, TAssociation lastAssociation, boolean alwaysPersist) {
+	protected void ensureImplementedInterfaces(ITypeBinding bnd, TType fmx, TWithTypes owner, TAssociation lastAssociation) {
 		for (ITypeBinding intbnd : bnd.getInterfaces()) {
-			TType superTyp = this.ensureFamixInterface(intbnd, null, null, /*isGeneric*/intbnd.isParameterizedType() || intbnd.isRawType(), extractModifierOfTypeFrom(intbnd), alwaysPersist);
+			TType superTyp = this.ensureFamixInterface(intbnd, null, null, /*isGeneric*/intbnd.isParameterizedType() || intbnd.isRawType(), extractModifierOfTypeFrom(intbnd));
 			if (bnd.isInterface()) {
 				// in Java "subtyping" link between 2 interfaces is call inheritance 
 				lastAssociation = ensureFamixInheritance((TWithInheritances)superTyp, (TWithInheritances)fmx, lastAssociation);
@@ -687,8 +681,7 @@ public class EntityDictionary {
 				fmx = l.iterator().next();
 			}
 			else {
-				// may be we should be careful not to persist all these special entities?
-				fmx = createFamixEntity(fmxClass, name, /*persistIt*/true);
+				fmx = createFamixEntity(fmxClass, name);
 			}
 			
 			if (key != null) {
@@ -814,9 +807,8 @@ public class EntityDictionary {
 	 * @param name of the type
 	 * @param owner of the type
 	 * @param ctxt -- context of use of the type
-	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
 	 */
-	public TType ensureFamixType(ITypeBinding bnd, String name, TWithTypes owner, TWithTypes ctxt, int modifiers, boolean alwaysPersist) {
+	public TType ensureFamixType(ITypeBinding bnd, String name, TWithTypes owner, TWithTypes ctxt, int modifiers) {
 		TType fmx = null;
 
 		if (bnd == null) {
@@ -829,11 +821,10 @@ public class EntityDictionary {
 			}
 
 			if ( (owner != null) && (owner instanceof TWithParameterizedTypes) ) {
-				return this.ensureFamixParameterType(null, name, (TWithParameterizedTypes) owner, alwaysPersist);
+				return this.ensureFamixParameterType(null, name, (TWithParameterizedTypes) owner);
 			}
 			else {
-				// impossible to decide whether to persist it or not. So we just hope for the best
-				fmx = ensureFamixEntity(Type.class, bnd, name, alwaysPersist);
+				fmx = ensureFamixEntity(Type.class, bnd, name);
 				fmx.setTypeContainer(owner);
 				return fmx;
 			}
@@ -859,25 +850,25 @@ public class EntityDictionary {
 		}
 
 		if ((bnd.isRawType() || bnd.isGenericType()) && !bnd.isInterface() ) {
-			return this.ensureFamixClass(bnd.getErasure(), name, (TNamedEntity) owner, /*isGeneric*/true, modifiers, alwaysPersist);
+			return this.ensureFamixClass(bnd.getErasure(), name, (TNamedEntity) owner, /*isGeneric*/true, modifiers);
 		}
 		
 		if (bnd.isAnnotation()) {
-			return this.ensureFamixAnnotationType(bnd, name, (ContainerEntity) owner, alwaysPersist);
+			return this.ensureFamixAnnotationType(bnd, name, (ContainerEntity) owner);
 		}
 
 		if (bnd.isInterface()) {
-			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/bnd.isParameterizedType() || bnd.isRawType(), modifiers, alwaysPersist);
+			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/bnd.isParameterizedType() || bnd.isRawType(), modifiers);
 		}
 
 		if (bnd.isParameterizedType() || bnd.isRawType()) {
-			return this.ensureFamixParameterizedType(bnd, name, /*generic*/null, ctxt, alwaysPersist);
+			return this.ensureFamixParameterizedType(bnd, name, /*generic*/null, ctxt);
 		}
 		if (isThrowable(bnd)) {
-			return this.ensureFamixException(bnd, name, owner, /*isGeneric*/false, modifiers, alwaysPersist);
+			return this.ensureFamixException(bnd, name, owner, /*isGeneric*/false, modifiers);
 		}
 		if (bnd.isClass()) {
-			return this.ensureFamixClass(bnd, name, (TNamedEntity) owner, /*isGeneric*/false, modifiers, alwaysPersist);
+			return this.ensureFamixClass(bnd, name, (TNamedEntity) owner, /*isGeneric*/false, modifiers);
 		}
 
 		//otherwise (none of the above)
@@ -887,33 +878,33 @@ public class EntityDictionary {
 		}
 
 		if (owner == null) {
-			owner = (TWithTypes) this.ensureOwner(bnd, alwaysPersist);
+			owner = (TWithTypes) this.ensureOwner(bnd);
 		}
 
 		if (bnd.isTypeVariable() ) {
 			if (owner instanceof ParameterizableClass) {
-				fmx = ensureFamixParameterType(bnd, name, (TWithParameterizedTypes) owner, alwaysPersist);
+				fmx = ensureFamixParameterType(bnd, name, (TWithParameterizedTypes) owner);
 			}
 			else {
 				// a type defined for a method parameter or return type
-				fmx = ensureFamixEntity(Type.class, bnd, name, alwaysPersist);
+				fmx = ensureFamixEntity(Type.class, bnd, name);
 				fmx.setTypeContainer(owner);
 			}
 			return fmx;
 		}
 
-		fmx = ensureFamixEntity(Type.class, bnd, name, alwaysPersist);
+		fmx = ensureFamixEntity(Type.class, bnd, name);
 		fmx.setTypeContainer(owner);
 		return fmx;
 	}
 
-	public TType ensureFamixType(ITypeBinding bnd, TWithTypes context, boolean alwaysPersist) {
+	public TType ensureFamixType(ITypeBinding bnd, TWithTypes context) {
 		int modifiers = extractModifierOfTypeFrom(bnd);
-		return ensureFamixType(bnd, /*name*/null, /*owner*/null, context, modifiers, alwaysPersist);
+		return ensureFamixType(bnd, /*name*/null, /*owner*/null, context, modifiers);
 	}
 	
-	public TType ensureFamixType(ITypeBinding bnd, boolean alwaysPersist) {
-		return ensureFamixType(bnd, /*ctxt*/null, alwaysPersist);
+	public TType ensureFamixType(ITypeBinding bnd) {
+		return ensureFamixType(bnd, /*ctxt*/null);
 	}
 
 	private int extractModifierOfTypeFrom(ITypeBinding bnd) {
@@ -938,14 +929,13 @@ public class EntityDictionary {
 	/**
 	 * Returns a Famix Class associated with the ITypeBinding.
 	 * The Entity is created if it does not exist.
-	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
 	 * @param name -- the name of the FAMIX Method (MUST NOT be null, but this is not checked)
 	 * @param owner -- type defining the method (should not be null, but it will work if it is) 
-	 * @param persistIt -- whether the Class should be persisted in the Famix repository
+	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
 	@SuppressWarnings("deprecation")
-	public Class ensureFamixClass(ITypeBinding bnd, String name, TNamedEntity owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+	public Class ensureFamixClass(ITypeBinding bnd, String name, TNamedEntity owner, boolean isGeneric, int modifiers) {
 		Class fmx = null;
 
 		// --------------- some special cases
@@ -994,7 +984,7 @@ public class EntityDictionary {
 		// --------------- owner
 		if (owner == null) {
 			if (bnd != null) {
-				owner = ensureOwner(bnd, alwaysPersist);
+				owner = ensureOwner(bnd);
 			}
 			/*				owner = ensureFamixPackageDefault();
 			} else {*/
@@ -1011,13 +1001,12 @@ public class EntityDictionary {
 		}
 
 		// ---------------- create
-		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
 			if (isGeneric) {
-				fmx = ensureFamixParameterizableClass(bnd, name, (ContainerEntity) owner, persistIt);
+				fmx = ensureFamixParameterizableClass(bnd, name, (ContainerEntity) owner);
 			}
 			else {
-				fmx = ensureFamixEntity(Class.class, bnd, name, persistIt);
+				fmx = ensureFamixEntity(Class.class, bnd, name);
 				fmx.setTypeContainer((ContainerEntity)owner);
 			}
 		}
@@ -1027,19 +1016,17 @@ public class EntityDictionary {
 			if (bnd != null) {
 				setClassModifiers(fmx, bnd.getDeclaredModifiers());
 			}
-			if (persistIt) {
-				TAssociation lastAssoc = null;
-				Collection<Type> sups = new LinkedList<Type>();
-				if (bnd != null) {
-					ITypeBinding supbnd = bnd.getSuperclass();
-					if (supbnd != null) {
-						lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastAssoc);
-					}
-					else {
-						lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastAssoc);
-					}
-					ensureImplementedInterfaces(bnd, fmx, (ContainerEntity) owner, lastAssoc, alwaysPersist);
+			TAssociation lastAssoc = null;
+			Collection<Type> sups = new LinkedList<Type>();
+			if (bnd != null) {
+				ITypeBinding supbnd = bnd.getSuperclass();
+				if (supbnd != null) {
+					lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd), fmx, lastAssoc);
 				}
+				else {
+					lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastAssoc);
+				}
+				ensureImplementedInterfaces(bnd, fmx, (ContainerEntity) owner, lastAssoc);
 			}
 		}
 
@@ -1049,15 +1036,13 @@ public class EntityDictionary {
 	/**
 	 * Returns a Famix Exception associated with the ITypeBinding.
 	 * The Entity is created if it does not exist.
-	 *
-	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
 	 * @param name -- the name of the FAMIX Method (MUST NOT be null, but this is not checked)
 	 * @param owner -- type defining the method (should not be null, but it will work if it is) 
-	 * @param alwaysPersist -- whether the type is unconditionally persisted or if we should check
+	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
+	 *
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	@SuppressWarnings("deprecation")
-	public <T extends TWithTypes & TNamedEntity> Exception ensureFamixException(ITypeBinding bnd, String name, TWithTypes owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+	public <T extends TWithTypes & TNamedEntity> Exception ensureFamixException(ITypeBinding bnd, String name, TWithTypes owner, boolean isGeneric, int modifiers) {
 		Exception fmx = null;
 
 		// --------------- some special cases
@@ -1104,7 +1089,7 @@ public class EntityDictionary {
 			if (bnd == null) {
 				owner = ensureFamixPackageDefault();
 			} else {
-				owner = (TWithTypes) ensureOwner(bnd, alwaysPersist);
+				owner = (TWithTypes) ensureOwner(bnd);
 			}
 		}
 
@@ -1117,27 +1102,24 @@ public class EntityDictionary {
 		}
 
 		// ---------------- create
-		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
-			fmx = ensureFamixEntity(Exception.class, bnd, name, /*alwaysPersist?*/persistIt);
+			fmx = ensureFamixEntity(Exception.class, bnd, name);
 			fmx.setTypeContainer(owner);
 		}
 
 		if (fmx!=null) {
 			// we just created it or it was not bound, so we make sure it has the right information in it
-			if (persistIt) {
-				TAssociation lastAssoc = null;
-				Collection<Type> sups = new LinkedList<Type>();
-				if (bnd != null) {
-					ITypeBinding supbnd = bnd.getSuperclass();
-					if (supbnd != null) {
-						lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd, alwaysPersist), fmx, lastAssoc);
-					}
-					else {
-						lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastAssoc);
-					}
-					ensureImplementedInterfaces(bnd, fmx, owner, lastAssoc, alwaysPersist);
+			TAssociation lastAssoc = null;
+			Collection<Type> sups = new LinkedList<Type>();
+			if (bnd != null) {
+				ITypeBinding supbnd = bnd.getSuperclass();
+				if (supbnd != null) {
+					lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixType(supbnd), fmx, lastAssoc);
 				}
+				else {
+					lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastAssoc);
+				}
+				ensureImplementedInterfaces(bnd, fmx, owner, lastAssoc);
 			}
 		}
 
@@ -1146,13 +1128,12 @@ public class EntityDictionary {
 
 	/**
 	 * Returns a FAMIX Interface with the given <b>name</b>, creating it if it does not exist yet.
-	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
 	 * @param name -- the name of the FAMIX Method (MUST NOT be null, but this is not checked)
 	 * @param owner -- type defining the method (should not be null, but it will work if it is) 
-	 * @param persistIt -- whether the Class should be persisted in the Famix repository
+	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
 	 * @return the FAMIX Class or null in case of a FAMIX error
 	 */
-	public <T extends TWithTypes & TNamedEntity> Interface ensureFamixInterface(ITypeBinding bnd, String name, TWithTypes owner, boolean isGeneric, int modifiers, boolean alwaysPersist) {
+	public <T extends TWithTypes & TNamedEntity> Interface ensureFamixInterface(ITypeBinding bnd, String name, TWithTypes owner, boolean isGeneric, int modifiers) {
 		Interface fmx = null;
 
 		// --------------- some special cases
@@ -1199,7 +1180,7 @@ public class EntityDictionary {
 			if (bnd == null) {
 				owner = ensureFamixPackageDefault();
 			} else {
-				owner = (TWithTypes) ensureOwner(bnd, alwaysPersist);
+				owner = (TWithTypes) ensureOwner(bnd);
 			}
 		}
 
@@ -1212,13 +1193,12 @@ public class EntityDictionary {
 		}
 
 		// ---------------- create
-		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
 			if (isGeneric) {
-				fmx = ensureFamixParameterizableInterface(bnd, name, owner, persistIt);
+				fmx = ensureFamixParameterizableInterface(bnd, name, owner);
 			}
 			else {
-				fmx = ensureFamixEntity(Interface.class, bnd, name, persistIt);
+				fmx = ensureFamixEntity(Interface.class, bnd, name);
 				fmx.setTypeContainer(owner);
 			}
 		}
@@ -1228,12 +1208,10 @@ public class EntityDictionary {
 			if (bnd != null) {
 				setInterfaceModifiers(fmx, bnd.getDeclaredModifiers());
 			}
-			if (persistIt) {
-				TAssociation lastAssociation = null;
-				Collection<Type> sups = new LinkedList<Type>();
-				if (bnd != null) {
-					ensureImplementedInterfaces(bnd, fmx, owner, lastAssociation, alwaysPersist);
-				}
+			TAssociation lastAssociation = null;
+			Collection<Type> sups = new LinkedList<Type>();
+			if (bnd != null) {
+				ensureImplementedInterfaces(bnd, fmx, owner, lastAssociation);
 			}
 		}
 		return fmx;
@@ -1248,7 +1226,7 @@ public class EntityDictionary {
 			removeEntity((NamedEntity) excepFmx);
 
 			key = entityToKey.get((NamedEntity) excepFmx);
-			tmp = ensureFamixEntity(Class.class, key, excepFmx.getName(), /*alwaysPersist?*/true);
+			tmp = ensureFamixEntity(Class.class, key, excepFmx.getName());
 			tmp.setTypeContainer((ContainerEntity)owner);
 
 			tmp.addMethods(((TWithMethods) excepFmx).getMethods());
@@ -1290,7 +1268,7 @@ public class EntityDictionary {
 			removeEntity((NamedEntity) excepFmx);
 
 			key = entityToKey.get((NamedEntity) excepFmx);
-			tmp = ensureFamixException((ITypeBinding) key, excepFmx.getName(), owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist?*/true);
+			tmp = ensureFamixException((ITypeBinding) key, excepFmx.getName(), owner, /*isGeneric*/false, UNKNOWN_MODIFIERS);
 
 			tmp.addMethods(((TWithMethods) excepFmx).getMethods());
 			if (excepFmx instanceof TWithAttributes) {
@@ -1319,40 +1297,39 @@ public class EntityDictionary {
 	 * helper method, we know the type exists, ensureFamixClass will recover it
 	 */
 	public Class getFamixClass(ITypeBinding bnd, String name, ContainerEntity owner) {
-		return ensureFamixClass(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
+		return ensureFamixClass(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS);
 	}
 
 	/**
 	 * helper method, we know the type exists, ensureFamixInterface will recover it
 	 */
 	public Interface getFamixInterface(ITypeBinding bnd, String name, ContainerEntity owner) {
-		return ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
+		return ensureFamixInterface(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS);
 	}
 
 	/**
 	 * helper method, we know the type exists, ensureFamixInterface will recover it
 	 */
 	public Exception getFamixException(ITypeBinding bnd, String name, ContainerEntity owner) {
-		return ensureFamixException(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS, /*alwaysPersist*/false);
+		return ensureFamixException(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS);
 	}
 
 	/**
 	 * Ensures a famix entity for the owner of a binding.<br>
 	 * This owner can be a method, a class or a namespace
 	 * @param bnd -- binding for the owned entity
-	 * @param persistIt  -- whether to persist or not the type
 	 * @return a famix entity for the owner
 	 */
-	private TNamedEntity ensureOwner(ITypeBinding bnd, boolean persistIt) {
+	private TNamedEntity ensureOwner(ITypeBinding bnd) {
 		TNamedEntity owner = null;
 		IMethodBinding parentMtd = bnd.getDeclaringMethod();
 		if (parentMtd != null) {
-			owner = this.ensureFamixMethod(parentMtd, persistIt);  // cast needed to desambiguate the call
+			owner = this.ensureFamixMethod(parentMtd);  // cast needed to desambiguate the call
 		}
 		else {
 			ITypeBinding parentClass = bnd.getDeclaringClass();
 			if (parentClass != null) {
-				TType tmpOwn = this.ensureFamixType(parentClass, /*alwaysPersist?*/persistIt);
+				TType tmpOwn = this.ensureFamixType(parentClass);
 				if (tmpOwn instanceof ParameterizedType) {
 					owner =  (TNamedEntity) ((ParameterizedType) tmpOwn).getParameterizableClass();
 				}
@@ -1376,10 +1353,9 @@ public class EntityDictionary {
 	/**
 	 * Returns a FAMIX ParameterizableType with the given <b>name</b>, creating it if it does not exist yet
 	 * @param name -- the name of the FAMIX Type
-	 * @param persistIt -- whether the ParameterizableClass should be persisted in the Famix repository
 	 * @return the FAMIX ParameterizableType or null in case of a FAMIX error
 	 */
-	public <T extends TWithTypes & TNamedEntity> ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, TWithParameterizedTypes generic, TWithTypes owner, boolean alwaysPersist) {
+	public <T extends TWithTypes & TNamedEntity> ParameterizedType ensureFamixParameterizedType(ITypeBinding bnd, String name, TWithParameterizedTypes generic, TWithTypes owner) {
 		ParameterizedType fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -1408,23 +1384,14 @@ public class EntityDictionary {
 		if ((generic == null) && (bnd != null)) {
 			int modifiers = (bnd.getErasure() != null) ? bnd.getErasure().getModifiers() : UNKNOWN_MODIFIERS;
 			if(bnd.isInterface()) {
-				generic = (ParameterizableInterface) ensureFamixInterface(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
+				generic = (ParameterizableInterface) ensureFamixInterface(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers);
 			} else {
-				generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers, alwaysPersist);
+				generic = (ParameterizableClass) ensureFamixClass(bnd.getErasure(), name, /*owner*/null, /*isGeneric*/true, modifiers);
 			}
 		}
 
 		// --------------- owner
 		owner = ((Type) generic).getTypeContainer();
-		/* Old behavior, see issue 868
-		   if (owner == null) {
-			if (bnd == null) {
-				owner = ensureFamixNamespaceDefault();  // not really sure what to do here
-			}
-			else {
-				owner = ensureOwner(bnd, alwaysPersist);
-			}
-		}*/
 
 		// --------------- recover from name ?
 		for (ParameterizedType candidate : getEntityByName(ParameterizedType.class, name) ) {
@@ -1435,9 +1402,8 @@ public class EntityDictionary {
 		}
 
 		// --------------- create
-		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
-			fmx = ensureFamixEntity(ParameterizedType.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(ParameterizedType.class, bnd, name);
 			fmx.setTypeContainer(owner);
 			fmx.setParameterizableClass(generic);
 		}
@@ -1491,7 +1457,7 @@ public class EntityDictionary {
 			if (bnd == null) {
 				owner = ensureFamixPackageDefault();  // not really sure what to do here
 			} else {
-				owner = (TWithTypes) ensureOwner(bnd, /*persistIt*/true); // owner should be a class or package so yes persist it
+				owner = (TWithTypes) ensureOwner(bnd);
 			}
 		}
 
@@ -1504,7 +1470,7 @@ public class EntityDictionary {
 		}
 
 		if (fmx == null) {
-			fmx = ensureFamixEntity(Enum.class, bnd, name, /*persistIt*/true);
+			fmx = ensureFamixEntity(Enum.class, bnd, name);
 			fmx.setTypeContainer(owner);
 		}
 
@@ -1522,7 +1488,7 @@ public class EntityDictionary {
 		return ensureFamixEnum(bnd, name, owner);
 	}
 
-	public EnumValue ensureFamixEnumValue(IVariableBinding bnd,	String name, Enum owner, boolean persistIt) {
+	public EnumValue ensureFamixEnumValue(IVariableBinding bnd,	String name, Enum owner) {
 		EnumValue fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -1559,7 +1525,7 @@ public class EntityDictionary {
 			}
 		}
 		if (fmx == null) {
-			fmx = ensureFamixEntity(EnumValue.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(EnumValue.class, bnd, name);
 			fmx.setParentEnum(owner);
 		}
 
@@ -1574,13 +1540,13 @@ public class EntityDictionary {
 	 * helper method, we know the type enumValue, ensureFamixEnumValue will recover it
 	 */
 	public EnumValue getFamixEnumValue(IVariableBinding bnd, String name, Enum owner) {
-		return ensureFamixEnumValue(bnd, name, owner, /*persistIt*/false);
+		return ensureFamixEnumValue(bnd, name, owner);
 	}
 
 	/**
 	 * e.g. see {@link EntityDictionary#ensureFamixClass}
 	 */
-	public AnnotationType ensureFamixAnnotationType(ITypeBinding bnd, String name, ContainerEntity owner, boolean alwaysPersist) {
+	public AnnotationType ensureFamixAnnotationType(ITypeBinding bnd, String name, ContainerEntity owner) {
 		AnnotationType fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -1623,9 +1589,8 @@ public class EntityDictionary {
 		}
 
 		// --------------- create
-		boolean persistIt = alwaysPersist || (! (owner instanceof Method));
 		if (fmx == null) {
-			fmx = ensureFamixEntity(AnnotationType.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(AnnotationType.class, bnd, name);
 			fmx.setAnnotationTypesContainer(owner);
 		}
 
@@ -1642,10 +1607,10 @@ public class EntityDictionary {
 	 * helper method, we know the type exists, ensureFamixAnnotationType will recover it
 	 */
 	public AnnotationType getFamixAnnotationType(ITypeBinding bnd, String name, ContainerEntity owner) {
-		return ensureFamixAnnotationType(bnd, name, owner, /*alwaysPersist*/false);
+		return ensureFamixAnnotationType(bnd, name, owner);
 	}
 
-	public AnnotationTypeAttribute ensureFamixAnnotationTypeAttribute(IMethodBinding bnd, String name, AnnotationType owner, boolean persistIt) {
+	public AnnotationTypeAttribute ensureFamixAnnotationTypeAttribute(IMethodBinding bnd, String name, AnnotationType owner) {
 		AnnotationTypeAttribute fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -1672,7 +1637,7 @@ public class EntityDictionary {
 			else {
 				ITypeBinding parentType = bnd.getDeclaringClass();
 				if (parentType != null) {
-					owner = this.ensureFamixAnnotationType(parentType, null, null, persistIt);
+					owner = this.ensureFamixAnnotationType(parentType, null, null);
 				}
 				else  {
 					return null;  // what would be the use of an AnnotationTypeAttribute without AnnotationType ?
@@ -1696,7 +1661,7 @@ public class EntityDictionary {
 		}
 
 		if (fmx == null) {
-			fmx = ensureFamixEntity(AnnotationTypeAttribute.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(AnnotationTypeAttribute.class, bnd, name);
 			fmx.setParentType(owner);
 		}
 
@@ -1713,17 +1678,16 @@ public class EntityDictionary {
 	 * helper method, we know the attribute exists, ensureFamixAnnotationTypeAttribute will recover it
 	 */
 	public AnnotationTypeAttribute getFamixAnnotationTypeAttribute(IMethodBinding bnd, String name, AnnotationType owner) {
-		return ensureFamixAnnotationTypeAttribute( bnd, name, owner, /*persistIt*/false);
+		return ensureFamixAnnotationTypeAttribute( bnd, name, owner);
 	}
 
 	/**
 	 * Returns a FAMIX ParameterType (created by a FAMIX ParameterizableClass) with the given <b>name</b>, creating it if it does not exist yet
 	 * In the second case, sets some default properties: not Abstract, not Final, not Private, not Protected, not Public
 	 * @param name -- the name of the FAMIX ParameterType
-	 * @param persistIt -- whether the ParameterType should be persisted in the Famix repository
 	 * @return the FAMIX ParameterType or null in case of a FAMIX error
 	 */
-	public ParameterType ensureFamixParameterType(ITypeBinding bnd,	String name, TWithParameterizedTypes owner, boolean persistIt) {
+	public ParameterType ensureFamixParameterType(ITypeBinding bnd,	String name, TWithParameterizedTypes owner) {
 		ParameterType fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -1750,7 +1714,7 @@ public class EntityDictionary {
 			else {
 				ITypeBinding parentClass = bnd.getDeclaringClass();
 				if (parentClass != null) {
-					owner = (ParameterizableClass) this.ensureFamixType(parentClass, /*alwaysPersist?*/persistIt);
+					owner = (ParameterizableClass) this.ensureFamixType(parentClass);
 				}
 				else {
 					owner = null;  // not really sure what to do here
@@ -1768,7 +1732,7 @@ public class EntityDictionary {
 
 		// --------------- create
 		if (fmx == null) {
-			fmx = ensureFamixEntity(ParameterType.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(ParameterType.class, bnd, name);
 			fmx.setTypeContainer((ContainerEntity) owner);
 		}
 
@@ -2271,29 +2235,27 @@ public class EntityDictionary {
 		}
 	}
 
-	public Method ensureFamixMethod(IMethodBinding bnd, boolean persistIt) {
+	public Method ensureFamixMethod(IMethodBinding bnd) {
 		return ensureFamixMethod(
 				bnd,
 				/*name*/null,
 				/*paramsType*/(Collection<String>)null,
 				/*returnType*/null,
 				/*owner*/null,
-				(bnd == null) ? UNKNOWN_MODIFIERS : bnd.getModifiers(),
-				persistIt);
+				(bnd == null) ? UNKNOWN_MODIFIERS : bnd.getModifiers());
 	}
 
 	/**
 	 * Returns a Famix Method associated with the IMethodBinding. The Entity is created if it does not exist.
 	 * The Entity is created if it does not exist.
-	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
 	 * @param name -- the name of the FAMIX Method (MUST NOT be null, but this is not checked)
-	 * @param sig -- method's signature, including type of parameters and return type (should not be null, but it will work if it is)
 	 * @param ret -- Famix Type returned by the method (ideally should only be null in case of a constructor, but will accept it in any case)
 	 * @param owner -- type defining the method (should not be null, but it will work if it is)
-	 * @param persistIt -- whether the Method should be persisted in the Famix repository
+	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
+	 * @param sig -- method's signature, including type of parameters and return type (should not be null, but it will work if it is)
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, TType ret, TWithMethods owner, int modifiers, boolean persistIt) {
+	public Method ensureFamixMethod(IMethodBinding bnd, String name, Collection<String> paramTypes, TType ret, TWithMethods owner, int modifiers) {
 		Method fmx = null;
 		String sig;
 		boolean delayedRetTyp;
@@ -2361,7 +2323,7 @@ public class EntityDictionary {
 						delayedRetTyp = true;
 					}
 					else {
-						ret = this.ensureFamixType(retTypBnd,(TWithTypes) /*ctxt*/owner, /*alwaysPersist?*/persistIt);
+						ret = this.ensureFamixType(retTypBnd,(TWithTypes) /*ctxt*/owner);
 					}
 				}
 			}
@@ -2375,7 +2337,7 @@ public class EntityDictionary {
 			else {
 				ITypeBinding classBnd = bnd.getDeclaringClass();
 				if (classBnd != null) {
-					TType tmpOwn = ensureFamixType(classBnd, /*alwaysPersist?*/persistIt);
+					TType tmpOwn = ensureFamixType(classBnd);
 					if (tmpOwn instanceof ParameterizedType) {
 						owner =  (TWithMethods) ((ParameterizedType) tmpOwn).getParameterizableClass();
 					}
@@ -2398,7 +2360,7 @@ public class EntityDictionary {
 		}
 
 		if (fmx == null) {
-			fmx = ensureFamixEntity(Method.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(Method.class, bnd, name);
 			fmx.setSignature(sig);
 			fmx.setDeclaredType(ret);
 			fmx.setParentType(owner);
@@ -2414,7 +2376,7 @@ public class EntityDictionary {
 
 		if ((fmx != null) && delayedRetTyp) {
 			int retTypModifiers = (retTypBnd != null) ? retTypBnd.getModifiers() : UNKNOWN_MODIFIERS;
-			fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/fmx, /*ctxt*/(ContainerEntity) owner, retTypModifiers, /*alwaysPersist?*/persistIt));
+			fmx.setDeclaredType(this.ensureFamixType(retTypBnd, /*name*/null, /*owner*/fmx, /*ctxt*/(ContainerEntity) owner, retTypModifiers));
 		}
 
 		return fmx;
@@ -2426,7 +2388,7 @@ public class EntityDictionary {
 	 * @return the Famix Method
 	 */
 	public Method ensureFamixStubMethod(String name) {
-		return ensureFamixMethod(null, name, /*paramType*/(Collection<String>)null, /*returnType*/null, ensureFamixClassStubOwner(), /*modifiers*/0, false);  // cast needed to desambiguate the call
+		return ensureFamixMethod(null, name, /*paramType*/(Collection<String>)null, /*returnType*/null, ensureFamixClassStubOwner(), /*modifiers*/0);  // cast needed to desambiguate the call
 	}
 
 	public void setAttributeModifiers(Attribute fmx, int mod) {
@@ -2477,14 +2439,13 @@ public class EntityDictionary {
 	/**
 	 * Returns a Famix Attribute associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
 	 * @param name -- the name of the FAMIX Attribute (MUST NOT be null, but this is not checked)
 	 * @param type -- Famix Type of the Attribute (should not be null, but it will work if it is)
 	 * @param owner -- type defining the Attribute (should not be null, but it will work if it is)
-	 * @param persistIt -- whether the Attribute should be persisted in the Famix repository
+	 * @param key to which the entity will be mapped (may be null, but then it will be difficult to recover the entity)
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, Type type, TWithAttributes owner, boolean persistIt) {
+	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, Type type, TWithAttributes owner) {
 		Attribute fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -2502,17 +2463,7 @@ public class EntityDictionary {
 				name = bnd.getName();
 			}
 		}
-/*
-		// --------------- type
-		if (type == null) {
-			if (bnd == null) {
-				type = null;  // what else ?
-			}
-			else {
-				type = this.ensureFamixType(bnd.getType(), /*ctxt* /owner, /*alwaysPersist?* /persistIt);
-			}
-		}
-*/
+
 		// --------------- owner
 		if (owner == null) {
 			if (bnd == null) {
@@ -2521,7 +2472,7 @@ public class EntityDictionary {
 			else {
 				ITypeBinding classBnd = bnd.getDeclaringClass();
 				if (classBnd != null) {
-					TType tmpOwn = ensureFamixType(classBnd, /*alwaysPersist?*/persistIt);
+					TType tmpOwn = ensureFamixType(classBnd);
 					if (tmpOwn instanceof ParameterizedType) {
 						owner = (TWithAttributes) ((ParameterizedType) tmpOwn).getParameterizableClass();
 					} else {
@@ -2542,7 +2493,7 @@ public class EntityDictionary {
 		}
 
 		if (fmx == null) {
-			fmx = ensureFamixEntity(Attribute.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(Attribute.class, bnd, name);
 			fmx.setParentType( owner);
 		}
 
@@ -2558,24 +2509,23 @@ public class EntityDictionary {
 		return fmx;
 	}
 
-	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, TWithAttributes owner, boolean persistIt) {
-		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, persistIt);
+	public Attribute ensureFamixAttribute(IVariableBinding bnd, String name, TWithAttributes owner) {
+		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner);
 	}
 
 	/**
 	 * helper method, we know the var exists, ensureFamixAttribute will recover it
 	 */
 	public Attribute getFamixAttribute(IVariableBinding bnd, String name, TWithAttributes owner) {
-		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner, /*persistIt*/false);
+		return ensureFamixAttribute(bnd, name, /*declared type*/null, owner);
 	}
 
 	/**
 	 * Returns a Famix Parameter associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
-	 * @param persistIt -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if "bnd" is null or in case of a Famix error
 	 */
-	public Parameter ensureFamixParameter(IVariableBinding bnd, String name, Type typ, TMethod tMethod, boolean persistIt) {
+	public Parameter ensureFamixParameter(IVariableBinding bnd, String name, Type typ, TMethod tMethod) {
 		Parameter fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -2600,20 +2550,10 @@ public class EntityDictionary {
 				tMethod = ensureFamixStubMethod("<"+name+"_owner>");
 			}
 			else {
-				tMethod = ensureFamixMethod(bnd.getDeclaringMethod(), persistIt);
+				tMethod = ensureFamixMethod(bnd.getDeclaringMethod());
 			}
 		}
-/*
-		// --------------- type
-		if (typ == null) {
-			if (bnd == null) {
-				typ = null;  // what else ?
-			}
-			else {
-				typ = this.ensureFamixType(bnd.getType(), /*ctxt* /owner.getParentType(), /*alwaysPersist?* /persistIt);  // context of the parameter def = the class definition
-			}
-		}
-*/
+
 		// --------------- recover from name ?
 		for (Parameter candidate : getEntityByName(Parameter.class, name) ) {
 			if ( matchAndMapVariable(bnd, name, tMethod, candidate) ) {
@@ -2623,7 +2563,7 @@ public class EntityDictionary {
 		}
 
 		if (fmx == null) {
-			fmx = ensureFamixEntity(Parameter.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(Parameter.class, bnd, name);
 			fmx.setParentBehaviouralEntity(tMethod);
 		}
 
@@ -2639,17 +2579,16 @@ public class EntityDictionary {
 	 * helper method, we know the var exists, ensureFamixParameter will recover it
 	 */
 	public Parameter getFamixParameter(IVariableBinding bnd, String name, TMethod tMethod) {
-		return ensureFamixParameter(bnd, name, /*declared type*/null, tMethod, /*persistIt*/false);
+		return ensureFamixParameter(bnd, name, /*declared type*/null, tMethod);
 	}
 
 	/**
 	 * Returns a Famix LocalVariable associated with the IVariableBinding.
 	 * The Entity is created if it does not exist.<br>
 	 * @param name -- the name of the FAMIX LocalVariable
-	 * @param persistIt  -- whether to persist or not the entity eventually created
 	 * @return the Famix Entity found or created. May return null if <b>bnd</b> and <b>name</b> are null, or <b>bnd</b> and <b>owner</b> are null, or in case of a Famix error
 	 */
-	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, String name, TWithLocalVariables owner, boolean persistIt) {
+	public LocalVariable ensureFamixLocalVariable(IVariableBinding bnd, String name, TWithLocalVariables owner) {
 		LocalVariable fmx = null;
 
 		// --------------- to avoid useless computations if we can
@@ -2667,24 +2606,14 @@ public class EntityDictionary {
 				name = bnd.getName();
 			}
 		}
-/*
-		// --------------- type
-		if (typ == null) {
-			if (bnd == null) {
-				typ = null;  // what else ?
-			}
-			else {
-				typ = this.ensureFamixType(bnd.getType(), /*ctxt* /owner, /*alwaysPersist?* /persistIt);
-			}
-		}
-*/
+
 		// --------------- owner
 		if (owner == null) {
 			if (bnd == null) {
 				return null;  // what would be the interest of a local variable for which we ignore the declaring method?
 			}
 			else {
-				owner = ensureFamixMethod(bnd.getDeclaringMethod(), false);
+				owner = ensureFamixMethod(bnd.getDeclaringMethod());
 			}
 		}
 
@@ -2697,7 +2626,7 @@ public class EntityDictionary {
 		}
 
 		if (fmx == null) {
-			fmx = ensureFamixEntity(LocalVariable.class, bnd, name, persistIt);
+			fmx = ensureFamixEntity(LocalVariable.class, bnd, name);
 			fmx.setParentBehaviouralEntity(owner);
 		}
 
@@ -2713,7 +2642,7 @@ public class EntityDictionary {
 	 * helper method, we know the var exists, ensureFamixLocalVariable will recover it
 	 */
 	public LocalVariable getFamixLocalVariable(IVariableBinding bnd, String name, TWithLocalVariables owner) {
-		return ensureFamixLocalVariable(bnd, name, owner, /*persistIt*/false);
+		return ensureFamixLocalVariable(bnd, name, owner);
 	}
 
 	/**
@@ -2722,19 +2651,18 @@ public class EntityDictionary {
 	 * @param name -- the name of the FAMIX ImplicitVariable (should be Dictionary.SELF_NAME or Dictionary.SUPER_NAME)
 	 * @param type -- the Famix Type for this ImplicitVariable (should not be null)
 	 * @param tMethod -- the ContainerEntity where the implicit variable appears (should be a method inside <b>type</b>)
-	 * @param persistIt -- whether the ImplicitVariable should be persisted in the Famix repository
 	 * @return the FAMIX ImplicitVariable or null in case of a FAMIX error
 	 */
-	public ImplicitVariable ensureFamixImplicitVariable(IBinding key, String name, TType type, TMethod tMethod, boolean persistIt) {
+	public ImplicitVariable ensureFamixImplicitVariable(IBinding key, String name, TType type, TMethod tMethod) {
 		ImplicitVariable fmx;
-		fmx = ensureFamixEntity(ImplicitVariable.class, key, name, persistIt);
+		fmx = ensureFamixEntity(ImplicitVariable.class, key, name);
 		fmx.setParentBehaviouralEntity(tMethod);
 		return fmx;
 	}
 
-	public ImplicitVariable ensureFamixImplicitVariable(String name, TType tType, TMethod tMethod, boolean persistIt) {
+	public ImplicitVariable ensureFamixImplicitVariable(String name, TType tType, TMethod tMethod) {
 		IBinding bnd = ImplicitVarBinding.getInstance(tMethod, name);
-		return ensureFamixImplicitVariable(bnd, name, tType, tMethod, persistIt);
+		return ensureFamixImplicitVariable(bnd, name, tType, tMethod);
 	}
 
 	/**
@@ -2891,8 +2819,7 @@ public class EntityDictionary {
 	 */
 	public Class ensureFamixMetaClass(ITypeBinding bnd) {
 		Package javaLang = ensureFamixPackageJavaLang((bnd == null) ? null : bnd.getPackage());
-		// always persist the MetaClass whatever the value of VerveineJParser.classSummary
-		Class fmx = this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC & Modifier.FINAL, /*alwaysPersist?*/true);
+		Class fmx = this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, Modifier.PUBLIC & Modifier.FINAL);
 
 		if ((fmx != null) && (fmx.getSuperInheritances() == null)) {
 			ensureFamixInheritance(ensureFamixClassObject(null), fmx, null);
@@ -2903,7 +2830,7 @@ public class EntityDictionary {
 
 	public Class getFamixMetaClass(ITypeBinding bnd) {
 		Package javaLang = ensureFamixPackageJavaLang((bnd == null) ? null : bnd.getPackage());
-		return this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, UNKNOWN_MODIFIERS, /*alwaysPersist?*/false);
+		return this.ensureFamixClass(null, METACLASS_NAME, javaLang, /*isGeneric*/true, UNKNOWN_MODIFIERS);
 	}
 
 	/**
