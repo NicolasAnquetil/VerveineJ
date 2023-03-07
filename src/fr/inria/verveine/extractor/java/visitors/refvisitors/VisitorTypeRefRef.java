@@ -215,7 +215,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		visitFieldDeclaration(node);  // to recover optional EntityDictionary.INIT_BLOCK_NAME method
+		hasInitBlock(node);  // to recover optional EntityDictionary.INIT_BLOCK_NAME method
 		visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());   // to create the TypeRefs
 		return true;
 	}

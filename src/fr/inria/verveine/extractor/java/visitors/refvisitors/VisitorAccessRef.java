@@ -210,7 +210,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-	    if (visitFieldDeclaration(node)) {   // true if hasInitializer + recovers EntityDictionary.INIT_BLOCK_NAME method
+	    if (hasInitBlock(node)) {   // true if hasInitializer + recovers EntityDictionary.INIT_BLOCK_NAME method
             visitNodeList(node.fragments());
         }
         return false;

@@ -261,7 +261,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
     @SuppressWarnings("unchecked")
-    public boolean visitFieldDeclaration(FieldDeclaration node) {
+    public boolean hasInitBlock(FieldDeclaration node) {
         boolean hasInitBlock = false;
         for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
             if (vardecl.getInitializer() != null) {

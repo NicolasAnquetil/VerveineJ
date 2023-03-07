@@ -210,7 +210,7 @@ public class VisitorVarsDef extends GetVisitedEntityAbstractVisitor {
 		}
 
 		// Possible local variables in optional initializer
-		if (visitFieldDeclaration(node)) {  // recovers optional EntityDictionary.INIT_BLOCK_NAME method
+		if (hasInitBlock(node)) {  // recovers optional EntityDictionary.INIT_BLOCK_NAME method
 			structuralType = StructuralEntityKinds.LOCALVAR;
 			for (VariableDeclaration vardecl : (List<VariableDeclaration>)node.fragments() ) {
 				vardecl.getInitializer().accept(this);

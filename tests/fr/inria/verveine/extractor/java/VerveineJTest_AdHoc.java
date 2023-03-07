@@ -253,7 +253,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	}
 
 	@Test
-	public void testClassWithNoBindingButCanBeIdentifiedAsExceptionImportedAsException() {
+	public void testClassWithNoBindingButCanBeIdentifiedAsException() {
 		parse(new String[]{"test_src/ad_hoc/Example.java"});
 
 		org.moosetechnology.model.famix.famixjavaentities.Exception clazz = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "BackingStoreException");
@@ -365,6 +365,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	public void testEnumDecl() {
 		parse(new String[]{"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java"});
 
+		// java.lang.Enum entity
 		org.moosetechnology.model.famix.famixjavaentities.Class javaLangEnum = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Enum");
 		assertNotNull(javaLangEnum);
 		assertEquals("lang", Util.getOwner(javaLangEnum).getName());
@@ -373,9 +374,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		org.moosetechnology.model.famix.famixjavaentities.Class card = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Card");
 		assertNotNull(card);
 
+		// declared enum: Rank 
 		org.moosetechnology.model.famix.famixjavaentities.Enum rk = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Rank");
 		assertNotNull(rk);
-		assertEquals("Rank", rk.getName());
 		assertEquals(13, rk.getEnumValues().size());
 		assertSame(card, Util.getOwner(rk));
 		assertNotNull(rk.getSourceAnchor());
@@ -384,14 +385,9 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(ParameterizedType.class, rkSuper.getClass());
 		assertEquals(javaLangEnum, ((ParameterizedType) rkSuper).getParameterizableClass());
 
-		EnumValue nine = detectFamixElement(EnumValue.class, "NINE");
-		assertNotNull(nine);
-		assertEquals("NINE", nine.getName());
-		assertSame(rk, nine.getParentEnum());
-
+		// declared enum: Suit 
 		org.moosetechnology.model.famix.famixjavaentities.Enum st = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Suit");
 		assertNotNull(st);
-		assertEquals("Suit", st.getName());
 		assertEquals(1, st.getSuperInheritances().size());
 		Type stSuper = (Type) firstElt(st.getSuperInheritances()).getSuperclass();
 		assertEquals(ParameterizedType.class, stSuper.getClass());
@@ -399,10 +395,52 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(4, st.getEnumValues().size());
 		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.getOwner(st));
 
+		// declared enum: Planet 
+		org.moosetechnology.model.famix.famixjavaentities.Enum pl = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Planet");
+		assertNotNull(pl);
+		assertEquals(1, pl.getSuperInheritances().size());
+		Type plSuper = (Type) firstElt(pl.getSuperInheritances()).getSuperclass();
+		assertEquals(ParameterizedType.class, plSuper.getClass());
+		assertEquals(javaLangEnum, ((ParameterizedType) plSuper).getParameterizableClass());
+		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.getOwner(pl));
+		assertEquals(8, pl.getEnumValues().size());
+		assertEquals(4, pl.getAttributes().size());
+		assertEquals(7 + 2, pl.getMethods().size()); // 7 methods + <initializer> + implicit used: values()
+	}
+
+	@Test
+	public void testEnumValues() {
+		parse(new String[]{"test_src/ad_hoc/Card.java"});
+
+		org.moosetechnology.model.famix.famixjavaentities.Enum rk = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Rank");
+		assertNotNull(rk);
+
+		org.moosetechnology.model.famix.famixjavaentities.Enum st = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Suit");
+		assertNotNull(st);
+
+		EnumValue nine = detectFamixElement(EnumValue.class, "NINE");
+		assertNotNull(nine);
+		assertEquals("NINE", nine.getName());
+		assertSame(rk, nine.getParentEnum());
+
 		EnumValue hrt = detectFamixElement(EnumValue.class, "HEARTS");
 		assertNotNull(hrt);
 		assertEquals("HEARTS", hrt.getName());
 		assertSame(st, hrt.getParentEnum());
+	}
+
+	@Test
+	public void testEnumAsVariableType() {
+		parse(new String[]{"test_src/ad_hoc/Card.java", "test_src/ad_hoc/Planet.java"});
+
+		org.moosetechnology.model.famix.famixjavaentities.Class card = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "Card");
+		assertNotNull(card);
+
+		org.moosetechnology.model.famix.famixjavaentities.Enum rk = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Rank");
+		assertNotNull(rk);
+
+		org.moosetechnology.model.famix.famixjavaentities.Enum st = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Suit");
+		assertNotNull(st);
 
 		assertEquals(3, card.getAttributes().size());
 		for (TAttribute ta : card.getAttributes()) {
@@ -415,18 +453,6 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 				assertEquals("protoDeck", a.getName());
 			}
 		}
-
-		org.moosetechnology.model.famix.famixjavaentities.Enum pl = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Planet");
-		assertNotNull(pl);
-		assertEquals("Planet", pl.getName());
-		assertEquals(1, pl.getSuperInheritances().size());
-		Type plSuper = (Type) firstElt(pl.getSuperInheritances()).getSuperclass();
-		assertEquals(ParameterizedType.class, plSuper.getClass());
-		assertEquals(javaLangEnum, ((ParameterizedType) plSuper).getParameterizableClass());
-		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.getOwner(pl));
-		assertEquals(8, pl.getEnumValues().size());
-		assertEquals(4, pl.getAttributes().size());
-		assertEquals(7 + 2, pl.getMethods().size()); // 7 methods + <initializer> + implicit used: values()
 	}
 
 	@Test

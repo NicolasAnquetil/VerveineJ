@@ -1,7 +1,17 @@
 package comments;
 
 
-public class CommentClass{
+public class ClassWithComments {
+
+	/**
+	 * an Attribute with a JavaDoc
+	 */
+	private int x;
+	
+	/*
+	 * Another attribute with a block comment
+	 */
+	private int y;
 
 	// simple constructor
     CommentClass(){
@@ -15,7 +25,7 @@ public class CommentClass{
      * constructor with javadoc
      */
     CommentClass(int i, int j){
-        /* simple constructor
+        /* block comment in the constructor
          */
     	this(j);
     }
@@ -26,9 +36,9 @@ public class CommentClass{
 
     // method witout modifier and with comment
     int method(int i){
-        /* comment in method body
+        /* another block comment in method body
          */
-    	method(i,0);
+    	ClassWithComments obj;
     }
 
     /**
