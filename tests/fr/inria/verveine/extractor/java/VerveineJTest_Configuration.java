@@ -145,13 +145,49 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	public void testCommentsText() {
 		parse(new String[]{"-commenttext", "test_src/comments"});
 
-		assertEquals(13, entitiesOfType(Comment.class).size());
+		assertEquals(14, entitiesOfType(Comment.class).size());
 		for (Comment cmt : entitiesOfType(Comment.class)) {
 			assertNull(cmt.getSourceAnchor());
 			assertNotNull( cmt.getContent());
+			assertTrue( cmt.getContent().length() > 20); // none of the comments have less than 20 characters
 			assertEquals('/', cmt.getContent().charAt(0));
-			System.out.println(cmt.getContent());
 		}
+
+		Class clazz = detectFamixElement(Class.class, "ClassWithComments");
+		assertNotNull(clazz);
+		assertEquals(1, clazz.getComments().size());
+
+		int numberTested = 0;
+		for (Attribute att : entitiesOfType(Attribute.class)) {
+			assertEquals(1, att.getComments().size());
+			numberTested++;
+		}
+		assertEquals(2, numberTested);  // check that all attributes were actually found and tested
+
+		assertEquals(10, entitiesOfType(Method.class).size());
+		for (Method meth : entitiesOfType(Method.class)) {
+			if (meth.getSignature().equals("ClassWithComments(int i, int j)")) {
+				numberTested++;
+				assertEquals(2, meth.getComments().size());
+			}
+			else if (meth.getName().equals("method2")) {
+				numberTested++;
+				assertEquals(2, meth.getComments().size());
+			}
+			else if (meth.getName().equals("method3")) {
+				numberTested++;
+				assertEquals(1, meth.getComments().size());
+			}
+			else if (meth.getName().equals("method4")) {
+				numberTested++;
+				assertEquals(0, meth.getComments().size());
+			}
+			else if (meth.getName().equals("methodWithoutBody")) {
+				numberTested++;
+				assertEquals(1, meth.getComments().size());
+			}
+		}
+		assertEquals(6, numberTested);  // check that all expected methods were actually found and tested
 	}
 
 	@Test

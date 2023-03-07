@@ -2675,7 +2675,7 @@ public class EntityDictionary {
 	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner, boolean commentText) {
 		Comment cmt = null;
 
-		if ( (jCmt != null) && (owner != null) && (! commentAlreadyRecorded(owner, jCmt)) ) {
+		if ( (jCmt != null) && (owner != null) ) {
 			
 			cmt = new Comment();
 			if (commentText) {
@@ -2695,21 +2695,6 @@ public class EntityDictionary {
 		}
 
 		return cmt;
-	}
-
-	private boolean commentAlreadyRecorded(TWithComments fmx, org.eclipse.jdt.core.dom.Comment jCmt) {
-		int startPos = jCmt.getStartPosition();
-		boolean found = false;
-
-		for (TComment cmt : fmx.getComments()) {
-			Comment cmt2 = (Comment)cmt;
-			if (((IndexedFileAnchor)cmt2.getSourceAnchor()).getStartPos().intValue() == startPos) {
-				found = true;
-				break;
-			}
-		}
-
-		return found;
 	}
 
 	/**

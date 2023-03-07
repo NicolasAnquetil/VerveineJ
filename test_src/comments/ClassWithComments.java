@@ -1,3 +1,6 @@
+/*
+ * File comment
+ */
 package comments;
 
 
@@ -14,28 +17,28 @@ public class ClassWithComments {
 	private int y;
 
 	// simple constructor
-    CommentClass(){
+	ClassWithComments(){
     }
 
     // constructor with comment
-    CommentClass(int i){
+	ClassWithComments(int i){
     }
 
     /**
      * constructor with javadoc
      */
-    CommentClass(int i, int j){
+	ClassWithComments(int i, int j){
         /* block comment in the constructor
          */
     	this(j);
     }
 
     /* method with nothing */
-    int method(){
+    int method1(){
     }
 
     // method witout modifier and with comment
-    int method(int i){
+    int method2(int i){
         /* another block comment in method body
          */
     	ClassWithComments obj;
@@ -44,20 +47,20 @@ public class ClassWithComments {
     /**
      * method witout modifier and with javadoc
      */
-    int method(int i, int j){
+    int method3(int i, int j){
     }
 
-    public int method(){
+    public int method4(){
     }
 
     // a method with modifier and normal comment
-    public int method(double a){
+    public int method5(double a){
     }
 
     /**
      * a method with modifier and javadoc comment
      */
-    public int method(double a, double b){
+    public int method6(double a, double b){
     }
 
     /**

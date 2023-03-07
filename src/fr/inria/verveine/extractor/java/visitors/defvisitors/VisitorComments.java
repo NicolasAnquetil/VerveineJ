@@ -9,6 +9,7 @@ import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -24,9 +25,11 @@ import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor
 
 /**
  * A class to collect all comments.
- * Some important details on comment in JDT:
+ * Some important details on comments in JDT:
  * <ul>
  * <li>only JavaDoc comment are associated to any entity node in the AST (the entity immediately after the javadoc)</li>
+ * <li>The <code>startPosition</code> of a node with a JavaDoc is actually the <code>startPosition</code> of the JavaDoc
+ *   (ie. the JavaDoc is considered to be part of the entity declaration)</li> 
  * <li>line and block comment are recorded in a list, but we have to decide to what entity they will be associated.
  *   We put them in the method containing them or in the method or attribute immediately after them if they are outside a method</li>
  * <li>content (text) of block or line comments is not stored, only their position and length.
@@ -100,7 +103,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	public boolean visit(TypeDeclaration node) {
 		TWithComments fmx = (TWithComments) visitTypeDeclaration(node);
 
-		assignCommentsBefore(node, fmx);
+		assignCommentsBefore(node, node.getJavadoc(), fmx);
 		classMemberDeclarations = true;
 
 		return super.visit(node);
@@ -134,7 +137,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	public boolean visit(EnumDeclaration node) {
 		TWithComments fmx = visitEnumDeclaration( node);
 
-		assignCommentsBefore(node, fmx);
+		assignCommentsBefore(node, node.getJavadoc(), fmx);
 		classMemberDeclarations = true;
 
 		return super.visit(node);
@@ -150,7 +153,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	public boolean visit(AnnotationTypeDeclaration node) {
 		TWithComments fmx = visitAnnotationTypeDeclaration( node);
 
-		assignCommentsBefore(node, fmx);
+		assignCommentsBefore(node, node.getJavadoc(), fmx);
 		classMemberDeclarations = true;
 
 		return super.visit(node);
@@ -166,7 +169,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	public boolean visit(MethodDeclaration node) {
 		Method fmx = visitMethodDeclaration( node);
 
-		assignCommentsBefore(node, fmx);
+		assignCommentsBefore(node, node.getJavadoc(), fmx);
 		classMemberDeclarations = false;
 		methodStartPosition = node.getStartPosition();
 
@@ -175,7 +178,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 
 	@Override
 	public void endVisit(MethodDeclaration node) {
-		assignCommentsInside(node, (TWithComments) context.popMethod());
+		assignCommentsInside(node, (TWithComments) context.topMethod());
 		classMemberDeclarations = true;
 		endVisitMethodDeclaration(node);
 	}
@@ -183,14 +186,9 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	public boolean visit(AnnotationTypeMemberDeclaration node) {
 		AnnotationTypeAttribute fmx = visitAnnotationTypeMemberDeclaration( node);
 
-		assignCommentsBefore(node, fmx);
+		assignCommentsBefore(node, node.getJavadoc(), fmx);
 
 		return super.visit(node);
-	}
-
-	public void endVisit(AnnotationTypeMemberDeclaration node) {
-		this.context.popAnnotationMember();
-		super.endVisit(node);
 	}
 
 	@Override
@@ -200,7 +198,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 			if ( ! ((TSourceEntity) fmx).getIsStub() ) {
 				// if it is a stub, it might have been created by the getFamixAttribute just above
 				// Anyway we cannot have a comment on a stub
-				assignCommentsBefore(node, fmx);
+				assignCommentsBefore(node, /*optionalJavadoc*/null, fmx);
 			}
 		}
 
@@ -218,20 +216,17 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 
 	/**
 	 * Assigns all "pending" comments to the Famix entity.<br>
-	 * Pending comments are those not treated that appear before the <code>node</code> associated with the Famix entity 
+	 * Pending comments are those not treated that appear before the <code>node</code> associated with the Famix entity.<br>
+	 * <code>optionalJavadoc</code> is an optional Javadoc comment (!) that could be associated to the <code>node</code>.
+	 * If this is the case, the real <code>startPosition</code> of the <code>node</code> must be incremented of the length of the javadoc
+	 * because this one is considered part of the <code>node</code>.
 	 */
-	protected void assignCommentsBefore(ASTNode node, TWithComments fmx) {
-		if (fmx == null) {
-			return;
+	protected void assignCommentsBefore(ASTNode node, Javadoc optionalJavadoc, TWithComments fmx) {
+		int start = node.getStartPosition();
+		if (optionalJavadoc != null) {
+			start += optionalJavadoc.getLength();
 		}
-
-		Comment cmt = allComments.get(nextComment);
-
-		while ( commentIsBefore(cmt, node)) {
-			dico.createFamixComment(cmt, fmx, options.commentsAsText());
-			nextComment++;
-			cmt = allComments.get(nextComment);
-		}		
+		assignCommentsInInterval( 0, start, fmx);
 	}
 
 	/**
@@ -245,27 +240,34 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	 * Assigns to the Famix entity all "pending" comments that appear within the interval [start ; stop] 
 	 */
 	protected void assignCommentsInInterval(int start, int end, TWithComments fmx) {
+		boolean searchComment = true;
+
 		if (fmx == null) {
 			return;
 		}
 
-		Comment cmt = allComments.get(nextComment);
-
-		while ( commentIsInside(cmt, start, end)) {
-			dico.createFamixComment(cmt, fmx, options.commentsAsText());
-			nextComment++;
-			cmt = allComments.get(nextComment);
+		while ( searchComment && pendingComments() ) {
+			Comment cmt = allComments.get(nextComment);
+			if (commentIsInside(cmt, start, end)) {
+				dico.createFamixComment(cmt, fmx, options.commentsAsText());
+				nextComment++;
+			}
+			else {
+				searchComment = false;
+			}
 		}		
-
 	}
 
 	/**
-	 * whether <code>cmt</code> appears before <code>node</code> or not 
+	 * Whether there is still some "pending" comments
 	 */
-	protected boolean commentIsBefore(Comment cmt, ASTNode node) {
-		return node.getStartPosition() >= (cmt.getStartPosition() + cmt.getLength());
+	protected boolean pendingComments() {
+		return nextComment < allComments.size();
 	}
-	
+
+	/**
+	 * whether <code>cmt</code> appears inside interval [ start ; end ] 
+	 */
 	protected boolean commentIsInside(Comment cmt, int start, int end) {
 		return (start <= cmt.getStartPosition()) && (end >= cmt.getStartPosition() + cmt.getLength());
 	}
