@@ -114,10 +114,15 @@ public class VerveineJOptions {
 	 */
 	protected boolean debugging;
 
+	/**
+	 * Text of comments exported in the model instead of using source anchor
+	 */
+	protected boolean commentText;
+
 	public VerveineJOptions() {
 		this.allLocals = false;
 		this.codeVers = null;
-		this.anchors = null;
+		this.commentText = false;
 		this.incrementalParsing = false;
 		this.outputFileName = null;
 		this.outputFormat = MSE_OUTPUT_FORMAT;
@@ -186,6 +191,8 @@ public class VerveineJOptions {
 		} else if (arg.equals("-anchor")) {
 			setOptionAnchor(args, i);
 			argumentsTreated++;
+		} else if (arg.equals("-commenttext")) {
+			commentText = true;//
 		} else if (arg.equals("-format")) {
 			setOptionFormat(args, i);
 			argumentsTreated++;
@@ -215,6 +222,9 @@ public class VerveineJOptions {
 		return argumentsTreated;
 	}
 
+	/**
+	 * Computes the path of all included jars 
+	 */
 	protected String[] setOptionClassPath( String[] classPath, String[] args, int i) throws IllegalArgumentException {
 		if (args[i].equals("-autocp")) {
 			if (i < args.length) {
@@ -313,16 +323,6 @@ public class VerveineJOptions {
 	}
 
 	protected void usage() {
-		/* possible enhancements:
-		 * (1) allow to not generate some info
-		 * -nodep = do not create dependencies (access, reference, invocation)
-		 * -novar (or -noleaf) = do not create "variables", including attributes. Implies not creating accesses
-		 * -nobehavior = do not create methods. Implies not creating invocations
-		 * (2) allow to summarize some info
-		 * -classdep = generate dependencies between classes not between their members. Implies not creating accesses, reference, invocation but instead
-		 *   some new relation: classdep
-		 */
-
 		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-prettyPrint] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
 		System.err.println("      [-i] toggles incremental parsing on (can parse a project in parts that are added to the output file)");
@@ -337,6 +337,7 @@ public class VerveineJOptions {
 				"                                     - no entity\n" +
 				"                                     - only named entities [default]\n" +
 				"                                     - named entities+associations (i.e. accesses, invocations, references)");
+		System.err.println("      [-commenttext] comments text in the model instead of as a source anchor");
 		System.err.println("      [-cp CLASSPATH] classpath where to look for stubs");
 		System.err.println("      [-autocp DIR] gather all jars in DIR and put them in the classpath");
 		System.err.println("      [-filecp FILE] gather all jars listed in FILE (absolute paths) and put them in the classpath");
@@ -544,6 +545,10 @@ public class VerveineJOptions {
 
 	public boolean withDebug() {
 		return debugging;
+	}
+
+	public boolean commentsAsText() {
+		return commentText;
 	}
 
 }

@@ -70,7 +70,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 			context.setLastReference(ref);
 
 			if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {
-				dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+				dico.addSourceAnchor(ref, node);
 			}
 		}
 		return super.visit(node);
@@ -201,7 +201,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 		ref = dico.addFamixReference((Method) context.top(), fmx, context.getLastReference());
 		context.setLastReference(ref);
 		if (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) {
-			dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+			dico.addSourceAnchor(ref, node);
         }
 
 		return super.visit(node);
@@ -215,7 +215,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-		visitFieldDeclaration(node);  // to recover optional EntityDictionary.INIT_BLOCK_NAME method
+		hasInitBlock(node);  // to recover optional EntityDictionary.INIT_BLOCK_NAME method
 		visitVariableDeclaration((List<VariableDeclaration>)node.fragments(), node.getType());   // to create the TypeRefs
 		return true;
 	}
@@ -286,7 +286,7 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 				Reference ref = dico.addFamixReference((Method) context.top(), referred, context.getLastReference());
 				context.setLastReference(ref);
 				if ((options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (ref != null) ) {
-					dico.addSourceAnchor(ref, node, /*oneLineAnchor*/true);
+					dico.addSourceAnchor(ref, node);
 				}
 			}
 		}

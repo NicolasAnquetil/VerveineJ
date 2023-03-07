@@ -146,7 +146,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			this.context.pushType(fmx);
 
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 
 			for (TypeParameter tp : tparams) {
@@ -215,7 +215,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			Util.recursivelySetIsStub(fmx, false);
 
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 			this.context.pushType(fmx);
 			return super.visit(node);
@@ -244,7 +244,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 
 			this.context.pushType(fmx);
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 			return super.visit(node);
 		} else {
@@ -265,7 +265,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 		if (fmx != null) {
 			Util.recursivelySetIsStub(fmx, false);
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 
 			context.pushType(fmx);
@@ -324,7 +324,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			}
 
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 
 			if (node.getBody() != null) {
@@ -373,7 +373,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 		if (fmx != null) {
             dico.setMethodModifiers(fmx, node.getModifiers());
             if (options.withAnchors()) {
-            	dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+            	dico.addSourceAnchor(fmx, node);
 			}
 
 			if (node.getBody() != null) {
@@ -438,7 +438,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 		if (fmx != null) {
 			fmx.setIsStub(false);
 			if (options.withAnchors()) {
-				dico.addSourceAnchor(fmx, node, /*oneLineAnchor*/false);
+				dico.addSourceAnchor(fmx, node);
 			}
 
 			context.pushAnnotationMember(fmx);

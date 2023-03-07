@@ -859,8 +859,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 			if (tmpAnc.getStartPos().intValue() > 5) { // i.e. not the one at the beginning of the file
 				anc = tmpAnc;
 				if (isWindows()) {
-					assertEquals(69, tmpAnc.getStartPos());
-					assertEquals(129, tmpAnc.getEndPos());
+					assertEquals(64+5, tmpAnc.getStartPos());
+					assertEquals(120+9, tmpAnc.getEndPos());
 				} else {
 					assertEquals(64, tmpAnc.getStartPos());
 					assertEquals(120, tmpAnc.getEndPos());
@@ -869,17 +869,23 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		}
 		assertNotNull(anc);
 
-		Method meth = detectFamixElement(Method.class, "equalsSingle");
+		Method meth = null;
+		for (TMethod m : clazz.getMethods()) {
+			if (m.getName().equals("isDestinationFor")) {
+				meth = (Method) m;
+				break;
+			}
+		}
 		assertNotNull(meth);
 		cmts = meth.getComments();
 		assertEquals(1, cmts.size());
 		anc = (SourceAnchor) ((Comment) firstElt(cmts)).getSourceAnchor();
 		if (isWindows()) {
-			assertEquals(563, ((IndexedFileAnchor) anc).getStartPos());
-			assertEquals(621, ((IndexedFileAnchor) anc).getEndPos());
+			assertEquals(316+23, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(437+25, ((IndexedFileAnchor) anc).getEndPos());
 		} else {
-			assertEquals(533, ((IndexedFileAnchor) anc).getStartPos());
-			assertEquals(588, ((IndexedFileAnchor) anc).getEndPos());
+			assertEquals(316, ((IndexedFileAnchor) anc).getStartPos());
+			assertEquals(437, ((IndexedFileAnchor) anc).getEndPos());
 		}
 
 		// testing the non javadoc comments (those that are treated)
@@ -891,7 +897,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(1, cmts.size());
 		anc = (SourceAnchor) ((Comment) firstElt(cmts)).getSourceAnchor();
 		if (isWindows()) {
-			assertEquals(176, ((IndexedFileAnchor) anc).getStartPos().intValue());
+			assertEquals(164+8, ((IndexedFileAnchor) anc).getStartPos().intValue());
 		} else {
 			assertEquals(164, ((IndexedFileAnchor) anc).getStartPos().intValue());
 		}

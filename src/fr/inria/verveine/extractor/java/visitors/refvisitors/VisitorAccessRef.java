@@ -210,7 +210,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
-	    if (visitFieldDeclaration(node)) {   // true if hasInitializer + recovers EntityDictionary.INIT_BLOCK_NAME method
+	    if (hasInitBlock(node)) {   // true if hasInitializer + recovers EntityDictionary.INIT_BLOCK_NAME method
             visitNodeList(node.fragments());
         }
         return false;
@@ -244,7 +244,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 				// check that lastAccess corresponds to current one
 				&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
 				&& ((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getName().getIdentifier())) {
-			dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
+			dico.addSourceAnchor(lastAccess, node);
 		}
 		return false;
 	}
@@ -264,7 +264,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 					// check that lastAccess corresponds to current one
 					&& (lastAccess != null) && (lastAccess.getAccessor() == accessor)
 					&& (((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getName().getIdentifier()))) {
-				dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
+				dico.addSourceAnchor(lastAccess, node);
 			}
 		}
 		return false;
@@ -409,7 +409,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 
 			TAccess lastAccess = context.getLastAccess();
 			if ( (options.withAnchors(VerveineJOptions.AnchorOptions.assoc)) && (lastAccess != null) ) {
-				dico.addSourceAnchor(lastAccess, node.getParent(), /*oneLineAnchor*/true);
+				dico.addSourceAnchor(lastAccess, node.getParent());
 			}
 		}
 
@@ -446,7 +446,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
                     // check that lastAccess corresponds to current one
                     && (lastAccess != null) && (lastAccess.getAccessor() == accessor)
                     && (((TNamedEntity) lastAccess.getVariable()).getName().equals(node.getIdentifier()))) {
-                dico.addSourceAnchor(lastAccess, node, /*oneLineAnchor*/true);
+                dico.addSourceAnchor(lastAccess, node);
             }
         }
 		return false;

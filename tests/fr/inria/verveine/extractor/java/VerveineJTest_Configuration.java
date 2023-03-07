@@ -109,36 +109,85 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 		assertEquals(3, entitiesOfType(LocalVariable.class).size());  // nom, num, e
 		assertEquals(8, entitiesOfType(Access.class).size()); // getNum() -> num, setNum() -> num, getNom() -> nom, setNom() -> nom + 4 "this"
 	}
-
+	
 	@Test
 	public void testAlllocals() {
 		// works in team with testNotAlllocals
 		parse(new String[]{"-alllocals", "test_src/exceptions/ReadClient.java", "test_src/exceptions/ReadException.java"}); // note: ReadException.java needed to resolve lire() method
-
+		
 		assertEquals(5, entitiesOfType( LocalVariable.class).size());      // lire().nom ; lire().num ; lire().e ; lire().c ; lire().i
-        int accessReadClient = 0;
-        int accessLire = 0;
-        int accessSetNum = 0;
-        int accessGetNum = 0;
-        int accessSetNom = 0;
-        int accessGetNom = 0;
-        for (Access acc : entitiesOfType( Access.class)) {
-            switch (((TNamedEntity)acc.getAccessor()).getName()) {
-                case "ReadClient": accessReadClient++; break;
-                case "lire": accessLire++; break;
-                case "getNum": accessGetNum++; break;
-                case "setNum": accessSetNum++; break;
-                case "getNom": accessGetNom++; break;
-                case "setNom": accessSetNom++; break;
-                default: fail("Unknown accessor name: " + ((TNamedEntity)acc.getAccessor()).getName()); break;
-            }
-        }
-        assertEquals(4, accessReadClient);
-        assertEquals(20, accessLire);
-        assertEquals(1, accessGetNum);
-        assertEquals(3, accessSetNum);
-        assertEquals(1, accessGetNom);
-        assertEquals(3, accessSetNom);
+		int accessReadClient = 0;
+		int accessLire = 0;
+		int accessSetNum = 0;
+		int accessGetNum = 0;
+		int accessSetNom = 0;
+		int accessGetNom = 0;
+		for (Access acc : entitiesOfType( Access.class)) {
+			switch (((TNamedEntity)acc.getAccessor()).getName()) {
+			case "ReadClient": accessReadClient++; break;
+			case "lire": accessLire++; break;
+			case "getNum": accessGetNum++; break;
+			case "setNum": accessSetNum++; break;
+			case "getNom": accessGetNom++; break;
+			case "setNom": accessSetNom++; break;
+			default: fail("Unknown accessor name: " + ((TNamedEntity)acc.getAccessor()).getName()); break;
+			}
+		}
+		assertEquals(4, accessReadClient);
+		assertEquals(20, accessLire);
+		assertEquals(1, accessGetNum);
+		assertEquals(3, accessSetNum);
+		assertEquals(1, accessGetNom);
+		assertEquals(3, accessSetNom);
+	}
+
+	@Test
+	public void testCommentsText() {
+		parse(new String[]{"-commenttext", "test_src/comments"});
+
+		assertEquals(14, entitiesOfType(Comment.class).size());
+		for (Comment cmt : entitiesOfType(Comment.class)) {
+			assertNull(cmt.getSourceAnchor());
+			assertNotNull( cmt.getContent());
+			assertTrue( cmt.getContent().length() > 20); // none of the comments have less than 20 characters
+			assertEquals('/', cmt.getContent().charAt(0));
+		}
+
+		Class clazz = detectFamixElement(Class.class, "ClassWithComments");
+		assertNotNull(clazz);
+		assertEquals(1, clazz.getComments().size());
+
+		int numberTested = 0;
+		for (Attribute att : entitiesOfType(Attribute.class)) {
+			assertEquals(1, att.getComments().size());
+			numberTested++;
+		}
+		assertEquals(2, numberTested);  // check that all attributes were actually found and tested
+
+		assertEquals(10, entitiesOfType(Method.class).size());
+		for (Method meth : entitiesOfType(Method.class)) {
+			if (meth.getSignature().equals("ClassWithComments(int i, int j)")) {
+				numberTested++;
+				assertEquals(2, meth.getComments().size());
+			}
+			else if (meth.getName().equals("method2")) {
+				numberTested++;
+				assertEquals(2, meth.getComments().size());
+			}
+			else if (meth.getName().equals("method3")) {
+				numberTested++;
+				assertEquals(1, meth.getComments().size());
+			}
+			else if (meth.getName().equals("method4")) {
+				numberTested++;
+				assertEquals(0, meth.getComments().size());
+			}
+			else if (meth.getName().equals("methodWithoutBody")) {
+				numberTested++;
+				assertEquals(1, meth.getComments().size());
+			}
+		}
+		assertEquals(6, numberTested);  // check that all expected methods were actually found and tested
 	}
 
 	@Test
