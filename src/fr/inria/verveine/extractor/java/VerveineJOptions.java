@@ -4,6 +4,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.ASTParser;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.regex.Pattern;
 
@@ -37,6 +38,11 @@ public class VerveineJOptions {
 	 * By default, the extension is provided by the output format
 	 */
 	public final static String OUTPUT_FILE = "output";
+
+	/**
+	 * Default encodings of the java files to read
+	 */
+	private static final String DEFAULT_FILE_ENCODING = "UTF-8";
 
 	/**
 	 * Option for MSE output format
@@ -84,6 +90,11 @@ public class VerveineJOptions {
 	 * collection of matchers of file name to process excluding expr (see
 	 */
 	protected Collection<Pattern> excludeMatchers;
+
+	/**
+	 * File encoding to use to read java files
+	 */
+	protected String fileEncoding = DEFAULT_FILE_ENCODING;
 
 	/**
 	 * Name of the file where to put the MSE model.
@@ -142,6 +153,7 @@ public class VerveineJOptions {
 			} catch (IllegalArgumentException e) {
 				System.err.println(e.getMessage());
 				usage();
+				throw e;
 			}
 		}
 
@@ -178,6 +190,7 @@ public class VerveineJOptions {
 	
 		if (arg.equals("-h")) {
 			usage();
+			System.exit(0);
 		}
 		else if (arg.matches("-1\\.[1-7]") || arg.matches("-[1-7]")) {
 			setCodeVersion(arg);
@@ -187,6 +200,9 @@ public class VerveineJOptions {
 			prettyPrint = true;
 		} else if ((arg.charAt(0) == '-') && (arg.endsWith("cp"))) {
 			classPathOptions = setOptionClassPath(classPathOptions, args, i);
+			argumentsTreated++;
+		} else if (arg.equals("-encoding")) {
+			setOptionEncoding(args, i);
 			argumentsTreated++;
 		} else if (arg.equals("-anchor")) {
 			setOptionAnchor(args, i);
@@ -227,21 +243,21 @@ public class VerveineJOptions {
 	 */
 	protected String[] setOptionClassPath( String[] classPath, String[] args, int i) throws IllegalArgumentException {
 		if (args[i].equals("-autocp")) {
-			if (i < args.length) {
+			if (i+1 < args.length) {
 				return addToClassPath(classPath, collectAllJars(args[i+1]) );
 			} else {
 				throw new IllegalArgumentException("-autocp requires a root folder");
 			}
 		}
 		else if (args[i].equals("-filecp")) {
-			if (i < args.length) {
+			if (i+1 < args.length) {
 				return addToClassPath(classPath, readAllJars(args[i+1]));
 			} else {
 				throw new IllegalArgumentException("-filecp requires a filename");
 			}
 		}
 		else if (args[i].equals("-cp")) {
-			if (i < args.length) {
+			if (i+1 < args.length) {
 				return addToClassPath(classPath,  Arrays.asList(args[i+1].split(System.getProperty("path.separator"))));
 			}
 			else {
@@ -249,6 +265,40 @@ public class VerveineJOptions {
 			}	
 		}
 		return classPath;
+	}
+
+	protected void setOptionEncoding(String[] args, int i) {
+		if (i+1 < args.length) {
+			this.fileEncoding = args[i + 1].trim();
+			if (Charset.availableCharsets().get(this.fileEncoding) == null) {
+				throw new IllegalArgumentException("Unknown file encoding: -encoding " + this.fileEncoding);
+			}
+		} else {
+			throw new IllegalArgumentException("-encoding requires an encoding name (eg. " + DEFAULT_FILE_ENCODING + ")");
+		}
+	}
+
+	protected void setOptionAnchor(String[] args, int i) {
+		if (i+1 < args.length) {
+			String anchor = args[i + 1].trim();
+			anchors = VerveineJOptions.AnchorOptions.getValue(anchor);
+			if (anchors == null) {
+				throw new IllegalArgumentException("unknown option to -anchor: " + anchor);
+			}
+		} else {
+			throw new IllegalArgumentException("-anchor requires an option (none|default|assoc)");
+		}
+	}
+
+	protected void setOptionFormat(String[] args, int i) {
+		if (i+1 < args.length) {
+			this.outputFormat = args[i + 1].trim();
+			if ((! this.outputFormat.equalsIgnoreCase(MSE_OUTPUT_FORMAT)) && (! this.outputFormat.equalsIgnoreCase(JSON_OUTPUT_FORMAT))) {
+				throw new IllegalArgumentException("unknown option to -format: " + outputFormat);
+			}
+		} else {
+			throw new IllegalArgumentException("-format requires an option (mse|json)");
+		}
 	}
 
 	protected List<String> collectAllJars(String sDir) {
@@ -299,29 +349,6 @@ public class VerveineJOptions {
 		return tmpPath;
 	}
 
-	protected void setOptionAnchor(String[] args, int i) {
-		if (i < args.length) {
-			String anchor = args[i + 1].trim();
-			anchors = VerveineJOptions.AnchorOptions.getValue(anchor);
-			if (anchors == null) {
-				throw new IllegalArgumentException("unknown option to -anchor: " + anchor);
-			}
-		} else {
-			throw new IllegalArgumentException("-anchor requires an option (none|default|assoc)");
-		}
-	}
-
-	protected void setOptionFormat(String[] args, int i) {
-		if (i < args.length) {
-			outputFormat = args[i + 1].trim();
-			if ((!outputFormat.equalsIgnoreCase(MSE_OUTPUT_FORMAT)) && (!outputFormat.equalsIgnoreCase(JSON_OUTPUT_FORMAT))) {
-				throw new IllegalArgumentException("unknown option to -format: " + outputFormat);
-			}
-		} else {
-			throw new IllegalArgumentException("-format requires an option (mse|json)");
-		}
-	}
-
 	protected void usage() {
 		System.err.println("Usage: VerveineJ [-h] [-i] [-o <output-file-name>] [-prettyPrint] [-summary] [-alllocals] [-anchor (none|default|assoc)] [-cp CLASSPATH | -autocp DIR] [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] <files-to-parse> | <dirs-to-parse>");
 		System.err.println("      [-h] prints this message");
@@ -333,6 +360,7 @@ public class VerveineJOptions {
 		System.err.println("                 Summarizing at the level of classes does not produce Methods, Attributes, Accesses, and Invocations");
 		System.err.println("                 Everything is represented as references between classes: e.g. \"A.m1() invokes B.m2()\" is uplifted to \"A references B\"");
 		System.err.println("      [-alllocals] Forces outputing all local variables, even those with primitive type (incompatible with \"-summary\")");
+		System.err.println("      [-encoding <file-encoding-name>] File encoding to use for reading the source code default: " + DEFAULT_FILE_ENCODING);
 		System.err.println("      [-anchor (none|entity|default|assoc)] options for source anchor information:\n" +
 				"                                     - no entity\n" +
 				"                                     - only named entities [default]\n" +
@@ -344,14 +372,13 @@ public class VerveineJOptions {
 		System.err.println("      [-excludepath GLOBBINGEXPR] A globbing expression of file path to exclude from parsing");
 		System.err.println("      [-1.1 | -1 | -1.2 | -2 | ... | -1.7 | -7] specifies version of Java");
 		System.err.println("      <files-to-parse>|<dirs-to-parse> list of source files to parse or directories to search for source files");
-		System.exit(0);
-	
 	}
 
 	protected void setCodeVersion(String arg) {
 		if (codeVers != null) {
 			System.err.println("Trying to set twice code versions: " + codeVers + " and " + arg);
 			usage();
+			throw new IllegalArgumentException();
 		} else if (arg.equals("-1.1") || arg.equals("-1")) {
 			codeVers = JavaCore.VERSION_1_1;
 		} else if (arg.equals("-1.2") || arg.equals("-2")) {
@@ -549,6 +576,10 @@ public class VerveineJOptions {
 
 	public boolean commentsAsText() {
 		return commentText;
+	}
+
+	public String getFileEncoding() {
+		return fileEncoding;
 	}
 
 }

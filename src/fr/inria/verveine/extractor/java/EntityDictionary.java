@@ -77,7 +77,6 @@ import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 import ch.akuhn.fame.Repository;
-import fr.inria.verveine.extractor.java.utils.FileContentExtractor;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 
@@ -2666,30 +2665,38 @@ public class EntityDictionary {
 	}
 
 	/**
-	 * Creates and returns a FAMIX Comment and associates it with an Entity (ex: for Javadocs)
+	 * Creates and returns a Famix Comment and associates it with an Entity (ex: for Javadocs)
 	 * @param jCmt -- the content (String) of the comment 
 	 * @param owner -- the entity that is commented
-	 * @param commentText -- whether to export the source anchor of the comment (position in file) or its content (string)
-	 * @return the FAMIX Comment
+	 * @return the Famix Comment
 	 */
-	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner, boolean commentText) {
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner) {
 		Comment cmt = null;
 
 		if ( (jCmt != null) && (owner != null) ) {
 			
 			cmt = new Comment();
-			if (commentText) {
-				IndexedFileAnchor position = createIndexedFileAnchor(jCmt);
-				if (position != null) {
-					cmt.setContent(
-							FileContentExtractor.getFileContent(position.getFileName(),
-							(int)position.getStartPos(),
-							(int)position.getEndPos()) );
-				}
-			}
-			else {
-				addSourceAnchor(cmt, jCmt);
-			}
+			addSourceAnchor(cmt, jCmt);
+			famixRepoAdd(cmt);
+			cmt.setCommentedEntity(owner);
+		}
+
+		return cmt;
+	}
+
+	/**
+	 * Creates and returns a Famix Comment and associates it with an Entity
+	 * @param jCmt -- the content (String) of the comment 
+	 * @param owner -- the entity that is commented
+	 * @param content -- the text of the comment
+	 * @return the Famix Comment
+	 */
+	public Comment createFamixComment(org.eclipse.jdt.core.dom.Comment jCmt, TWithComments owner, String content) {
+		Comment cmt = null;
+
+		if ( (jCmt != null) && (owner != null) ) {
+			cmt = new Comment();
+			cmt.setContent(content );
 			famixRepoAdd(cmt);
 			cmt.setCommentedEntity(owner);
 		}
