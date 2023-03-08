@@ -1,5 +1,12 @@
 package fr.inria.verveine.extractor.java.visitors.defvisitors;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import org.eclipse.jdt.core.dom.ASTNode;
@@ -74,6 +81,11 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	 */
 	private int methodStartPosition;
 
+	protected String currentFilename = null;
+	protected BufferedReader openedFile = null;
+	protected int lastPositionRead = 0;
+
+
 	public VisitorComments(EntityDictionary dico, VerveineJOptions options) {
 		super(dico, options);
 		classMemberDeclarations = false;
@@ -83,7 +95,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 
 	@Override
 	public boolean visit(CompilationUnit node) {
-		allComments = node.getCommentList();
+		initializeCommentsReader(node);
 		if (allComments.size() == 0) {
 			// no comment, not visiting
 			return false;
@@ -97,6 +109,7 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	@Override
 	public void endVisit(CompilationUnit node) {
 		endVisitCompilationUnit(node);
+		closeFile();
 	}
 
 	@Override
@@ -249,13 +262,23 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 		while ( searchComment && pendingComments() ) {
 			Comment cmt = allComments.get(nextComment);
 			if (commentIsInside(cmt, start, end)) {
-				dico.createFamixComment(cmt, fmx, options.commentsAsText());
+				commentCreation( cmt, fmx);
 				nextComment++;
 			}
 			else {
 				searchComment = false;
 			}
 		}		
+	}
+
+	private void commentCreation(Comment cmt, TWithComments fmx) {
+		if (options.commentsAsText()) {
+			
+			dico.createFamixComment(cmt, fmx, getFileContent(cmt.getStartPosition(), cmt.getLength()));
+		}
+		else {
+			dico.createFamixComment(cmt, fmx);
+		}
 	}
 
 	/**
@@ -270,6 +293,59 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 	 */
 	protected boolean commentIsInside(Comment cmt, int start, int end) {
 		return (start <= cmt.getStartPosition()) && (end >= cmt.getStartPosition() + cmt.getLength());
+	}
+
+	protected void initializeCommentsReader(CompilationUnit node) {
+		allComments = node.getCommentList();
+
+		currentFilename = (String) ((CompilationUnit)node).getProperty(EntityDictionary.SOURCE_FILENAME_PROPERTY);
+		try {
+			InputStream is = new FileInputStream(currentFilename);
+			this.openedFile = new BufferedReader(new InputStreamReader(is, options.getFileEncoding()));
+
+			this.lastPositionRead = 0;
+		} catch (FileNotFoundException|UnsupportedEncodingException e) {
+			System.err.println("Not able to read comments from "+currentFilename);
+		}
+
+	}
+
+	protected String getFileContent( int start, int lenghtToRead) {
+		char buffer[];
+		
+		if(openedFile == null) {
+			return "";
+		}
+
+		buffer = new char[lenghtToRead];
+		try {
+			
+			openedFile.skip(start - lastPositionRead);
+			int ret = openedFile.read( buffer, /*offset in buffer*/0, lenghtToRead);
+
+			if (ret < lenghtToRead) {
+				System.err.println("missing bytes in "+ currentFilename + ", read " + ret + " instead of " + lenghtToRead);
+				return "";
+			}
+			lastPositionRead = start + ret;
+
+			return new String(buffer);
+			
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "";
+	}
+
+	protected void closeFile() {
+		if (openedFile != null) {
+			try {
+				openedFile.close();
+			} catch (IOException e) {
+				// nothing
+			}
+			openedFile= null;
+		}
 	}
 
 }

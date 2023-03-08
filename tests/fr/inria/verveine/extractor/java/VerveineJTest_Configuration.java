@@ -1,6 +1,7 @@
 package fr.inria.verveine.extractor.java;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.*;
 import org.moosetechnology.model.famix.famixjavaentities.Class;
@@ -142,6 +143,21 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	}
 
 	@Test
+	public void testEncodingUTF8() {
+		parser.configure(new String[]{"-encoding", "UTF-8", "test_src/comments"});
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testEncodingMissing() {
+		parser.configure(new String[]{"-encoding"});
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testEncodingWrong() {
+		parser.configure(new String[]{"-encoding", "BLAH", "test_src/comments"});
+	}
+
+	@Test
 	public void testCommentsText() {
 		parse(new String[]{"-commenttext", "test_src/comments"});
 
@@ -188,6 +204,19 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 			}
 		}
 		assertEquals(6, numberTested);  // check that all expected methods were actually found and tested
+	}
+
+	@Test
+	public void testCommentsAnchor() {
+		parse(new String[]{"test_src/comments"});
+
+		assertEquals(14, entitiesOfType(Comment.class).size());
+		for (Comment cmt : entitiesOfType(Comment.class)) {
+			assertNotNull(cmt.getSourceAnchor());
+			assertNull( cmt.getContent());
+			int len = (int)((IndexedFileAnchor)cmt.getSourceAnchor()).getEndPos() - (int)((IndexedFileAnchor)cmt.getSourceAnchor()).getStartPos();
+			assertTrue( len >= 20); // none of the comments have less than 20 characters
+		}
 	}
 
 	@Test
