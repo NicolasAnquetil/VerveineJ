@@ -7,6 +7,7 @@ import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -77,6 +78,7 @@ import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 import ch.akuhn.fame.Repository;
+import ch.akuhn.foreach.Collect;
 import fr.inria.verveine.extractor.java.utils.ImplicitVarBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 
@@ -1281,7 +1283,8 @@ public class EntityDictionary {
 			tmp.setSourceAnchor(excepFmx.getSourceAnchor());
 			tmp.addAnnotationInstances(((NamedEntity) excepFmx).getAnnotationInstances());
 			// tmp.addComments(excepFmx.getComments());
-			tmp.addIncomingReferences(excepFmx.getIncomingReferences());
+			List<TReference> newList = excepFmx.getIncomingReferences().stream().collect(Collectors.toList());
+			tmp.addIncomingReferences(newList);
 			tmp.setIsStub(excepFmx.getIsStub());
 			tmp.addTypes(((ContainerEntity) excepFmx).getTypes());
 		}
