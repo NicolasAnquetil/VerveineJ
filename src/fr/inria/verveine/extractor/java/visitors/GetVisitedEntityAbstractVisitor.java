@@ -7,6 +7,7 @@ import fr.inria.verveine.extractor.java.utils.StubBinding;
 import fr.inria.verveine.extractor.java.utils.Util;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Exception;
 import org.moosetechnology.model.famix.famixjavaentities.Package;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 import org.moosetechnology.model.famix.famixtraits.TType;
@@ -118,7 +119,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 	}
 
 	protected void endVisitTypeDeclaration(TypeDeclaration node) {
-		if (context.topType() instanceof org.moosetechnology.model.famix.famixjavaentities.Class || context.topType() instanceof Interface) {
+		if (context.topType() instanceof org.moosetechnology.model.famix.famixjavaentities.Class || context.topType() instanceof Interface || context.topType() instanceof Exception) {
 			context.pop();
 		}
 		super.endVisit(node);
