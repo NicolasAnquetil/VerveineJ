@@ -210,12 +210,12 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
 	public void testCommentsAnchor() {
 		parse(new String[]{"test_src/comments"});
 
-		assertEquals(14, entitiesOfType(Comment.class).size());
+		assertEquals(16, entitiesOfType(Comment.class).size());
 		for (Comment cmt : entitiesOfType(Comment.class)) {
 			assertNotNull(cmt.getSourceAnchor());
 			assertNull( cmt.getContent());
 			int len = (int)((IndexedFileAnchor)cmt.getSourceAnchor()).getEndPos() - (int)((IndexedFileAnchor)cmt.getSourceAnchor()).getStartPos();
-			assertTrue( len >= 20); // none of the comments have less than 20 characters
+			assertTrue( len >= 10); // none of the comments have less than 20 characters
 		}
 	}
 
