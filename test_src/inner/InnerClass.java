@@ -20,4 +20,12 @@ public class InnerClass {
         };
     }
 
+    private myMethod() {
+        class AClass {
+            int i;
+            Object j;
+        }
+        AClass test = new AClass();
+    }
+
 }
