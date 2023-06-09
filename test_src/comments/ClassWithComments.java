@@ -16,6 +16,15 @@ public class ClassWithComments {
 	 */
 	private int y;
 
+    static {
+        try {
+            // Url comment
+            final Object url = new Object();
+        } catch (final Exception ex) {
+            // Fichier non trouvé ou incorrect. Il est facultatif donc pas de message.
+        }
+    }
+
 	// simple constructor
 	ClassWithComments(){
     }

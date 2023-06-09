@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.dom.AnonymousClassDeclaration;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.EnumDeclaration;
+import org.eclipse.jdt.core.dom.Initializer;
 import org.eclipse.jdt.core.dom.Javadoc;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -28,8 +29,11 @@ import org.moosetechnology.model.famix.famixtraits.TWithComments;
 
 import fr.inria.verveine.extractor.java.EntityDictionary;
 import fr.inria.verveine.extractor.java.VerveineJOptions;
+import fr.inria.verveine.extractor.java.utils.StructuralEntityKinds;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 
+
+import org.moosetechnology.model.famix.famixjavaentities.LocalVariable;
 /**
  * A class to collect all comments.
  * Some important details on comments in JDT:
@@ -202,6 +206,19 @@ public class VisitorComments extends GetVisitedEntityAbstractVisitor {
 		assignCommentsBefore(node, node.getJavadoc(), fmx);
 
 		return super.visit(node);
+	}
+
+	@Override
+	public boolean visit(Initializer node) {
+		visitInitializer(node);
+		classMemberDeclarations = false;
+		return super.visit(node);
+	}
+
+	@Override
+	public void endVisit(Initializer node) {
+		classMemberDeclarations = true;
+		endVisitInitializer(node);
 	}
 
 	@Override
