@@ -210,6 +210,12 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         }
     }
 
+    @Test
+    public void testIteratorIsParametrizableInterface() {
+        ParameterizableInterface interface1 = detectFamixElement( ParameterizableInterface.class, "Iterator");
+        assertNotNull(interface1);
+    }
+
     	// UTILITIES --------------------------------------------------
 
     private Collection<java.lang.Class<?>> allInterfaces() {

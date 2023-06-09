@@ -860,7 +860,7 @@ public class EntityDictionary {
 		}
 
 		if (bnd.isInterface()) {
-			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/bnd.isParameterizedType() || bnd.isRawType(), modifiers);
+			return this.ensureFamixInterface(bnd, name, owner, /*isGeneric*/bnd.isGenericType() || bnd.isParameterizedType() || bnd.isRawType(), modifiers);
 		}
 
 		if (bnd.isParameterizedType() || bnd.isRawType()) {
