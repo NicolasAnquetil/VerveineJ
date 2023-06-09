@@ -202,6 +202,7 @@ public class VisitorVarsDef extends GetVisitedEntityAbstractVisitor {
 	@SuppressWarnings("unchecked")
 	@Override
 	public boolean visit(FieldDeclaration node) {
+		StructuralEntityKinds saved = structuralType;
 		structuralType = StructuralEntityKinds.ATTRIBUTE;
 
 		// creating the attribute(s)
@@ -216,7 +217,7 @@ public class VisitorVarsDef extends GetVisitedEntityAbstractVisitor {
 				vardecl.getInitializer().accept(this);
 			}
 		}
-
+		structuralType = saved;
 		return false;  // already visited all children
 	}
 
