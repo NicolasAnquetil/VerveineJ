@@ -69,6 +69,7 @@ import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famix.famixtraits.TStructuralEntity;
 import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TWithAccesses;
+import org.moosetechnology.model.famix.famixtraits.TWithAnnotationInstances;
 import org.moosetechnology.model.famix.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famix.famixtraits.TWithComments;
 import org.moosetechnology.model.famix.famixtraits.TWithInheritances;
@@ -400,7 +401,7 @@ public class EntityDictionary {
 		return fmx;
 	}
 
-	public AnnotationInstance addFamixAnnotationInstance(NamedEntity fmx, AnnotationType annType, Collection<AnnotationInstanceAttribute> annAtts) {
+	public AnnotationInstance addFamixAnnotationInstance(TWithAnnotationInstances fmx, AnnotationType annType, Collection<AnnotationInstanceAttribute> annAtts) {
 		AnnotationInstance inst = null;
 		if ( (fmx != null) && (annType != null) ) {
 			inst = new AnnotationInstance();
@@ -1312,7 +1313,7 @@ public class EntityDictionary {
 	/**
 	 * helper method, we know the type exists, ensureFamixInterface will recover it
 	 */
-	public Exception getFamixException(ITypeBinding bnd, String name, ContainerEntity owner) {
+	public Exception getFamixException(ITypeBinding bnd, String name, TWithTypes owner) {
 		return ensureFamixException(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS);
 	}
 

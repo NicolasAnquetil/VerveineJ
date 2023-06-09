@@ -107,7 +107,7 @@ public abstract class GetVisitedEntityAbstractVisitor extends ASTVisitor {
 		if(bnd.isInterface()) {
 			fmx = dico.getFamixInterface(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		} else if (dico.isThrowable(bnd)) {
-			fmx = dico.getFamixException(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
+			fmx = dico.getFamixException(bnd, /*name*/node.getName().getIdentifier(), (TWithTypes) /*owner*/context.top());
 		} else {
 			fmx = dico.getFamixClass(bnd, /*name*/node.getName().getIdentifier(), (ContainerEntity) /*owner*/context.top());
 		}

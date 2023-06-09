@@ -85,4 +85,12 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 
     }
 
+
+    @Test
+    public void testAnnotedExceptionCanExist() {
+        org.moosetechnology.model.famix.famixjavaentities.Exception annotedException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "AnnotedException");
+        assertEquals(annotedException.getAnnotationInstances().size(), 1);
+
+    }
+
 }

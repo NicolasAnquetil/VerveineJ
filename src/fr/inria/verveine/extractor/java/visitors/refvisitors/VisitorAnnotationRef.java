@@ -8,6 +8,7 @@ import org.moosetechnology.model.famix.famixjavaentities.AnnotationInstanceAttri
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationType;
 import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute;
 import org.moosetechnology.model.famix.famixjavaentities.NamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TWithAnnotationInstances;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -134,7 +135,6 @@ public class VisitorAnnotationRef extends GetVisitedEntityAbstractVisitor {
 	 * @param bnd -- IBinding of an entity (possibly null)
 	 */
 	private void createAnnotationInstances(IBinding bnd) {
-		NamedEntity fmx;
 		if (bnd != null) {
 			for (IAnnotationBinding annBnd : bnd.getAnnotations()) {
 				// create type of the annotation
@@ -149,7 +149,7 @@ public class VisitorAnnotationRef extends GetVisitedEntityAbstractVisitor {
 				}
 
 				// add the annotation instance to the Famix entity, may be if fmx==null we should not even create the AnnotationInstanceType ?
-				fmx = (NamedEntity) dico.getEntityByKey(bnd);
+				TWithAnnotationInstances fmx = (TWithAnnotationInstances) dico.getEntityByKey(bnd);
 				if (fmx != null) {
 					dico.addFamixAnnotationInstance(fmx, annType, annAtts);
 				}

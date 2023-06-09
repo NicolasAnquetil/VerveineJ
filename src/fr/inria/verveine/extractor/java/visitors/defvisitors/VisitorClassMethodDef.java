@@ -110,7 +110,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			fmx = dico.ensureFamixInterface(
 				bnd, 
 				/*name*/node.getName().getIdentifier(), 
-				(ContainerEntity) 
+				(TWithTypes) 
 				/*owner*/context.top(), 
 				/*isGeneric*/tparams.size()>0, 
 				node.getModifiers());
@@ -118,7 +118,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			fmx = dico.ensureFamixException(
 				bnd, 
 				/*name*/node.getName().getIdentifier(), 
-				(ContainerEntity) 
+				(TWithTypes) 
 				/*owner*/context.top(), 
 				/*isGeneric*/tparams.size()>0, 
 				node.getModifiers());
