@@ -3,6 +3,7 @@ package fr.inria.verveine.extractor.java;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 
 import static org.junit.Assert.*;
 
@@ -91,6 +92,16 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         org.moosetechnology.model.famix.famixjavaentities.Exception annotedException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "AnnotedException");
         assertEquals(annotedException.getAnnotationInstances().size(), 1);
 
+    }
+
+    @Test
+    public void testExceptionInDefineMethodAfterInnerException() {
+        org.moosetechnology.model.famix.famixjavaentities.Exception anException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "InDefineMethodAfterInnerException");
+        assertNotNull(anException);
+        assertEquals(((TNamedEntity)anException.getTypeContainer()).getName(), "DefineMethodAfterInnerException");
+        // Assert that after the declaration of an exception, we still can create method in a class
+        Method methodAfterException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Method.class, "methodAfterException");
+        assertEquals(((TNamedEntity)methodAfterException.getParentType()).getName(), "DefineMethodAfterInnerException");
     }
 
 }
