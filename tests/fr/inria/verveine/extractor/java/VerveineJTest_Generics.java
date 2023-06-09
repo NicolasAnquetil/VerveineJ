@@ -30,12 +30,13 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 	 * Array of all the java classes that are directly used in the Generics "project"
 	 */
 	protected static final java.lang.Class<?> [] JAVA_CLASSES_USED =
-			new java.lang.Class<?> [] { 
+		new java.lang.Class<?> [] { 
 		java.lang.String.class,
 		java.util.Hashtable.class,
 		java.util.ArrayList.class,
 		java.lang.Class.class,
 		java.lang.System.class,
+        java.util.HashMap.class
 	};
 
 	/**
@@ -46,6 +47,8 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 		java.util.Map.class,
 		java.util.List.class,
 		java.util.Collection.class,
+        java.util.HashMap.class,
+        java.util.AbstractMap.class
 	};
 
 		
@@ -153,8 +156,11 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 		- java.util.Dictionary<> Hashtable
         - AbstractList<> ArrayList
         - java.util.AbstractCollection<> java.util.AbstractList
+        ** IN OnlyReferenceToGeneric : 2
+        - HashMap
+        - AbstractMap
         */     
-        assertEquals(18, ptypes.size());
+        assertEquals(20, ptypes.size());
 
         for (ParameterizedType typ : ptypes) {
             assertEquals(((Type)typ.getParameterizableClass()).getIsStub(), typ.getIsStub());
