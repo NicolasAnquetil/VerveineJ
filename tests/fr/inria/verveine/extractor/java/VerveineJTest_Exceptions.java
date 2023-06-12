@@ -104,4 +104,21 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
         assertEquals(((TNamedEntity)methodAfterException.getParentType()).getName(), "DefineMethodAfterInnerException");
     }
 
+
+    @Test
+    public void testSubException() {
+        org.moosetechnology.model.famix.famixjavaentities.Exception anException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "MInnerException");
+        org.moosetechnology.model.famix.famixjavaentities.Exception aReadException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "MRead");
+        org.moosetechnology.model.famix.famixjavaentities.Exception aWriteException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "MWrite");
+        org.moosetechnology.model.famix.famixjavaentities.Exception aReadWriteException = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Exception.class, "MReadWrite");
+
+        assertNotNull(anException);
+        assertNotNull(aReadException);
+        assertNotNull(aWriteException);
+        assertNotNull(aReadWriteException);
+        assertEquals(aReadException.getTypeContainer(), anException);
+        assertEquals(aWriteException.getTypeContainer(), anException);
+        assertEquals(aReadWriteException.getTypeContainer(), anException);
+    }
+
 }

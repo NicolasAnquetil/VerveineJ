@@ -228,7 +228,7 @@ public class EntityStack {
 	 * @return the Famix class
 	 */
 	public TType popType() {
-		return this.popUpto(Type.class);
+		return this.popUpto(TType.class);
 	}
 
 	/**

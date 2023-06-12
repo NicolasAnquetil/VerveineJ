@@ -1005,11 +1005,11 @@ public class EntityDictionary {
 		// ---------------- create
 		if (fmx == null) {
 			if (isGeneric) {
-				fmx = ensureFamixParameterizableClass(bnd, name, (ContainerEntity) owner);
+				fmx = ensureFamixParameterizableClass(bnd, name, (TWithTypes) owner);
 			}
 			else {
 				fmx = ensureFamixEntity(Class.class, bnd, name);
-				fmx.setTypeContainer((ContainerEntity)owner);
+				fmx.setTypeContainer((TWithTypes)owner);
 			}
 		}
 
@@ -1028,7 +1028,7 @@ public class EntityDictionary {
 				else {
 					lastAssoc = ensureFamixInheritance((TWithInheritances) ensureFamixClassObject(null), fmx, lastAssoc);
 				}
-				ensureImplementedInterfaces(bnd, fmx, (ContainerEntity) owner, lastAssoc);
+				ensureImplementedInterfaces(bnd, fmx, (TWithTypes) owner, lastAssoc);
 			}
 		}
 
@@ -1299,7 +1299,7 @@ public class EntityDictionary {
 	/**
 	 * helper method, we know the type exists, ensureFamixClass will recover it
 	 */
-	public Class getFamixClass(ITypeBinding bnd, String name, ContainerEntity owner) {
+	public Class getFamixClass(ITypeBinding bnd, String name, TNamedEntity owner) {
 		return ensureFamixClass(bnd, name, owner, /*isGeneric*/false, UNKNOWN_MODIFIERS);
 	}
 
