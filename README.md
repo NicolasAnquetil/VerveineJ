@@ -52,3 +52,14 @@ You can also use Ant or the pre-created IntelliJ build
 ```sh
 ant junit
 ```
+
+### Debug advanced mode
+
+Sometimes, because of the JVM optimization, stacktraces are not fully displayed.
+To force JVM keep the full stacktrace, you can use the following vm options:
+
+```txt
+-XX:-OmitStackTraceInFastThrow -Xint
+```
+
+> This will make the execution super slow, so keep this option for debug purpose only.
