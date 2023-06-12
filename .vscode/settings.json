@@ -1,0 +1,20 @@
+{
+    "java.debug.settings.onBuildFailureProceed": true,
+    "java.project.sourcePaths": [
+        "src",
+        "gen",
+        "tests"
+    ],
+    "java.project.resourceFilters": [
+        "\\.git"
+    ],
+    "java.test.config": [
+        {
+            "name": "default",
+            "workingDirectory": "${workspaceFolder}",
+            "vmargs": [
+                "-XX:-OmitStackTraceInFastThrow", "-Xint"
+            ]
+        }
+    ]
+}
