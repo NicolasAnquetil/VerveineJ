@@ -126,7 +126,6 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			fmx = dico.ensureFamixClass(
 					bnd, 
 					/*name*/node.getName().getIdentifier(), 
-					(ContainerEntity) 
 					/*owner*/context.top(), 
 					/*isGeneric*/tparams.size()>0, 
 					node.getModifiers());
