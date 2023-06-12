@@ -400,7 +400,7 @@ public class VisitorAccessRef extends AbstractRefVisitor {
 		ImplicitVariable fmx = dico.ensureFamixImplicitVariable(
 				bnd, 
 				EntityDictionary.SELF_NAME, 
-				(Type) this.context.topType(), 
+				this.context.topType(), 
 				context.topMethod());
 		if (fmx != null) {
 			TMethod accessor = this.context.topMethod();
