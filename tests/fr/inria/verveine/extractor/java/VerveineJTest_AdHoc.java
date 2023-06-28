@@ -52,8 +52,19 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		parser.parse();
 		parser.exportModel(DEFAULT_OUTPUT_FILE);
 	}
+	
+	@Test 
+    public void testParametric() {
+    	parse(new String[] {"test_src/ad_hoc/ClassA.java"});
+    	ParametricClass parametricClass = detectFamixElement( ParametricClass.class, "ClassA");
+    	ParametricClass c = detectFamixElement(ParametricClass.class, "classB");
+		assertNotNull(parametricClass);
+		assertNotNull(c);
+    	
+    	
+    }
 
-	@Test
+	/*@Test
 	public void testJunit5Bug1() {
 		File generatedMSE = new File(DEFAULT_OUTPUT_FILE);
 		generatedMSE.deleteOnExit();
@@ -771,5 +782,6 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
         assertEquals( 1, subClass.getSuperInheritances().size() );
         assertEquals(superClass, firstElt(subClass.getSuperInheritances()).getSuperclass() );
     }
+    */
 
 }

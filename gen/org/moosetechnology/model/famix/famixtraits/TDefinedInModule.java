@@ -10,7 +10,7 @@ import ch.akuhn.fame.FameProperty;
 @FameDescription("TDefinedInModule")
 public interface TDefinedInModule  {
 
-        @FameProperty(name = "parentModule", opposite = "moduleEntities")
+        @FameProperty(name = "parentModule", opposite = "moduleEntities", container = true)
     public TModule getParentModule();
 
     public void setParentModule(TModule parentModule);

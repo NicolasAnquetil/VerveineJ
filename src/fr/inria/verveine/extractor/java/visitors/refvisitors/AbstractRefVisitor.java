@@ -6,8 +6,10 @@ import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famix.famixjavaentities.ParametricInterface;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famix.famixtraits.TParameterizedTypeUser;
+import org.moosetechnology.model.famix.famixtraits.TParametricEntity;
 import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
@@ -122,11 +124,11 @@ public class AbstractRefVisitor extends GetVisitedEntityAbstractVisitor {
 			}
 			ITypeBinding parameterizableBnd = bnd.getErasure();
 			int modifiers = (parameterizableBnd != null) ? parameterizableBnd.getModifiers() : EntityDictionary.UNKNOWN_MODIFIERS;
-			TWithParameterizedTypes generic;
+			TParametricEntity generic;
 			if(parameterizableBnd.isInterface()) {
-				generic = (ParameterizableInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers);
+				generic = (ParametricInterface) dico.ensureFamixInterface(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers);
 			} else {
-				generic = (TWithParameterizedTypes) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers);
+				generic = (TParametricEntity) dico.ensureFamixClass(parameterizableBnd, name, /*owner*/null, /*isGeneric*/true, modifiers);
 			}
 			// not creating parameterized interfaces here
 			//if (bnd == parameterizableBnd) {
@@ -138,7 +140,7 @@ public class AbstractRefVisitor extends GetVisitedEntityAbstractVisitor {
 			for (ITypeBinding targ : bnd.getTypeArguments()) {
 				TType fmxTArg = this.referedType(targ, ctxt, false);
 				if (fmxTArg != null) {
-					((org.moosetechnology.model.famix.famixjavaentities.ParameterizedType) fmxTyp).addArguments((TParameterizedTypeUser) fmxTArg);
+					//((org.moosetechnology.model.famix.famixjavaentities.ParametricClass) fmxTyp).addArguments((TParameterizedTypeUser) fmxTArg);
 				}
 			}
 		} else {

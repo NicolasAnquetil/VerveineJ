@@ -5,13 +5,12 @@ import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import java.util.*;
-
 import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Traits")
 @FameDescription("TException")
-public interface TException extends TNamedEntity, TEntityMetaLevelDependency, TWithAttributes, TWithMethods, TSourceEntity, TReferenceable, TWithInheritances, TInvocationsReceiver, TType, TPackageable, TClass, TWithComments {
+public interface TException extends TEntityMetaLevelDependency, TNamedEntity, TWithAttributes, TWithMethods, TSourceEntity, TReferenceable, TInvocationsReceiver, TWithInheritances, TType, TPackageable, TClass, TWithComments {
 
         @FameProperty(name = "throwingEntities", opposite = "thrownExceptions", derived = true)
     public Collection<TWithExceptions> getThrowingEntities();

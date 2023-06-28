@@ -51,7 +51,9 @@ import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famix.famixjavaentities.ParametricClass;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
+import org.moosetechnology.model.famix.famixtraits.TParametricEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithMethods;
 import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
@@ -136,7 +138,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			// if it is a generic and some parameterizedTypes were created for it
 			// they are marked as stub which is not right
 			if (tparams.size() > 0) {
-				for (ParameterizedType candidate : dico.getEntityByName(ParameterizedType.class,
+				for (ParametricClass candidate : dico.getEntityByName(ParametricClass.class,
 						node.getName().getIdentifier())) {
 					candidate.setIsStub(false);
 				}
@@ -152,7 +154,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 				// if there is a type parameter, then fmx will be a Famix ParameterizableClass
 				// note: owner of the ParameterType is the ParameterizableClass
 				ParameterType fmxParam = dico.ensureFamixParameterType(tp.resolveBinding(),
-						tp.getName().getIdentifier(), (TWithParameterizedTypes) fmx);
+						tp.getName().getIdentifier(), (TParametricEntity) fmx);
 				if (fmxParam != null) {
 					fmxParam.setIsStub(false);
 				}

@@ -11,7 +11,7 @@ import java.util.*;
 @FameDescription("TTrait")
 public interface TTrait  {
 
-        @FameProperty(name = "traitOwner", opposite = "traits")
+        @FameProperty(name = "traitOwner", opposite = "traits", container = true)
     public TWithTraits getTraitOwner();
 
     public void setTraitOwner(TWithTraits traitOwner);

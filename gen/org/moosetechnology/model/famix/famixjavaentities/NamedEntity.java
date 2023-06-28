@@ -6,7 +6,6 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixtraits.TAnnotationInstance;
 import org.moosetechnology.model.famix.famixtraits.TInvocation;
 import org.moosetechnology.model.famix.famixtraits.TInvocationsReceiver;
@@ -25,10 +24,7 @@ public class NamedEntity extends SourcedEntity implements TEntityMetaLevelDepend
     
     private Collection<TInvocation> receivingInvocations; 
 
-    @Override
-    public String toString() {
-    	return getClass().getSimpleName() + "(" + getName() + ")";
-    }
+
 
     @FameProperty(name = "annotationInstances", opposite = "annotatedEntity", derived = true)
     public Collection<TAnnotationInstance> getAnnotationInstances() {

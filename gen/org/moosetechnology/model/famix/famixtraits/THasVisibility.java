@@ -21,8 +21,8 @@ public interface THasVisibility  {
     @FameProperty(name = "isPublic", derived = true)
     public Boolean getIsPublic();
 
-    @FameProperty(name = "isPackage", derived = true)
-    public Boolean getIsPackage();
+    @FameProperty(name = "isPackageVisibility", derived = true)
+    public Boolean getIsPackageVisibility();
 
     @FameProperty(name = "isPrivate", derived = true)
     public Boolean getIsPrivate();

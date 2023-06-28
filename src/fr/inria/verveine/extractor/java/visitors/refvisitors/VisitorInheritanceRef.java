@@ -84,7 +84,7 @@ public class VisitorInheritanceRef extends GetVisitedEntityAbstractVisitor {
 				sup = dico.ensureFamixType(supbnd);
 			} else {
 				Package javaLang = dico.ensureFamixPackageJavaLang(null);
-				ParameterizableClass generic = (ParameterizableClass) dico.ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/javaLang, /*isGeneric*/true, /*modifiers*/Modifier.ABSTRACT & Modifier.PUBLIC);
+				ParametricClass generic = (ParametricClass) dico.ensureFamixClass(/*bnd*/null, /*name*/"Enum", /*owner*/javaLang, /*isGeneric*/true, /*modifiers*/Modifier.ABSTRACT & Modifier.PUBLIC);
 				sup = dico.ensureFamixParameterizedType(/*bnd*/null, /*name*/"Enum", generic, /*ctxt*/(ContainerEntity) context.top());
 			}
 			dico.ensureFamixInheritance((TWithInheritances) sup, fmx, /*lastInheritance*/null);

@@ -6,7 +6,6 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TAccess;
 import org.moosetechnology.model.famix.famixtraits.TAccessible;
@@ -39,15 +38,15 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
     
     private Collection<TAccess> incomingAccesses; 
 
-    private Boolean isClassSide = false;
+    private Boolean isClassSide;
     
-    private Boolean isFinal = false;
+    private Boolean isFinal;
     
-    private Boolean isStub = false;
+    private Boolean isStub;
     
-    private Boolean isTransient = false;
+    private Boolean isTransient;
     
-    private Boolean isVolatile = false;
+    private Boolean isVolatile;
     
     private String name;
     
@@ -159,12 +158,6 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "hasClassScope", derived = true)
-    public Boolean getHasClassScope() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "hasComments", derived = true)
     public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
@@ -252,25 +245,28 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
         this.isFinal = isFinal;
     }
     
-
-    @FameProperty(name = "isPackage", derived = true)
-    public Boolean getIsPackage() {
-        return this.visibility.equals("package");
+    @FameProperty(name = "isPackageVisibility", derived = true)
+    public Boolean getIsPackageVisibility() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "isPrivate", derived = true)
     public Boolean getIsPrivate() {
-        return this.visibility.equals("private");
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "isProtected", derived = true)
     public Boolean getIsProtected() {
-        return this.visibility.equals("protected");
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "isPublic", derived = true)
     public Boolean getIsPublic() {
-        return this.visibility.equals("public"); 
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "isStub")

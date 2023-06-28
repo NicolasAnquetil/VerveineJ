@@ -16,11 +16,11 @@ public interface TEntityMetaLevelDependency  {
     @FameProperty(name = "numberOfChildren", derived = true)
     public Number getNumberOfChildren();
 
-    @FameProperty(name = "fanOut", derived = true)
-    public Number getFanOut();
-
     @FameProperty(name = "fanIn", derived = true)
     public Number getFanIn();
+
+    @FameProperty(name = "fanOut", derived = true)
+    public Number getFanOut();
 
     @FameProperty(name = "numberOfInternalProviders", derived = true)
     public Number getNumberOfInternalProviders();

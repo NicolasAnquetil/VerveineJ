@@ -6,7 +6,6 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TAccess;
 import org.moosetechnology.model.famix.famixtraits.TCanBeAbstract;
@@ -18,6 +17,8 @@ import org.moosetechnology.model.famix.famixtraits.THasKind;
 import org.moosetechnology.model.famix.famixtraits.THasSignature;
 import org.moosetechnology.model.famix.famixtraits.THasVisibility;
 import org.moosetechnology.model.famix.famixtraits.TImplicitVariable;
+import org.moosetechnology.model.famix.famixtraits.TImport;
+import org.moosetechnology.model.famix.famixtraits.TImportable;
 import org.moosetechnology.model.famix.famixtraits.TInvocable;
 import org.moosetechnology.model.famix.famixtraits.TInvocation;
 import org.moosetechnology.model.famix.famixtraits.TLocalVariable;
@@ -45,7 +46,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Method")
-public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanBeSynchronized, TEntityMetaLevelDependency, THasKind, THasSignature, THasVisibility, TInvocable, TMethod, TMethodMetrics, TNamedEntity, TSourceEntity, TTypedEntity, TWithAccesses, TWithComments, TWithExceptions, TWithImplicitVariables, TWithInvocations, TWithLocalVariables, TWithParameters, TWithReferences, TWithStatements {
+public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanBeSynchronized, TEntityMetaLevelDependency, THasKind, THasSignature, THasVisibility, TImportable, TInvocable, TMethod, TMethodMetrics, TNamedEntity, TSourceEntity, TTypedEntity, TWithAccesses, TWithComments, TWithExceptions, TWithImplicitVariables, TWithInvocations, TWithLocalVariables, TWithParameters, TWithReferences, TWithStatements {
 
     private Number numberOfConditionals;
     
@@ -63,17 +64,17 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     
     private Collection<TImplicitVariable> implicitVariables; 
 
+    private Collection<TImport> incomingImports; 
+
     private Collection<TInvocation> incomingInvocations; 
 
-    private Boolean isAbstract = false;
+    private Boolean isAbstract;
     
-    private Boolean isClassSide = false;
+    private Boolean isClassSide;
     
-    private Boolean isFinal = false;
-
+    private Boolean isFinal;
+    
     private Boolean isStub;
-
-    private Boolean isDead;
     
     private Boolean isSynchronized;
     
@@ -101,10 +102,7 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
 
     private String visibility;
     
-@Override
-public String toString() {
-	return "Method(" + signature + ")";
-}
+
 
     @FameProperty(name = "clientBehaviours", derived = true)
     public Collection<Method> getClientBehaviours() {
@@ -437,12 +435,6 @@ public String toString() {
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "hasClassScope", derived = true)
-    public Boolean getHasClassScope() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "hasComments", derived = true)
     public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
@@ -504,6 +496,57 @@ public String toString() {
 
     public boolean hasImplicitVariables() {
         return !getImplicitVariables().isEmpty();
+    }
+
+    @FameProperty(name = "incomingImports", opposite = "importedEntity", derived = true)
+    public Collection<TImport> getIncomingImports() {
+        if (incomingImports == null) {
+            incomingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportedEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportedEntity(Method.this);
+                }
+            };
+        }
+        return incomingImports;
+    }
+    
+    public void setIncomingImports(Collection<? extends TImport> incomingImports) {
+        this.getIncomingImports().clear();
+        this.getIncomingImports().addAll(incomingImports);
+    }                    
+    
+        
+    public void addIncomingImports(TImport one) {
+        this.getIncomingImports().add(one);
+    }   
+    
+    public void addIncomingImports(TImport one, TImport... many) {
+        this.getIncomingImports().add(one);
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+    
+    public void addIncomingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+                
+    public void addIncomingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }
+    
+    public int numberOfIncomingImports() {
+        return getIncomingImports().size();
+    }
+
+    public boolean hasIncomingImports() {
+        return !getIncomingImports().isEmpty();
     }
 
     @FameProperty(name = "incomingInvocations", opposite = "candidates", derived = true)
@@ -588,11 +631,8 @@ public String toString() {
     
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead() {
-        return isDead;  
-    }
-
-    public void setIsDead(Boolean isDead) {
-        this.isDead = isDead;
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
     @FameProperty(name = "isFinal")
@@ -603,6 +643,36 @@ public String toString() {
     public void setIsFinal(Boolean isFinal) {
         this.isFinal = isFinal;
     }
+    
+    /*	@FameProperty(name = "isGetter", derived = true)
+    public Boolean getIsGetter() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }	*/
+    
+    @FameProperty(name = "isPackageVisibility", derived = true)
+    public Boolean getIsPackageVisibility() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    /*	@FameProperty(name = "isPrivate", derived = true)
+    public Boolean getIsPrivate() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }	
+    
+    @FameProperty(name = "isProtected", derived = true)
+    public Boolean getIsProtected() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "isPublic", derived = true)
+    public Boolean getIsPublic() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }	*/
     
     @FameProperty(name = "isSetter", derived = true)
     public Boolean getIsSetter() {
@@ -765,6 +835,12 @@ public String toString() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
+    
+  /*  @FameProperty(name = "numberOfStatements", derived = true)
+    public Number getNumberOfStatements() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }  */
     
     @FameProperty(name = "outgoingInvocations", opposite = "sender", derived = true)
     public Collection<TInvocation> getOutgoingInvocations() {
@@ -1028,44 +1104,44 @@ public String toString() {
         this.visibility = visibility;
     }
     
-        // Manually added
+ // Manually added
 
-        private Number numberOfStatements;
+    private Number numberOfStatements;
 
-        @FameProperty(name = "numberOfStatements")
-        public Number getNumberOfStatements() {
-            return numberOfStatements;
-        }
-    
-        public void setNumberOfStatements(Number number) {
-            numberOfStatements = number;
-        }
-    
-        @FameProperty(name = "isPackage", derived = true)
-        public Boolean getIsPackage() {
-            return this.visibility.equals("package");
-        }
-    
-        @FameProperty(name = "isPrivate", derived = true)
-        public Boolean getIsPrivate() {
-            return this.visibility.equals("private");
-        }
-    
-        @FameProperty(name = "isProtected", derived = true)
-        public Boolean getIsProtected() {
-            return this.visibility.equals("protected");
-        }
-    
-        @FameProperty(name = "isPublic", derived = true)
-        public Boolean getIsPublic() {
-            return this.visibility.equals("public");
-        }
+    @FameProperty(name = "numberOfStatements")
+    public Number getNumberOfStatements() {
+        return numberOfStatements;
+    }
 
-        @Override
-        public Boolean getIsGetter() {
-            // TODO Auto-generated method stub
-            return null;
-        }
+    public void setNumberOfStatements(Number number) {
+        numberOfStatements = number;
+    }
+
+    @FameProperty(name = "isPackage", derived = true)
+    public Boolean getIsPackage() {
+        return this.visibility.equals("package");
+    }
+
+    @FameProperty(name = "isPrivate", derived = true)
+    public Boolean getIsPrivate() {
+        return this.visibility.equals("private");
+    }
+
+    @FameProperty(name = "isProtected", derived = true)
+    public Boolean getIsProtected() {
+        return this.visibility.equals("protected");
+    }
+
+    @FameProperty(name = "isPublic", derived = true)
+    public Boolean getIsPublic() {
+        return this.visibility.equals("public");
+    }
+
+    @Override
+    public Boolean getIsGetter() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 
 }

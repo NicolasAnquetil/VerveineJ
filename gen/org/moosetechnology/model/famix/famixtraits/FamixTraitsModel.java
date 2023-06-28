@@ -42,6 +42,8 @@ public class FamixTraitsModel {
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TCohesionCouplingMetrics.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TComment.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TCompilationUnit.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TConcreteParameterType.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TConcretisation.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TDefinedInModule.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TDereferencedInvocation.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TEnum.class);
@@ -54,6 +56,7 @@ public class FamixTraitsModel {
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TFileSystemEntity.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TFolder.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TFunction.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TGenericParameterType.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TGlobalVariable.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.THasImmediateSource.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.THasKind.class);
@@ -64,6 +67,8 @@ public class FamixTraitsModel {
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TImplementable.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TImplementation.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TImplicitVariable.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TImport.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TImportable.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TIndexedFileNavigation.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TInheritance.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TInvocable.class);
@@ -80,9 +85,8 @@ public class FamixTraitsModel {
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TPackage.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TPackageable.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TParameter.class);
-		metamodel.with(org.moosetechnology.model.famix.famixtraits.TParameterType.class);
-		metamodel.with(org.moosetechnology.model.famix.famixtraits.TParameterizedType.class);
-		metamodel.with(org.moosetechnology.model.famix.famixtraits.TParameterizedTypeUser.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TParameterConcretisation.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TParametricEntity.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TPreprocessorDefine.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TPreprocessorIfdef.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TPrimitiveType.class);
@@ -122,13 +126,12 @@ public class FamixTraitsModel {
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithGlobalVariables.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithHeaders.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithImplicitVariables.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithImports.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithInheritances.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithInvocations.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithLocalVariables.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithMethods.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithPackages.class);
-		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypeUsers.class);
-		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithParameters.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithReferences.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TWithSourceLanguages.class);

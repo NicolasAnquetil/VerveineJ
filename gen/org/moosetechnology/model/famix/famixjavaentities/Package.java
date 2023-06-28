@@ -6,29 +6,28 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TComment;
-import org.moosetechnology.model.famix.famixtraits.TGlobalVariable;
+import org.moosetechnology.model.famix.famixtraits.TImport;
+import org.moosetechnology.model.famix.famixtraits.TImportable;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famix.famixtraits.TPackage;
 import org.moosetechnology.model.famix.famixtraits.TPackageable;
 import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithComments;
-import org.moosetechnology.model.famix.famixtraits.TWithGlobalVariables;
 import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Package")
-public class Package extends ContainerEntity implements TEntityMetaLevelDependency, TNamedEntity, TPackage, TPackageable, TSourceEntity, TWithComments, TWithGlobalVariables {
+public class Package extends ContainerEntity implements TEntityMetaLevelDependency, TImportable, TNamedEntity, TPackage, TPackageable, TSourceEntity, TWithComments {
 
     private Collection<TPackageable> childEntities; 
 
     private Collection<TComment> comments; 
 
-    private Collection<TGlobalVariable> globalVariables; 
+    private Collection<TImport> incomingImports; 
 
     private Boolean isStub;
     
@@ -228,63 +227,63 @@ public class Package extends ContainerEntity implements TEntityMetaLevelDependen
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "globalVariables", opposite = "parentScope", derived = true)
-    public Collection<TGlobalVariable> getGlobalVariables() {
-        if (globalVariables == null) {
-            globalVariables = new MultivalueSet<TGlobalVariable>() {
-                @Override
-                protected void clearOpposite(TGlobalVariable e) {
-                    e.setParentScope(null);
-                }
-                @Override
-                protected void setOpposite(TGlobalVariable e) {
-                    e.setParentScope(Package.this);
-                }
-            };
-        }
-        return globalVariables;
-    }
-    
-    public void setGlobalVariables(Collection<? extends TGlobalVariable> globalVariables) {
-        this.getGlobalVariables().clear();
-        this.getGlobalVariables().addAll(globalVariables);
-    }                    
-    
-        
-    public void addGlobalVariables(TGlobalVariable one) {
-        this.getGlobalVariables().add(one);
-    }   
-    
-    public void addGlobalVariables(TGlobalVariable one, TGlobalVariable... many) {
-        this.getGlobalVariables().add(one);
-        for (TGlobalVariable each : many)
-            this.getGlobalVariables().add(each);
-    }   
-    
-    public void addGlobalVariables(Iterable<? extends TGlobalVariable> many) {
-        for (TGlobalVariable each : many)
-            this.getGlobalVariables().add(each);
-    }   
-                
-    public void addGlobalVariables(TGlobalVariable[] many) {
-        for (TGlobalVariable each : many)
-            this.getGlobalVariables().add(each);
-    }
-    
-    public int numberOfGlobalVariables() {
-        return getGlobalVariables().size();
-    }
-
-    public boolean hasGlobalVariables() {
-        return !getGlobalVariables().isEmpty();
-    }
-
     @FameProperty(name = "hasComments", derived = true)
     public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "incomingImports", opposite = "importedEntity", derived = true)
+    public Collection<TImport> getIncomingImports() {
+        if (incomingImports == null) {
+            incomingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportedEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportedEntity(Package.this);
+                }
+            };
+        }
+        return incomingImports;
+    }
+    
+    public void setIncomingImports(Collection<? extends TImport> incomingImports) {
+        this.getIncomingImports().clear();
+        this.getIncomingImports().addAll(incomingImports);
+    }                    
+    
+        
+    public void addIncomingImports(TImport one) {
+        this.getIncomingImports().add(one);
+    }   
+    
+    public void addIncomingImports(TImport one, TImport... many) {
+        this.getIncomingImports().add(one);
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+    
+    public void addIncomingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+                
+    public void addIncomingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }
+    
+    public int numberOfIncomingImports() {
+        return getIncomingImports().size();
+    }
+
+    public boolean hasIncomingImports() {
+        return !getIncomingImports().isEmpty();
+    }
+
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead() {
         // TODO: this is a derived property, implement this method manually.
