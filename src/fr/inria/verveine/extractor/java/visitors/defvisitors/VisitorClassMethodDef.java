@@ -50,12 +50,12 @@ import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute
 import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
-import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
+//import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
 import org.moosetechnology.model.famix.famixjavaentities.ParametricClass;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 import org.moosetechnology.model.famix.famixtraits.TParametricEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithMethods;
-import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
+//import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 import fr.inria.verveine.extractor.java.EntityDictionary;
@@ -155,6 +155,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 				// note: owner of the ParameterType is the ParameterizableClass
 				ParameterType fmxParam = dico.ensureFamixParameterType(tp.resolveBinding(),
 						tp.getName().getIdentifier(), (TParametricEntity) fmx);
+				fmxParam.addGenericEntity((ParametricClass)fmx);
 				if (fmxParam != null) {
 					fmxParam.setIsStub(false);
 				}
@@ -300,7 +301,6 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		IMethodBinding bnd = (IMethodBinding) StubBinding.getDeclarationBinding(node);
-
         Collection<String> paramTypes = new ArrayList<>();
         for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
             paramTypes.add( Util.jdtTypeName(param.getType()));
@@ -319,7 +319,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			// fmx.setBodyHash(this.computeHashForMethodBody(node));
 
 			this.context.pushMethod(fmx);
-
+			
 			if (node.isConstructor()) {
 				fmx.setKind(EntityDictionary.CONSTRUCTOR_KIND_MARKER);
 			}

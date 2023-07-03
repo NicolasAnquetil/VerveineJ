@@ -40,60 +40,6 @@ public class VisitorTypeRefRef extends AbstractRefVisitor {
 	public void endVisit(CompilationUnit node) {
 		endVisitCompilationUnit(node);
 	}
-	
-	@Override
-	public boolean visit(TypeParameter node) {
-		ITypeBinding bnd = node.resolveBinding();
-		ParameterType fmx = dico.ensureFamixParameterType(bnd, null, null);
-		ParametricClass owner = null;
-		
-		ITypeBinding parentClass = bnd.getDeclaringClass();
-		if (parentClass != null) {
-			owner = (ParametricClass) dico.ensureFamixType(parentClass);
-		}
-
-		fmx.addGenericEntity(owner);
-		return super.visit(node);
-	}
-
-	@Override
-	public void endVisit(TypeParameter node) {
-	}
-	
-	@Override
-	public boolean visit(SimpleType node) {
-		ITypeBinding bnd = node.resolveBinding();
-		if(bnd.isTypeVariable()) {
-			ParameterType fmx = dico.ensureFamixParameterType(bnd, null, null);
-			ParametricClass owner = null;
-			ParameterizedType p = (ParameterizedType)node.getParent();
-			
-			ITypeBinding parentClass = p.resolveBinding();
-			if (parentClass != null) {
-				owner = (ParametricClass) dico.ensureFamixType(parentClass);
-			}
-
-			fmx.addGenericEntity(owner);
-			
-		}
-		if(bnd.isClass() && !bnd.isParameterizedType()) {
-			org.moosetechnology.model.famix.famixjavaentities.Type t = (org.moosetechnology.model.famix.famixjavaentities.Type) dico.ensureFamixType(bnd);
-			ParametricClass owner = null;
-			ParameterizedType p = (ParameterizedType)node.getParent();
-			
-			ITypeBinding parentClass = p.resolveBinding();
-			if (parentClass != null) {
-				owner = (ParametricClass) dico.ensureFamixType(parentClass);
-			}
-
-			t.addConcreteEntity(owner);
-		}
-		return super.visit(node);
-	}
-
-	@Override
-	public void endVisit(SimpleType node) {
-	}
 
 	@Override
 	public boolean visit(TypeDeclaration node) {

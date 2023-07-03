@@ -50,7 +50,7 @@ public class VerveineJParser {
 
 
 		options = new VerveineJOptions();
-		jdtParser = ASTParser.newParser(AST.JLS8);
+		jdtParser = ASTParser.newParser(AST.JLS9);
 	}
 
 	public void configure(String[] args) {

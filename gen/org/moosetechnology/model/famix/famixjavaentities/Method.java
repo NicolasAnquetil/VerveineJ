@@ -76,6 +76,8 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     
     private Boolean isStub;
     
+    private Boolean isDead;
+    
     private Boolean isSynchronized;
     
     private String kind;
@@ -631,8 +633,11 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
+        return isDead;  
+    }
+
+    public void setIsDead(Boolean isDead) {
+        this.isDead = isDead;
     }
     
     @FameProperty(name = "isFinal")
@@ -644,35 +649,13 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         this.isFinal = isFinal;
     }
     
-    /*	@FameProperty(name = "isGetter", derived = true)
-    public Boolean getIsGetter() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }	*/
-    
+
     @FameProperty(name = "isPackageVisibility", derived = true)
     public Boolean getIsPackageVisibility() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    /*	@FameProperty(name = "isPrivate", derived = true)
-    public Boolean getIsPrivate() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }	
-    
-    @FameProperty(name = "isProtected", derived = true)
-    public Boolean getIsProtected() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "isPublic", derived = true)
-    public Boolean getIsPublic() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }	*/
     
     @FameProperty(name = "isSetter", derived = true)
     public Boolean getIsSetter() {
@@ -836,11 +819,7 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-  /*  @FameProperty(name = "numberOfStatements", derived = true)
-    public Number getNumberOfStatements() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }  */
+
     
     @FameProperty(name = "outgoingInvocations", opposite = "sender", derived = true)
     public Collection<TInvocation> getOutgoingInvocations() {
@@ -1104,7 +1083,7 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         this.visibility = visibility;
     }
     
- // Manually added
+    // Manually added
 
     private Number numberOfStatements;
 
@@ -1142,7 +1121,6 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         // TODO Auto-generated method stub
         return null;
     }
-
 
 }
 
