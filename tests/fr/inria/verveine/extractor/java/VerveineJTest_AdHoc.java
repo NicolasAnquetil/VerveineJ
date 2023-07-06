@@ -8,6 +8,7 @@ import fr.inria.verveine.extractor.java.utils.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.*;
+import org.moosetechnology.model.famix.famixjavaentities.Class;
 import org.moosetechnology.model.famix.famixjavaentities.Enum;
 import org.moosetechnology.model.famix.famixjavaentities.Package;
 import org.moosetechnology.model.famix.famixtraits.*;
@@ -56,7 +57,10 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 	@Test 
     public void testParametric() {
     	parse(new String[] {"test_src/ad_hoc/ClassA.java"});
+    	// ParametricClass genericType = detectFamixElement( ParametricClass.class, "ClassA");
     	ParametricClass genericType = detectFamixElement( ParametricClass.class, "ClassA");
+    	ParametricClass genericType2 = detectFamixElement( ParametricClass.class, "ClassC");
+
 		assertNotNull(genericType);
 	
     	

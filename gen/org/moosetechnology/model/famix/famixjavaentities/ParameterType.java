@@ -8,6 +8,7 @@ import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TGenericParameterType;
+import org.moosetechnology.model.famix.famixtraits.TInheritance;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famix.famixtraits.TParameterConcretisation;
 import org.moosetechnology.model.famix.famixtraits.TParametricEntity;
@@ -17,13 +18,14 @@ import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
+import org.moosetechnology.model.famix.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("ParameterType")
-public class ParameterType extends Type implements TEntityMetaLevelDependency, TGenericParameterType, TNamedEntity, TReferenceable, TSourceEntity, TType, TTypedEntity {
+public class ParameterType extends Type implements TEntityMetaLevelDependency, TGenericParameterType, TNamedEntity, TReferenceable, TSourceEntity, TWithInheritances, TType, TTypedEntity {
 
     private Collection<TParameterConcretisation> concretisations; 
 
@@ -45,7 +47,9 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
     
     private Collection<TTypedEntity> typedEntities; 
 
+    private Collection<TInheritance> subInheritances; 
 
+    private Collection<TInheritance> superInheritances;
 
     @FameProperty(name = "concretisations", opposite = "genericParameters", derived = true)
     public Collection<TParameterConcretisation> getConcretisations() {
@@ -405,7 +409,113 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
         return !getTypedEntities().isEmpty();
     }
 
+    @FameProperty(name = "subInheritances", opposite = "superclass", derived = true)
+    public Collection<TInheritance> getSubInheritances() {
+        if (subInheritances == null) {
+            subInheritances = new MultivalueSet<TInheritance>() {
+                @Override
+                protected void clearOpposite(TInheritance e) {
+                    e.setSuperclass(null);
+                }
+                @Override
+                protected void setOpposite(TInheritance e) {
+                    e.setSuperclass(ParameterType.this);
+                }
+            };
+        }
+        return subInheritances;
+    }
+    
+    public void setSubInheritances(Collection<? extends TInheritance> subInheritances) {
+        this.getSubInheritances().clear();
+        this.getSubInheritances().addAll(subInheritances);
+    }                    
+    
+        
+    public void addSubInheritances(TInheritance one) {
+        this.getSubInheritances().add(one);
+    }   
+    
+    public void addSubInheritances(TInheritance one, TInheritance... many) {
+        this.getSubInheritances().add(one);
+        for (TInheritance each : many)
+            this.getSubInheritances().add(each);
+    }   
+    
+    public void addSubInheritances(Iterable<? extends TInheritance> many) {
+        for (TInheritance each : many)
+            this.getSubInheritances().add(each);
+    }   
+                
+    public void addSubInheritances(TInheritance[] many) {
+        for (TInheritance each : many)
+            this.getSubInheritances().add(each);
+    }
+    
+    public int numberOfSubInheritances() {
+        return getSubInheritances().size();
+    }
 
+    public boolean hasSubInheritances() {
+        return !getSubInheritances().isEmpty();
+    }
+
+    @FameProperty(name = "subclassHierarchyDepth", derived = true)
+    public Number getSubclassHierarchyDepth() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "superInheritances", opposite = "subclass", derived = true)
+    public Collection<TInheritance> getSuperInheritances() {
+        if (superInheritances == null) {
+            superInheritances = new MultivalueSet<TInheritance>() {
+                @Override
+                protected void clearOpposite(TInheritance e) {
+                    e.setSubclass(null);
+                }
+                @Override
+                protected void setOpposite(TInheritance e) {
+                    e.setSubclass(ParameterType.this);
+                }
+            };
+        }
+        return superInheritances;
+    }
+    
+    public void setSuperInheritances(Collection<? extends TInheritance> superInheritances) {
+        this.getSuperInheritances().clear();
+        this.getSuperInheritances().addAll(superInheritances);
+    }                    
+    
+        
+    public void addSuperInheritances(TInheritance one) {
+        this.getSuperInheritances().add(one);
+    }   
+    
+    public void addSuperInheritances(TInheritance one, TInheritance... many) {
+        this.getSuperInheritances().add(one);
+        for (TInheritance each : many)
+            this.getSuperInheritances().add(each);
+    }   
+    
+    public void addSuperInheritances(Iterable<? extends TInheritance> many) {
+        for (TInheritance each : many)
+            this.getSuperInheritances().add(each);
+    }   
+                
+    public void addSuperInheritances(TInheritance[] many) {
+        for (TInheritance each : many)
+            this.getSuperInheritances().add(each);
+    }
+    
+    public int numberOfSuperInheritances() {
+        return getSuperInheritances().size();
+    }
+
+    public boolean hasSuperInheritances() {
+        return !getSuperInheritances().isEmpty();
+    }
 
 }
 

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -15,15 +16,17 @@ import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
 import org.moosetechnology.model.famix.famixjavaentities.Parameter;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
-import org.moosetechnology.model.famix.famixjavaentities.ParameterizableClass;
-import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
-import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
 import org.moosetechnology.model.famix.famixjavaentities.ParametricClass;
 import org.moosetechnology.model.famix.famixjavaentities.ParametricInterface;
+import org.moosetechnology.model.famix.famixjavaentities.ParametricMethod;
 import org.moosetechnology.model.famix.famixjavaentities.Type;
+import org.moosetechnology.model.famix.famixjavaentities.Class;
+import org.moosetechnology.model.famix.famixjavaentities.Concretisation;
+import org.moosetechnology.model.famix.famixtraits.TConcreteParameterType;
+import org.moosetechnology.model.famix.famixtraits.TConcretisation;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famix.famixtraits.TParameter;
-import org.moosetechnology.model.famix.famixtraits.TParameterizedType;
+
 import org.moosetechnology.model.famix.famixtraits.TType;
 
 public class VerveineJTest_Generics extends VerveineJTest_Basic {
@@ -68,20 +71,64 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         parser.configure( new String[] {"test_src/generics"});
         parser.parse();
     }
+    
+    @Test
+    public void testInvocationOnConcretisation() {
+    	ParametricClass classE = (ParametricClass)genericEntityNamed("E");
+    	Method m = detectFamixElement(Method.class, "m");
+    	assertNotNull(classE);
+    	assertEquals(1, classE.getConcretisations().size());
+    	ParametricClass concrete = (ParametricClass)firstElt(classE.getConcretisations()).getConcreteEntity();
+    	assertEquals(1, concrete.getIncomingReferences().size());
+    	assertEquals(1, concrete.getMethods().size());
+    	
+    }
+    
+    @Test
+    public void testParameterTypeConcretisation() {
+    	ParametricClass classB = (ParametricClass)genericEntityNamed("B");
+    	assertNotNull(classB);
+    	ParametricClass classC = (ParametricClass)genericEntityNamed("C");
+    	assertNotNull(classC);
+    	ParametricClass classD = (ParametricClass)genericEntityNamed("D");
+    	assertNotNull(classD);
+    	for (TConcretisation c : classC.getConcretisations()) {
+    		int i= 0;
+    		ParametricClass pc = (ParametricClass)c.getConcreteEntity();
+    		assertEquals(2, pc.getConcreteParameters().size());
+    		for(TConcreteParameterType p : pc.getConcreteParameters()) {
+    			ParameterType genParam = (ParameterType) firstElt(p.getGeneric()).getGenericParameters(); 			
+    			assertNotNull(genParam);
+    			
+    			if(i==0) {
+    				assertEquals(firstElt(genParam.getGenericEntity()), classC);
+    				ParametricClass genClass = (ParametricClass)firstElt(((ParameterType)p).getGenericEntity());
+    				assertEquals(ParameterType.class, genParam.getClass());
+    				assertTrue(genClass == classB || genClass == classD);
+    			}else {
+    				assertEquals(Class.class, p.getClass());
+    			}
+    			
+    			i++;
+    		}
+    		
+    	}
+    	
+    }
 
     @Test
     public void testParameterizableClass() {
-       // assertEquals( allParameterizedClasses().count() + 1, entitiesOfType( ParametricClass.class).size());   // Java generics + Dictionary
-//        assertEquals(allParameterizedInterfaces().count(), entitiesOfType( ParametricInterface.class).size());
 
         ParametricClass generic = null;
-        for (ParametricClass g : entitiesNamed( ParametricClass.class, "Dictionary")) {
-            if (((TNamedEntity) g.getTypeContainer()).getName().equals(EntityDictionary.DEFAULT_PCKG_NAME)) {
-                // note: For testing purposes class Dictionary<B> in ad_hoc is defined without "package" instruction, so it ends up in the default package
-                generic = g;
-                break;
-            }
+        
+        Collection<ParametricClass> dicts = entitiesNamed(ParametricClass.class, "Dictionary");
+        for(ParametricClass c : dicts) {
+        	if(!c.getIsStub() && c.getGenericParameters().size() == 1 && firstElt(c.getGenericParameters()).getName().equals("B")) {
+        		generic = c;
+        		break;
+        	}
         }
+       
         assertNotNull(generic);
         assertEquals("Dictionary", generic.getName());
         assertEquals(2, generic.getTypes().size());  // <B> , ImplicitVars
@@ -114,30 +161,36 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         assertNotNull(refedArrList);
         assertEquals("ArrayList", refedArrList.getName());
 
-        org.moosetechnology.model.famix.famixjavaentities.Class arrList = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Class.class, "ArrayList");
+        ParametricClass arrList = (ParametricClass)genericEntityNamed( "ArrayList");
         assertNotNull(arrList);
-        assertEquals(arrList, refedArrList.getGenericEntity());
-        assertEquals(arrList.getContainer(), refedArrList.getContainer()); //getTypeContainer
+        assertEquals(arrList, firstElt(refedArrList.getGenericEntity()).getGenericEntity());
+        assertEquals(arrList.getParentPackage(), refedArrList.getParentPackage()); //getTypeContainer
 
-        assertEquals(1, refedArrList.getArguments().size()); //concreteParameters
-        assertEquals("ABC", ((TNamedEntity)firstElt(refedArrList.getArguments())).getName()); //concreteParameters
+        assertEquals(1, refedArrList.getConcreteParameters().size()); //concreteParameters
+        assertEquals("ABC", ((TNamedEntity)firstElt(refedArrList.getConcreteParameters())).getName()); //concreteParameters
     }
 
     @Test
     public void testUseOfParameterizedClass() {
-        ParametricClass arrList = detectFamixElement( ParametricClass.class, "ArrayList");
-        assertEquals(2, arrList.getParameterizedTypes().size()); // WrongInvocation.getX() ; Dictionnary.getEntityByName()
-        for (TParameterizedType tparamed : arrList.getParameterizedTypes()) {
-            ParameterizedType paramed = (ParameterizedType) tparamed;
-            assertEquals(1, paramed.getIncomingReferences().size());
-            String refererName = ((TNamedEntity)firstElt(paramed.getIncomingReferences()).getReferencer()).getName();
-            assertTrue(refererName.equals("getEntityByName") || refererName.equals("getX") );
+        ParametricClass arrList = (ParametricClass)genericEntityNamed( "ArrayList");
+        assertEquals(3, arrList.getConcretisations().size()); // WrongInvocation.getX() ; Dictionnary.getEntityByName()
+        for (TConcretisation concretisation : arrList.getConcretisations()) {
+            ParametricClass paramed = (ParametricClass) concretisation.getConcreteEntity();
+            if(firstElt(paramed.getConcreteParameters()).getName().equals("B")) {
+            	assertEquals(0, paramed.getIncomingReferences().size());
+            }else {
+            	assertEquals(1, paramed.getIncomingReferences().size());
+            	String refererName = ((TNamedEntity)firstElt(paramed.getIncomingReferences()).getReferencer()).getName();
+                assertTrue(refererName.equals("getEntityByName") || refererName.equals("getX") );
+            }
+            
+            
         }
     }
 
     @Test  // issue 960
     public void testStubStatusParameterizedTypes() {
-        Collection<ParameterizedType> ptypes = entitiesOfType( ParameterizedType.class);
+        Collection<ParametricClass> ptypes = entitiesOfType( ParametricClass.class);
 
         /*
         - ArrayList<ABC> Repository.List<X>()
@@ -162,10 +215,10 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         - HashMap
         - AbstractMap
         */     
-        assertEquals(20, ptypes.size());
 
-        for (ParameterizedType typ : ptypes) {
-            assertEquals(((Type)typ.getParameterizableClass()).getIsStub(), typ.getIsStub());
+        for (ParametricClass typ : ptypes) {
+        	if(!typ.getGenericEntity().isEmpty())
+        		assertEquals(((Type)(firstElt(typ.getGenericEntity()).getGenericEntity())).getIsStub(), typ.getIsStub());
         }
     }
 
@@ -187,22 +240,23 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         ContainerEntity cont = (ContainerEntity) b.getTypeContainer();
         assertNotNull(cont);
         assertEquals("Dictionary", cont.getName());
-        assertSame(ParameterizableClass.class, cont.getClass());
+        assertSame(ParametricClass.class, cont.getClass());
     }
 
     @Test
     public void testMethodParameterArgumentTypes() {
-        Method meth = detectFamixElement( Method.class, "ensureFamixEntity");
+        ParametricMethod meth = detectFamixElement( ParametricMethod.class, "ensureFamixEntity");
         assertEquals(3, meth.getParameters().size());
+        
         for (TParameter tparam : meth.getParameters()) {
             Parameter param = (Parameter) tparam;
             if (param.getName().equals("fmxClass")) {
                 Type classT = (Type) param.getDeclaredType();
                 assertNotNull(classT);
                 assertEquals("Class", classT.getName());
-                assertEquals(ParameterizedType.class, classT.getClass());
-                assertEquals(1, ((ParameterizedType)classT).getArguments().size());
-                Type t = (Type) firstElt(((ParameterizedType)classT).getArguments());
+                assertEquals(ParametricClass.class, classT.getClass());
+                assertEquals(1, ((ParametricClass)classT).getConcreteParameters().size());
+                Type t = (Type) firstElt(((ParametricClass)classT).getConcreteParameters());
                 assertEquals("T", t.getName());
                 assertSame(meth, t.getTypeContainer());
             }
@@ -217,12 +271,43 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
             }
         }
     }
+    
+    @Test
+    public void testParameterTypeInMethodParameter() {
+        Method meth = detectFamixElement( Method.class, "parameterClass");
+        ParametricClass c = (ParametricClass)meth.getParentType();
+        assertEquals(1, meth.getParameters().size());
+        
+        Parameter param = (Parameter)firstElt(meth.getParameters());
+        Type classT = (Type) param.getDeclaredType();
+        assertNotNull(classT);
+        assertEquals("ArrayList", classT.getName());
+        assertEquals(ParametricClass.class, classT.getClass());
+        assertEquals(1, ((ParametricClass)classT).getConcreteParameters().size());
+        Type t = (Type) firstElt(((ParametricClass)classT).getConcreteParameters());
+        assertEquals("B", t.getName());
+        assertSame(c, t.getTypeContainer());
+    }
 
     @Test
-    public void testIteratorIsParametrizableInterface() {
-        ParameterizableInterface interface1 = detectFamixElement( ParameterizableInterface.class, "Iterator");
+    public void testIteratorIsParametricInterface() {
+        ParametricInterface interface1 = detectFamixElement( ParametricInterface.class, "Iterator");
         assertNotNull(interface1);
     }
+    
+    @Test
+    public void testImplementationOfParametricInterface() {
+    	Class classA = detectFamixElement( Class.class, "ClassA");
+    	assertNotNull(classA);
+    	
+    	assertEquals(1, classA.getInterfaceImplementations().size());
+    	ParametricInterface myInterface = (ParametricInterface) firstElt(classA.getInterfaceImplementations()).getMyInterface();
+    	assertEquals(ParametricInterface.class, myInterface.getClass());
+    	assertEquals(1, myInterface.getGenericEntity().size());
+    	
+    	
+    }
+    
 
     	// UTILITIES --------------------------------------------------
 

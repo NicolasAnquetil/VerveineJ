@@ -5,6 +5,7 @@ import fr.inria.verveine.extractor.java.VerveineJOptions;
 import fr.inria.verveine.extractor.java.visitors.GetVisitedEntityAbstractVisitor;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
+import org.moosetechnology.model.famix.famixjavaentities.ParametricClass;
 //import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
 import org.moosetechnology.model.famix.famixjavaentities.ParametricInterface;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
@@ -134,7 +135,7 @@ public class AbstractRefVisitor extends GetVisitedEntityAbstractVisitor {
 			//if (bnd == parameterizableBnd) {
 			//	fmxTyp = dico.ensureFamixParameterizedType(null, name, generic, (TWithTypes) /*owner*/ctxt, persistClass(null));
 			//} else {
-				fmxTyp = dico.ensureFamixParameterizedType(bnd, name, generic, (TWithTypes) /*owner*/ctxt);
+				fmxTyp = (TType)dico.ensureFamixParameterizedType(bnd, name, generic, (TWithTypes) /*owner*/ctxt);
 			//}
 
 			for (ITypeBinding targ : bnd.getTypeArguments()) {

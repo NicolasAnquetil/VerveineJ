@@ -27,7 +27,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Type")
-public class Type extends ContainerEntity implements TConcreteParameterType, TEntityMetaLevelDependency, TNamedEntity, TReferenceable, TSourceEntity, TType, TWithInheritances, TWithMethods {
+public class Type extends ContainerEntity implements TConcreteParameterType, TEntityMetaLevelDependency, TNamedEntity, TReferenceable, TSourceEntity, TType, /*TWithInheritances,*/ TWithMethods {
 
     private Collection<TParametricEntity> concreteEntity; 
 
@@ -45,9 +45,9 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
     
     private TSourceAnchor sourceAnchor;
     
-    private Collection<TInheritance> subInheritances; 
+ /*   private Collection<TInheritance> subInheritances; 
 
-    private Collection<TInheritance> superInheritances; 
+    private Collection<TInheritance> superInheritances; */
 
     private TWithTypes typeContainer;
     
@@ -430,7 +430,7 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
-    
+    /*
     @FameProperty(name = "subInheritances", opposite = "superclass", derived = true)
     public Collection<TInheritance> getSubInheritances() {
         if (subInheritances == null) {
@@ -537,7 +537,7 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
 
     public boolean hasSuperInheritances() {
         return !getSuperInheritances().isEmpty();
-    }
+    }*/
 
     @FameProperty(name = "tightClassCohesion", derived = true)
     public Number getTightClassCohesion() {

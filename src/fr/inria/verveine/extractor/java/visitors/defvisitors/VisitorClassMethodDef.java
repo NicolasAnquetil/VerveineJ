@@ -150,16 +150,6 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 				dico.addSourceAnchor(fmx, node);
 			}
 
-			for (TypeParameter tp : tparams) {
-				// if there is a type parameter, then fmx will be a Famix ParameterizableClass
-				// note: owner of the ParameterType is the ParameterizableClass
-				ParameterType fmxParam = dico.ensureFamixParameterType(tp.resolveBinding(),
-						tp.getName().getIdentifier(), (TParametricEntity) fmx);
-				fmxParam.addGenericEntity((ParametricClass)fmx);
-				if (fmxParam != null) {
-					fmxParam.setIsStub(false);
-				}
-			}
 
 			return super.visit(node);
 		} else {
