@@ -17,7 +17,7 @@ public interface TConcretisation extends TAssociationMetaLevelDependency, TAssoc
 
     public void setGenericEntity(TParametricEntity genericEntity);
 
-    @FameProperty(name = "concreteEntity", opposite = "genericEntity")
+    @FameProperty(name = "concreteEntity", opposite = "genericEntities")
     public TParametricEntity getConcreteEntity();
 
     public void setConcreteEntity(TParametricEntity concreteEntity);

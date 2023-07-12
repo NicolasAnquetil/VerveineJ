@@ -12,7 +12,12 @@ import org.moosetechnology.model.famix.moosequery.TAssociationMetaLevelDependenc
 @FameDescription("TParameterConcretisation")
 public interface TParameterConcretisation extends TAssociationMetaLevelDependency, TAssociation, TSourceEntity {
 
-        @FameProperty(name = "concretisation", opposite = "parameterConcretisation")
+        @FameProperty(name = "concreteParameter", opposite = "generic")
+    public TConcreteParameterType getConcreteParameter();
+
+    public void setConcreteParameter(TConcreteParameterType concreteParameter);
+
+    @FameProperty(name = "concretisation", opposite = "parameterConcretisation")
     public Collection<TConcretisation> getConcretisation();
 
     public void setConcretisation(Collection<? extends TConcretisation> concretisation);
@@ -29,15 +34,10 @@ public interface TParameterConcretisation extends TAssociationMetaLevelDependenc
 
     public boolean hasConcretisation();
 
-    @FameProperty(name = "genericParameters", opposite = "concretisations")
-    public TGenericParameterType getGenericParameters();
+    @FameProperty(name = "genericParameter", opposite = "concretisations")
+    public TGenericParameterType getGenericParameter();
 
-    public void setGenericParameters(TGenericParameterType genericParameters);
-
-    @FameProperty(name = "concreteParameters", opposite = "generic")
-    public TConcreteParameterType getConcreteParameters();
-
-    public void setConcreteParameters(TConcreteParameterType concreteParameters);
+    public void setGenericParameter(TGenericParameterType genericParameter);
 
 
 

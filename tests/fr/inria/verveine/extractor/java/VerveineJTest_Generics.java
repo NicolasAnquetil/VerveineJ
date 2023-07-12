@@ -68,20 +68,25 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
     public void setUp() throws Exception {
         parser = new VerveineJParser();
         repo = parser.getFamixRepo();
-        parser.configure( new String[] {"test_src/generics"});
+        parser.configure( new String[] {"test_src/generics/"});
         parser.parse();
     }
     
     @Test
     public void testInvocationOnConcretisation() {
     	ParametricClass classE = (ParametricClass)genericEntityNamed("E");
+    	Method constructor = detectFamixElement(Method.class, "E");
     	Method m = detectFamixElement(Method.class, "m");
+    	assertNotNull(constructor); 
     	assertNotNull(classE);
-    	assertEquals(1, classE.getConcretisations().size());
+    	assertEquals(1, classE.getConcretisations().size()); 
     	ParametricClass concrete = (ParametricClass)firstElt(classE.getConcretisations()).getConcreteEntity();
     	assertEquals(1, concrete.getIncomingReferences().size());
-    	assertEquals(1, concrete.getMethods().size());
-    	
+    	assertEquals(0, concrete.getMethods().size());
+    	assertEquals(1, constructor.getIncomingInvocations().size());
+    	assertEquals(classE, constructor.getParentType());
+    	assertEquals(1, m.getIncomingInvocations().size());
+    	assertEquals(classE, m.getParentType());
     }
     
     @Test
@@ -97,7 +102,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
     		ParametricClass pc = (ParametricClass)c.getConcreteEntity();
     		assertEquals(2, pc.getConcreteParameters().size());
     		for(TConcreteParameterType p : pc.getConcreteParameters()) {
-    			ParameterType genParam = (ParameterType) firstElt(p.getGeneric()).getGenericParameters(); 			
+    			ParameterType genParam = (ParameterType) firstElt(p.getGeneric()).getGenericParameter(); 			
     			assertNotNull(genParam);
     			
     			if(i==0) {
@@ -163,7 +168,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
 
         ParametricClass arrList = (ParametricClass)genericEntityNamed( "ArrayList");
         assertNotNull(arrList);
-        assertEquals(arrList, firstElt(refedArrList.getGenericEntity()).getGenericEntity());
+        assertEquals(arrList, firstElt(refedArrList.getGenericEntities()).getGenericEntity());
         assertEquals(arrList.getParentPackage(), refedArrList.getParentPackage()); //getTypeContainer
 
         assertEquals(1, refedArrList.getConcreteParameters().size()); //concreteParameters
@@ -217,8 +222,8 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
         */     
 
         for (ParametricClass typ : ptypes) {
-        	if(!typ.getGenericEntity().isEmpty())
-        		assertEquals(((Type)(firstElt(typ.getGenericEntity()).getGenericEntity())).getIsStub(), typ.getIsStub());
+        	if(!typ.getGenericEntities().isEmpty())
+        		assertEquals(((Type)(firstElt(typ.getGenericEntities()).getGenericEntity())).getIsStub(), typ.getIsStub());
         }
     }
 
@@ -303,7 +308,7 @@ public class VerveineJTest_Generics extends VerveineJTest_Basic {
     	assertEquals(1, classA.getInterfaceImplementations().size());
     	ParametricInterface myInterface = (ParametricInterface) firstElt(classA.getInterfaceImplementations()).getMyInterface();
     	assertEquals(ParametricInterface.class, myInterface.getClass());
-    	assertEquals(1, myInterface.getGenericEntity().size());
+    	assertEquals(1, myInterface.getGenericEntities().size());
     	
     	
     }

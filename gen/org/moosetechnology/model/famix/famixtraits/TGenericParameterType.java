@@ -12,7 +12,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 @FameDescription("TGenericParameterType")
 public interface TGenericParameterType extends TEntityMetaLevelDependency, TNamedEntity, TSourceEntity, TReferenceable, TType {
 
-        @FameProperty(name = "concretisations", opposite = "genericParameters", derived = true)
+        @FameProperty(name = "concretisations", opposite = "genericParameter", derived = true)
     public Collection<TParameterConcretisation> getConcretisations();
 
     public void setConcretisations(Collection<? extends TParameterConcretisation> concretisations);

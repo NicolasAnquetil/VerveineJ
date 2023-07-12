@@ -21,11 +21,11 @@ import org.moosetechnology.model.famix.moosequery.TAssociationMetaLevelDependenc
 @FameDescription("ParameterConcretisation")
 public class ParameterConcretisation extends Entity implements TAssociation, TAssociationMetaLevelDependency, TParameterConcretisation, TSourceEntity {
 
-    private TConcreteParameterType concreteParameters;
+    private TConcreteParameterType concreteParameter;
     
-    private Collection<TConcretisation> concretisation; 
+    private Collection<TConcretisation> concretisations; 
 
-    private TGenericParameterType genericParameters;
+    private TGenericParameterType genericParameter;
     
     private Boolean isStub;
     
@@ -39,25 +39,25 @@ public class ParameterConcretisation extends Entity implements TAssociation, TAs
     
 
 
-    @FameProperty(name = "concreteParameters", opposite = "generic")
-    public TConcreteParameterType getConcreteParameters() {
-        return concreteParameters;
+    @FameProperty(name = "concreteParameter", opposite = "generic")
+    public TConcreteParameterType getConcreteParameter() {
+        return concreteParameter;
     }
 
-    public void setConcreteParameters(TConcreteParameterType concreteParameters) {
-        if (this.concreteParameters != null) {
-            if (this.concreteParameters.equals(concreteParameters)) return;
-            this.concreteParameters.getGeneric().remove(this);
+    public void setConcreteParameter(TConcreteParameterType concreteParameter) {
+        if (this.concreteParameter != null) {
+            if (this.concreteParameter.equals(concreteParameter)) return;
+            this.concreteParameter.getGeneric().remove(this);
         }
-        this.concreteParameters = concreteParameters;
-        if (concreteParameters == null) return;
-        concreteParameters.getGeneric().add(this);
+        this.concreteParameter = concreteParameter;
+        if (concreteParameter == null) return;
+        concreteParameter.getGeneric().add(this);
     }
     
     @FameProperty(name = "concretisation", opposite = "parameterConcretisation")
     public Collection<TConcretisation> getConcretisation() {
-        if (concretisation == null) {
-            concretisation = new MultivalueSet<TConcretisation>() {
+        if (concretisations == null) {
+            concretisations = new MultivalueSet<TConcretisation>() {
                 @Override
                 protected void clearOpposite(TConcretisation e) {
                     e.getParameterConcretisation().remove(ParameterConcretisation.this);
@@ -68,7 +68,7 @@ public class ParameterConcretisation extends Entity implements TAssociation, TAs
                 }
             };
         }
-        return concretisation;
+        return concretisations;
     }
     
     public void setConcretisation(Collection<? extends TConcretisation> concretisation) {
@@ -116,19 +116,19 @@ public class ParameterConcretisation extends Entity implements TAssociation, TAs
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "genericParameters", opposite = "concretisations")
-    public TGenericParameterType getGenericParameters() {
-        return genericParameters;
+    @FameProperty(name = "genericParameter", opposite = "concretisations")
+    public TGenericParameterType getGenericParameter() {
+        return genericParameter;
     }
 
-    public void setGenericParameters(TGenericParameterType genericParameters) {
-        if (this.genericParameters != null) {
-            if (this.genericParameters.equals(genericParameters)) return;
-            this.genericParameters.getConcretisations().remove(this);
+    public void setGenericParameter(TGenericParameterType genericParameter) {
+        if (this.genericParameter != null) {
+            if (this.genericParameter.equals(genericParameter)) return;
+            this.genericParameter.getConcretisations().remove(this);
         }
-        this.genericParameters = genericParameters;
-        if (genericParameters == null) return;
-        genericParameters.getConcretisations().add(this);
+        this.genericParameter = genericParameter;
+        if (genericParameter == null) return;
+        genericParameter.getConcretisations().add(this);
     }
     
     @FameProperty(name = "isStub")

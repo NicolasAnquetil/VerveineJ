@@ -26,6 +26,7 @@ import org.moosetechnology.model.famix.famixtraits.TReference;
 import org.moosetechnology.model.famix.famixtraits.TReferenceable;
 import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixtraits.TThrowable;
 import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithAnnotationInstances;
@@ -40,7 +41,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Exception")
-public class Exception extends Class implements TCanImplement, TClass, TEntityMetaLevelDependency, TException, THasVisibility, TInvocationsReceiver, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TType, TWithAnnotationInstances, TWithAttributes, TWithComments, TWithInheritances, TWithMethods, TWithTypes {
+public class Exception extends Class implements TCanImplement, TClass, TEntityMetaLevelDependency, TException, THasVisibility, TInvocationsReceiver, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TThrowable, TType, TWithAnnotationInstances, TWithAttributes, TWithComments, TWithInheritances, TWithMethods, TWithTypes {
 
     private Collection<TAnnotationInstance> annotationInstances; 
 

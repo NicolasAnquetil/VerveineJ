@@ -29,7 +29,7 @@ public interface TConcreteParameterType extends TEntityMetaLevelDependency, TNam
 
     public boolean hasConcreteEntity();
 
-    @FameProperty(name = "generic", opposite = "concreteParameters", derived = true)
+    @FameProperty(name = "generic", opposite = "concreteParameter", derived = true)
     public Collection<TParameterConcretisation> getGeneric();
 
     public void setGeneric(Collection<? extends TParameterConcretisation> generic);

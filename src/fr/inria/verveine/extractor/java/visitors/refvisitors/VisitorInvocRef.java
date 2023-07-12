@@ -373,8 +373,9 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 										TType methOwner, Collection<Expression> l_args) {
 		TMethod sender = this.context.topMethod();
 		TMethod invoked = null;
+		IMethodBinding actuallBnd= calledBnd;
 		Invocation invok = null;
-
+		
 		if (calledBnd != null) {
 			// for parameterized methods there is a level of indirection, for other methods doesn't change anything
 			if(!calledBnd.isParameterizedMethod()) {
@@ -407,8 +408,15 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 					if (receiver != null)
 						owner = (TType) receiver;
-					else
-						owner = methOwner;
+					else {
+						if(actuallBnd != null && actuallBnd.getDeclaringClass().isParameterizedType()) {
+							owner = this.dico.ensureFamixType(calledBnd.getDeclaringClass().getErasure());
+						}else{
+							owner = methOwner;
+						}
+						
+					}
+						
 					//  static method called on the class (or null receiver)
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null,
 							(TWithMethods) /*owner*/owner, modifiers);

@@ -99,6 +99,7 @@ public class FamixTraitsModel {
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TStructuralEntity.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TTemplate.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TTemplateUser.class);
+		metamodel.with(org.moosetechnology.model.famix.famixtraits.TThrowable.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TTrait.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TTraitUsage.class);
 		metamodel.with(org.moosetechnology.model.famix.famixtraits.TTraitUser.class);

@@ -107,7 +107,7 @@ public abstract class VerveineJTest_Basic {
     	TParametricEntity selected = null;
     	
     	for(NamedEntity ne: candidates) {
-    		if(ne instanceof TParametricEntity && ((TParametricEntity)ne).getGenericEntity().isEmpty()) {
+    		if(ne instanceof TParametricEntity && ((TParametricEntity)ne).getGenericEntities().isEmpty()) {
     			selected = (TParametricEntity)ne;
     		}
     	}

@@ -30,7 +30,7 @@ public class Concretisation extends Entity implements TAssociation, TAssociation
     
     private Number numberOfLinesOfCode;
     
-    private Collection<TParameterConcretisation> parameterConcretisation; 
+    private Collection<TParameterConcretisation> parameterConcretisations; 
 
     private TAssociation previous;
     
@@ -38,7 +38,7 @@ public class Concretisation extends Entity implements TAssociation, TAssociation
     
 
 
-    @FameProperty(name = "concreteEntity", opposite = "genericEntity")
+    @FameProperty(name = "concreteEntity", opposite = "genericEntities")
     public TParametricEntity getConcreteEntity() {
         return concreteEntity;
     }
@@ -46,11 +46,11 @@ public class Concretisation extends Entity implements TAssociation, TAssociation
     public void setConcreteEntity(TParametricEntity concreteEntity) {
         if (this.concreteEntity != null) {
             if (this.concreteEntity.equals(concreteEntity)) return;
-            this.concreteEntity.getGenericEntity().remove(this);
+            this.concreteEntity.getGenericEntities().remove(this);
         }
         this.concreteEntity = concreteEntity;
         if (concreteEntity == null) return;
-        concreteEntity.getGenericEntity().add(this);
+        concreteEntity.getGenericEntities().add(this);
     }
     
     @FameProperty(name = "containsReplicas", derived = true)
@@ -120,8 +120,8 @@ public class Concretisation extends Entity implements TAssociation, TAssociation
     
     @FameProperty(name = "parameterConcretisation", opposite = "concretisation", derived = true)
     public Collection<TParameterConcretisation> getParameterConcretisation() {
-        if (parameterConcretisation == null) {
-            parameterConcretisation = new MultivalueSet<TParameterConcretisation>() {
+        if (parameterConcretisations == null) {
+            parameterConcretisations = new MultivalueSet<TParameterConcretisation>() {
                 @Override
                 protected void clearOpposite(TParameterConcretisation e) {
                     e.getConcretisation().remove(Concretisation.this);
@@ -132,7 +132,7 @@ public class Concretisation extends Entity implements TAssociation, TAssociation
                 }
             };
         }
-        return parameterConcretisation;
+        return parameterConcretisations;
     }
     
     public void setParameterConcretisation(Collection<? extends TParameterConcretisation> parameterConcretisation) {

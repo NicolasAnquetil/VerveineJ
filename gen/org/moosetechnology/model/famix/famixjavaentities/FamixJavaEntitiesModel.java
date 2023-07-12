@@ -42,7 +42,6 @@ public class FamixJavaEntitiesModel {
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.ParameterConcretisation.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.ParameterType.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.ParametricClass.class);
-		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.ParametricInheritance.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.ParametricInterface.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.ParametricMethod.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.PrimitiveType.class);

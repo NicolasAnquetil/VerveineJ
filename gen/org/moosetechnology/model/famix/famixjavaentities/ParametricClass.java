@@ -20,7 +20,7 @@ public class ParametricClass extends Class implements TParametricEntity {
 
     private Collection<TConcretisation> concretisations; 
 
-    private Collection<TConcretisation> genericEntity; 
+    private Collection<TConcretisation> genericEntities; 
 
     private Collection<TGenericParameterType> genericParameters; 
 
@@ -127,10 +127,10 @@ public class ParametricClass extends Class implements TParametricEntity {
         return !getConcretisations().isEmpty();
     }
 
-    @FameProperty(name = "genericEntity", opposite = "concreteEntity", derived = true)
-    public Collection<TConcretisation> getGenericEntity() {
-        if (genericEntity == null) {
-            genericEntity = new MultivalueSet<TConcretisation>() {
+    @FameProperty(name = "genericEntities", opposite = "concreteEntity", derived = true)
+    public Collection<TConcretisation> getGenericEntities() {
+        if (genericEntities == null) {
+            genericEntities = new MultivalueSet<TConcretisation>() {
                 @Override
                 protected void clearOpposite(TConcretisation e) {
                     e.setConcreteEntity(null);
@@ -141,41 +141,41 @@ public class ParametricClass extends Class implements TParametricEntity {
                 }
             };
         }
-        return genericEntity;
+        return genericEntities;
     }
     
-    public void setGenericEntity(Collection<? extends TConcretisation> genericEntity) {
-        this.getGenericEntity().clear();
-        this.getGenericEntity().addAll(genericEntity);
+    public void setGenericEntities(Collection<? extends TConcretisation> genericEntities) {
+        this.getGenericEntities().clear();
+        this.getGenericEntities().addAll(genericEntities);
     }                    
     
         
-    public void addGenericEntity(TConcretisation one) {
-        this.getGenericEntity().add(one);
+    public void addGenericEntities(TConcretisation one) {
+        this.getGenericEntities().add(one);
     }   
     
-    public void addGenericEntity(TConcretisation one, TConcretisation... many) {
-        this.getGenericEntity().add(one);
+    public void addGenericEntities(TConcretisation one, TConcretisation... many) {
+        this.getGenericEntities().add(one);
         for (TConcretisation each : many)
-            this.getGenericEntity().add(each);
+            this.getGenericEntities().add(each);
     }   
     
-    public void addGenericEntity(Iterable<? extends TConcretisation> many) {
+    public void addGenericEntities(Iterable<? extends TConcretisation> many) {
         for (TConcretisation each : many)
-            this.getGenericEntity().add(each);
+            this.getGenericEntities().add(each);
     }   
                 
-    public void addGenericEntity(TConcretisation[] many) {
+    public void addGenericEntities(TConcretisation[] many) {
         for (TConcretisation each : many)
-            this.getGenericEntity().add(each);
+            this.getGenericEntities().add(each);
     }
     
-    public int numberOfGenericEntity() {
-        return getGenericEntity().size();
+    public int numberOfGenericEntities() {
+        return getGenericEntities().size();
     }
 
-    public boolean hasGenericEntity() {
-        return !getGenericEntity().isEmpty();
+    public boolean hasGenericEntities() {
+        return !getGenericEntities().isEmpty();
     }
 
     @FameProperty(name = "genericParameters", opposite = "genericEntity")

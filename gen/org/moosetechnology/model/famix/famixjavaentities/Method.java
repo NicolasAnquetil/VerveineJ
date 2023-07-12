@@ -12,7 +12,6 @@ import org.moosetechnology.model.famix.famixtraits.TCanBeAbstract;
 import org.moosetechnology.model.famix.famixtraits.TCanBeClassSide;
 import org.moosetechnology.model.famix.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famix.famixtraits.TComment;
-import org.moosetechnology.model.famix.famixtraits.TException;
 import org.moosetechnology.model.famix.famixtraits.THasKind;
 import org.moosetechnology.model.famix.famixtraits.THasSignature;
 import org.moosetechnology.model.famix.famixtraits.THasVisibility;
@@ -29,6 +28,7 @@ import org.moosetechnology.model.famix.famixtraits.TParameter;
 import org.moosetechnology.model.famix.famixtraits.TReference;
 import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixtraits.TThrowable;
 import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithAccesses;
@@ -52,13 +52,13 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     
     private Collection<TAccess> accesses; 
 
-    private Collection<TException> caughtExceptions; 
+    private Collection<TThrowable> caughtExceptions; 
 
     private Collection<TComment> comments; 
 
     private Number cyclomaticComplexity;
     
-    private Collection<TException> declaredExceptions; 
+    private Collection<TThrowable> declaredExceptions; 
 
     private TType declaredType;
     
@@ -70,13 +70,13 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
 
     private Boolean isAbstract;
     
+    private Boolean isDead;
+    
     private Boolean isClassSide;
     
     private Boolean isFinal;
     
     private Boolean isStub;
-    
-    private Boolean isDead;
     
     private Boolean isSynchronized;
     
@@ -100,7 +100,7 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     
     private TSourceAnchor sourceAnchor;
     
-    private Collection<TException> thrownExceptions; 
+    private Collection<TThrowable> thrownExceptions; 
 
     private String visibility;
     
@@ -239,15 +239,15 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     }
 
     @FameProperty(name = "caughtExceptions", opposite = "catchingEntities")
-    public Collection<TException> getCaughtExceptions() {
+    public Collection<TThrowable> getCaughtExceptions() {
         if (caughtExceptions == null) {
-            caughtExceptions = new MultivalueSet<TException>() {
+            caughtExceptions = new MultivalueSet<TThrowable>() {
                 @Override
-                protected void clearOpposite(TException e) {
+                protected void clearOpposite(TThrowable e) {
                     e.getCatchingEntities().remove(Method.this);
                 }
                 @Override
-                protected void setOpposite(TException e) {
+                protected void setOpposite(TThrowable e) {
                     e.getCatchingEntities().add(Method.this);
                 }
             };
@@ -255,28 +255,28 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         return caughtExceptions;
     }
     
-    public void setCaughtExceptions(Collection<? extends TException> caughtExceptions) {
+    public void setCaughtExceptions(Collection<? extends TThrowable> caughtExceptions) {
         this.getCaughtExceptions().clear();
         this.getCaughtExceptions().addAll(caughtExceptions);
     }
     
-    public void addCaughtExceptions(TException one) {
+    public void addCaughtExceptions(TThrowable one) {
         this.getCaughtExceptions().add(one);
     }   
     
-    public void addCaughtExceptions(TException one, TException... many) {
+    public void addCaughtExceptions(TThrowable one, TThrowable... many) {
         this.getCaughtExceptions().add(one);
-        for (TException each : many)
+        for (TThrowable each : many)
             this.getCaughtExceptions().add(each);
     }   
     
-    public void addCaughtExceptions(Iterable<? extends TException> many) {
-        for (TException each : many)
+    public void addCaughtExceptions(Iterable<? extends TThrowable> many) {
+        for (TThrowable each : many)
             this.getCaughtExceptions().add(each);
     }   
                 
-    public void addCaughtExceptions(TException[] many) {
-        for (TException each : many)
+    public void addCaughtExceptions(TThrowable[] many) {
+        for (TThrowable each : many)
             this.getCaughtExceptions().add(each);
     }
     
@@ -355,15 +355,15 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     }
     
     @FameProperty(name = "declaredExceptions", opposite = "declaringEntities")
-    public Collection<TException> getDeclaredExceptions() {
+    public Collection<TThrowable> getDeclaredExceptions() {
         if (declaredExceptions == null) {
-            declaredExceptions = new MultivalueSet<TException>() {
+            declaredExceptions = new MultivalueSet<TThrowable>() {
                 @Override
-                protected void clearOpposite(TException e) {
+                protected void clearOpposite(TThrowable e) {
                     e.getDeclaringEntities().remove(Method.this);
                 }
                 @Override
-                protected void setOpposite(TException e) {
+                protected void setOpposite(TThrowable e) {
                     e.getDeclaringEntities().add(Method.this);
                 }
             };
@@ -371,28 +371,28 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         return declaredExceptions;
     }
     
-    public void setDeclaredExceptions(Collection<? extends TException> declaredExceptions) {
+    public void setDeclaredExceptions(Collection<? extends TThrowable> declaredExceptions) {
         this.getDeclaredExceptions().clear();
         this.getDeclaredExceptions().addAll(declaredExceptions);
     }
     
-    public void addDeclaredExceptions(TException one) {
+    public void addDeclaredExceptions(TThrowable one) {
         this.getDeclaredExceptions().add(one);
     }   
     
-    public void addDeclaredExceptions(TException one, TException... many) {
+    public void addDeclaredExceptions(TThrowable one, TThrowable... many) {
         this.getDeclaredExceptions().add(one);
-        for (TException each : many)
+        for (TThrowable each : many)
             this.getDeclaredExceptions().add(each);
     }   
     
-    public void addDeclaredExceptions(Iterable<? extends TException> many) {
-        for (TException each : many)
+    public void addDeclaredExceptions(Iterable<? extends TThrowable> many) {
+        for (TThrowable each : many)
             this.getDeclaredExceptions().add(each);
     }   
                 
-    public void addDeclaredExceptions(TException[] many) {
-        for (TException each : many)
+    public void addDeclaredExceptions(TThrowable[] many) {
+        for (TThrowable each : many)
             this.getDeclaredExceptions().add(each);
     }
     
@@ -649,7 +649,7 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         this.isFinal = isFinal;
     }
     
-
+    
     @FameProperty(name = "isPackageVisibility", derived = true)
     public Boolean getIsPackageVisibility() {
         // TODO: this is a derived property, implement this method manually.
@@ -819,7 +819,6 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-
     
     @FameProperty(name = "outgoingInvocations", opposite = "sender", derived = true)
     public Collection<TInvocation> getOutgoingInvocations() {
@@ -1025,15 +1024,15 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     }
     
     @FameProperty(name = "thrownExceptions", opposite = "throwingEntities")
-    public Collection<TException> getThrownExceptions() {
+    public Collection<TThrowable> getThrownExceptions() {
         if (thrownExceptions == null) {
-            thrownExceptions = new MultivalueSet<TException>() {
+            thrownExceptions = new MultivalueSet<TThrowable>() {
                 @Override
-                protected void clearOpposite(TException e) {
+                protected void clearOpposite(TThrowable e) {
                     e.getThrowingEntities().remove(Method.this);
                 }
                 @Override
-                protected void setOpposite(TException e) {
+                protected void setOpposite(TThrowable e) {
                     e.getThrowingEntities().add(Method.this);
                 }
             };
@@ -1041,28 +1040,28 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         return thrownExceptions;
     }
     
-    public void setThrownExceptions(Collection<? extends TException> thrownExceptions) {
+    public void setThrownExceptions(Collection<? extends TThrowable> thrownExceptions) {
         this.getThrownExceptions().clear();
         this.getThrownExceptions().addAll(thrownExceptions);
     }
     
-    public void addThrownExceptions(TException one) {
+    public void addThrownExceptions(TThrowable one) {
         this.getThrownExceptions().add(one);
     }   
     
-    public void addThrownExceptions(TException one, TException... many) {
+    public void addThrownExceptions(TThrowable one, TThrowable... many) {
         this.getThrownExceptions().add(one);
-        for (TException each : many)
+        for (TThrowable each : many)
             this.getThrownExceptions().add(each);
     }   
     
-    public void addThrownExceptions(Iterable<? extends TException> many) {
-        for (TException each : many)
+    public void addThrownExceptions(Iterable<? extends TThrowable> many) {
+        for (TThrowable each : many)
             this.getThrownExceptions().add(each);
     }   
                 
-    public void addThrownExceptions(TException[] many) {
-        for (TException each : many)
+    public void addThrownExceptions(TThrowable[] many) {
+        for (TThrowable each : many)
             this.getThrownExceptions().add(each);
     }
     
@@ -1083,8 +1082,6 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         this.visibility = visibility;
     }
     
-    // Manually added
-
     private Number numberOfStatements;
 
     @FameProperty(name = "numberOfStatements")
@@ -1121,6 +1118,7 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
         // TODO Auto-generated method stub
         return null;
     }
+
 
 }
 

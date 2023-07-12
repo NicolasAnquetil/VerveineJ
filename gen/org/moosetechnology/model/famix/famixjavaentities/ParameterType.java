@@ -16,8 +16,10 @@ import org.moosetechnology.model.famix.famixtraits.TReference;
 import org.moosetechnology.model.famix.famixtraits.TReferenceable;
 import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixtraits.TThrowable;
 import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
+import org.moosetechnology.model.famix.famixtraits.TWithExceptions;
 import org.moosetechnology.model.famix.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
@@ -25,12 +27,16 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("ParameterType")
-public class ParameterType extends Type implements TEntityMetaLevelDependency, TGenericParameterType, TNamedEntity, TReferenceable, TSourceEntity, TWithInheritances, TType, TTypedEntity {
+public class ParameterType extends Type implements TEntityMetaLevelDependency, TGenericParameterType, TNamedEntity, TReferenceable, TSourceEntity, TThrowable, TType, TTypedEntity, TWithInheritances {
+
+    private Collection<TWithExceptions> catchingEntities; 
 
     private Collection<TParameterConcretisation> concretisations; 
 
     private TType declaredType;
     
+    private Collection<TWithExceptions> declaringEntities; 
+
     private Collection<TParametricEntity> genericEntity; 
 
     private Collection<TReference> incomingReferences; 
@@ -43,25 +49,79 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
     
     private TSourceAnchor sourceAnchor;
     
+    private Collection<TInheritance> subInheritances; 
+
+    private Collection<TInheritance> superInheritances; 
+
+    private Collection<TWithExceptions> throwingEntities; 
+
     private TWithTypes typeContainer;
     
     private Collection<TTypedEntity> typedEntities; 
 
-    private Collection<TInheritance> subInheritances; 
 
-    private Collection<TInheritance> superInheritances;
 
-    @FameProperty(name = "concretisations", opposite = "genericParameters", derived = true)
+    @FameProperty(name = "catchingEntities", opposite = "caughtExceptions", derived = true)
+    public Collection<TWithExceptions> getCatchingEntities() {
+        if (catchingEntities == null) {
+            catchingEntities = new MultivalueSet<TWithExceptions>() {
+                @Override
+                protected void clearOpposite(TWithExceptions e) {
+                    e.getCaughtExceptions().remove(ParameterType.this);
+                }
+                @Override
+                protected void setOpposite(TWithExceptions e) {
+                    e.getCaughtExceptions().add(ParameterType.this);
+                }
+            };
+        }
+        return catchingEntities;
+    }
+    
+    public void setCatchingEntities(Collection<? extends TWithExceptions> catchingEntities) {
+        this.getCatchingEntities().clear();
+        this.getCatchingEntities().addAll(catchingEntities);
+    }
+    
+    public void addCatchingEntities(TWithExceptions one) {
+        this.getCatchingEntities().add(one);
+    }   
+    
+    public void addCatchingEntities(TWithExceptions one, TWithExceptions... many) {
+        this.getCatchingEntities().add(one);
+        for (TWithExceptions each : many)
+            this.getCatchingEntities().add(each);
+    }   
+    
+    public void addCatchingEntities(Iterable<? extends TWithExceptions> many) {
+        for (TWithExceptions each : many)
+            this.getCatchingEntities().add(each);
+    }   
+                
+    public void addCatchingEntities(TWithExceptions[] many) {
+        for (TWithExceptions each : many)
+            this.getCatchingEntities().add(each);
+    }
+    
+    public int numberOfCatchingEntities() {
+        return getCatchingEntities().size();
+    }
+
+    public boolean hasCatchingEntities() {
+        return !getCatchingEntities().isEmpty();
+    }
+
+    @FameProperty(name = "concretisations", opposite = "genericParameter", derived = true)
     public Collection<TParameterConcretisation> getConcretisations() {
         if (concretisations == null) {
             concretisations = new MultivalueSet<TParameterConcretisation>() {
                 @Override
                 protected void clearOpposite(TParameterConcretisation e) {
-                    e.setGenericParameters(null);
+                    e.setGenericParameter(null);
                 }
                 @Override
                 protected void setOpposite(TParameterConcretisation e) {
-                    e.setGenericParameters(ParameterType.this);
+                    e.setGenericParameter(ParameterType.this);
                 }
             };
         }
@@ -123,6 +183,56 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
         declaredType.getTypedEntities().add(this);
     }
     
+    @FameProperty(name = "declaringEntities", opposite = "declaredExceptions", derived = true)
+    public Collection<TWithExceptions> getDeclaringEntities() {
+        if (declaringEntities == null) {
+            declaringEntities = new MultivalueSet<TWithExceptions>() {
+                @Override
+                protected void clearOpposite(TWithExceptions e) {
+                    e.getDeclaredExceptions().remove(ParameterType.this);
+                }
+                @Override
+                protected void setOpposite(TWithExceptions e) {
+                    e.getDeclaredExceptions().add(ParameterType.this);
+                }
+            };
+        }
+        return declaringEntities;
+    }
+    
+    public void setDeclaringEntities(Collection<? extends TWithExceptions> declaringEntities) {
+        this.getDeclaringEntities().clear();
+        this.getDeclaringEntities().addAll(declaringEntities);
+    }
+    
+    public void addDeclaringEntities(TWithExceptions one) {
+        this.getDeclaringEntities().add(one);
+    }   
+    
+    public void addDeclaringEntities(TWithExceptions one, TWithExceptions... many) {
+        this.getDeclaringEntities().add(one);
+        for (TWithExceptions each : many)
+            this.getDeclaringEntities().add(each);
+    }   
+    
+    public void addDeclaringEntities(Iterable<? extends TWithExceptions> many) {
+        for (TWithExceptions each : many)
+            this.getDeclaringEntities().add(each);
+    }   
+                
+    public void addDeclaringEntities(TWithExceptions[] many) {
+        for (TWithExceptions each : many)
+            this.getDeclaringEntities().add(each);
+    }
+    
+    public int numberOfDeclaringEntities() {
+        return getDeclaringEntities().size();
+    }
+
+    public boolean hasDeclaringEntities() {
+        return !getDeclaringEntities().isEmpty();
+    }
+
     @FameProperty(name = "duplicationRate", derived = true)
     public Number getDuplicationRate() {
         // TODO: this is a derived property, implement this method manually.
@@ -191,6 +301,12 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
         return !getGenericEntity().isEmpty();
     }
 
+    @FameProperty(name = "hierarchyNestingLevel", derived = true)
+    public Number getHierarchyNestingLevel() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "incomingReferences", opposite = "referredType", derived = true)
     public Collection<TReference> getIncomingReferences() {
         if (incomingReferences == null) {
@@ -278,6 +394,12 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfDirectSubclasses", derived = true)
+    public Number getNumberOfDirectSubclasses() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfExternalClients", derived = true)
     public Number getNumberOfExternalClients() {
         // TODO: this is a derived property, implement this method manually.
@@ -317,6 +439,12 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfSubclasses", derived = true)
+    public Number getNumberOfSubclasses() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "replicas", derived = true)
     public Replica getReplicas() {
         // TODO: this is a derived property, implement this method manually.
@@ -343,72 +471,6 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "typeContainer", opposite = "types", container = true)
-    public TWithTypes getTypeContainer() {
-        return typeContainer;
-    }
-
-    public void setTypeContainer(TWithTypes typeContainer) {
-        if (this.typeContainer != null) {
-            if (this.typeContainer.equals(typeContainer)) return;
-            this.typeContainer.getTypes().remove(this);
-        }
-        this.typeContainer = typeContainer;
-        if (typeContainer == null) return;
-        typeContainer.getTypes().add(this);
-    }
-    
-    @FameProperty(name = "typedEntities", opposite = "declaredType", derived = true)
-    public Collection<TTypedEntity> getTypedEntities() {
-        if (typedEntities == null) {
-            typedEntities = new MultivalueSet<TTypedEntity>() {
-                @Override
-                protected void clearOpposite(TTypedEntity e) {
-                    e.setDeclaredType(null);
-                }
-                @Override
-                protected void setOpposite(TTypedEntity e) {
-                    e.setDeclaredType(ParameterType.this);
-                }
-            };
-        }
-        return typedEntities;
-    }
-    
-    public void setTypedEntities(Collection<? extends TTypedEntity> typedEntities) {
-        this.getTypedEntities().clear();
-        this.getTypedEntities().addAll(typedEntities);
-    }                    
-    
-        
-    public void addTypedEntities(TTypedEntity one) {
-        this.getTypedEntities().add(one);
-    }   
-    
-    public void addTypedEntities(TTypedEntity one, TTypedEntity... many) {
-        this.getTypedEntities().add(one);
-        for (TTypedEntity each : many)
-            this.getTypedEntities().add(each);
-    }   
-    
-    public void addTypedEntities(Iterable<? extends TTypedEntity> many) {
-        for (TTypedEntity each : many)
-            this.getTypedEntities().add(each);
-    }   
-                
-    public void addTypedEntities(TTypedEntity[] many) {
-        for (TTypedEntity each : many)
-            this.getTypedEntities().add(each);
-    }
-    
-    public int numberOfTypedEntities() {
-        return getTypedEntities().size();
-    }
-
-    public boolean hasTypedEntities() {
-        return !getTypedEntities().isEmpty();
-    }
-
     @FameProperty(name = "subInheritances", opposite = "superclass", derived = true)
     public Collection<TInheritance> getSubInheritances() {
         if (subInheritances == null) {
@@ -516,6 +578,124 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
     public boolean hasSuperInheritances() {
         return !getSuperInheritances().isEmpty();
     }
+
+    @FameProperty(name = "throwingEntities", opposite = "thrownExceptions", derived = true)
+    public Collection<TWithExceptions> getThrowingEntities() {
+        if (throwingEntities == null) {
+            throwingEntities = new MultivalueSet<TWithExceptions>() {
+                @Override
+                protected void clearOpposite(TWithExceptions e) {
+                    e.getThrownExceptions().remove(ParameterType.this);
+                }
+                @Override
+                protected void setOpposite(TWithExceptions e) {
+                    e.getThrownExceptions().add(ParameterType.this);
+                }
+            };
+        }
+        return throwingEntities;
+    }
+    
+    public void setThrowingEntities(Collection<? extends TWithExceptions> throwingEntities) {
+        this.getThrowingEntities().clear();
+        this.getThrowingEntities().addAll(throwingEntities);
+    }
+    
+    public void addThrowingEntities(TWithExceptions one) {
+        this.getThrowingEntities().add(one);
+    }   
+    
+    public void addThrowingEntities(TWithExceptions one, TWithExceptions... many) {
+        this.getThrowingEntities().add(one);
+        for (TWithExceptions each : many)
+            this.getThrowingEntities().add(each);
+    }   
+    
+    public void addThrowingEntities(Iterable<? extends TWithExceptions> many) {
+        for (TWithExceptions each : many)
+            this.getThrowingEntities().add(each);
+    }   
+                
+    public void addThrowingEntities(TWithExceptions[] many) {
+        for (TWithExceptions each : many)
+            this.getThrowingEntities().add(each);
+    }
+    
+    public int numberOfThrowingEntities() {
+        return getThrowingEntities().size();
+    }
+
+    public boolean hasThrowingEntities() {
+        return !getThrowingEntities().isEmpty();
+    }
+
+    @FameProperty(name = "typeContainer", opposite = "types", container = true)
+    public TWithTypes getTypeContainer() {
+        return typeContainer;
+    }
+
+    public void setTypeContainer(TWithTypes typeContainer) {
+        if (this.typeContainer != null) {
+            if (this.typeContainer.equals(typeContainer)) return;
+            this.typeContainer.getTypes().remove(this);
+        }
+        this.typeContainer = typeContainer;
+        if (typeContainer == null) return;
+        typeContainer.getTypes().add(this);
+    }
+    
+    @FameProperty(name = "typedEntities", opposite = "declaredType", derived = true)
+    public Collection<TTypedEntity> getTypedEntities() {
+        if (typedEntities == null) {
+            typedEntities = new MultivalueSet<TTypedEntity>() {
+                @Override
+                protected void clearOpposite(TTypedEntity e) {
+                    e.setDeclaredType(null);
+                }
+                @Override
+                protected void setOpposite(TTypedEntity e) {
+                    e.setDeclaredType(ParameterType.this);
+                }
+            };
+        }
+        return typedEntities;
+    }
+    
+    public void setTypedEntities(Collection<? extends TTypedEntity> typedEntities) {
+        this.getTypedEntities().clear();
+        this.getTypedEntities().addAll(typedEntities);
+    }                    
+    
+        
+    public void addTypedEntities(TTypedEntity one) {
+        this.getTypedEntities().add(one);
+    }   
+    
+    public void addTypedEntities(TTypedEntity one, TTypedEntity... many) {
+        this.getTypedEntities().add(one);
+        for (TTypedEntity each : many)
+            this.getTypedEntities().add(each);
+    }   
+    
+    public void addTypedEntities(Iterable<? extends TTypedEntity> many) {
+        for (TTypedEntity each : many)
+            this.getTypedEntities().add(each);
+    }   
+                
+    public void addTypedEntities(TTypedEntity[] many) {
+        for (TTypedEntity each : many)
+            this.getTypedEntities().add(each);
+    }
+    
+    public int numberOfTypedEntities() {
+        return getTypedEntities().size();
+    }
+
+    public boolean hasTypedEntities() {
+        return !getTypedEntities().isEmpty();
+    }
+
+
 
 }
 

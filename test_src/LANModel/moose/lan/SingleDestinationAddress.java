@@ -9,7 +9,7 @@ package moose.lan;
  *
  */
 public class SingleDestinationAddress extends AbstractDestinationAddress {
-
+	
 	private String id;
 	
 	public String id() {
