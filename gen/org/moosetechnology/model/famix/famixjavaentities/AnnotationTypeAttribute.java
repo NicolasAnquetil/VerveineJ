@@ -6,7 +6,6 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TAccess;
 import org.moosetechnology.model.famix.famixtraits.TAccessible;
@@ -216,12 +215,6 @@ public class AnnotationTypeAttribute extends NamedEntity implements TAccessible,
     
     @FameProperty(name = "fanOut", derived = true)
     public Number getFanOut() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "hasClassScope", derived = true)
-    public Boolean getHasClassScope() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

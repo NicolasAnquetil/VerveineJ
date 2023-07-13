@@ -10,7 +10,7 @@ import ch.akuhn.fame.FameProperty;
 @FameDescription("TCompilationUnit")
 public interface TCompilationUnit extends TFileSystemEntity, TFile {
 
-        @FameProperty(name = "compilationUnitOwner", opposite = "compilationUnit")
+        @FameProperty(name = "compilationUnitOwner", opposite = "compilationUnit", container = true)
     public TWithCompilationUnits getCompilationUnitOwner();
 
     public void setCompilationUnitOwner(TWithCompilationUnits compilationUnitOwner);

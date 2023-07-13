@@ -4,7 +4,6 @@ package org.moosetechnology.model.famix.famixjavaentities;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TAssociation;
 import org.moosetechnology.model.famix.famixtraits.TCanImplement;

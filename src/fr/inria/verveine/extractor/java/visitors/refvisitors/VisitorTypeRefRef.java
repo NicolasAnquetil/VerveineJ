@@ -5,6 +5,8 @@ import fr.inria.verveine.extractor.java.VerveineJOptions;
 import org.eclipse.jdt.core.dom.*;
 import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
+import org.moosetechnology.model.famix.famixjavaentities.ParametricClass;
 import org.moosetechnology.model.famix.famixjavaentities.Reference;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
 import org.moosetechnology.model.famix.famixtraits.TType;

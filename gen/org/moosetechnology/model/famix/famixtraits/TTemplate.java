@@ -28,7 +28,7 @@ public interface TTemplate  {
 
     public boolean hasTemplateUsers();
 
-    @FameProperty(name = "templateOwner", opposite = "templates")
+    @FameProperty(name = "templateOwner", opposite = "templates", container = true)
     public TWithTemplates getTemplateOwner();
 
     public void setTemplateOwner(TWithTemplates templateOwner);

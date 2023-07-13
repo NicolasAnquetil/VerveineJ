@@ -6,32 +6,30 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
+import org.moosetechnology.model.famix.famixtraits.TConcreteParameterType;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famix.famixtraits.TParameterizedTypeUser;
+import org.moosetechnology.model.famix.famixtraits.TParameterConcretisation;
+import org.moosetechnology.model.famix.famixtraits.TParametricEntity;
 import org.moosetechnology.model.famix.famixtraits.TReference;
 import org.moosetechnology.model.famix.famixtraits.TReferenceable;
 import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famix.famixtraits.TType;
-import org.moosetechnology.model.famix.famixtraits.TTypeAlias;
 import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithMethods;
-import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypeUsers;
-import org.moosetechnology.model.famix.famixtraits.TWithTypeAliases;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Type")
-public class Type extends ContainerEntity implements TEntityMetaLevelDependency, TNamedEntity, TParameterizedTypeUser, TReferenceable, TSourceEntity, TType, TWithMethods, TWithTypeAliases {
+public class Type extends ContainerEntity implements TConcreteParameterType, TEntityMetaLevelDependency, TNamedEntity, TReferenceable, TSourceEntity, TType, TWithMethods {
 
-    private ContainerEntity container;
+    private Collection<TParametricEntity> concreteEntities; 
 
-    private Collection<TWithParameterizedTypeUsers> argumentsInParameterizedTypes; 
+    private Collection<TParameterConcretisation> generics; 
 
     private Collection<TReference> incomingReferences; 
 
@@ -45,20 +43,11 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
     
     private TSourceAnchor sourceAnchor;
     
-    private Collection<TTypeAlias> typeAliases; 
-
     private TWithTypes typeContainer;
     
     private Collection<TTypedEntity> typedEntities; 
 
-    @FameProperty(name = "container")
-    public ContainerEntity getContainer() {
-        return container;
-    }
 
-    public void setContainer(ContainerEntity container) {
-        this.container = container;
-    }
 
     @FameProperty(name = "isInnerClass", derived = true)
     public Boolean getIsInnerClass() {
@@ -78,54 +67,54 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "argumentsInParameterizedTypes", opposite = "arguments", derived = true)
-    public Collection<TWithParameterizedTypeUsers> getArgumentsInParameterizedTypes() {
-        if (argumentsInParameterizedTypes == null) {
-            argumentsInParameterizedTypes = new MultivalueSet<TWithParameterizedTypeUsers>() {
+    @FameProperty(name = "concreteEntity", opposite = "concreteParameters", derived = true)
+    public Collection<TParametricEntity> getConcreteEntity() {
+        if (concreteEntities == null) {
+            concreteEntities = new MultivalueSet<TParametricEntity>() {
                 @Override
-                protected void clearOpposite(TWithParameterizedTypeUsers e) {
-                    e.getArguments().remove(Type.this);
+                protected void clearOpposite(TParametricEntity e) {
+                    e.getConcreteParameters().remove(Type.this);
                 }
                 @Override
-                protected void setOpposite(TWithParameterizedTypeUsers e) {
-                    e.getArguments().add(Type.this);
+                protected void setOpposite(TParametricEntity e) {
+                    e.getConcreteParameters().add(Type.this);
                 }
             };
         }
-        return argumentsInParameterizedTypes;
+        return concreteEntities;
     }
     
-    public void setArgumentsInParameterizedTypes(Collection<? extends TWithParameterizedTypeUsers> argumentsInParameterizedTypes) {
-        this.getArgumentsInParameterizedTypes().clear();
-        this.getArgumentsInParameterizedTypes().addAll(argumentsInParameterizedTypes);
+    public void setConcreteEntity(Collection<? extends TParametricEntity> concreteEntity) {
+        this.getConcreteEntity().clear();
+        this.getConcreteEntity().addAll(concreteEntity);
     }
     
-    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers one) {
-        this.getArgumentsInParameterizedTypes().add(one);
+    public void addConcreteEntity(TParametricEntity one) {
+        this.getConcreteEntity().add(one);
     }   
     
-    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers one, TWithParameterizedTypeUsers... many) {
-        this.getArgumentsInParameterizedTypes().add(one);
-        for (TWithParameterizedTypeUsers each : many)
-            this.getArgumentsInParameterizedTypes().add(each);
+    public void addConcreteEntity(TParametricEntity one, TParametricEntity... many) {
+        this.getConcreteEntity().add(one);
+        for (TParametricEntity each : many)
+            this.getConcreteEntity().add(each);
     }   
     
-    public void addArgumentsInParameterizedTypes(Iterable<? extends TWithParameterizedTypeUsers> many) {
-        for (TWithParameterizedTypeUsers each : many)
-            this.getArgumentsInParameterizedTypes().add(each);
+    public void addConcreteEntity(Iterable<? extends TParametricEntity> many) {
+        for (TParametricEntity each : many)
+            this.getConcreteEntity().add(each);
     }   
                 
-    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers[] many) {
-        for (TWithParameterizedTypeUsers each : many)
-            this.getArgumentsInParameterizedTypes().add(each);
+    public void addConcreteEntity(TParametricEntity[] many) {
+        for (TParametricEntity each : many)
+            this.getConcreteEntity().add(each);
     }
     
-    public int numberOfArgumentsInParameterizedTypes() {
-        return getArgumentsInParameterizedTypes().size();
+    public int numberOfConcreteEntity() {
+        return getConcreteEntity().size();
     }
 
-    public boolean hasArgumentsInParameterizedTypes() {
-        return !getArgumentsInParameterizedTypes().isEmpty();
+    public boolean hasConcreteEntity() {
+        return !getConcreteEntity().isEmpty();
     }
 
     @FameProperty(name = "containsReplicas", derived = true)
@@ -152,6 +141,57 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "generic", opposite = "concreteParameter", derived = true)
+    public Collection<TParameterConcretisation> getGeneric() {
+        if (generics == null) {
+            generics = new MultivalueSet<TParameterConcretisation>() {
+                @Override
+                protected void clearOpposite(TParameterConcretisation e) {
+                    e.setConcreteParameter(null);
+                }
+                @Override
+                protected void setOpposite(TParameterConcretisation e) {
+                    e.setConcreteParameter(Type.this);
+                }
+            };
+        }
+        return generics;
+    }
+    
+    public void setGeneric(Collection<? extends TParameterConcretisation> generics) {
+        this.getGeneric().clear();
+        this.getGeneric().addAll(generics);
+    }                    
+    
+        
+    public void addGeneric(TParameterConcretisation one) {
+        this.getGeneric().add(one);
+    }   
+    
+    public void addGeneric(TParameterConcretisation one, TParameterConcretisation... many) {
+        this.getGeneric().add(one);
+        for (TParameterConcretisation each : many)
+            this.getGeneric().add(each);
+    }   
+    
+    public void addGeneric(Iterable<? extends TParameterConcretisation> many) {
+        for (TParameterConcretisation each : many)
+            this.getGeneric().add(each);
+    }   
+                
+    public void addGeneric(TParameterConcretisation[] many) {
+        for (TParameterConcretisation each : many)
+            this.getGeneric().add(each);
+    }
+    
+    public int numberOfGeneric() {
+        return getGeneric().size();
+    }
+
+    public boolean hasGeneric() {
+        return !getGeneric().isEmpty();
+    }
+
     @FameProperty(name = "incomingReferences", opposite = "referredType", derived = true)
     public Collection<TReference> getIncomingReferences() {
         if (incomingReferences == null) {
@@ -373,57 +413,6 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "typeAliases", opposite = "aliasedType", derived = true)
-    public Collection<TTypeAlias> getTypeAliases() {
-        if (typeAliases == null) {
-            typeAliases = new MultivalueSet<TTypeAlias>() {
-                @Override
-                protected void clearOpposite(TTypeAlias e) {
-                    e.setAliasedType(null);
-                }
-                @Override
-                protected void setOpposite(TTypeAlias e) {
-                    e.setAliasedType(Type.this);
-                }
-            };
-        }
-        return typeAliases;
-    }
-    
-    public void setTypeAliases(Collection<? extends TTypeAlias> typeAliases) {
-        this.getTypeAliases().clear();
-        this.getTypeAliases().addAll(typeAliases);
-    }                    
-    
-        
-    public void addTypeAliases(TTypeAlias one) {
-        this.getTypeAliases().add(one);
-    }   
-    
-    public void addTypeAliases(TTypeAlias one, TTypeAlias... many) {
-        this.getTypeAliases().add(one);
-        for (TTypeAlias each : many)
-            this.getTypeAliases().add(each);
-    }   
-    
-    public void addTypeAliases(Iterable<? extends TTypeAlias> many) {
-        for (TTypeAlias each : many)
-            this.getTypeAliases().add(each);
-    }   
-                
-    public void addTypeAliases(TTypeAlias[] many) {
-        for (TTypeAlias each : many)
-            this.getTypeAliases().add(each);
-    }
-    
-    public int numberOfTypeAliases() {
-        return getTypeAliases().size();
-    }
-
-    public boolean hasTypeAliases() {
-        return !getTypeAliases().isEmpty();
-    }
-
     @FameProperty(name = "typeContainer", opposite = "types", container = true)
     public TWithTypes getTypeContainer() {
         return typeContainer;

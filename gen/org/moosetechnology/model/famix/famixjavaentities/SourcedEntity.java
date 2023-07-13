@@ -4,21 +4,14 @@ package org.moosetechnology.model.famix.famixjavaentities;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-import ch.akuhn.fame.internal.MultivalueSet;
-import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
-import org.moosetechnology.model.famix.famixtraits.TFile;
 import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
-import org.moosetechnology.model.famix.famixtraits.TWithFiles;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("SourcedEntity")
-public class SourcedEntity extends Entity implements TSourceEntity, TWithFiles {
-
-    private Collection<TFile> containerFiles; 
+public class SourcedEntity extends Entity implements TSourceEntity {
 
     private Boolean isStub;
     
@@ -34,56 +27,6 @@ public class SourcedEntity extends Entity implements TSourceEntity, TWithFiles {
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "containerFiles", opposite = "entities")
-    public Collection<TFile> getContainerFiles() {
-        if (containerFiles == null) {
-            containerFiles = new MultivalueSet<TFile>() {
-                @Override
-                protected void clearOpposite(TFile e) {
-                    e.getEntities().remove(SourcedEntity.this);
-                }
-                @Override
-                protected void setOpposite(TFile e) {
-                    e.getEntities().add(SourcedEntity.this);
-                }
-            };
-        }
-        return containerFiles;
-    }
-    
-    public void setContainerFiles(Collection<? extends TFile> containerFiles) {
-        this.getContainerFiles().clear();
-        this.getContainerFiles().addAll(containerFiles);
-    }
-    
-    public void addContainerFiles(TFile one) {
-        this.getContainerFiles().add(one);
-    }   
-    
-    public void addContainerFiles(TFile one, TFile... many) {
-        this.getContainerFiles().add(one);
-        for (TFile each : many)
-            this.getContainerFiles().add(each);
-    }   
-    
-    public void addContainerFiles(Iterable<? extends TFile> many) {
-        for (TFile each : many)
-            this.getContainerFiles().add(each);
-    }   
-                
-    public void addContainerFiles(TFile[] many) {
-        for (TFile each : many)
-            this.getContainerFiles().add(each);
-    }
-    
-    public int numberOfContainerFiles() {
-        return getContainerFiles().size();
-    }
-
-    public boolean hasContainerFiles() {
-        return !getContainerFiles().isEmpty();
-    }
-
     @FameProperty(name = "containsReplicas", derived = true)
     public Boolean getContainsReplicas() {
         // TODO: this is a derived property, implement this method manually.

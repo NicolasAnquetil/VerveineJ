@@ -6,13 +6,14 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TAttribute;
 import org.moosetechnology.model.famix.famixtraits.TComment;
 import org.moosetechnology.model.famix.famixtraits.TEnum;
 import org.moosetechnology.model.famix.famixtraits.TEnumValue;
 import org.moosetechnology.model.famix.famixtraits.THasVisibility;
+import org.moosetechnology.model.famix.famixtraits.TImport;
+import org.moosetechnology.model.famix.famixtraits.TImportable;
 import org.moosetechnology.model.famix.famixtraits.TInheritance;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
@@ -25,6 +26,7 @@ import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famix.famixtraits.TWithComments;
 import org.moosetechnology.model.famix.famixtraits.TWithEnumValues;
+import org.moosetechnology.model.famix.famixtraits.TWithImports;
 import org.moosetechnology.model.famix.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famix.famixtraits.TWithMethods;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
@@ -33,13 +35,15 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Enum")
-public class Enum extends Type implements TEntityMetaLevelDependency, TEnum, THasVisibility, TNamedEntity, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithEnumValues, TWithInheritances, TWithMethods {
+public class Enum extends Type implements TEntityMetaLevelDependency, TEnum, THasVisibility, TImportable, TNamedEntity, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithEnumValues, TWithImports, TWithInheritances, TWithMethods {
 
     private Collection<TAttribute> attributes; 
 
     private Collection<TComment> comments; 
 
     private Collection<TEnumValue> enumValues; 
+
+    private Collection<TImport> incomingImports; 
 
     private Collection<TReference> incomingReferences; 
 
@@ -51,6 +55,8 @@ public class Enum extends Type implements TEntityMetaLevelDependency, TEnum, THa
     
     private Number numberOfLinesOfCode;
     
+    private Collection<TImport> outgoingImports; 
+
     private TSourceAnchor sourceAnchor;
     
     private Collection<TInheritance> subInheritances; 
@@ -254,6 +260,57 @@ public class Enum extends Type implements TEntityMetaLevelDependency, TEnum, THa
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "incomingImports", opposite = "importedEntity", derived = true)
+    public Collection<TImport> getIncomingImports() {
+        if (incomingImports == null) {
+            incomingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportedEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportedEntity(Enum.this);
+                }
+            };
+        }
+        return incomingImports;
+    }
+    
+    public void setIncomingImports(Collection<? extends TImport> incomingImports) {
+        this.getIncomingImports().clear();
+        this.getIncomingImports().addAll(incomingImports);
+    }                    
+    
+        
+    public void addIncomingImports(TImport one) {
+        this.getIncomingImports().add(one);
+    }   
+    
+    public void addIncomingImports(TImport one, TImport... many) {
+        this.getIncomingImports().add(one);
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+    
+    public void addIncomingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+                
+    public void addIncomingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }
+    
+    public int numberOfIncomingImports() {
+        return getIncomingImports().size();
+    }
+
+    public boolean hasIncomingImports() {
+        return !getIncomingImports().isEmpty();
+    }
+
     @FameProperty(name = "incomingReferences", opposite = "referredType", derived = true)
     public Collection<TReference> getIncomingReferences() {
         if (incomingReferences == null) {
@@ -311,8 +368,8 @@ public class Enum extends Type implements TEntityMetaLevelDependency, TEnum, THa
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "isPackage", derived = true)
-    public Boolean getIsPackage() {
+    @FameProperty(name = "isPackageVisibility", derived = true)
+    public Boolean getIsPackageVisibility() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -491,6 +548,57 @@ public class Enum extends Type implements TEntityMetaLevelDependency, TEnum, THa
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "outgoingImports", opposite = "importingEntity", derived = true)
+    public Collection<TImport> getOutgoingImports() {
+        if (outgoingImports == null) {
+            outgoingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportingEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportingEntity(Enum.this);
+                }
+            };
+        }
+        return outgoingImports;
+    }
+    
+    public void setOutgoingImports(Collection<? extends TImport> outgoingImports) {
+        this.getOutgoingImports().clear();
+        this.getOutgoingImports().addAll(outgoingImports);
+    }                    
+    
+        
+    public void addOutgoingImports(TImport one) {
+        this.getOutgoingImports().add(one);
+    }   
+    
+    public void addOutgoingImports(TImport one, TImport... many) {
+        this.getOutgoingImports().add(one);
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }   
+    
+    public void addOutgoingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }   
+                
+    public void addOutgoingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }
+    
+    public int numberOfOutgoingImports() {
+        return getOutgoingImports().size();
+    }
+
+    public boolean hasOutgoingImports() {
+        return !getOutgoingImports().isEmpty();
+    }
+
     @FameProperty(name = "replicas", derived = true)
     public Replica getReplicas() {
         // TODO: this is a derived property, implement this method manually.

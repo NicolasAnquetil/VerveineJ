@@ -1,12 +1,11 @@
 // Automagically generated code, please do not change
 package org.moosetechnology.model.famix.famixjavaentities;
 
-import org.moosetechnology.model.famix.famixtraits.TComment;
-import org.moosetechnology.model.famix.famixtraits.TWithComments;
-
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
+import org.moosetechnology.model.famix.famixtraits.TComment;
+import org.moosetechnology.model.famix.famixtraits.TWithComments;
 
 
 @FamePackage("Famix-Java-Entities")
@@ -17,6 +16,7 @@ public class Comment extends SourcedEntity implements TComment {
     
     private String content;
     
+
 
     @FameProperty(name = "commentedEntity", opposite = "comments")
     public TWithComments getCommentedEntity() {

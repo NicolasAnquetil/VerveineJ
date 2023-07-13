@@ -8,6 +8,7 @@ import org.moosetechnology.model.famix.famixjavaentities.*;
 import org.moosetechnology.model.famix.famixjavaentities.Package;
 import org.moosetechnology.model.famix.famixtraits.TAttribute;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TParametricEntity;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famix.famixtraits.TStructuralEntity;
 
@@ -63,6 +64,13 @@ public abstract class VerveineJTest_Basic {
 	protected <T> T firstElt(Collection<T> coll) {
 		return coll.iterator().next();
 	}
+	
+	protected <T> T elementAt(Collection<T> coll, int pos) {
+		Iterator<T> it = coll.iterator();
+		for(int i = 0; i< pos; i++)
+			it.next();
+		return it.next();
+	}
 
     public <T extends Entity> Collection<T> entitiesOfType(Class<T> clazz) {
         return repo.all(clazz);
@@ -99,6 +107,20 @@ public abstract class VerveineJTest_Basic {
         }
 
         return ret;
+    }
+    
+    public TParametricEntity genericEntityNamed(String name) {
+    	Collection<NamedEntity> candidates = entitiesNamed( NamedEntity.class, name);
+    	TParametricEntity selected = null;
+    	
+    	for(NamedEntity ne: candidates) {
+    		if(ne instanceof TParametricEntity && ((TParametricEntity)ne).getGenericEntities().isEmpty()) {
+    			selected = (TParametricEntity)ne;
+    		}
+    	}
+    	
+    	return selected;
+    	
     }
 
 	// ---------------- generic tests methods ------------------

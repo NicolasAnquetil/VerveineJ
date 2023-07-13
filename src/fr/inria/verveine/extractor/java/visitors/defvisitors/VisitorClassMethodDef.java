@@ -50,10 +50,12 @@ import org.moosetechnology.model.famix.famixjavaentities.AnnotationTypeAttribute
 import org.moosetechnology.model.famix.famixjavaentities.ContainerEntity;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
-import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
+//import org.moosetechnology.model.famix.famixjavaentities.ParameterizedType;
+import org.moosetechnology.model.famix.famixjavaentities.ParametricClass;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
+import org.moosetechnology.model.famix.famixtraits.TParametricEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithMethods;
-import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
+//import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypes;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 
 import fr.inria.verveine.extractor.java.EntityDictionary;
@@ -136,7 +138,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			// if it is a generic and some parameterizedTypes were created for it
 			// they are marked as stub which is not right
 			if (tparams.size() > 0) {
-				for (ParameterizedType candidate : dico.getEntityByName(ParameterizedType.class,
+				for (ParametricClass candidate : dico.getEntityByName(ParametricClass.class,
 						node.getName().getIdentifier())) {
 					candidate.setIsStub(false);
 				}
@@ -148,15 +150,6 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 				dico.addSourceAnchor(fmx, node);
 			}
 
-			for (TypeParameter tp : tparams) {
-				// if there is a type parameter, then fmx will be a Famix ParameterizableClass
-				// note: owner of the ParameterType is the ParameterizableClass
-				ParameterType fmxParam = dico.ensureFamixParameterType(tp.resolveBinding(),
-						tp.getName().getIdentifier(), (TWithParameterizedTypes) fmx);
-				if (fmxParam != null) {
-					fmxParam.setIsStub(false);
-				}
-			}
 
 			return super.visit(node);
 		} else {
@@ -298,7 +291,6 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 	@Override
 	public boolean visit(MethodDeclaration node) {
 		IMethodBinding bnd = (IMethodBinding) StubBinding.getDeclarationBinding(node);
-
         Collection<String> paramTypes = new ArrayList<>();
         for (SingleVariableDeclaration param : (List<SingleVariableDeclaration>) node.parameters()) {
             paramTypes.add( Util.jdtTypeName(param.getType()));
@@ -317,7 +309,7 @@ public class VisitorClassMethodDef extends GetVisitedEntityAbstractVisitor {
 			// fmx.setBodyHash(this.computeHashForMethodBody(node));
 
 			this.context.pushMethod(fmx);
-
+			
 			if (node.isConstructor()) {
 				fmx.setKind(EntityDictionary.CONSTRUCTOR_KIND_MARKER);
 			}

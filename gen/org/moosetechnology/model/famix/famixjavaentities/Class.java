@@ -6,7 +6,6 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TAttribute;
 import org.moosetechnology.model.famix.famixtraits.TCanBeAbstract;
@@ -14,9 +13,12 @@ import org.moosetechnology.model.famix.famixtraits.TCanBeClassSide;
 import org.moosetechnology.model.famix.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famix.famixtraits.TCanImplement;
 import org.moosetechnology.model.famix.famixtraits.TClass;
+import org.moosetechnology.model.famix.famixtraits.TClassMetrics;
 import org.moosetechnology.model.famix.famixtraits.TComment;
 import org.moosetechnology.model.famix.famixtraits.THasVisibility;
 import org.moosetechnology.model.famix.famixtraits.TImplementation;
+import org.moosetechnology.model.famix.famixtraits.TImport;
+import org.moosetechnology.model.famix.famixtraits.TImportable;
 import org.moosetechnology.model.famix.famixtraits.TInheritance;
 import org.moosetechnology.model.famix.famixtraits.TInvocation;
 import org.moosetechnology.model.famix.famixtraits.TInvocationsReceiver;
@@ -33,6 +35,7 @@ import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famix.famixtraits.TWithComments;
+import org.moosetechnology.model.famix.famixtraits.TWithImports;
 import org.moosetechnology.model.famix.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famix.famixtraits.TWithMethods;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
@@ -41,7 +44,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Class")
-public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanImplement, TClass, TClassMetrics, TEntityMetaLevelDependency, THasVisibility, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
+public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanImplement, TClass, TClassMetrics, TEntityMetaLevelDependency, THasVisibility, TImportable, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithImports, TWithInheritances, TWithMethods {
 
     private Boolean isInterface = false;
     
@@ -49,15 +52,17 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
 
     private Collection<TComment> comments; 
 
+    private Collection<TImport> incomingImports; 
+
     private Collection<TReference> incomingReferences; 
 
     private Collection<TImplementation> interfaceImplementations; 
 
-    private Boolean isAbstract = false;
+    private Boolean isAbstract;
     
-    private Boolean isClassSide = false;
+    private Boolean isClassSide;
     
-    private Boolean isFinal = false;
+    private Boolean isFinal;
     
     private Boolean isStub;
     
@@ -67,6 +72,8 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     
     private Number numberOfLinesOfCode;
     
+    private Collection<TImport> outgoingImports; 
+
     private TPackage parentPackage;
     
     private Collection<TInvocation> receivingInvocations; 
@@ -83,11 +90,6 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
 
     private String visibility;
     
-
-@Override
-public String toString() {
-	return "Class(" + name + ")";
-}
 
 
     @FameProperty(name = "isIgnored", derived = true)
@@ -243,6 +245,57 @@ public String toString() {
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "incomingImports", opposite = "importedEntity", derived = true)
+    public Collection<TImport> getIncomingImports() {
+        if (incomingImports == null) {
+            incomingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportedEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportedEntity(Class.this);
+                }
+            };
+        }
+        return incomingImports;
+    }
+    
+    public void setIncomingImports(Collection<? extends TImport> incomingImports) {
+        this.getIncomingImports().clear();
+        this.getIncomingImports().addAll(incomingImports);
+    }                    
+    
+        
+    public void addIncomingImports(TImport one) {
+        this.getIncomingImports().add(one);
+    }   
+    
+    public void addIncomingImports(TImport one, TImport... many) {
+        this.getIncomingImports().add(one);
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+    
+    public void addIncomingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+                
+    public void addIncomingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }
+    
+    public int numberOfIncomingImports() {
+        return getIncomingImports().size();
+    }
+
+    public boolean hasIncomingImports() {
+        return !getIncomingImports().isEmpty();
+    }
+
     @FameProperty(name = "incomingReferences", opposite = "referredType", derived = true)
     public Collection<TReference> getIncomingReferences() {
         if (incomingReferences == null) {
@@ -377,9 +430,9 @@ public String toString() {
     public void setIsFinal(Boolean isFinal) {
         this.isFinal = isFinal;
     }
-
+    
     @FameProperty(name = "isPackage", derived = true)
-    public Boolean getIsPackage() {
+    public Boolean getIsPackageVisibility() {
         return this.visibility.equals("package");
     }
 
@@ -491,14 +544,14 @@ public String toString() {
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfAccessorMethods", derived = true)
-    public Number getNumberOfAccessorMethods() {
+    @FameProperty(name = "numberOfAttributes", derived = true)
+    public Number getNumberOfAttributes() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfAttributes", derived = true)
-    public Number getNumberOfAttributes() {
+    @FameProperty(name = "numberOfAttributesInherited", derived = true)
+    public Number getNumberOfAttributesInherited() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -511,12 +564,6 @@ public String toString() {
     
     @FameProperty(name = "numberOfComments", derived = true)
     public Number getNumberOfComments() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "numberOfConstructorMethods", derived = true)
-    public Number getNumberOfConstructorMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -572,26 +619,32 @@ public String toString() {
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "numberOfLocallyDefinedMethods", derived = true)
+    public Number getNumberOfLocallyDefinedMethods() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
     @FameProperty(name = "numberOfMethods", derived = true)
     public Number getNumberOfMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfPrivateMethods", derived = true)
-    public Number getNumberOfPrivateMethods() {
+    @FameProperty(name = "numberOfMethodsInHierarchy", derived = true)
+    public Number getNumberOfMethodsInHierarchy() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfProtectedMethods", derived = true)
-    public Number getNumberOfProtectedMethods() {
+    @FameProperty(name = "numberOfMethodsInherited", derived = true)
+    public Number getNumberOfMethodsInherited() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfPublicMethods", derived = true)
-    public Number getNumberOfPublicMethods() {
+    @FameProperty(name = "numberOfMethodsOverriden", derived = true)
+    public Number getNumberOfMethodsOverriden() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -602,6 +655,57 @@ public String toString() {
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "outgoingImports", opposite = "importingEntity", derived = true)
+    public Collection<TImport> getOutgoingImports() {
+        if (outgoingImports == null) {
+            outgoingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportingEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportingEntity(Class.this);
+                }
+            };
+        }
+        return outgoingImports;
+    }
+    
+    public void setOutgoingImports(Collection<? extends TImport> outgoingImports) {
+        this.getOutgoingImports().clear();
+        this.getOutgoingImports().addAll(outgoingImports);
+    }                    
+    
+        
+    public void addOutgoingImports(TImport one) {
+        this.getOutgoingImports().add(one);
+    }   
+    
+    public void addOutgoingImports(TImport one, TImport... many) {
+        this.getOutgoingImports().add(one);
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }   
+    
+    public void addOutgoingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }   
+                
+    public void addOutgoingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }
+    
+    public int numberOfOutgoingImports() {
+        return getOutgoingImports().size();
+    }
+
+    public boolean hasOutgoingImports() {
+        return !getOutgoingImports().isEmpty();
+    }
+
     @FameProperty(name = "parentPackage", opposite = "childEntities", container = true)
     public TPackage getParentPackage() {
         return parentPackage;
@@ -804,6 +908,12 @@ public String toString() {
 
     @FameProperty(name = "tightClassCohesion", derived = true)
     public Number getTightClassCohesion() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "totalNumberOfSubclasses", derived = true)
+    public Number getTotalNumberOfSubclasses() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

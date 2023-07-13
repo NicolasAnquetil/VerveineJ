@@ -6,7 +6,6 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixtraits.TAttribute;
 import org.moosetechnology.model.famix.famixtraits.TCanBeClassSide;
 import org.moosetechnology.model.famix.famixtraits.TCanBeFinal;
@@ -14,6 +13,8 @@ import org.moosetechnology.model.famix.famixtraits.TComment;
 import org.moosetechnology.model.famix.famixtraits.THasVisibility;
 import org.moosetechnology.model.famix.famixtraits.TImplementable;
 import org.moosetechnology.model.famix.famixtraits.TImplementation;
+import org.moosetechnology.model.famix.famixtraits.TImport;
+import org.moosetechnology.model.famix.famixtraits.TImportable;
 import org.moosetechnology.model.famix.famixtraits.TInheritance;
 import org.moosetechnology.model.famix.famixtraits.TInvocation;
 import org.moosetechnology.model.famix.famixtraits.TInvocationsReceiver;
@@ -22,13 +23,14 @@ import org.moosetechnology.model.famix.famixtraits.TPackage;
 import org.moosetechnology.model.famix.famixtraits.TPackageable;
 import org.moosetechnology.model.famix.famixtraits.TWithAttributes;
 import org.moosetechnology.model.famix.famixtraits.TWithComments;
+import org.moosetechnology.model.famix.famixtraits.TWithImports;
 import org.moosetechnology.model.famix.famixtraits.TWithInheritances;
 import org.moosetechnology.model.famix.famixtraits.TWithMethods;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Interface")
-public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THasVisibility, TImplementable, TInvocationsReceiver, TPackageable, TWithAttributes, TWithComments, TWithInheritances, TWithMethods {
+public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THasVisibility, TImplementable, TImportable, TInvocationsReceiver, TPackageable, TWithAttributes, TWithComments, TWithImports, TWithInheritances, TWithMethods {
 
     private Collection<TAttribute> attributes; 
 
@@ -36,11 +38,15 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THa
 
     private Collection<TImplementation> implementations; 
 
+    private Collection<TImport> incomingImports; 
+
     private Boolean isClassSide;
     
     private Boolean isFinal;
     
     private Collection<TMethod> methods; 
+
+    private Collection<TImport> outgoingImports; 
 
     private TPackage parentPackage;
     
@@ -52,6 +58,8 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THa
 
     private String visibility;
     
+
+
     @FameProperty(name = "attributes", opposite = "parentType", derived = true)
     public Collection<TAttribute> getAttributes() {
         if (attributes == null) {
@@ -217,6 +225,57 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THa
         return !getImplementations().isEmpty();
     }
 
+    @FameProperty(name = "incomingImports", opposite = "importedEntity", derived = true)
+    public Collection<TImport> getIncomingImports() {
+        if (incomingImports == null) {
+            incomingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportedEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportedEntity(Interface.this);
+                }
+            };
+        }
+        return incomingImports;
+    }
+    
+    public void setIncomingImports(Collection<? extends TImport> incomingImports) {
+        this.getIncomingImports().clear();
+        this.getIncomingImports().addAll(incomingImports);
+    }                    
+    
+        
+    public void addIncomingImports(TImport one) {
+        this.getIncomingImports().add(one);
+    }   
+    
+    public void addIncomingImports(TImport one, TImport... many) {
+        this.getIncomingImports().add(one);
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+    
+    public void addIncomingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+                
+    public void addIncomingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }
+    
+    public int numberOfIncomingImports() {
+        return getIncomingImports().size();
+    }
+
+    public boolean hasIncomingImports() {
+        return !getIncomingImports().isEmpty();
+    }
+
     @FameProperty(name = "isClassSide")
     public Boolean getIsClassSide() {
         return isClassSide;
@@ -235,8 +294,8 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THa
         this.isFinal = isFinal;
     }
     
-    @FameProperty(name = "isPackage", derived = true)
-    public Boolean getIsPackage() {
+    @FameProperty(name = "isPackageVisibility", derived = true)
+    public Boolean getIsPackageVisibility() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -346,6 +405,57 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THa
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "outgoingImports", opposite = "importingEntity", derived = true)
+    public Collection<TImport> getOutgoingImports() {
+        if (outgoingImports == null) {
+            outgoingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportingEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportingEntity(Interface.this);
+                }
+            };
+        }
+        return outgoingImports;
+    }
+    
+    public void setOutgoingImports(Collection<? extends TImport> outgoingImports) {
+        this.getOutgoingImports().clear();
+        this.getOutgoingImports().addAll(outgoingImports);
+    }                    
+    
+        
+    public void addOutgoingImports(TImport one) {
+        this.getOutgoingImports().add(one);
+    }   
+    
+    public void addOutgoingImports(TImport one, TImport... many) {
+        this.getOutgoingImports().add(one);
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }   
+    
+    public void addOutgoingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }   
+                
+    public void addOutgoingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getOutgoingImports().add(each);
+    }
+    
+    public int numberOfOutgoingImports() {
+        return getOutgoingImports().size();
+    }
+
+    public boolean hasOutgoingImports() {
+        return !getOutgoingImports().isEmpty();
+    }
+
     @FameProperty(name = "parentPackage", opposite = "childEntities", container = true)
     public TPackage getParentPackage() {
         return parentPackage;
@@ -540,6 +650,8 @@ public class Interface extends Type implements TCanBeClassSide, TCanBeFinal, THa
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
+    
+
 
 }
 
