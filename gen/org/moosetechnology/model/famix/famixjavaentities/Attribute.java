@@ -38,15 +38,15 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
     
     private Collection<TAccess> incomingAccesses; 
 
-    private Boolean isClassSide;
+    private Boolean isClassSide = false;
     
-    private Boolean isFinal;
+    private Boolean isFinal = false;
     
-    private Boolean isStub;
+    private Boolean isStub = false;
     
-    private Boolean isTransient;
+    private Boolean isTransient = false;
     
-    private Boolean isVolatile;
+    private Boolean isVolatile = false;
     
     private String name;
     

@@ -787,5 +787,5 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
         assertEquals( 1, subClass.getSuperInheritances().size() );
         assertEquals(superClass, firstElt(subClass.getSuperInheritances()).getSuperclass() );
     }
-
+    
 }

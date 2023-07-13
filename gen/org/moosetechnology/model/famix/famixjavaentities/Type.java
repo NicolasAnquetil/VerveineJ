@@ -27,7 +27,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 @FameDescription("Type")
 public class Type extends ContainerEntity implements TConcreteParameterType, TEntityMetaLevelDependency, TNamedEntity, TReferenceable, TSourceEntity, TType, TWithMethods {
 
-    private Collection<TParametricEntity> concreteEntity; 
+    private Collection<TParametricEntity> concreteEntities; 
 
     private Collection<TParameterConcretisation> generics; 
 
@@ -69,8 +69,8 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
     
     @FameProperty(name = "concreteEntity", opposite = "concreteParameters", derived = true)
     public Collection<TParametricEntity> getConcreteEntity() {
-        if (concreteEntity == null) {
-            concreteEntity = new MultivalueSet<TParametricEntity>() {
+        if (concreteEntities == null) {
+            concreteEntities = new MultivalueSet<TParametricEntity>() {
                 @Override
                 protected void clearOpposite(TParametricEntity e) {
                     e.getConcreteParameters().remove(Type.this);
@@ -81,7 +81,7 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
                 }
             };
         }
-        return concreteEntity;
+        return concreteEntities;
     }
     
     public void setConcreteEntity(Collection<? extends TParametricEntity> concreteEntity) {

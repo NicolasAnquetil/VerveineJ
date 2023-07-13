@@ -37,7 +37,7 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
     
     private Collection<TWithExceptions> declaringEntities; 
 
-    private Collection<TParametricEntity> genericEntity; 
+    private Collection<TParametricEntity> genericEntities; 
 
     private Collection<TReference> incomingReferences; 
 
@@ -253,8 +253,8 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
     
     @FameProperty(name = "genericEntity", opposite = "genericParameters", derived = true)
     public Collection<TParametricEntity> getGenericEntity() {
-        if (genericEntity == null) {
-            genericEntity = new MultivalueSet<TParametricEntity>() {
+        if (genericEntities == null) {
+            genericEntities = new MultivalueSet<TParametricEntity>() {
                 @Override
                 protected void clearOpposite(TParametricEntity e) {
                     e.getGenericParameters().remove(ParameterType.this);
@@ -265,7 +265,7 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
                 }
             };
         }
-        return genericEntity;
+        return genericEntities;
     }
     
     public void setGenericEntity(Collection<? extends TParametricEntity> genericEntity) {

@@ -68,13 +68,13 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
 
     private Collection<TInvocation> incomingInvocations; 
 
-    private Boolean isAbstract;
+    private Boolean isAbstract = false;
     
     private Boolean isDead;
     
-    private Boolean isClassSide;
+    private Boolean isClassSide = false;
     
-    private Boolean isFinal;
+    private Boolean isFinal = false;
     
     private Boolean isStub;
     

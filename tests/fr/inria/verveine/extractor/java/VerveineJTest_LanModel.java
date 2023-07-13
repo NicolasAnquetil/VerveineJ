@@ -886,8 +886,8 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(1, cmts.size());
 		anc = (SourceAnchor) ((Comment) firstElt(cmts)).getSourceAnchor();
 		if (isWindows()) {
-			assertEquals(316+23, ((IndexedFileAnchor) anc).getStartPos());
-			assertEquals(437+25, ((IndexedFileAnchor) anc).getEndPos());
+			assertEquals(316+22, ((IndexedFileAnchor) anc).getStartPos()); // +22 because of line return encoding in Windows
+			assertEquals(437+24, ((IndexedFileAnchor) anc).getEndPos());
 		} else {
 			assertEquals(316, ((IndexedFileAnchor) anc).getStartPos());
 			assertEquals(437, ((IndexedFileAnchor) anc).getEndPos());
@@ -902,7 +902,7 @@ public class VerveineJTest_LanModel extends VerveineJTest_Basic {
 		assertEquals(1, cmts.size());
 		anc = (SourceAnchor) ((Comment) firstElt(cmts)).getSourceAnchor();
 		if (isWindows()) {
-			assertEquals(164+8, ((IndexedFileAnchor) anc).getStartPos().intValue());
+			assertEquals(164+12, ((IndexedFileAnchor) anc).getStartPos().intValue()); // +12 because of line return encoding in Windows
 		} else {
 			assertEquals(164, ((IndexedFileAnchor) anc).getStartPos().intValue());
 		}

@@ -64,6 +64,13 @@ public abstract class VerveineJTest_Basic {
 	protected <T> T firstElt(Collection<T> coll) {
 		return coll.iterator().next();
 	}
+	
+	protected <T> T elementAt(Collection<T> coll, int pos) {
+		Iterator<T> it = coll.iterator();
+		for(int i = 0; i< pos; i++)
+			it.next();
+		return it.next();
+	}
 
     public <T extends Entity> Collection<T> entitiesOfType(Class<T> clazz) {
         return repo.all(clazz);
