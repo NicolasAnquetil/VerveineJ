@@ -10,41 +10,41 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TConcreteParameterType")
-public interface TConcreteParameterType extends TEntityMetaLevelDependency, TNamedEntity, TSourceEntity, TReferenceable, TType {
+public interface TConcreteParameterType extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TReferenceable, TType {
 
-        @FameProperty(name = "concreteEntity", opposite = "concreteParameters", derived = true)
-    public Collection<TParametricEntity> getConcreteEntity();
+        @FameProperty(name = "generics", opposite = "concreteParameter", derived = true)
+    public Collection<TParameterConcretisation> getGenerics();
 
-    public void setConcreteEntity(Collection<? extends TParametricEntity> concreteEntity);
+    public void setGenerics(Collection<? extends TParameterConcretisation> generics);
 
-    public void addConcreteEntity(TParametricEntity one);
+    public void addGenerics(TParameterConcretisation one);
 
-    public void addConcreteEntity(TParametricEntity one, TParametricEntity... many);
+    public void addGenerics(TParameterConcretisation one, TParameterConcretisation... many);
 
-    public void addConcreteEntity(Iterable<? extends TParametricEntity> many);
+    public void addGenerics(Iterable<? extends TParameterConcretisation> many);
 
-    public void addConcreteEntity(TParametricEntity[] many);
+    public void addGenerics(TParameterConcretisation[] many);
 
-    public int numberOfConcreteEntity();
+    public int numberOfGenerics();
 
-    public boolean hasConcreteEntity();
+    public boolean hasGenerics();
 
-    @FameProperty(name = "generic", opposite = "concreteParameter", derived = true)
-    public Collection<TParameterConcretisation> getGeneric();
+    @FameProperty(name = "concreteEntities", opposite = "concreteParameters", derived = true)
+    public Collection<TParametricEntity> getConcreteEntities();
 
-    public void setGeneric(Collection<? extends TParameterConcretisation> generic);
+    public void setConcreteEntities(Collection<? extends TParametricEntity> concreteEntities);
 
-    public void addGeneric(TParameterConcretisation one);
+    public void addConcreteEntities(TParametricEntity one);
 
-    public void addGeneric(TParameterConcretisation one, TParameterConcretisation... many);
+    public void addConcreteEntities(TParametricEntity one, TParametricEntity... many);
 
-    public void addGeneric(Iterable<? extends TParameterConcretisation> many);
+    public void addConcreteEntities(Iterable<? extends TParametricEntity> many);
 
-    public void addGeneric(TParameterConcretisation[] many);
+    public void addConcreteEntities(TParametricEntity[] many);
 
-    public int numberOfGeneric();
+    public int numberOfConcreteEntities();
 
-    public boolean hasGeneric();
+    public boolean hasConcreteEntities();
 
 
 

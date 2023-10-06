@@ -245,7 +245,7 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
         this.isFinal = isFinal;
     }
     
-    @FameProperty(name = "isPackage", derived = true)
+    @FameProperty(name = "getIsPackageVisibility", derived = true)
     public Boolean getIsPackageVisibility() {
         return this.visibility.equals("package");
     }

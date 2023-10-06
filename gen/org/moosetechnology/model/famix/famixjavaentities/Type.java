@@ -25,7 +25,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Type")
-public class Type extends ContainerEntity implements TConcreteParameterType, TEntityMetaLevelDependency, TNamedEntity, TReferenceable, TSourceEntity, TType, TWithMethods {
+public class Type extends ContainerEntity implements TBound, TConcreteParameterType, TEntityMetaLevelDependency, TNamedEntity, TReferenceable, TSourceEntity, TType, TWithMethods {
 
     private Collection<TParametricEntity> concreteEntities; 
 
@@ -35,6 +35,8 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
 
     private Boolean isStub;
     
+    private Collection<TBounded> lowerBoundedWildcards; 
+
     private Collection<TMethod> methods; 
 
     private String name;
@@ -46,6 +48,8 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
     private TWithTypes typeContainer;
     
     private Collection<TTypedEntity> typedEntities; 
+
+    private Collection<TBounded> upperBoundedWildcards; 
 
 
 
@@ -67,8 +71,8 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "concreteEntity", opposite = "concreteParameters", derived = true)
-    public Collection<TParametricEntity> getConcreteEntity() {
+    @FameProperty(name = "concreteEntities", opposite = "concreteParameters", derived = true)
+    public Collection<TParametricEntity> getConcreteEntities() {
         if (concreteEntities == null) {
             concreteEntities = new MultivalueSet<TParametricEntity>() {
                 @Override
@@ -84,37 +88,37 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
         return concreteEntities;
     }
     
-    public void setConcreteEntity(Collection<? extends TParametricEntity> concreteEntity) {
-        this.getConcreteEntity().clear();
-        this.getConcreteEntity().addAll(concreteEntity);
+    public void setConcreteEntities(Collection<? extends TParametricEntity> concreteEntities) {
+        this.getConcreteEntities().clear();
+        this.getConcreteEntities().addAll(concreteEntities);
     }
     
-    public void addConcreteEntity(TParametricEntity one) {
-        this.getConcreteEntity().add(one);
+    public void addConcreteEntities(TParametricEntity one) {
+        this.getConcreteEntities().add(one);
     }   
     
-    public void addConcreteEntity(TParametricEntity one, TParametricEntity... many) {
-        this.getConcreteEntity().add(one);
+    public void addConcreteEntities(TParametricEntity one, TParametricEntity... many) {
+        this.getConcreteEntities().add(one);
         for (TParametricEntity each : many)
-            this.getConcreteEntity().add(each);
+            this.getConcreteEntities().add(each);
     }   
     
-    public void addConcreteEntity(Iterable<? extends TParametricEntity> many) {
+    public void addConcreteEntities(Iterable<? extends TParametricEntity> many) {
         for (TParametricEntity each : many)
-            this.getConcreteEntity().add(each);
+            this.getConcreteEntities().add(each);
     }   
                 
-    public void addConcreteEntity(TParametricEntity[] many) {
+    public void addConcreteEntities(TParametricEntity[] many) {
         for (TParametricEntity each : many)
-            this.getConcreteEntity().add(each);
+            this.getConcreteEntities().add(each);
     }
     
-    public int numberOfConcreteEntity() {
-        return getConcreteEntity().size();
+    public int numberOfConcreteEntities() {
+        return getConcreteEntities().size();
     }
 
-    public boolean hasConcreteEntity() {
-        return !getConcreteEntity().isEmpty();
+    public boolean hasConcreteEntities() {
+        return !getConcreteEntities().isEmpty();
     }
 
     @FameProperty(name = "containsReplicas", derived = true)
@@ -141,8 +145,8 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "generic", opposite = "concreteParameter", derived = true)
-    public Collection<TParameterConcretisation> getGeneric() {
+    @FameProperty(name = "generics", opposite = "concreteParameter", derived = true)
+    public Collection<TParameterConcretisation> getGenerics() {
         if (generics == null) {
             generics = new MultivalueSet<TParameterConcretisation>() {
                 @Override
@@ -158,38 +162,38 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
         return generics;
     }
     
-    public void setGeneric(Collection<? extends TParameterConcretisation> generics) {
-        this.getGeneric().clear();
-        this.getGeneric().addAll(generics);
+    public void setGenerics(Collection<? extends TParameterConcretisation> generics) {
+        this.getGenerics().clear();
+        this.getGenerics().addAll(generics);
     }                    
     
         
-    public void addGeneric(TParameterConcretisation one) {
-        this.getGeneric().add(one);
+    public void addGenerics(TParameterConcretisation one) {
+        this.getGenerics().add(one);
     }   
     
-    public void addGeneric(TParameterConcretisation one, TParameterConcretisation... many) {
-        this.getGeneric().add(one);
+    public void addGenerics(TParameterConcretisation one, TParameterConcretisation... many) {
+        this.getGenerics().add(one);
         for (TParameterConcretisation each : many)
-            this.getGeneric().add(each);
+            this.getGenerics().add(each);
     }   
     
-    public void addGeneric(Iterable<? extends TParameterConcretisation> many) {
+    public void addGenerics(Iterable<? extends TParameterConcretisation> many) {
         for (TParameterConcretisation each : many)
-            this.getGeneric().add(each);
+            this.getGenerics().add(each);
     }   
                 
-    public void addGeneric(TParameterConcretisation[] many) {
+    public void addGenerics(TParameterConcretisation[] many) {
         for (TParameterConcretisation each : many)
-            this.getGeneric().add(each);
+            this.getGenerics().add(each);
     }
     
-    public int numberOfGeneric() {
-        return getGeneric().size();
+    public int numberOfGenerics() {
+        return getGenerics().size();
     }
 
-    public boolean hasGeneric() {
-        return !getGeneric().isEmpty();
+    public boolean hasGenerics() {
+        return !getGenerics().isEmpty();
     }
 
     @FameProperty(name = "incomingReferences", opposite = "referredType", derived = true)
@@ -258,6 +262,57 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
         this.isStub = isStub;
     }
     
+    @FameProperty(name = "lowerBoundedWildcards", opposite = "lowerBound", derived = true)
+    public Collection<TBounded> getLowerBoundedWildcards() {
+        if (lowerBoundedWildcards == null) {
+            lowerBoundedWildcards = new MultivalueSet<TBounded>() {
+                @Override
+                protected void clearOpposite(TBounded e) {
+                    e.setLowerBound(null);
+                }
+                @Override
+                protected void setOpposite(TBounded e) {
+                    e.setLowerBound(Type.this);
+                }
+            };
+        }
+        return lowerBoundedWildcards;
+    }
+    
+    public void setLowerBoundedWildcards(Collection<? extends TBounded> lowerBoundedWildcards) {
+        this.getLowerBoundedWildcards().clear();
+        this.getLowerBoundedWildcards().addAll(lowerBoundedWildcards);
+    }                    
+    
+        
+    public void addLowerBoundedWildcards(TBounded one) {
+        this.getLowerBoundedWildcards().add(one);
+    }   
+    
+    public void addLowerBoundedWildcards(TBounded one, TBounded... many) {
+        this.getLowerBoundedWildcards().add(one);
+        for (TBounded each : many)
+            this.getLowerBoundedWildcards().add(each);
+    }   
+    
+    public void addLowerBoundedWildcards(Iterable<? extends TBounded> many) {
+        for (TBounded each : many)
+            this.getLowerBoundedWildcards().add(each);
+    }   
+                
+    public void addLowerBoundedWildcards(TBounded[] many) {
+        for (TBounded each : many)
+            this.getLowerBoundedWildcards().add(each);
+    }
+    
+    public int numberOfLowerBoundedWildcards() {
+        return getLowerBoundedWildcards().size();
+    }
+
+    public boolean hasLowerBoundedWildcards() {
+        return !getLowerBoundedWildcards().isEmpty();
+    }
+
     @FameProperty(name = "methods", opposite = "parentType", derived = true)
     public Collection<TMethod> getMethods() {
         if (methods == null) {
@@ -477,6 +532,57 @@ public class Type extends ContainerEntity implements TConcreteParameterType, TEn
 
     public boolean hasTypedEntities() {
         return !getTypedEntities().isEmpty();
+    }
+
+    @FameProperty(name = "upperBoundedWildcards", opposite = "upperBound", derived = true)
+    public Collection<TBounded> getUpperBoundedWildcards() {
+        if (upperBoundedWildcards == null) {
+            upperBoundedWildcards = new MultivalueSet<TBounded>() {
+                @Override
+                protected void clearOpposite(TBounded e) {
+                    e.setUpperBound(null);
+                }
+                @Override
+                protected void setOpposite(TBounded e) {
+                    e.setUpperBound(Type.this);
+                }
+            };
+        }
+        return upperBoundedWildcards;
+    }
+    
+    public void setUpperBoundedWildcards(Collection<? extends TBounded> upperBoundedWildcards) {
+        this.getUpperBoundedWildcards().clear();
+        this.getUpperBoundedWildcards().addAll(upperBoundedWildcards);
+    }                    
+    
+        
+    public void addUpperBoundedWildcards(TBounded one) {
+        this.getUpperBoundedWildcards().add(one);
+    }   
+    
+    public void addUpperBoundedWildcards(TBounded one, TBounded... many) {
+        this.getUpperBoundedWildcards().add(one);
+        for (TBounded each : many)
+            this.getUpperBoundedWildcards().add(each);
+    }   
+    
+    public void addUpperBoundedWildcards(Iterable<? extends TBounded> many) {
+        for (TBounded each : many)
+            this.getUpperBoundedWildcards().add(each);
+    }   
+                
+    public void addUpperBoundedWildcards(TBounded[] many) {
+        for (TBounded each : many)
+            this.getUpperBoundedWildcards().add(each);
+    }
+    
+    public int numberOfUpperBoundedWildcards() {
+        return getUpperBoundedWildcards().size();
+    }
+
+    public boolean hasUpperBoundedWildcards() {
+        return !getUpperBoundedWildcards().isEmpty();
     }
 
     @FameProperty(name = "weightedMethodCount", derived = true)

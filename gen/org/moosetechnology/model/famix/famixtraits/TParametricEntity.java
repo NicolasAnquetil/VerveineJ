@@ -28,7 +28,12 @@ public interface TParametricEntity  {
 
     public boolean hasConcretisations();
 
-    @FameProperty(name = "genericParameters", opposite = "genericEntity")
+    @FameProperty(name = "genericEntity", opposite = "concreteEntity", derived = true)
+    public TConcretisation getGenericEntity();
+
+    public void setGenericEntity(TConcretisation genericEntity);
+
+    @FameProperty(name = "genericParameters", opposite = "genericEntities")
     public Collection<TGenericParameterType> getGenericParameters();
 
     public void setGenericParameters(Collection<? extends TGenericParameterType> genericParameters);
@@ -45,7 +50,7 @@ public interface TParametricEntity  {
 
     public boolean hasGenericParameters();
 
-    @FameProperty(name = "concreteParameters", opposite = "concreteEntity")
+    @FameProperty(name = "concreteParameters", opposite = "concreteEntities")
     public Collection<TConcreteParameterType> getConcreteParameters();
 
     public void setConcreteParameters(Collection<? extends TConcreteParameterType> concreteParameters);
@@ -61,23 +66,6 @@ public interface TParametricEntity  {
     public int numberOfConcreteParameters();
 
     public boolean hasConcreteParameters();
-
-    @FameProperty(name = "genericEntities", opposite = "concreteEntity", derived = true)
-    public Collection<TConcretisation> getGenericEntities();
-
-    public void setGenericEntities(Collection<? extends TConcretisation> genericEntities);
-
-    public void addGenericEntities(TConcretisation one);
-
-    public void addGenericEntities(TConcretisation one, TConcretisation... many);
-
-    public void addGenericEntities(Iterable<? extends TConcretisation> many);
-
-    public void addGenericEntities(TConcretisation[] many);
-
-    public int numberOfGenericEntities();
-
-    public boolean hasGenericEntities();
 
 
 

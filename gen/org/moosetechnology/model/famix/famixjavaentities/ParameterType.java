@@ -251,8 +251,8 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "genericEntity", opposite = "genericParameters", derived = true)
-    public Collection<TParametricEntity> getGenericEntity() {
+    @FameProperty(name = "genericEntities", opposite = "genericParameters", derived = true)
+    public Collection<TParametricEntity> getGenericEntities() {
         if (genericEntities == null) {
             genericEntities = new MultivalueSet<TParametricEntity>() {
                 @Override
@@ -268,37 +268,37 @@ public class ParameterType extends Type implements TEntityMetaLevelDependency, T
         return genericEntities;
     }
     
-    public void setGenericEntity(Collection<? extends TParametricEntity> genericEntity) {
-        this.getGenericEntity().clear();
-        this.getGenericEntity().addAll(genericEntity);
+    public void setGenericEntities(Collection<? extends TParametricEntity> genericEntities) {
+        this.getGenericEntities().clear();
+        this.getGenericEntities().addAll(genericEntities);
     }
     
-    public void addGenericEntity(TParametricEntity one) {
-        this.getGenericEntity().add(one);
+    public void addGenericEntities(TParametricEntity one) {
+        this.getGenericEntities().add(one);
     }   
     
-    public void addGenericEntity(TParametricEntity one, TParametricEntity... many) {
-        this.getGenericEntity().add(one);
+    public void addGenericEntities(TParametricEntity one, TParametricEntity... many) {
+        this.getGenericEntities().add(one);
         for (TParametricEntity each : many)
-            this.getGenericEntity().add(each);
+            this.getGenericEntities().add(each);
     }   
     
-    public void addGenericEntity(Iterable<? extends TParametricEntity> many) {
+    public void addGenericEntities(Iterable<? extends TParametricEntity> many) {
         for (TParametricEntity each : many)
-            this.getGenericEntity().add(each);
+            this.getGenericEntities().add(each);
     }   
                 
-    public void addGenericEntity(TParametricEntity[] many) {
+    public void addGenericEntities(TParametricEntity[] many) {
         for (TParametricEntity each : many)
-            this.getGenericEntity().add(each);
+            this.getGenericEntities().add(each);
     }
     
-    public int numberOfGenericEntity() {
-        return getGenericEntity().size();
+    public int numberOfGenericEntities() {
+        return getGenericEntities().size();
     }
 
-    public boolean hasGenericEntity() {
-        return !getGenericEntity().isEmpty();
+    public boolean hasGenericEntities() {
+        return !getGenericEntities().isEmpty();
     }
 
     @FameProperty(name = "hierarchyNestingLevel", derived = true)

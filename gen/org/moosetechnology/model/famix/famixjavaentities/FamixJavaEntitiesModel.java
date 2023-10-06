@@ -50,6 +50,8 @@ public class FamixJavaEntitiesModel {
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.SourceLanguage.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.SourceTextAnchor.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.SourcedEntity.class);
+		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.TBound.class);
+		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.TBounded.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.TCanBeSynchronized.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.TCanBeTransient.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.TCanBeVolatile.class);
@@ -59,6 +61,7 @@ public class FamixJavaEntitiesModel {
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.Type.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.UnknownSourceLanguage.class);
 		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.UnknownVariable.class);
+		metamodel.with(org.moosetechnology.model.famix.famixjavaentities.Wildcard.class);
 
     }
 

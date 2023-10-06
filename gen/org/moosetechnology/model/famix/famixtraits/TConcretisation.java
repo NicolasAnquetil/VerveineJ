@@ -12,32 +12,32 @@ import org.moosetechnology.model.famix.moosequery.TAssociationMetaLevelDependenc
 @FameDescription("TConcretisation")
 public interface TConcretisation extends TAssociationMetaLevelDependency, TAssociation, TSourceEntity {
 
-        @FameProperty(name = "genericEntity", opposite = "concretisations")
+        @FameProperty(name = "parameterConcretisations", opposite = "concretisations", derived = true)
+    public Collection<TParameterConcretisation> getParameterConcretisations();
+
+    public void setParameterConcretisations(Collection<? extends TParameterConcretisation> parameterConcretisations);
+
+    public void addParameterConcretisations(TParameterConcretisation one);
+
+    public void addParameterConcretisations(TParameterConcretisation one, TParameterConcretisation... many);
+
+    public void addParameterConcretisations(Iterable<? extends TParameterConcretisation> many);
+
+    public void addParameterConcretisations(TParameterConcretisation[] many);
+
+    public int numberOfParameterConcretisations();
+
+    public boolean hasParameterConcretisations();
+
+    @FameProperty(name = "genericEntity", opposite = "concretisations")
     public TParametricEntity getGenericEntity();
 
     public void setGenericEntity(TParametricEntity genericEntity);
 
-    @FameProperty(name = "concreteEntity", opposite = "genericEntities")
+    @FameProperty(name = "concreteEntity", opposite = "genericEntity")
     public TParametricEntity getConcreteEntity();
 
     public void setConcreteEntity(TParametricEntity concreteEntity);
-
-    @FameProperty(name = "parameterConcretisation", opposite = "concretisation", derived = true)
-    public Collection<TParameterConcretisation> getParameterConcretisation();
-
-    public void setParameterConcretisation(Collection<? extends TParameterConcretisation> parameterConcretisation);
-
-    public void addParameterConcretisation(TParameterConcretisation one);
-
-    public void addParameterConcretisation(TParameterConcretisation one, TParameterConcretisation... many);
-
-    public void addParameterConcretisation(Iterable<? extends TParameterConcretisation> many);
-
-    public void addParameterConcretisation(TParameterConcretisation[] many);
-
-    public int numberOfParameterConcretisation();
-
-    public boolean hasParameterConcretisation();
 
 
 

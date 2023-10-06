@@ -10,7 +10,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TGenericParameterType")
-public interface TGenericParameterType extends TEntityMetaLevelDependency, TNamedEntity, TSourceEntity, TReferenceable, TType {
+public interface TGenericParameterType extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TReferenceable, TType {
 
         @FameProperty(name = "concretisations", opposite = "genericParameter", derived = true)
     public Collection<TParameterConcretisation> getConcretisations();
@@ -29,22 +29,22 @@ public interface TGenericParameterType extends TEntityMetaLevelDependency, TName
 
     public boolean hasConcretisations();
 
-    @FameProperty(name = "genericEntity", opposite = "genericParameters", derived = true)
-    public Collection<TParametricEntity> getGenericEntity();
+    @FameProperty(name = "genericEntities", opposite = "genericParameters", derived = true)
+    public Collection<TParametricEntity> getGenericEntities();
 
-    public void setGenericEntity(Collection<? extends TParametricEntity> genericEntity);
+    public void setGenericEntities(Collection<? extends TParametricEntity> genericEntities);
 
-    public void addGenericEntity(TParametricEntity one);
+    public void addGenericEntities(TParametricEntity one);
 
-    public void addGenericEntity(TParametricEntity one, TParametricEntity... many);
+    public void addGenericEntities(TParametricEntity one, TParametricEntity... many);
 
-    public void addGenericEntity(Iterable<? extends TParametricEntity> many);
+    public void addGenericEntities(Iterable<? extends TParametricEntity> many);
 
-    public void addGenericEntity(TParametricEntity[] many);
+    public void addGenericEntities(TParametricEntity[] many);
 
-    public int numberOfGenericEntity();
+    public int numberOfGenericEntities();
 
-    public boolean hasGenericEntity();
+    public boolean hasGenericEntities();
 
 
 

@@ -12,27 +12,27 @@ import org.moosetechnology.model.famix.moosequery.TAssociationMetaLevelDependenc
 @FameDescription("TParameterConcretisation")
 public interface TParameterConcretisation extends TAssociationMetaLevelDependency, TAssociation, TSourceEntity {
 
-        @FameProperty(name = "concreteParameter", opposite = "generic")
+        @FameProperty(name = "concretisations", opposite = "parameterConcretisations")
+    public Collection<TConcretisation> getConcretisations();
+
+    public void setConcretisations(Collection<? extends TConcretisation> concretisations);
+
+    public void addConcretisations(TConcretisation one);
+
+    public void addConcretisations(TConcretisation one, TConcretisation... many);
+
+    public void addConcretisations(Iterable<? extends TConcretisation> many);
+
+    public void addConcretisations(TConcretisation[] many);
+
+    public int numberOfConcretisations();
+
+    public boolean hasConcretisations();
+
+    @FameProperty(name = "concreteParameter", opposite = "generics")
     public TConcreteParameterType getConcreteParameter();
 
     public void setConcreteParameter(TConcreteParameterType concreteParameter);
-
-    @FameProperty(name = "concretisation", opposite = "parameterConcretisation")
-    public Collection<TConcretisation> getConcretisation();
-
-    public void setConcretisation(Collection<? extends TConcretisation> concretisation);
-
-    public void addConcretisation(TConcretisation one);
-
-    public void addConcretisation(TConcretisation one, TConcretisation... many);
-
-    public void addConcretisation(Iterable<? extends TConcretisation> many);
-
-    public void addConcretisation(TConcretisation[] many);
-
-    public int numberOfConcretisation();
-
-    public boolean hasConcretisation();
 
     @FameProperty(name = "genericParameter", opposite = "concretisations")
     public TGenericParameterType getGenericParameter();

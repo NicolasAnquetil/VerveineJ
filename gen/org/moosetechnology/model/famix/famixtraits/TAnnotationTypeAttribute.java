@@ -10,7 +10,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TAnnotationTypeAttribute")
-public interface TAnnotationTypeAttribute extends TEntityMetaLevelDependency, TNamedEntity, TSourceEntity, TStructuralEntity, TAttribute, TTypedEntity, TAccessible {
+public interface TAnnotationTypeAttribute extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TStructuralEntity, TAttribute, TTypedEntity, TAccessible {
 
         @FameProperty(name = "annotationAttributeInstances", opposite = "annotationTypeAttribute", derived = true)
     public Collection<TTypedAnnotationInstanceAttribute> getAnnotationAttributeInstances();

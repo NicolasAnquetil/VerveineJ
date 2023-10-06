@@ -321,7 +321,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		ArrayList<Interface> withoutConcret = new ArrayList<Interface>();
 		for(Interface inter: entitiesOfType(Interface.class)) {
 			if(inter instanceof ParametricInterface) {
-				if(((ParametricInterface)inter).getGenericEntities().isEmpty()) {
+				if(((ParametricInterface)inter).getGenericEntity() == null) {
 					genericInters.add(inter);
 					withoutConcret.add(inter);
 				}
@@ -399,7 +399,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(1, rk.getSuperInheritances().size());
 		Type rkSuper = (Type) firstElt(rk.getSuperInheritances()).getSuperclass();
 		assertEquals(ParametricClass.class, rkSuper.getClass());
-		assertEquals(javaLangEnum, firstElt(((ParametricClass) rkSuper).getGenericEntities()).getGenericEntity());
+		assertEquals(javaLangEnum, ((ParametricClass) rkSuper).getGenericEntity().getGenericEntity());
 
 		// declared enum: Suit 
 		org.moosetechnology.model.famix.famixjavaentities.Enum st = detectFamixElement(org.moosetechnology.model.famix.famixjavaentities.Enum.class, "Suit");
@@ -407,7 +407,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(1, st.getSuperInheritances().size());
 		Type stSuper = (Type) firstElt(st.getSuperInheritances()).getSuperclass();
 		assertEquals(ParametricClass.class, stSuper.getClass());
-		assertEquals(javaLangEnum, firstElt(((ParametricClass) stSuper).getGenericEntities()).getGenericEntity());
+		assertEquals(javaLangEnum, ((ParametricClass) stSuper).getGenericEntity().getGenericEntity());
 		assertEquals(4, st.getEnumValues().size());
 		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.getOwner(st));
 
@@ -417,7 +417,7 @@ public class VerveineJTest_AdHoc extends VerveineJTest_Basic {
 		assertEquals(1, pl.getSuperInheritances().size());
 		Type plSuper = (Type) firstElt(pl.getSuperInheritances()).getSuperclass();
 		assertEquals(ParametricClass.class, plSuper.getClass());
-		assertEquals(javaLangEnum, firstElt(((ParametricClass) plSuper).getGenericEntities()).getGenericEntity());
+		assertEquals(javaLangEnum,((ParametricClass) plSuper).getGenericEntity().getGenericEntity());
 		assertSame(detectFamixElement(Package.class, "ad_hoc"), Util.getOwner(pl));
 		assertEquals(8, pl.getEnumValues().size());
 		assertEquals(4, pl.getAttributes().size());

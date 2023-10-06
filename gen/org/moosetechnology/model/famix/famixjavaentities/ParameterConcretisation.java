@@ -39,7 +39,7 @@ public class ParameterConcretisation extends Entity implements TAssociation, TAs
     
 
 
-    @FameProperty(name = "concreteParameter", opposite = "generic")
+    @FameProperty(name = "concreteParameter", opposite = "generics")
     public TConcreteParameterType getConcreteParameter() {
         return concreteParameter;
     }
@@ -47,61 +47,61 @@ public class ParameterConcretisation extends Entity implements TAssociation, TAs
     public void setConcreteParameter(TConcreteParameterType concreteParameter) {
         if (this.concreteParameter != null) {
             if (this.concreteParameter.equals(concreteParameter)) return;
-            this.concreteParameter.getGeneric().remove(this);
+            this.concreteParameter.getGenerics().remove(this);
         }
         this.concreteParameter = concreteParameter;
         if (concreteParameter == null) return;
-        concreteParameter.getGeneric().add(this);
+        concreteParameter.getGenerics().add(this);
     }
     
-    @FameProperty(name = "concretisation", opposite = "parameterConcretisation")
-    public Collection<TConcretisation> getConcretisation() {
+    @FameProperty(name = "concretisations", opposite = "parameterConcretisations")
+    public Collection<TConcretisation> getConcretisations() {
         if (concretisations == null) {
             concretisations = new MultivalueSet<TConcretisation>() {
                 @Override
                 protected void clearOpposite(TConcretisation e) {
-                    e.getParameterConcretisation().remove(ParameterConcretisation.this);
+                    e.getParameterConcretisations().remove(ParameterConcretisation.this);
                 }
                 @Override
                 protected void setOpposite(TConcretisation e) {
-                    e.getParameterConcretisation().add(ParameterConcretisation.this);
+                    e.getParameterConcretisations().add(ParameterConcretisation.this);
                 }
             };
         }
         return concretisations;
     }
     
-    public void setConcretisation(Collection<? extends TConcretisation> concretisation) {
-        this.getConcretisation().clear();
-        this.getConcretisation().addAll(concretisation);
+    public void setConcretisations(Collection<? extends TConcretisation> concretisations) {
+        this.getConcretisations().clear();
+        this.getConcretisations().addAll(concretisations);
     }
     
-    public void addConcretisation(TConcretisation one) {
-        this.getConcretisation().add(one);
+    public void addConcretisations(TConcretisation one) {
+        this.getConcretisations().add(one);
     }   
     
-    public void addConcretisation(TConcretisation one, TConcretisation... many) {
-        this.getConcretisation().add(one);
+    public void addConcretisations(TConcretisation one, TConcretisation... many) {
+        this.getConcretisations().add(one);
         for (TConcretisation each : many)
-            this.getConcretisation().add(each);
+            this.getConcretisations().add(each);
     }   
     
-    public void addConcretisation(Iterable<? extends TConcretisation> many) {
+    public void addConcretisations(Iterable<? extends TConcretisation> many) {
         for (TConcretisation each : many)
-            this.getConcretisation().add(each);
+            this.getConcretisations().add(each);
     }   
                 
-    public void addConcretisation(TConcretisation[] many) {
+    public void addConcretisations(TConcretisation[] many) {
         for (TConcretisation each : many)
-            this.getConcretisation().add(each);
+            this.getConcretisations().add(each);
     }
     
-    public int numberOfConcretisation() {
-        return getConcretisation().size();
+    public int numberOfConcretisations() {
+        return getConcretisations().size();
     }
 
-    public boolean hasConcretisation() {
-        return !getConcretisation().isEmpty();
+    public boolean hasConcretisations() {
+        return !getConcretisations().isEmpty();
     }
 
     @FameProperty(name = "containsReplicas", derived = true)

@@ -13,7 +13,6 @@ import org.moosetechnology.model.famix.famixtraits.TCanBeClassSide;
 import org.moosetechnology.model.famix.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famix.famixtraits.TCanImplement;
 import org.moosetechnology.model.famix.famixtraits.TClass;
-import org.moosetechnology.model.famix.famixtraits.TClassMetrics;
 import org.moosetechnology.model.famix.famixtraits.TComment;
 import org.moosetechnology.model.famix.famixtraits.THasVisibility;
 import org.moosetechnology.model.famix.famixtraits.TImplementation;
@@ -46,7 +45,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 @FameDescription("Class")
 public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanImplement, TClass, TClassMetrics, TEntityMetaLevelDependency, THasVisibility, TImportable, TInvocationsReceiver, TLCOMMetrics, TNamedEntity, TPackageable, TReferenceable, TSourceEntity, TType, TWithAttributes, TWithComments, TWithImports, TWithInheritances, TWithMethods {
 
-    private Boolean isInterface = false;
+    private Boolean isInterface;
     
     private Collection<TAttribute> attributes; 
 
@@ -431,7 +430,7 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
         this.isFinal = isFinal;
     }
     
-    @FameProperty(name = "isPackage", derived = true)
+    @FameProperty(name = "isPackagegetIsPackageVisibility", derived = true)
     public Boolean getIsPackageVisibility() {
         return this.visibility.equals("package");
     }
@@ -445,7 +444,7 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     public Boolean getIsProtected() {
         return this.visibility.equals("protected");
     }
-
+    
     @FameProperty(name = "isPublic", derived = true)
     public Boolean getIsPublic() {
         return this.visibility.equals("public");
@@ -544,14 +543,14 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfAttributes", derived = true)
-    public Number getNumberOfAttributes() {
+    @FameProperty(name = "numberOfAccessorMethods", derived = true)
+    public Number getNumberOfAccessorMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfAttributesInherited", derived = true)
-    public Number getNumberOfAttributesInherited() {
+    @FameProperty(name = "numberOfAttributes", derived = true)
+    public Number getNumberOfAttributes() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -564,6 +563,12 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
     
     @FameProperty(name = "numberOfComments", derived = true)
     public Number getNumberOfComments() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfConstructorMethods", derived = true)
+    public Number getNumberOfConstructorMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -619,32 +624,26 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfLocallyDefinedMethods", derived = true)
-    public Number getNumberOfLocallyDefinedMethods() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "numberOfMethods", derived = true)
     public Number getNumberOfMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfMethodsInHierarchy", derived = true)
-    public Number getNumberOfMethodsInHierarchy() {
+    @FameProperty(name = "numberOfPrivateMethods", derived = true)
+    public Number getNumberOfPrivateMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfMethodsInherited", derived = true)
-    public Number getNumberOfMethodsInherited() {
+    @FameProperty(name = "numberOfProtectedMethods", derived = true)
+    public Number getNumberOfProtectedMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "numberOfMethodsOverriden", derived = true)
-    public Number getNumberOfMethodsOverriden() {
+    @FameProperty(name = "numberOfPublicMethods", derived = true)
+    public Number getNumberOfPublicMethods() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -908,12 +907,6 @@ public class Class extends Type implements TCanBeAbstract, TCanBeClassSide, TCan
 
     @FameProperty(name = "tightClassCohesion", derived = true)
     public Number getTightClassCohesion() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "totalNumberOfSubclasses", derived = true)
-    public Number getTotalNumberOfSubclasses() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }

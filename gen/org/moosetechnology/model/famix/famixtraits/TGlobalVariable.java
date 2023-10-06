@@ -9,7 +9,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TGlobalVariable")
-public interface TGlobalVariable extends TEntityMetaLevelDependency, TNamedEntity, TSourceEntity, TStructuralEntity, TTypedEntity, TAccessible {
+public interface TGlobalVariable extends TNamedEntity, TEntityMetaLevelDependency, TSourceEntity, TStructuralEntity, TTypedEntity, TAccessible {
 
         @FameProperty(name = "parentScope", opposite = "globalVariables", container = true)
     public TWithGlobalVariables getParentScope();

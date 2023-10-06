@@ -9,7 +9,7 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Traits")
 @FameDescription("TClass")
-public interface TClass extends TNamedEntity, TEntityMetaLevelDependency, TWithAttributes, TWithMethods, TSourceEntity, TReferenceable, TWithInheritances, TInvocationsReceiver, TType, TPackageable, TWithComments {
+public interface TClass extends TEntityMetaLevelDependency, TNamedEntity, TWithAttributes, TWithMethods, TSourceEntity, TReferenceable, TInvocationsReceiver, TWithInheritances, TType, TPackageable, TWithComments {
 
         @FameProperty(name = "isTestCase", derived = true)
     public Boolean getIsTestCase();
