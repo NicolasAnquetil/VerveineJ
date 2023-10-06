@@ -50,7 +50,6 @@ public class Dictionary<B> {
 				fmxClass.class.isInstance(null);  /// for testing VerveineJ
 			}
 		}
-
 		return ret;
 	}
 
@@ -62,7 +61,10 @@ public class Dictionary<B> {
 			return mapBind.get(bnd);
 		}
 	}
-
+	
+	public void parameterClass(ArrayList<B> list) {
+		
+	}
 	protected void testMethodRettype() {
 		NamedEntity ent = createFamixEntity(NamedEntity.class, "test");
 		mapBind.uniplementedMethod(ent, "2nd param");

@@ -3,7 +3,9 @@ package fr.inria.verveine.extractor.java;
 import org.junit.Before;
 import org.junit.Test;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
+import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TThrowable;
 
 import static org.junit.Assert.*;
 
@@ -71,7 +73,7 @@ public class VerveineJTest_Exceptions extends VerveineJTest_Basic {
 
 //        assertEquals(0, meth.getParentType().getTypes().size());
         assertEquals(1, meth.getDeclaredExceptions().size());
-        org.moosetechnology.model.famix.famixjavaentities.Exception exD = (org.moosetechnology.model.famix.famixjavaentities.Exception) firstElt(meth.getDeclaredExceptions());
+        ParameterType exD = (ParameterType) firstElt(meth.getDeclaredExceptions());
         assertSame(meth, firstElt(exD.getDeclaringEntities()));
         assertEquals("T", exD.getName());
     }

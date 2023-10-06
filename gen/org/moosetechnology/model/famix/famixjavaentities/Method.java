@@ -6,18 +6,18 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TAccess;
 import org.moosetechnology.model.famix.famixtraits.TCanBeAbstract;
 import org.moosetechnology.model.famix.famixtraits.TCanBeClassSide;
 import org.moosetechnology.model.famix.famixtraits.TCanBeFinal;
 import org.moosetechnology.model.famix.famixtraits.TComment;
-import org.moosetechnology.model.famix.famixtraits.TException;
 import org.moosetechnology.model.famix.famixtraits.THasKind;
 import org.moosetechnology.model.famix.famixtraits.THasSignature;
 import org.moosetechnology.model.famix.famixtraits.THasVisibility;
 import org.moosetechnology.model.famix.famixtraits.TImplicitVariable;
+import org.moosetechnology.model.famix.famixtraits.TImport;
+import org.moosetechnology.model.famix.famixtraits.TImportable;
 import org.moosetechnology.model.famix.famixtraits.TInvocable;
 import org.moosetechnology.model.famix.famixtraits.TInvocation;
 import org.moosetechnology.model.famix.famixtraits.TLocalVariable;
@@ -28,6 +28,7 @@ import org.moosetechnology.model.famix.famixtraits.TParameter;
 import org.moosetechnology.model.famix.famixtraits.TReference;
 import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
+import org.moosetechnology.model.famix.famixtraits.TThrowable;
 import org.moosetechnology.model.famix.famixtraits.TType;
 import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithAccesses;
@@ -45,23 +46,25 @@ import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Method")
-public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanBeSynchronized, TEntityMetaLevelDependency, THasKind, THasSignature, THasVisibility, TInvocable, TMethod, TMethodMetrics, TNamedEntity, TSourceEntity, TTypedEntity, TWithAccesses, TWithComments, TWithExceptions, TWithImplicitVariables, TWithInvocations, TWithLocalVariables, TWithParameters, TWithReferences, TWithStatements {
+public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeClassSide, TCanBeFinal, TCanBeSynchronized, TEntityMetaLevelDependency, THasKind, THasSignature, THasVisibility, TImportable, TInvocable, TMethod, TMethodMetrics, TNamedEntity, TSourceEntity, TTypedEntity, TWithAccesses, TWithComments, TWithExceptions, TWithImplicitVariables, TWithInvocations, TWithLocalVariables, TWithParameters, TWithReferences, TWithStatements {
 
     private Number numberOfConditionals;
     
     private Collection<TAccess> accesses; 
 
-    private Collection<TException> caughtExceptions; 
+    private Collection<TThrowable> caughtExceptions; 
 
     private Collection<TComment> comments; 
 
     private Number cyclomaticComplexity;
     
-    private Collection<TException> declaredExceptions; 
+    private Collection<TThrowable> declaredExceptions; 
 
     private TType declaredType;
     
     private Collection<TImplicitVariable> implicitVariables; 
+
+    private Collection<TImport> incomingImports; 
 
     private Collection<TInvocation> incomingInvocations; 
 
@@ -70,10 +73,8 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     private Boolean isClassSide = false;
     
     private Boolean isFinal = false;
-
+    
     private Boolean isStub;
-
-    private Boolean isDead;
     
     private Boolean isSynchronized;
     
@@ -97,14 +98,15 @@ public class Method extends ContainerEntity implements TCanBeAbstract, TCanBeCla
     
     private TSourceAnchor sourceAnchor;
     
-    private Collection<TException> thrownExceptions; 
+    private Collection<TThrowable> thrownExceptions; 
 
     private String visibility;
+
+	private boolean isDead;
+	
+	private Number numberOfStatements;
     
-@Override
-public String toString() {
-	return "Method(" + signature + ")";
-}
+
 
     @FameProperty(name = "clientBehaviours", derived = true)
     public Collection<Method> getClientBehaviours() {
@@ -239,15 +241,15 @@ public String toString() {
     }
 
     @FameProperty(name = "caughtExceptions", opposite = "catchingEntities")
-    public Collection<TException> getCaughtExceptions() {
+    public Collection<TThrowable> getCaughtExceptions() {
         if (caughtExceptions == null) {
-            caughtExceptions = new MultivalueSet<TException>() {
+            caughtExceptions = new MultivalueSet<TThrowable>() {
                 @Override
-                protected void clearOpposite(TException e) {
+                protected void clearOpposite(TThrowable e) {
                     e.getCatchingEntities().remove(Method.this);
                 }
                 @Override
-                protected void setOpposite(TException e) {
+                protected void setOpposite(TThrowable e) {
                     e.getCatchingEntities().add(Method.this);
                 }
             };
@@ -255,28 +257,28 @@ public String toString() {
         return caughtExceptions;
     }
     
-    public void setCaughtExceptions(Collection<? extends TException> caughtExceptions) {
+    public void setCaughtExceptions(Collection<? extends TThrowable> caughtExceptions) {
         this.getCaughtExceptions().clear();
         this.getCaughtExceptions().addAll(caughtExceptions);
     }
     
-    public void addCaughtExceptions(TException one) {
+    public void addCaughtExceptions(TThrowable one) {
         this.getCaughtExceptions().add(one);
     }   
     
-    public void addCaughtExceptions(TException one, TException... many) {
+    public void addCaughtExceptions(TThrowable one, TThrowable... many) {
         this.getCaughtExceptions().add(one);
-        for (TException each : many)
+        for (TThrowable each : many)
             this.getCaughtExceptions().add(each);
     }   
     
-    public void addCaughtExceptions(Iterable<? extends TException> many) {
-        for (TException each : many)
+    public void addCaughtExceptions(Iterable<? extends TThrowable> many) {
+        for (TThrowable each : many)
             this.getCaughtExceptions().add(each);
     }   
                 
-    public void addCaughtExceptions(TException[] many) {
-        for (TException each : many)
+    public void addCaughtExceptions(TThrowable[] many) {
+        for (TThrowable each : many)
             this.getCaughtExceptions().add(each);
     }
     
@@ -355,15 +357,15 @@ public String toString() {
     }
     
     @FameProperty(name = "declaredExceptions", opposite = "declaringEntities")
-    public Collection<TException> getDeclaredExceptions() {
+    public Collection<TThrowable> getDeclaredExceptions() {
         if (declaredExceptions == null) {
-            declaredExceptions = new MultivalueSet<TException>() {
+            declaredExceptions = new MultivalueSet<TThrowable>() {
                 @Override
-                protected void clearOpposite(TException e) {
+                protected void clearOpposite(TThrowable e) {
                     e.getDeclaringEntities().remove(Method.this);
                 }
                 @Override
-                protected void setOpposite(TException e) {
+                protected void setOpposite(TThrowable e) {
                     e.getDeclaringEntities().add(Method.this);
                 }
             };
@@ -371,28 +373,28 @@ public String toString() {
         return declaredExceptions;
     }
     
-    public void setDeclaredExceptions(Collection<? extends TException> declaredExceptions) {
+    public void setDeclaredExceptions(Collection<? extends TThrowable> declaredExceptions) {
         this.getDeclaredExceptions().clear();
         this.getDeclaredExceptions().addAll(declaredExceptions);
     }
     
-    public void addDeclaredExceptions(TException one) {
+    public void addDeclaredExceptions(TThrowable one) {
         this.getDeclaredExceptions().add(one);
     }   
     
-    public void addDeclaredExceptions(TException one, TException... many) {
+    public void addDeclaredExceptions(TThrowable one, TThrowable... many) {
         this.getDeclaredExceptions().add(one);
-        for (TException each : many)
+        for (TThrowable each : many)
             this.getDeclaredExceptions().add(each);
     }   
     
-    public void addDeclaredExceptions(Iterable<? extends TException> many) {
-        for (TException each : many)
+    public void addDeclaredExceptions(Iterable<? extends TThrowable> many) {
+        for (TThrowable each : many)
             this.getDeclaredExceptions().add(each);
     }   
                 
-    public void addDeclaredExceptions(TException[] many) {
-        for (TException each : many)
+    public void addDeclaredExceptions(TThrowable[] many) {
+        for (TThrowable each : many)
             this.getDeclaredExceptions().add(each);
     }
     
@@ -433,12 +435,6 @@ public String toString() {
     
     @FameProperty(name = "fanOut", derived = true)
     public Number getFanOut() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
-    @FameProperty(name = "hasClassScope", derived = true)
-    public Boolean getHasClassScope() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
@@ -504,6 +500,57 @@ public String toString() {
 
     public boolean hasImplicitVariables() {
         return !getImplicitVariables().isEmpty();
+    }
+
+    @FameProperty(name = "incomingImports", opposite = "importedEntity", derived = true)
+    public Collection<TImport> getIncomingImports() {
+        if (incomingImports == null) {
+            incomingImports = new MultivalueSet<TImport>() {
+                @Override
+                protected void clearOpposite(TImport e) {
+                    e.setImportedEntity(null);
+                }
+                @Override
+                protected void setOpposite(TImport e) {
+                    e.setImportedEntity(Method.this);
+                }
+            };
+        }
+        return incomingImports;
+    }
+    
+    public void setIncomingImports(Collection<? extends TImport> incomingImports) {
+        this.getIncomingImports().clear();
+        this.getIncomingImports().addAll(incomingImports);
+    }                    
+    
+        
+    public void addIncomingImports(TImport one) {
+        this.getIncomingImports().add(one);
+    }   
+    
+    public void addIncomingImports(TImport one, TImport... many) {
+        this.getIncomingImports().add(one);
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+    
+    public void addIncomingImports(Iterable<? extends TImport> many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }   
+                
+    public void addIncomingImports(TImport[] many) {
+        for (TImport each : many)
+            this.getIncomingImports().add(each);
+    }
+    
+    public int numberOfIncomingImports() {
+        return getIncomingImports().size();
+    }
+
+    public boolean hasIncomingImports() {
+        return !getIncomingImports().isEmpty();
     }
 
     @FameProperty(name = "incomingInvocations", opposite = "candidates", derived = true)
@@ -588,12 +635,12 @@ public String toString() {
     
     @FameProperty(name = "isDead", derived = true)
     public Boolean getIsDead() {
-        return isDead;  
+       return this.isDead;
     }
-
-    public void setIsDead(Boolean isDead) {
-        this.isDead = isDead;
-    }
+    
+    public void setIsDead(boolean b) {
+		this.isDead = b;
+	}
     
     @FameProperty(name = "isFinal")
     public Boolean getIsFinal() {
@@ -602,6 +649,33 @@ public String toString() {
 
     public void setIsFinal(Boolean isFinal) {
         this.isFinal = isFinal;
+    }
+    
+    @FameProperty(name = "isGetter", derived = true)
+    public Boolean getIsGetter() {
+        // TODO: this is a derived property, implement this method manually.
+        throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    
+    @FameProperty(name = "isPackageVisibility", derived = true)
+    public Boolean getIsPackageVisibility() {
+        return this.visibility.equals("package");
+    }
+
+    @FameProperty(name = "isPrivate", derived = true)
+    public Boolean getIsPrivate() {
+        return this.visibility.equals("private");
+    }
+
+    @FameProperty(name = "isProtected", derived = true)
+    public Boolean getIsProtected() {
+        return this.visibility.equals("protected");
+    }
+
+    @FameProperty(name = "isPublic", derived = true)
+    public Boolean getIsPublic() {
+        return this.visibility.equals("public");
     }
     
     @FameProperty(name = "isSetter", derived = true)
@@ -764,6 +838,15 @@ public String toString() {
     public Number getNumberOfParameters() {
         // TODO: this is a derived property, implement this method manually.
         throw new UnsupportedOperationException("Not yet implemented!");  
+    }
+    
+    @FameProperty(name = "numberOfStatements")
+    public Number getNumberOfStatements() {
+        return this.numberOfStatements;
+    }
+
+    public void setNumberOfStatements(Number number) {
+        this.numberOfStatements = number;
     }
     
     @FameProperty(name = "outgoingInvocations", opposite = "sender", derived = true)
@@ -970,15 +1053,15 @@ public String toString() {
     }
     
     @FameProperty(name = "thrownExceptions", opposite = "throwingEntities")
-    public Collection<TException> getThrownExceptions() {
+    public Collection<TThrowable> getThrownExceptions() {
         if (thrownExceptions == null) {
-            thrownExceptions = new MultivalueSet<TException>() {
+            thrownExceptions = new MultivalueSet<TThrowable>() {
                 @Override
-                protected void clearOpposite(TException e) {
+                protected void clearOpposite(TThrowable e) {
                     e.getThrowingEntities().remove(Method.this);
                 }
                 @Override
-                protected void setOpposite(TException e) {
+                protected void setOpposite(TThrowable e) {
                     e.getThrowingEntities().add(Method.this);
                 }
             };
@@ -986,28 +1069,28 @@ public String toString() {
         return thrownExceptions;
     }
     
-    public void setThrownExceptions(Collection<? extends TException> thrownExceptions) {
+    public void setThrownExceptions(Collection<? extends TThrowable> thrownExceptions) {
         this.getThrownExceptions().clear();
         this.getThrownExceptions().addAll(thrownExceptions);
     }
     
-    public void addThrownExceptions(TException one) {
+    public void addThrownExceptions(TThrowable one) {
         this.getThrownExceptions().add(one);
     }   
     
-    public void addThrownExceptions(TException one, TException... many) {
+    public void addThrownExceptions(TThrowable one, TThrowable... many) {
         this.getThrownExceptions().add(one);
-        for (TException each : many)
+        for (TThrowable each : many)
             this.getThrownExceptions().add(each);
     }   
     
-    public void addThrownExceptions(Iterable<? extends TException> many) {
-        for (TException each : many)
+    public void addThrownExceptions(Iterable<? extends TThrowable> many) {
+        for (TThrowable each : many)
             this.getThrownExceptions().add(each);
     }   
                 
-    public void addThrownExceptions(TException[] many) {
-        for (TException each : many)
+    public void addThrownExceptions(TThrowable[] many) {
+        for (TThrowable each : many)
             this.getThrownExceptions().add(each);
     }
     
@@ -1027,45 +1110,9 @@ public String toString() {
     public void setVisibility(String visibility) {
         this.visibility = visibility;
     }
-    
-        // Manually added
 
-        private Number numberOfStatements;
-
-        @FameProperty(name = "numberOfStatements")
-        public Number getNumberOfStatements() {
-            return numberOfStatements;
-        }
+	
     
-        public void setNumberOfStatements(Number number) {
-            numberOfStatements = number;
-        }
-    
-        @FameProperty(name = "isPackage", derived = true)
-        public Boolean getIsPackage() {
-            return this.visibility.equals("package");
-        }
-    
-        @FameProperty(name = "isPrivate", derived = true)
-        public Boolean getIsPrivate() {
-            return this.visibility.equals("private");
-        }
-    
-        @FameProperty(name = "isProtected", derived = true)
-        public Boolean getIsProtected() {
-            return this.visibility.equals("protected");
-        }
-    
-        @FameProperty(name = "isPublic", derived = true)
-        public Boolean getIsPublic() {
-            return this.visibility.equals("public");
-        }
-
-        @Override
-        public Boolean getIsGetter() {
-            // TODO Auto-generated method stub
-            return null;
-        }
 
 
 }

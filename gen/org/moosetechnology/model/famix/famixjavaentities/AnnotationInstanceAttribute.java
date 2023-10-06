@@ -4,7 +4,6 @@ package org.moosetechnology.model.famix.famixjavaentities;
 import ch.akuhn.fame.FameDescription;
 import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
-
 import org.moosetechnology.model.famix.famixtraits.TAnnotationInstanceAttribute;
 import org.moosetechnology.model.famix.famixtraits.TAnnotationTypeAttribute;
 import org.moosetechnology.model.famix.famixtraits.TTypedAnnotationInstanceAttribute;

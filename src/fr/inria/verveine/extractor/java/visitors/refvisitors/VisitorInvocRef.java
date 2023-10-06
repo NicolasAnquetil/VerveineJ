@@ -227,11 +227,17 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 		
 		TNamedEntity receiver = getReceiver(callingExpr);
 		IMethodBinding bnd = node.resolveMethodBinding();
+		
+		
 		String calledName = node.getName().getFullyQualifiedName();
 		
 		if (bnd == null) {
 			methodInvocation(bnd, calledName, receiver, getInvokedMethodOwner(callingExpr, receiver), node.arguments());
 		} else {
+			if(bnd.isParameterizedMethod()) {
+				dico.ensureFamixMethod(bnd);
+			}
+			// Ici il faut faire une invocation vers la concrétisation et pas la générique soit bnd.
 			methodInvocation(bnd, calledName, receiver, /*owner*/null, node.arguments());
 		}//context
 
@@ -367,11 +373,14 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 										TType methOwner, Collection<Expression> l_args) {
 		TMethod sender = this.context.topMethod();
 		TMethod invoked = null;
+		IMethodBinding actuallBnd= calledBnd;
 		Invocation invok = null;
-
+		
 		if (calledBnd != null) {
 			// for parameterized methods there is a level of indirection, for other methods doesn't change anything
-			calledBnd = calledBnd.getMethodDeclaration();
+			if(!calledBnd.isParameterizedMethod()) {
+				calledBnd = calledBnd.getMethodDeclaration();
+			}
 		}
 
 		if ((receiver != null) && (receiver.getName().equals("class")) && (calledBnd != null)
@@ -399,14 +408,33 @@ public class VisitorInvocRef extends AbstractRefVisitor {
 
 					if (receiver != null)
 						owner = (TType) receiver;
-					else
-						owner = methOwner;
+					else {
+						if(actuallBnd != null && actuallBnd.getDeclaringClass().isParameterizedType()) {
+							owner = this.dico.ensureFamixType(calledBnd.getDeclaringClass().getErasure());
+						}else{
+							owner = methOwner;
+						}
+						
+					}
+						
 					//  static method called on the class (or null receiver)
 					invoked = this.dico.ensureFamixMethod(calledBnd, calledName, unkwnArgs, /*retType*/null,
 							(TWithMethods) /*owner*/owner, modifiers);
 				}
 				
-				String signature = calledName + "(";
+				String signature ="";
+				if(calledBnd != null && calledBnd.isParameterizedMethod()) {
+					signature += "<";
+					Collection<TConcreteParameterType> params = ((TParametricEntity)invoked).getConcreteParameters();
+					int i = 0;
+					for(TConcreteParameterType param: params) {
+						signature += param.getName() + (i<params.size()-1 ? "," : "");
+						i++;
+					}
+					signature += "> ";
+				}
+				signature += calledName + "(";
+				
 				boolean first = true;
 				for (Expression a : l_args) {
 					if (first) {

@@ -10,6 +10,7 @@ import org.moosetechnology.model.famix.famixjavaentities.Method;
 import org.moosetechnology.model.famix.famixjavaentities.Package;
 import org.moosetechnology.model.famix.famixjavaentities.ParameterType;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
+import org.moosetechnology.model.famix.famixtraits.TThrowable;
 import org.moosetechnology.model.famix.famixtraits.TType;
 
 import java.util.List;
@@ -61,8 +62,8 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
 		Method fmx = visitMethodDeclaration( node);
 		if (fmx != null) {
 		    for (Type excep : (List<Type>) node.thrownExceptionTypes()) {
-		    	Exception excepFmx =  dico.asException(this.referedType(excep, (ContainerEntity) context.topType(), true, true));
-		    	dico.createFamixDeclaredException(fmx, (Exception) excepFmx);
+		    	TThrowable excepFmx =  dico.asException(this.referedType(excep, (ContainerEntity) context.topType(), true, true));
+		    	dico.createFamixDeclaredException(fmx,excepFmx);
             }
 			return super.visit(node);
 		} else {
@@ -80,7 +81,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
         Method meth = (Method) this.context.topMethod();
         Type excepClass = node.getException().getType();
         if (meth != null) {
-            org.moosetechnology.model.famix.famixjavaentities.Exception excepFmx = null;
+            TThrowable excepFmx = null;
             if ( NodeTypeChecker.isSimpleType(excepClass) || NodeTypeChecker.isQualifiedType(excepClass) ) {
                 excepFmx = dico.asException(referedType(excepClass, meth, true, true));
             }
@@ -95,7 +96,7 @@ public class VisitorExceptionRef extends AbstractRefVisitor {
     @Override
     public boolean visit(ThrowStatement node) {
         Method meth = (Method) this.context.topMethod();
-        org.moosetechnology.model.famix.famixjavaentities.Exception excepFmx = dico.asException(this
+        TThrowable excepFmx = dico.asException(this
                 .referedType(node.getExpression().resolveTypeBinding(), (TNamedEntity) context.topType(), true));
         if (excepFmx != null) {
         	dico.createFamixThrownException(meth, excepFmx);

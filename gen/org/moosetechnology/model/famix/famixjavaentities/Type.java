@@ -6,37 +6,37 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
+import org.moosetechnology.model.famix.famixtraits.TConcreteParameterType;
 import org.moosetechnology.model.famix.famixtraits.TMethod;
 import org.moosetechnology.model.famix.famixtraits.TNamedEntity;
-import org.moosetechnology.model.famix.famixtraits.TParameterizedTypeUser;
+import org.moosetechnology.model.famix.famixtraits.TParameterConcretisation;
+import org.moosetechnology.model.famix.famixtraits.TParametricEntity;
 import org.moosetechnology.model.famix.famixtraits.TReference;
 import org.moosetechnology.model.famix.famixtraits.TReferenceable;
 import org.moosetechnology.model.famix.famixtraits.TSourceAnchor;
 import org.moosetechnology.model.famix.famixtraits.TSourceEntity;
 import org.moosetechnology.model.famix.famixtraits.TType;
-import org.moosetechnology.model.famix.famixtraits.TTypeAlias;
 import org.moosetechnology.model.famix.famixtraits.TTypedEntity;
 import org.moosetechnology.model.famix.famixtraits.TWithMethods;
-import org.moosetechnology.model.famix.famixtraits.TWithParameterizedTypeUsers;
-import org.moosetechnology.model.famix.famixtraits.TWithTypeAliases;
 import org.moosetechnology.model.famix.famixtraits.TWithTypes;
 import org.moosetechnology.model.famix.moosequery.TEntityMetaLevelDependency;
 
 
 @FamePackage("Famix-Java-Entities")
 @FameDescription("Type")
-public class Type extends ContainerEntity implements TEntityMetaLevelDependency, TNamedEntity, TParameterizedTypeUser, TReferenceable, TSourceEntity, TType, TWithMethods, TWithTypeAliases {
+public class Type extends ContainerEntity implements TBound, TConcreteParameterType, TEntityMetaLevelDependency, TNamedEntity, TReferenceable, TSourceEntity, TType, TWithMethods {
 
-    private ContainerEntity container;
+    private Collection<TParametricEntity> concreteEntities; 
 
-    private Collection<TWithParameterizedTypeUsers> argumentsInParameterizedTypes; 
+    private Collection<TParameterConcretisation> generics; 
 
     private Collection<TReference> incomingReferences; 
 
     private Boolean isStub;
     
+    private Collection<TBounded> lowerBoundedWildcards; 
+
     private Collection<TMethod> methods; 
 
     private String name;
@@ -45,20 +45,13 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
     
     private TSourceAnchor sourceAnchor;
     
-    private Collection<TTypeAlias> typeAliases; 
-
     private TWithTypes typeContainer;
     
     private Collection<TTypedEntity> typedEntities; 
 
-    @FameProperty(name = "container")
-    public ContainerEntity getContainer() {
-        return container;
-    }
+    private Collection<TBounded> upperBoundedWildcards; 
 
-    public void setContainer(ContainerEntity container) {
-        this.container = container;
-    }
+
 
     @FameProperty(name = "isInnerClass", derived = true)
     public Boolean getIsInnerClass() {
@@ -78,54 +71,54 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "argumentsInParameterizedTypes", opposite = "arguments", derived = true)
-    public Collection<TWithParameterizedTypeUsers> getArgumentsInParameterizedTypes() {
-        if (argumentsInParameterizedTypes == null) {
-            argumentsInParameterizedTypes = new MultivalueSet<TWithParameterizedTypeUsers>() {
+    @FameProperty(name = "concreteEntities", opposite = "concreteParameters", derived = true)
+    public Collection<TParametricEntity> getConcreteEntities() {
+        if (concreteEntities == null) {
+            concreteEntities = new MultivalueSet<TParametricEntity>() {
                 @Override
-                protected void clearOpposite(TWithParameterizedTypeUsers e) {
-                    e.getArguments().remove(Type.this);
+                protected void clearOpposite(TParametricEntity e) {
+                    e.getConcreteParameters().remove(Type.this);
                 }
                 @Override
-                protected void setOpposite(TWithParameterizedTypeUsers e) {
-                    e.getArguments().add(Type.this);
+                protected void setOpposite(TParametricEntity e) {
+                    e.getConcreteParameters().add(Type.this);
                 }
             };
         }
-        return argumentsInParameterizedTypes;
+        return concreteEntities;
     }
     
-    public void setArgumentsInParameterizedTypes(Collection<? extends TWithParameterizedTypeUsers> argumentsInParameterizedTypes) {
-        this.getArgumentsInParameterizedTypes().clear();
-        this.getArgumentsInParameterizedTypes().addAll(argumentsInParameterizedTypes);
+    public void setConcreteEntities(Collection<? extends TParametricEntity> concreteEntities) {
+        this.getConcreteEntities().clear();
+        this.getConcreteEntities().addAll(concreteEntities);
     }
     
-    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers one) {
-        this.getArgumentsInParameterizedTypes().add(one);
+    public void addConcreteEntities(TParametricEntity one) {
+        this.getConcreteEntities().add(one);
     }   
     
-    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers one, TWithParameterizedTypeUsers... many) {
-        this.getArgumentsInParameterizedTypes().add(one);
-        for (TWithParameterizedTypeUsers each : many)
-            this.getArgumentsInParameterizedTypes().add(each);
+    public void addConcreteEntities(TParametricEntity one, TParametricEntity... many) {
+        this.getConcreteEntities().add(one);
+        for (TParametricEntity each : many)
+            this.getConcreteEntities().add(each);
     }   
     
-    public void addArgumentsInParameterizedTypes(Iterable<? extends TWithParameterizedTypeUsers> many) {
-        for (TWithParameterizedTypeUsers each : many)
-            this.getArgumentsInParameterizedTypes().add(each);
+    public void addConcreteEntities(Iterable<? extends TParametricEntity> many) {
+        for (TParametricEntity each : many)
+            this.getConcreteEntities().add(each);
     }   
                 
-    public void addArgumentsInParameterizedTypes(TWithParameterizedTypeUsers[] many) {
-        for (TWithParameterizedTypeUsers each : many)
-            this.getArgumentsInParameterizedTypes().add(each);
+    public void addConcreteEntities(TParametricEntity[] many) {
+        for (TParametricEntity each : many)
+            this.getConcreteEntities().add(each);
     }
     
-    public int numberOfArgumentsInParameterizedTypes() {
-        return getArgumentsInParameterizedTypes().size();
+    public int numberOfConcreteEntities() {
+        return getConcreteEntities().size();
     }
 
-    public boolean hasArgumentsInParameterizedTypes() {
-        return !getArgumentsInParameterizedTypes().isEmpty();
+    public boolean hasConcreteEntities() {
+        return !getConcreteEntities().isEmpty();
     }
 
     @FameProperty(name = "containsReplicas", derived = true)
@@ -152,6 +145,57 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
+    @FameProperty(name = "generics", opposite = "concreteParameter", derived = true)
+    public Collection<TParameterConcretisation> getGenerics() {
+        if (generics == null) {
+            generics = new MultivalueSet<TParameterConcretisation>() {
+                @Override
+                protected void clearOpposite(TParameterConcretisation e) {
+                    e.setConcreteParameter(null);
+                }
+                @Override
+                protected void setOpposite(TParameterConcretisation e) {
+                    e.setConcreteParameter(Type.this);
+                }
+            };
+        }
+        return generics;
+    }
+    
+    public void setGenerics(Collection<? extends TParameterConcretisation> generics) {
+        this.getGenerics().clear();
+        this.getGenerics().addAll(generics);
+    }                    
+    
+        
+    public void addGenerics(TParameterConcretisation one) {
+        this.getGenerics().add(one);
+    }   
+    
+    public void addGenerics(TParameterConcretisation one, TParameterConcretisation... many) {
+        this.getGenerics().add(one);
+        for (TParameterConcretisation each : many)
+            this.getGenerics().add(each);
+    }   
+    
+    public void addGenerics(Iterable<? extends TParameterConcretisation> many) {
+        for (TParameterConcretisation each : many)
+            this.getGenerics().add(each);
+    }   
+                
+    public void addGenerics(TParameterConcretisation[] many) {
+        for (TParameterConcretisation each : many)
+            this.getGenerics().add(each);
+    }
+    
+    public int numberOfGenerics() {
+        return getGenerics().size();
+    }
+
+    public boolean hasGenerics() {
+        return !getGenerics().isEmpty();
+    }
+
     @FameProperty(name = "incomingReferences", opposite = "referredType", derived = true)
     public Collection<TReference> getIncomingReferences() {
         if (incomingReferences == null) {
@@ -218,6 +262,57 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
         this.isStub = isStub;
     }
     
+    @FameProperty(name = "lowerBoundedWildcards", opposite = "lowerBound", derived = true)
+    public Collection<TBounded> getLowerBoundedWildcards() {
+        if (lowerBoundedWildcards == null) {
+            lowerBoundedWildcards = new MultivalueSet<TBounded>() {
+                @Override
+                protected void clearOpposite(TBounded e) {
+                    e.setLowerBound(null);
+                }
+                @Override
+                protected void setOpposite(TBounded e) {
+                    e.setLowerBound(Type.this);
+                }
+            };
+        }
+        return lowerBoundedWildcards;
+    }
+    
+    public void setLowerBoundedWildcards(Collection<? extends TBounded> lowerBoundedWildcards) {
+        this.getLowerBoundedWildcards().clear();
+        this.getLowerBoundedWildcards().addAll(lowerBoundedWildcards);
+    }                    
+    
+        
+    public void addLowerBoundedWildcards(TBounded one) {
+        this.getLowerBoundedWildcards().add(one);
+    }   
+    
+    public void addLowerBoundedWildcards(TBounded one, TBounded... many) {
+        this.getLowerBoundedWildcards().add(one);
+        for (TBounded each : many)
+            this.getLowerBoundedWildcards().add(each);
+    }   
+    
+    public void addLowerBoundedWildcards(Iterable<? extends TBounded> many) {
+        for (TBounded each : many)
+            this.getLowerBoundedWildcards().add(each);
+    }   
+                
+    public void addLowerBoundedWildcards(TBounded[] many) {
+        for (TBounded each : many)
+            this.getLowerBoundedWildcards().add(each);
+    }
+    
+    public int numberOfLowerBoundedWildcards() {
+        return getLowerBoundedWildcards().size();
+    }
+
+    public boolean hasLowerBoundedWildcards() {
+        return !getLowerBoundedWildcards().isEmpty();
+    }
+
     @FameProperty(name = "methods", opposite = "parentType", derived = true)
     public Collection<TMethod> getMethods() {
         if (methods == null) {
@@ -373,57 +468,6 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "typeAliases", opposite = "aliasedType", derived = true)
-    public Collection<TTypeAlias> getTypeAliases() {
-        if (typeAliases == null) {
-            typeAliases = new MultivalueSet<TTypeAlias>() {
-                @Override
-                protected void clearOpposite(TTypeAlias e) {
-                    e.setAliasedType(null);
-                }
-                @Override
-                protected void setOpposite(TTypeAlias e) {
-                    e.setAliasedType(Type.this);
-                }
-            };
-        }
-        return typeAliases;
-    }
-    
-    public void setTypeAliases(Collection<? extends TTypeAlias> typeAliases) {
-        this.getTypeAliases().clear();
-        this.getTypeAliases().addAll(typeAliases);
-    }                    
-    
-        
-    public void addTypeAliases(TTypeAlias one) {
-        this.getTypeAliases().add(one);
-    }   
-    
-    public void addTypeAliases(TTypeAlias one, TTypeAlias... many) {
-        this.getTypeAliases().add(one);
-        for (TTypeAlias each : many)
-            this.getTypeAliases().add(each);
-    }   
-    
-    public void addTypeAliases(Iterable<? extends TTypeAlias> many) {
-        for (TTypeAlias each : many)
-            this.getTypeAliases().add(each);
-    }   
-                
-    public void addTypeAliases(TTypeAlias[] many) {
-        for (TTypeAlias each : many)
-            this.getTypeAliases().add(each);
-    }
-    
-    public int numberOfTypeAliases() {
-        return getTypeAliases().size();
-    }
-
-    public boolean hasTypeAliases() {
-        return !getTypeAliases().isEmpty();
-    }
-
     @FameProperty(name = "typeContainer", opposite = "types", container = true)
     public TWithTypes getTypeContainer() {
         return typeContainer;
@@ -488,6 +532,57 @@ public class Type extends ContainerEntity implements TEntityMetaLevelDependency,
 
     public boolean hasTypedEntities() {
         return !getTypedEntities().isEmpty();
+    }
+
+    @FameProperty(name = "upperBoundedWildcards", opposite = "upperBound", derived = true)
+    public Collection<TBounded> getUpperBoundedWildcards() {
+        if (upperBoundedWildcards == null) {
+            upperBoundedWildcards = new MultivalueSet<TBounded>() {
+                @Override
+                protected void clearOpposite(TBounded e) {
+                    e.setUpperBound(null);
+                }
+                @Override
+                protected void setOpposite(TBounded e) {
+                    e.setUpperBound(Type.this);
+                }
+            };
+        }
+        return upperBoundedWildcards;
+    }
+    
+    public void setUpperBoundedWildcards(Collection<? extends TBounded> upperBoundedWildcards) {
+        this.getUpperBoundedWildcards().clear();
+        this.getUpperBoundedWildcards().addAll(upperBoundedWildcards);
+    }                    
+    
+        
+    public void addUpperBoundedWildcards(TBounded one) {
+        this.getUpperBoundedWildcards().add(one);
+    }   
+    
+    public void addUpperBoundedWildcards(TBounded one, TBounded... many) {
+        this.getUpperBoundedWildcards().add(one);
+        for (TBounded each : many)
+            this.getUpperBoundedWildcards().add(each);
+    }   
+    
+    public void addUpperBoundedWildcards(Iterable<? extends TBounded> many) {
+        for (TBounded each : many)
+            this.getUpperBoundedWildcards().add(each);
+    }   
+                
+    public void addUpperBoundedWildcards(TBounded[] many) {
+        for (TBounded each : many)
+            this.getUpperBoundedWildcards().add(each);
+    }
+    
+    public int numberOfUpperBoundedWildcards() {
+        return getUpperBoundedWildcards().size();
+    }
+
+    public boolean hasUpperBoundedWildcards() {
+        return !getUpperBoundedWildcards().isEmpty();
     }
 
     @FameProperty(name = "weightedMethodCount", derived = true)

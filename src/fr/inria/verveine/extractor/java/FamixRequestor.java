@@ -55,6 +55,7 @@ public class FamixRequestor extends FileASTRequestor {
 		try {
 			ast.accept(new VisitorPackageDef(famixDictionnary, options));
 			ast.accept(new VisitorClassMethodDef(famixDictionnary, options));
+			
 			ast.accept(new VisitorVarsDef(famixDictionnary, options));
 			ast.accept(new VisitorComments(famixDictionnary, options));
 

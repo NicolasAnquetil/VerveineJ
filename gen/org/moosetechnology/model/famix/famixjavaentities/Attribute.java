@@ -6,7 +6,6 @@ import ch.akuhn.fame.FamePackage;
 import ch.akuhn.fame.FameProperty;
 import ch.akuhn.fame.internal.MultivalueSet;
 import java.util.*;
-
 import org.moosetechnology.model.famix.famixreplication.Replica;
 import org.moosetechnology.model.famix.famixtraits.TAccess;
 import org.moosetechnology.model.famix.famixtraits.TAccessible;
@@ -159,12 +158,6 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
         throw new UnsupportedOperationException("Not yet implemented!");  
     }
     
-    @FameProperty(name = "hasClassScope", derived = true)
-    public Boolean getHasClassScope() {
-        // TODO: this is a derived property, implement this method manually.
-        throw new UnsupportedOperationException("Not yet implemented!");  
-    }
-    
     @FameProperty(name = "hasComments", derived = true)
     public Boolean getHasComments() {
         // TODO: this is a derived property, implement this method manually.
@@ -252,9 +245,8 @@ public class Attribute extends NamedEntity implements TAccessible, TAttribute, T
         this.isFinal = isFinal;
     }
     
-
-    @FameProperty(name = "isPackage", derived = true)
-    public Boolean getIsPackage() {
+    @FameProperty(name = "getIsPackageVisibility", derived = true)
+    public Boolean getIsPackageVisibility() {
         return this.visibility.equals("package");
     }
     

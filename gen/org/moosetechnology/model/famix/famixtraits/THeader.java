@@ -10,7 +10,7 @@ import ch.akuhn.fame.FameProperty;
 @FameDescription("THeader")
 public interface THeader extends TFileSystemEntity, TFile {
 
-        @FameProperty(name = "headerOwner", opposite = "header")
+        @FameProperty(name = "headerOwner", opposite = "header", container = true)
     public TWithHeaders getHeaderOwner();
 
     public void setHeaderOwner(TWithHeaders headerOwner);

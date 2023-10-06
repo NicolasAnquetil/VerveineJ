@@ -87,8 +87,8 @@ import org.moosetechnology.model.famix.famixjavaentities.LocalVariable;
 import org.moosetechnology.model.famix.famixjavaentities.Method;
 import org.moosetechnology.model.famix.famixjavaentities.Package;
 import org.moosetechnology.model.famix.famixjavaentities.Parameter;
-import org.moosetechnology.model.famix.famixjavaentities.ParameterizableClass;
-import org.moosetechnology.model.famix.famixjavaentities.ParameterizableInterface;
+import org.moosetechnology.model.famix.famixjavaentities.ParametricClass;
+import org.moosetechnology.model.famix.famixjavaentities.ParametricInterface;
 import org.moosetechnology.model.famix.famixjavaentities.PrimitiveType;
 import org.moosetechnology.model.famix.famixjavaentities.Reference;
 import org.moosetechnology.model.famix.famixtraits.TImplementation;
@@ -139,7 +139,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 				allInterfacesFromClasses(LAN_MODEL_JAVA_CLASSES_USED).size() + 1,  // add IPrinter
 				entitiesOfType(Interface.class).size());
 
-		assertEquals(1, entitiesOfType(ParameterizableInterface.class).size());//IPrinter
+		assertEquals(1, entitiesOfType(ParametricInterface.class).size());//IPrinter
 		assertEquals(3, entitiesOfType(PrimitiveType.class).size());
 		assertEquals(6, entitiesOfType(Method.class).size());
 		assertEquals(0, entitiesOfType(Attribute.class).size());
@@ -148,7 +148,7 @@ public class VerveineJTest_Summarized extends VerveineJTest_Basic {
 		assertEquals(0, entitiesOfType(LocalVariable.class).size());
 		assertEquals(1, entitiesOfType(AnnotationType.class).size());
 		assertEquals(0, entitiesOfType(AnnotationInstance.class).size());    // Override annotations on methods
-		assertEquals(0, entitiesOfType(ParameterizableClass.class).size());
+		assertEquals(0, entitiesOfType(ParametricClass.class).size());
 	}
 
 	@Test
