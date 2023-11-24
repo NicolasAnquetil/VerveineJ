@@ -535,7 +535,9 @@ public class VerveineJOptions {
 
 	protected void collectJavaFiles(File f, Collection<String> files) {
 		for (Pattern filter : excludeMatchers) {
-			if (filter.matcher(f.getName()).matches()) {
+			String absolutePath = f.getAbsolutePath();
+			if (filter.matcher(absolutePath).matches()) {
+				System.out.println("Excluded file: " + absolutePath);
 				return;
 			}
 		}

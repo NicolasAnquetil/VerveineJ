@@ -332,7 +332,7 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
     {
         String[] args = new String[] {
                 "-excludepath", "*Address*",
-                "-excludepath", "*erver*",
+                "-excludepath", "*erver\\\\*",
                 "test_src/LANModel/",
         };
 
