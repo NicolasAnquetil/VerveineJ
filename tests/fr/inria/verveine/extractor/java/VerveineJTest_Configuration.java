@@ -330,9 +330,15 @@ public class VerveineJTest_Configuration extends VerveineJTest_Basic {
     @Test
     public void testExcludepath()
     {
+    	String excludeDir ;
+    	if(isWindows()) {
+    		excludeDir = "*server\\\\*";
+    	}else {
+    		excludeDir = "*server/*";
+    	}
         String[] args = new String[] {
                 "-excludepath", "*Address*",
-                "-excludepath", "*erver\\\\*",
+                "-excludepath", excludeDir,
                 "test_src/LANModel/",
         };
 
